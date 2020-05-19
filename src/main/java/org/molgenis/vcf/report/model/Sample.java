@@ -1,13 +1,15 @@
 package org.molgenis.vcf.report.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
 import lombok.NonNull;
+import lombok.Value;
+import lombok.experimental.NonFinal;
 
-@Data
+@Value
+@NonFinal
 public class Sample {
 
   @JsonProperty("name")
   @NonNull
-  private String name;
+  String name;
 }

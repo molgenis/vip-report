@@ -2,23 +2,25 @@ package org.molgenis.vcf.report.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
-import lombok.Data;
 import lombok.NonNull;
+import lombok.Value;
+import lombok.experimental.NonFinal;
 
-@Data
+@Value
+@NonFinal
 public class Genotype {
 
   @JsonProperty("a")
   @NonNull
-  private List<String> alleles;
+  List<String> alleles;
 
   @JsonProperty("p")
   @NonNull
-  private boolean phased;
+  boolean phased;
 
   @JsonProperty("t")
   @NonNull
-  private Type type;
+  Type type;
 
   public enum Type {
     /** heterozygous */

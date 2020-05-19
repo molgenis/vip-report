@@ -1,5 +1,6 @@
 package org.molgenis.vcf.report.mapper;
 
+import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
@@ -42,36 +43,39 @@ public class HtsJdkToRecordMapper {
             .map(htsjdk.variant.variantcontext.Allele::getDisplayString)
             .collect(toList());
 
-    Record record = new Record(contig, start, referenceAllele, alternateAlleles);
-
+    List<String> ids;
     if (variantContext.hasID()) {
       String id = variantContext.getID();
-      List<String> ids = Arrays.asList(id.split(";", -1));
-      record.setIdentifiers(ids);
+      ids = Arrays.asList(id.split(";", -1));
+    } else {
+      ids = emptyList();
     }
 
-    if (variantContext.hasLog10PError()) {
-      record.setQuality(variantContext.getPhredScaledQual());
-    }
+    Double quality = variantContext.hasLog10PError() ? variantContext.getPhredScaledQual() : null;
+
+    List<String> filters;
     if (variantContext.filtersWereApplied()) {
       Set<String> filterSet = variantContext.getFilters();
-      List<String> filters = new ArrayList<>(filterSet);
+      filters = new ArrayList<>(filterSet);
       Collections.sort(filters);
-      record.setFilterStatus(filters);
+    } else {
+      filters = emptyList();
     }
 
+    List<RecordSample> recordSamples;
     if (!samples.isEmpty()) {
-      List<RecordSample> recordSamples = new ArrayList<>(samples.size());
+      recordSamples = new ArrayList<>(samples.size());
 
       List<@NonNull String> sampleNames = samples.stream().map(Sample::getName).collect(toList());
       for (Genotype genotype : variantContext.getGenotypesOrderedBy(sampleNames)) {
         RecordSample recordSample = htsJdkToRecordSampleMapper.map(genotype);
         recordSamples.add(recordSample);
       }
-
-      record.setRecordSamples(recordSamples);
+    } else {
+      recordSamples = emptyList();
     }
 
-    return record;
+    return new Record(
+        contig, start, ids, referenceAllele, alternateAlleles, quality, filters, recordSamples);
   }
 }

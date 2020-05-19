@@ -2,37 +2,39 @@ package org.molgenis.vcf.report.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
-import lombok.Data;
 import lombok.NonNull;
+import lombok.Value;
+import lombok.experimental.NonFinal;
 
-@Data
+@Value
+@NonFinal
 public class Record {
 
   @JsonProperty("c")
   @NonNull
-  private String chromosome;
+  String chromosome;
 
   @JsonProperty("p")
   @NonNull
-  private int position;
+  int position;
 
   @JsonProperty("i")
-  private List<String> identifiers;
+  List<String> identifiers;
 
   @JsonProperty("r")
   @NonNull
-  private String referenceAllele;
+  String referenceAllele;
 
   @JsonProperty("a")
   @NonNull
-  private List<String> alternateAlleles;
+  List<String> alternateAlleles;
 
   @JsonProperty("q")
-  private Double quality;
+  Double quality;
 
   @JsonProperty("f")
-  private List<String> filterStatus;
+  List<String> filterStatus;
 
   @JsonProperty("s")
-  private List<RecordSample> recordSamples;
+  List<RecordSample> recordSamples;
 }

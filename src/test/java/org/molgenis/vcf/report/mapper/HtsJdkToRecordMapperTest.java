@@ -44,7 +44,16 @@ class HtsJdkToRecordMapperTest {
     when(variantContext.getReference()).thenReturn(Allele.REF_C);
     when(variantContext.getAlternateAlleles()).thenReturn(List.of(Allele.ALT_C, Allele.ALT_T));
 
-    Record record = new Record(contig, position, referenceAllele, altAlleles);
+    Record record =
+        new Record(
+            contig,
+            position,
+            emptyList(),
+            referenceAllele,
+            altAlleles,
+            null,
+            emptyList(),
+            emptyList());
     Assertions.assertEquals(record, htsJdkToRecordMapper.map(variantContext, emptyList()));
   }
 
@@ -76,11 +85,16 @@ class HtsJdkToRecordMapperTest {
     when(variantContext.getGenotypesOrderedBy(List.of("sample0"))).thenReturn(List.of(genotype));
     when(htsJdkToRecordSampleMapper.map(genotype)).thenReturn(recordSample);
 
-    Record record = new Record(contig, position, referenceAllele, altAlleles);
-    record.setIdentifiers(List.of("rs0a", "rs0b"));
-    record.setQuality(quality);
-    record.setFilterStatus(List.of("q10", "s50"));
-    record.setRecordSamples(List.of(recordSample));
+    Record record =
+        new Record(
+            contig,
+            position,
+            List.of("rs0a", "rs0b"),
+            referenceAllele,
+            altAlleles,
+            quality,
+            List.of("q10", "s50"),
+            List.of(recordSample));
 
     Sample sample0 = new Sample("sample0");
     Assertions.assertEquals(record, htsJdkToRecordMapper.map(variantContext, List.of(sample0)));
