@@ -10,8 +10,7 @@ java -jar vcf-report.jar -i <arg> [-o <arg>] [-f] [-t <arg>] [-d]
  -o,--output <arg>     Output report file (.html).
  -f,--force            Override the output file if it already exists.
  -t,--template <arg>   Report template file (.html).
- -d,--debug            Enable debug mode (additional logging and pretty
-                       printed report.
+ -d,--debug            Enable debug mode (additional logging and pretty printed report.
 ```
 ```
 java -jar vcf-report.jar -v
