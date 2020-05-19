@@ -10,8 +10,7 @@ java -jar vcf-report.jar -i <arg> [-o <arg>] [-f] [-t <arg>] [-d]
  -o,--output <arg>     Output report file (.html).
  -f,--force            Override the output file if it already exists.
  -t,--template <arg>   Report template file (.html).
- -d,--debug            Enable debug mode (additional logging and pretty
-                       printed report.
+ -d,--debug            Enable debug mode (additional logging and pretty printed report.
 ```
 ```
 java -jar vcf-report.jar -v
@@ -25,7 +24,7 @@ java -jar vcf-report.jar -i my.vcf.gz -o my-report.html -t my-template.html
 java -jar vcf-report.jar -v
 ```
 ## Template
-The report generator transforms the input data to a JavaScript object (window.api) that is injected into the report template at the end of head tag.
+The report generator transforms the input data to a JavaScript object (window.api) that is injected into the report template at the end of the head tag.
 ### Example
 Consider the following template:
 ```html
