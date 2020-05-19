@@ -25,7 +25,7 @@ java -jar vcf-report.jar -i my.vcf.gz -o my-report.html -t my-template.html
 java -jar vcf-report.jar -v
 ```
 ## Template
-The report generator transforms the input data to a JavaScript object (window.api) that is injected into the report template at the end of head tag.
+The report generator transforms the input data to a JavaScript object (window.api) that is injected into the report template at the end of the head tag.
 ### Example
 Consider the following template:
 ```html
