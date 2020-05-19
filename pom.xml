@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <artifactId>vip-report</artifactId>
+
+  <build>
+    <finalName>vcf-report</finalName>
+
+    <plugins>
+      <plugin>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <groupId>org.springframework.boot</groupId>
+      </plugin>
+    </plugins>
+  </build>
+
+  <dependencies>
+    <dependency>
+      <artifactId>spring-boot-starter</artifactId>
+      <groupId>org.springframework.boot</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>lombok</artifactId>
+      <groupId>org.projectlombok</groupId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <artifactId>commons-cli</artifactId>
+      <groupId>commons-cli</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>jackson-databind</artifactId>
+      <groupId>com.fasterxml.jackson.core</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>htsjdk</artifactId>
+      <groupId>com.github.samtools</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>junit-vintage-engine</artifactId>
+          <groupId>org.junit.vintage</groupId>
+        </exclusion>
+      </exclusions>
+      <groupId>org.springframework.boot</groupId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <groupId>org.junit.jupiter</groupId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <artifactId>mockito-core</artifactId>
+      <groupId>org.mockito</groupId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <artifactId>commons-cli</artifactId>
+        <groupId>commons-cli</groupId>
+        <version>${commons.cli.version}</version>
+      </dependency>
+      <dependency>
+        <artifactId>htsjdk</artifactId>
+        <groupId>com.github.samtools</groupId>
+        <version>${samtools.htsjdk.version}</version>
+      </dependency>
+      <dependency>
+        <artifactId>junit-jupiter-engine</artifactId>
+        <groupId>org.junit.jupiter</groupId>
+        <version>${junit-jupiter.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <description>Report generator for Variant Call Format (VCF) files</description>
+
+  <groupId>org.molgenis</groupId>
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/molgenis/vip-report/issues</url>
+  </issueManagement>
+
+  <licenses>
+    <license>
+      <distribution>repo</distribution>
+      <name>The GNU Lesser General Public License, Version 3.0</name>
+      <url>http://www.gnu.org/licenses/lgpl-3.0.txt</url>
+    </license>
+  </licenses>
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <name>vip-report</name>
+
+  <parent>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <groupId>org.springframework.boot</groupId>
+    <relativePath/>
+    <version>2.3.0.RELEASE</version> <!-- lookup parent from repository -->
+  </parent>
+
+  <properties>
+    <commons.cli.version>1.4</commons.cli.version>
+    <java.version>11</java.version>
+    <samtools.htsjdk.version>2.21.3</samtools.htsjdk.version>
+  </properties>
+
+  <scm>
+    <connection>scm:git:git://github.com/molgenis/vip-report.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/molgenis/vip-report.git</developerConnection>
+    <url>https://github.com/molgenis/vip-report</url>
+  </scm>
+
+  <version>0.0.1-SNAPSHOT</version>
+
+</project>
