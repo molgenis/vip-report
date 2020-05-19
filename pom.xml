@@ -27,9 +27,9 @@
   </licenses>
 
   <scm>
-    <connection>scm:git:git://github.com/molgenis/spring-boot.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/molgenis/spring-boot.git</developerConnection>
-    <url>https://github.com/molgenis/spring-boot</url>
+    <connection>scm:git:git://github.com/molgenis/vip-report.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/molgenis/vip-report.git</developerConnection>
+    <url>https://github.com/molgenis/vip-report</url>
   </scm>
 
   <issueManagement>
