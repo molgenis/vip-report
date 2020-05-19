@@ -34,12 +34,13 @@ public class HtsJdkToSamplesMapper {
         samples.add(null);
       }
 
-      sampleNameToOffsetMap.forEach((sampleName, offset) -> {
-        if (offset < maxNrSamples) {
-          Sample sample = new Sample(sampleName);
-          samples.set(offset, sample);
-        }
-      });
+      sampleNameToOffsetMap.forEach(
+          (sampleName, offset) -> {
+            if (offset < maxNrSamples) {
+              Sample sample = new Sample(sampleName);
+              samples.set(offset, sample);
+            }
+          });
     }
     return new Items<>(samples, total);
   }

@@ -3,8 +3,13 @@ package org.molgenis.vcf.report;
 import static java.util.Objects.requireNonNull;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_DEBUG;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_DEBUG_LONG;
+import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_FORCE;
+import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_FORCE_LONG;
 
 import ch.qos.logback.classic.Level;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import lombok.NonNull;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -32,7 +37,8 @@ public class AppCommandLineRunner implements CommandLineRunner {
   private final ReportService reportService;
   private final CommandLineParser commandLineParser;
 
-  AppCommandLineRunner(@Value("${app.name}") String appName,
+  AppCommandLineRunner(
+      @Value("${app.name}") String appName,
       @Value("${app.version}") String appVersion,
       AppCommandLineToSettingsMapper appCommandLineToSettingsMapper,
       ReportService reportService) {
@@ -46,8 +52,9 @@ public class AppCommandLineRunner implements CommandLineRunner {
 
   @Override
   public void run(String... args) {
-    if (args.length == 1 && (args[0].equals("-" + AppCommandLineOptions.OPT_VERSION) || args[0]
-        .equals("--" + AppCommandLineOptions.OPT_VERSION_LONG))) {
+    if (args.length == 1
+        && (args[0].equals("-" + AppCommandLineOptions.OPT_VERSION)
+            || args[0].equals("--" + AppCommandLineOptions.OPT_VERSION_LONG))) {
       LOGGER.info("{} {}", appName, appVersion);
       return;
     }
@@ -66,9 +73,19 @@ public class AppCommandLineRunner implements CommandLineRunner {
     try {
       Settings settings = createSettings(args);
 
+      @NonNull Path outputReportPath = settings.getOutputReportPath();
+      if (settings.isOverwriteOutputReport()) {
+        Files.deleteIfExists(outputReportPath);
+      } else if (Files.exists(outputReportPath)) {
+        throw new IllegalArgumentException(
+            String.format(
+                "cannot create report '%s' because it already exists, use -%s or --%s to overwrite existing file",
+                outputReportPath, OPT_FORCE, OPT_FORCE_LONG));
+      }
+
       LOGGER.info("creating report for '{}' ...", settings.getInputVcfPath());
       reportService.createReport(settings);
-      LOGGER.info("created report '{}'", settings.getOutputReportPath());
+      LOGGER.info("created report '{}'", outputReportPath);
     } catch (Exception e) {
       LOGGER.error(e.getLocalizedMessage());
       System.exit(STATUS_MISC_ERROR);
@@ -85,7 +102,6 @@ public class AppCommandLineRunner implements CommandLineRunner {
     }
 
     AppCommandLineOptions.validateCommandLine(commandLine);
-
     return appCommandLineToSettingsMapper.map(commandLine, args);
   }
 

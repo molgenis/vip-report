@@ -23,8 +23,8 @@ public class HtsJdkToRecordsMapper {
     this.htsJdkToRecordMapper = requireNonNull(htsJdkToRecordMapper);
   }
 
-  public Items<Record> map(Iterable<VariantContext> variantContexts, int maxNrRecords,
-      List<Sample> samples) {
+  public Items<Record> map(
+      Iterable<VariantContext> variantContexts, int maxNrRecords, List<Sample> samples) {
     List<Record> records = new ArrayList<>(maxNrRecords);
     long nrRecord = 0;
     for (VariantContext variantContext : variantContexts) {

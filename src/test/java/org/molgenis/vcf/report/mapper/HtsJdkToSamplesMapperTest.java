@@ -36,8 +36,8 @@ class HtsJdkToSamplesMapperTest {
     int maxNrSamples = 2;
     List<Sample> samples = List.of(new Sample("sample0"), new Sample("sample1"));
     Items<Sample> expectedSampleItems = new Items<>(samples, 3);
-    Assertions
-        .assertEquals(expectedSampleItems, htsJdkToSamplesMapper.map(vcfHeader, maxNrSamples));
+    Assertions.assertEquals(
+        expectedSampleItems, htsJdkToSamplesMapper.map(vcfHeader, maxNrSamples));
   }
 
   @Test
@@ -47,7 +47,7 @@ class HtsJdkToSamplesMapperTest {
 
     Items<Sample> expectedSampleItems = new Items<>(emptyList(), 0);
     int maxNrSamples = 2;
-    Assertions
-        .assertEquals(expectedSampleItems, htsJdkToSamplesMapper.map(vcfHeader, maxNrSamples));
+    Assertions.assertEquals(
+        expectedSampleItems, htsJdkToSamplesMapper.map(vcfHeader, maxNrSamples));
   }
 }

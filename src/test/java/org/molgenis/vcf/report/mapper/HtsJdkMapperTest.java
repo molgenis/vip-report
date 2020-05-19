@@ -22,10 +22,8 @@ import org.molgenis.vcf.report.model.Sample;
 @ExtendWith(MockitoExtension.class)
 class HtsJdkMapperTest {
 
-  @Mock
-  private HtsJdkToRecordsMapper htsJdkToRecordsMapper;
-  @Mock
-  private HtsJdkToSamplesMapper htsJdkToSamplesMapper;
+  @Mock private HtsJdkToRecordsMapper htsJdkToRecordsMapper;
+  @Mock private HtsJdkToSamplesMapper htsJdkToSamplesMapper;
   private HtsJdkMapper htsJdkMapper;
 
   @BeforeEach

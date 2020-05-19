@@ -26,9 +26,10 @@ public class HtsJdkToRecordSampleMapper {
   }
 
   private Genotype mapGenotype(htsjdk.variant.variantcontext.Genotype genotype) {
-    List<String> alleles = genotype.getAlleles().stream()
-        .map(htsjdk.variant.variantcontext.Allele::getDisplayString).collect(
-            toList());
+    List<String> alleles =
+        genotype.getAlleles().stream()
+            .map(htsjdk.variant.variantcontext.Allele::getDisplayString)
+            .collect(toList());
     boolean phased = genotype.isPhased();
 
     Genotype.Type type = htsJdkGenotypeTypeMapper.map(genotype.getType());

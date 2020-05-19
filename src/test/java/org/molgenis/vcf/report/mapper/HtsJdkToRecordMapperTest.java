@@ -23,8 +23,7 @@ import org.molgenis.vcf.report.model.Sample;
 @ExtendWith(MockitoExtension.class)
 class HtsJdkToRecordMapperTest {
 
-  @Mock
-  private HtsJdkToRecordSampleMapper htsJdkToRecordSampleMapper;
+  @Mock private HtsJdkToRecordSampleMapper htsJdkToRecordSampleMapper;
   private HtsJdkToRecordMapper htsJdkToRecordMapper;
 
   @BeforeEach
@@ -89,7 +88,8 @@ class HtsJdkToRecordMapperTest {
 
   @Test
   void mapMissingContig() {
-    assertThrows(VcfParseException.class,
+    assertThrows(
+        VcfParseException.class,
         () -> htsJdkToRecordMapper.map(mock(VariantContext.class), emptyList()));
   }
 }

@@ -20,8 +20,8 @@ public class AppCommandLineToSettingsMapper {
   private final String appName;
   private final String appVersion;
 
-  AppCommandLineToSettingsMapper(@Value("${app.name}") String appName,
-      @Value("${app.version}") String appVersion) {
+  AppCommandLineToSettingsMapper(
+      @Value("${app.name}") String appName, @Value("${app.version}") String appVersion) {
     this.appName = appName;
     this.appVersion = appVersion;
   }
@@ -50,11 +50,15 @@ public class AppCommandLineToSettingsMapper {
     boolean debugMode = commandLine.hasOption(OPT_DEBUG);
 
     String appArgs = String.join(" ", args);
-    ReportGeneratorSettings reportGeneratorSettings = new ReportGeneratorSettings(appName,
-        appVersion, appArgs, ReportGeneratorSettings.DEFAULT_MAX_NR_SAMPLES,
-        ReportGeneratorSettings.DEFAULT_MAX_NR_RECORDS);
-    ReportWriterSettings reportWriterSettings = new ReportWriterSettings(overwriteOutput,
-        templatePath, debugMode);
-    return new Settings(inputPath, reportGeneratorSettings, outputPath, reportWriterSettings);
+    ReportGeneratorSettings reportGeneratorSettings =
+        new ReportGeneratorSettings(
+            appName,
+            appVersion,
+            appArgs,
+            ReportGeneratorSettings.DEFAULT_MAX_NR_SAMPLES,
+            ReportGeneratorSettings.DEFAULT_MAX_NR_RECORDS);
+    ReportWriterSettings reportWriterSettings = new ReportWriterSettings(templatePath, debugMode);
+    return new Settings(
+        inputPath, reportGeneratorSettings, outputPath, overwriteOutput, reportWriterSettings);
   }
 }

@@ -37,9 +37,10 @@ public class HtsJdkToRecordMapper {
 
     int start = variantContext.getStart();
     String referenceAllele = variantContext.getReference().getDisplayString();
-    List<String> alternateAlleles = variantContext.getAlternateAlleles().stream()
-        .map(htsjdk.variant.variantcontext.Allele::getDisplayString).collect(
-            toList());
+    List<String> alternateAlleles =
+        variantContext.getAlternateAlleles().stream()
+            .map(htsjdk.variant.variantcontext.Allele::getDisplayString)
+            .collect(toList());
 
     Record record = new Record(contig, start, referenceAllele, alternateAlleles);
 

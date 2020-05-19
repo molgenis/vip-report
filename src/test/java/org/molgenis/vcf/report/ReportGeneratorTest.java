@@ -27,8 +27,7 @@ import org.molgenis.vcf.report.model.Sample;
 @ExtendWith(MockitoExtension.class)
 class ReportGeneratorTest {
 
-  @Mock
-  private HtsJdkMapper htsJdkMapper;
+  @Mock private HtsJdkMapper htsJdkMapper;
   private ReportGenerator reportGenerator;
 
   @BeforeEach
@@ -51,10 +50,12 @@ class ReportGeneratorTest {
     String appName = "MyApp";
     String appVersion = "MyVersion";
     String appArgs = "MyArgs";
-    ReportGeneratorSettings reportGeneratorSettings = new ReportGeneratorSettings(appName,
-        appVersion, appArgs, maxNrSamples, maxNrRecords);
-    Report report = new Report(new ReportMetadata(appName, appVersion, appArgs),
-        new ReportData(sampleItems, recordItems));
+    ReportGeneratorSettings reportGeneratorSettings =
+        new ReportGeneratorSettings(appName, appVersion, appArgs, maxNrSamples, maxNrRecords);
+    Report report =
+        new Report(
+            new ReportMetadata(appName, appVersion, appArgs),
+            new ReportData(sampleItems, recordItems));
     assertEquals(report, reportGenerator.generateReport(inputVcfPath, reportGeneratorSettings));
   }
 }

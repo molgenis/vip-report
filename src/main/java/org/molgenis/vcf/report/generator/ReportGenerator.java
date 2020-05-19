@@ -36,26 +36,29 @@ public class ReportGenerator {
     return new VCFFileReader(vcfPath, false);
   }
 
-  private Report createReport(VCFFileReader vcfFileReader,
-      ReportGeneratorSettings reportGeneratorSettings) {
+  private Report createReport(
+      VCFFileReader vcfFileReader, ReportGeneratorSettings reportGeneratorSettings) {
     Items<Sample> samples = createSamples(vcfFileReader, reportGeneratorSettings);
-    Items<Record> records = createRecords(vcfFileReader, reportGeneratorSettings,
-        samples.getItems());
-    ReportMetadata reportMetadata = new ReportMetadata(reportGeneratorSettings.getAppName(),
-        reportGeneratorSettings.getAppVersion(), reportGeneratorSettings.getAppArguments());
+    Items<Record> records =
+        createRecords(vcfFileReader, reportGeneratorSettings, samples.getItems());
+    ReportMetadata reportMetadata =
+        new ReportMetadata(
+            reportGeneratorSettings.getAppName(),
+            reportGeneratorSettings.getAppVersion(),
+            reportGeneratorSettings.getAppArguments());
     ReportData reportData = new ReportData(samples, records);
     return new Report(reportMetadata, reportData);
   }
 
-
-  private Items<Sample> createSamples(VCFFileReader vcfFileReader,
-      ReportGeneratorSettings settings) {
+  private Items<Sample> createSamples(
+      VCFFileReader vcfFileReader, ReportGeneratorSettings settings) {
     VCFHeader fileHeader = vcfFileReader.getFileHeader();
     int maxNrSamples = settings.getMaxNrSamples();
     return htsJdkMapper.mapSamples(fileHeader, maxNrSamples);
   }
 
-  private Items<Record> createRecords(VCFFileReader vcfFileReader,
+  private Items<Record> createRecords(
+      VCFFileReader vcfFileReader,
       ReportGeneratorSettings reportGeneratorSettings,
       List<Sample> samples) {
     int maxNrRecords = reportGeneratorSettings.getMaxNrRecords();

@@ -19,12 +19,12 @@ class HtsJdkToGenotypeTypeMapperTest {
   private HtsJdkToGenotypeTypeMapper htsJdkToGenotypeTypeMapper;
 
   private static Stream<Arguments> map() {
-    return Stream.of(Arguments
-        .of(GenotypeType.NO_CALL, Type.NO_CALL), Arguments
-        .of(GenotypeType.HOM_REF, Type.HOMOZYGOUS_REF), Arguments
-        .of(GenotypeType.HET, Type.HETEROZYGOUS), Arguments
-        .of(GenotypeType.HOM_VAR, Type.HOMOZYGOUS_ALT), Arguments
-        .of(GenotypeType.MIXED, Type.PARTIAL_CALL));
+    return Stream.of(
+        Arguments.of(GenotypeType.NO_CALL, Type.NO_CALL),
+        Arguments.of(GenotypeType.HOM_REF, Type.HOMOZYGOUS_REF),
+        Arguments.of(GenotypeType.HET, Type.HETEROZYGOUS),
+        Arguments.of(GenotypeType.HOM_VAR, Type.HOMOZYGOUS_ALT),
+        Arguments.of(GenotypeType.MIXED, Type.PARTIAL_CALL));
   }
 
   @BeforeEach
@@ -40,7 +40,8 @@ class HtsJdkToGenotypeTypeMapperTest {
 
   @Test
   void mapUnexpectedEnumException() {
-    assertThrows(UnexpectedEnumException.class,
+    assertThrows(
+        UnexpectedEnumException.class,
         () -> htsJdkToGenotypeTypeMapper.map(GenotypeType.UNAVAILABLE));
   }
 }

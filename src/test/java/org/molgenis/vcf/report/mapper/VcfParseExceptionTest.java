@@ -8,7 +8,7 @@ class VcfParseExceptionTest {
 
   @Test
   void getMessage() {
-    assertEquals("error parsing vcf file: MyMessage",
-        new VcfParseException("MyMessage").getMessage());
+    assertEquals(
+        "error parsing vcf file: MyMessage", new VcfParseException("MyMessage").getMessage());
   }
 }

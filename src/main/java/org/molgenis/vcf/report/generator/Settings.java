@@ -10,5 +10,6 @@ public class Settings {
   @NonNull Path inputVcfPath;
   @NonNull ReportGeneratorSettings reportGeneratorSettings;
   @NonNull Path outputReportPath;
+  boolean overwriteOutputReport;
   @NonNull ReportWriterSettings reportWriterSettings;
 }

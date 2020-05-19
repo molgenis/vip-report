@@ -19,8 +19,7 @@ import org.molgenis.vcf.report.model.RecordSample;
 @ExtendWith(MockitoExtension.class)
 class HtsJdkToRecordSampleMapperTest {
 
-  @Mock
-  private HtsJdkToGenotypeTypeMapper htsJdkGenotypeTypeMapper;
+  @Mock private HtsJdkToGenotypeTypeMapper htsJdkGenotypeTypeMapper;
   private HtsJdkToRecordSampleMapper htsJdkToRecordSampleMapper;
 
   @BeforeEach
@@ -30,8 +29,8 @@ class HtsJdkToRecordSampleMapperTest {
 
   @Test
   void map() {
-    htsjdk.variant.variantcontext.Genotype htsJdkGenotype = mock(
-        htsjdk.variant.variantcontext.Genotype.class);
+    htsjdk.variant.variantcontext.Genotype htsJdkGenotype =
+        mock(htsjdk.variant.variantcontext.Genotype.class);
 
     GenotypeType htsGenotypeType = GenotypeType.HET;
     when(htsJdkGenotype.getType()).thenReturn(htsGenotypeType);

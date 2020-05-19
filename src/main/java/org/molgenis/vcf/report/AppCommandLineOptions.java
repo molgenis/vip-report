@@ -60,13 +60,15 @@ class AppCommandLineOptions {
 
     Options appVersionOptions = new Options();
     appVersionOptions.addOption(
-        Option.builder(OPT_VERSION).required().longOpt(OPT_VERSION_LONG).desc("Print version.")
+        Option.builder(OPT_VERSION)
+            .required()
+            .longOpt(OPT_VERSION_LONG)
+            .desc("Print version.")
             .build());
     APP_VERSION_OPTIONS = appVersionOptions;
   }
 
-  private AppCommandLineOptions() {
-  }
+  private AppCommandLineOptions() {}
 
   static Options getAppOptions() {
     return APP_OPTIONS;

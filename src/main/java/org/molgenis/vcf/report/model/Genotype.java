@@ -11,37 +11,29 @@ public class Genotype {
   @JsonProperty("a")
   @NonNull
   private List<String> alleles;
+
   @JsonProperty("p")
   @NonNull
   private boolean phased;
+
   @JsonProperty("t")
   @NonNull
   private Type type;
 
   public enum Type {
-    /**
-     * heterozygous
-     */
+    /** heterozygous */
     @JsonProperty("het")
     HETEROZYGOUS,
-    /**
-     * homozygous (all alleles are non-reference)
-     */
+    /** homozygous (all alleles are non-reference) */
     @JsonProperty("hom_a")
     HOMOZYGOUS_ALT,
-    /**
-     * homozygous (all alleles are reference)
-     */
+    /** homozygous (all alleles are reference) */
     @JsonProperty("hom_r")
     HOMOZYGOUS_REF,
-    /**
-     * no calls were made at all loci,
-     */
+    /** no calls were made at all loci, */
     @JsonProperty("miss")
     NO_CALL,
-    /**
-     * no calls were made at some loci,
-     */
+    /** no calls were made at some loci, */
     @JsonProperty("part")
     PARTIAL_CALL
   }

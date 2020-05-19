@@ -26,13 +26,10 @@ import org.molgenis.vcf.report.model.ReportMetadata;
 @ExtendWith(MockitoExtension.class)
 class ReportServiceTest {
 
-  @TempDir
-  static Path sharedTempDir;
+  @TempDir static Path sharedTempDir;
 
-  @Mock
-  private ReportGenerator reportGenerator;
-  @Mock
-  private ReportWriter reportWriter;
+  @Mock private ReportGenerator reportGenerator;
+  @Mock private ReportWriter reportWriter;
   private ReportService reportService;
 
   @BeforeEach
@@ -47,16 +44,21 @@ class ReportServiceTest {
     String appArguments = "MyArguments";
     Path inputVcfPath = Paths.get("src", "test", "resources", "example.vcf");
     Path outputReportPath = sharedTempDir.resolve("example.vcf.html");
-    Report report = new Report(new ReportMetadata(appName, appVersion, appArguments),
-        new ReportData(new Items<>(
-            emptyList(), 0), new Items<>(
-            emptyList(), 0)));
-    ReportGeneratorSettings reportGeneratorSettings = new ReportGeneratorSettings(appName,
-        appVersion, appArguments, ReportGeneratorSettings.DEFAULT_MAX_NR_SAMPLES,
-        ReportGeneratorSettings.DEFAULT_MAX_NR_RECORDS);
-    ReportWriterSettings reportWriterSettings = new ReportWriterSettings(true, null, true);
-    Settings settings = new Settings(inputVcfPath, reportGeneratorSettings, outputReportPath,
-        reportWriterSettings);
+    Report report =
+        new Report(
+            new ReportMetadata(appName, appVersion, appArguments),
+            new ReportData(new Items<>(emptyList(), 0), new Items<>(emptyList(), 0)));
+    ReportGeneratorSettings reportGeneratorSettings =
+        new ReportGeneratorSettings(
+            appName,
+            appVersion,
+            appArguments,
+            ReportGeneratorSettings.DEFAULT_MAX_NR_SAMPLES,
+            ReportGeneratorSettings.DEFAULT_MAX_NR_RECORDS);
+    ReportWriterSettings reportWriterSettings = new ReportWriterSettings(null, true);
+    Settings settings =
+        new Settings(
+            inputVcfPath, reportGeneratorSettings, outputReportPath, true, reportWriterSettings);
     when(reportGenerator.generateReport(inputVcfPath, reportGeneratorSettings)).thenReturn(report);
 
     reportService.createReport(settings);

@@ -12,8 +12,7 @@ import org.springframework.util.ResourceUtils;
 
 class AppIT {
 
-  @TempDir
-  Path sharedTempDir;
+  @TempDir Path sharedTempDir;
 
   @Test
   void test() throws IOException {
@@ -21,17 +20,17 @@ class AppIT {
     String outputFile = sharedTempDir.resolve("example.vcf.html").toString();
     String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
-    String[] args = {"-i", inputFile, "-o", outputFile, "-t",
-        templateFile};
+    String[] args = {"-i", inputFile, "-o", outputFile, "-t", templateFile};
     SpringApplication.run(App.class, args);
 
     String report = Files.readString(Path.of(outputFile));
 
     Path expectedReportPath = ResourceUtils.getFile("classpath:example.vcf.html").toPath();
-    String expectedReport = Files.readString(expectedReportPath)
-        .replace("{{ inputPath }}", inputFile.replace("\\", "\\\\"))
-        .replace("{{ outputPath }}", outputFile.replace("\\", "\\\\"))
-        .replace("{{ templatePath }}", templateFile.replace("\\", "\\\\"));
+    String expectedReport =
+        Files.readString(expectedReportPath)
+            .replace("{{ inputPath }}", inputFile.replace("\\", "\\\\"))
+            .replace("{{ outputPath }}", outputFile.replace("\\", "\\\\"))
+            .replace("{{ templatePath }}", templateFile.replace("\\", "\\\\"));
 
     assertEquals(expectedReport, report);
   }

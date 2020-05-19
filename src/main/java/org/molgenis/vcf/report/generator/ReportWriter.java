@@ -31,10 +31,6 @@ public class ReportWriter {
   private void writeCheckedException(
       Report report, Path outputFile, ReportWriterSettings reportWriterSettings)
       throws IOException {
-    if (reportWriterSettings.isOverwriteOutputReport()) {
-      Files.deleteIfExists(outputFile);
-    }
-
     String templateHtml;
     Path templatePath = reportWriterSettings.getTemplatePath();
     if (templatePath != null) {
@@ -47,6 +43,7 @@ public class ReportWriter {
         templateHtml = new String(inputStream.readAllBytes(), UTF_8);
       }
     }
+
     String scriptTag = createScriptTag(report, reportWriterSettings.isPrettyPrint());
     String reportHtml = templateHtml.replace("</head>", scriptTag + "</head>");
 

@@ -16,14 +16,14 @@ public class HtsJdkMapper {
   private final HtsJdkToRecordsMapper htsJdkToRecordsMapper;
   private final HtsJdkToSamplesMapper htsJdkToSamplesMapper;
 
-  public HtsJdkMapper(HtsJdkToRecordsMapper htsJdkToRecordsMapper,
-      HtsJdkToSamplesMapper htsJdkToSamplesMapper) {
+  public HtsJdkMapper(
+      HtsJdkToRecordsMapper htsJdkToRecordsMapper, HtsJdkToSamplesMapper htsJdkToSamplesMapper) {
     this.htsJdkToRecordsMapper = requireNonNull(htsJdkToRecordsMapper);
     this.htsJdkToSamplesMapper = requireNonNull(htsJdkToSamplesMapper);
   }
 
-  public Items<Record> mapRecords(Iterable<VariantContext> variantContexts, int maxRecords,
-      List<Sample> samples) {
+  public Items<Record> mapRecords(
+      Iterable<VariantContext> variantContexts, int maxRecords, List<Sample> samples) {
     return htsJdkToRecordsMapper.map(variantContexts, maxRecords, samples);
   }
 

@@ -18,8 +18,7 @@ import org.molgenis.vcf.report.model.Record;
 @ExtendWith(MockitoExtension.class)
 class HtsJdkToRecordsMapperTest {
 
-  @Mock
-  private HtsJdkToRecordMapper htsJdkToRecordMapper;
+  @Mock private HtsJdkToRecordMapper htsJdkToRecordMapper;
   private HtsJdkToRecordsMapper htsJdkToRecordsMapper;
 
   @BeforeEach
@@ -31,8 +30,8 @@ class HtsJdkToRecordsMapperTest {
   void map() {
     VariantContext variantContext0 = mock(VariantContext.class);
     VariantContext variantContext1 = mock(VariantContext.class);
-    Iterable<VariantContext> variantContexts = List
-        .of(variantContext0, variantContext1, mock(VariantContext.class));
+    Iterable<VariantContext> variantContexts =
+        List.of(variantContext0, variantContext1, mock(VariantContext.class));
 
     int maxNrRecords = 2;
     Record record0 = mock(Record.class);
@@ -41,7 +40,7 @@ class HtsJdkToRecordsMapperTest {
     Items<Record> expectedRecordItems = new Items<>(records, 3);
     doReturn(record0).when(htsJdkToRecordMapper).map(variantContext0, emptyList());
     doReturn(record1).when(htsJdkToRecordMapper).map(variantContext1, emptyList());
-    assertEquals(expectedRecordItems,
-        htsJdkToRecordsMapper.map(variantContexts, maxNrRecords, emptyList()));
+    assertEquals(
+        expectedRecordItems, htsJdkToRecordsMapper.map(variantContexts, maxNrRecords, emptyList()));
   }
 }
