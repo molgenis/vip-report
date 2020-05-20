@@ -17,8 +17,7 @@ deploy:
   token:
     secure: NNLoW1AQGSl3boZ7m+4anjLUUN13gXVI8M7gI4FhHRPyX9bf6zW9MZQfFUl65qJNEJucBHvtxSFyS4KnCk68P9ne1hSQrJtlOCGo8L8Yzi+Ruu+s9a+IxCJUdd4V/RUx4b9+8zxe/XGEv6UZaVBjL8LGb8eif659ONzmQL63Odtp9F8V+WBGMP2otRSQBEF6p9LgA0jMbavkd8L6nkZ28Y8bKQS0fjxlp9AYrUrz/mIDkDJscaAL6mVrZimloO1M4xDQde3ctwC9FzBlv+SjcImrUKSWyrirOL+igCAimxURyU6AGvLrXJY8eolVaEG8r9HbbMtHj6CmgVFYgU3z44nH3IyxQcfil2073RBnapyzmKUXEguLilO5jQbJUX+LSpHzKzpOk3ntimM2eiEOayO7yJzXz14xUEgVkX51G713L+EnhjasVwNsxSAbnJvDiJbOEMeXb5It6TYPl0+HmaPTWuOcrn80z4Fxw1j4qyQ3ZHkW+q6ncE/fWoO9o9QzQgOrG5fWB9xUi2AK1fn0d6EXBit28swBDs9//wrihHasjYSg/ye+GVdw8AS9Ti+ahDaK/EtcHFICfbPd73BxS/sOMVkN4scUaNHzbvpjXIEvKX2ax1dA72Er/89bC3bHuLq+LG0pY4Cu0Ss8bF1Td3vDM7//q4m4VYIJX33YVLE=
   file: target/vcf-report.jar
-  draft: true
-  overwrite: true
+  prerelease: true
   on:
     tags: true
   edge: true # opt in to dpl v2
