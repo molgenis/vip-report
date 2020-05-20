@@ -21,3 +21,4 @@ deploy:
   overwrite: true
   on:
     tags: true
+  edge: true # opt in to dpl v2
