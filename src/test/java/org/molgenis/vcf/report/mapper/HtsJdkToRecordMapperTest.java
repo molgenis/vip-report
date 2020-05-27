@@ -102,8 +102,8 @@ class HtsJdkToRecordMapperTest {
 
   @Test
   void mapMissingContig() {
-    assertThrows(
-        VcfParseException.class,
-        () -> htsJdkToRecordMapper.map(mock(VariantContext.class), emptyList()));
+    VariantContext variantContext = mock(VariantContext.class);
+    List<Sample> samples = emptyList();
+    assertThrows(VcfParseException.class, () -> htsJdkToRecordMapper.map(variantContext, samples));
   }
 }
