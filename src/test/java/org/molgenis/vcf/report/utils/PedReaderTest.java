@@ -43,7 +43,8 @@ class PedReaderTest {
     String ped = "FAM001  1  2 3  0  HP:0011675\n";
 
     try (PedReader pedReader = new PedReader(new StringReader(ped))) {
-      assertThrows(UnsupportedPedException.class, () -> pedReader.iterator().next());
+      Iterator<PedIndividual> iterator = pedReader.iterator();
+      assertThrows(UnsupportedPedException.class, iterator::next);
     }
   }
 
@@ -52,7 +53,8 @@ class PedReaderTest {
     String ped = "FAM001  1  0 0  1  2  A A  G G  A C\n";
 
     try (PedReader pedReader = new PedReader(new StringReader(ped))) {
-      assertThrows(UnsupportedPedException.class, () -> pedReader.iterator().next());
+      Iterator<PedIndividual> iterator = pedReader.iterator();
+      assertThrows(UnsupportedPedException.class, iterator::next);
     }
   }
 
@@ -61,13 +63,9 @@ class PedReaderTest {
     String ped = "FAM001  1  2 3  0  2\n";
 
     try (PedReader pedReader = new PedReader(new StringReader(ped))) {
-      assertThrows(
-          NoSuchElementException.class,
-          () -> {
-            Iterator<PedIndividual> iterator = pedReader.iterator();
-            iterator.next();
-            iterator.next();
-          });
+      Iterator<PedIndividual> iterator = pedReader.iterator();
+      iterator.next();
+      assertThrows(NoSuchElementException.class, iterator::next);
     }
   }
 
@@ -76,7 +74,8 @@ class PedReaderTest {
     String ped = "invalid ped data";
 
     try (PedReader pedReader = new PedReader(new StringReader(ped))) {
-      assertThrows(InvalidPedException.class, () -> pedReader.iterator().next());
+      Iterator<PedIndividual> iterator = pedReader.iterator();
+      assertThrows(InvalidPedException.class, iterator::next);
     }
   }
 }
