@@ -39,7 +39,7 @@ public class ReportWriter {
     } else {
       LOGGER.info("creating report using default template");
       try (InputStream inputStream =
-          new ClassPathResource("template-default.html").getInputStream()) {
+          new ClassPathResource("vip-report-template.html").getInputStream()) {
         templateHtml = new String(inputStream.readAllBytes(), UTF_8);
       }
     }
