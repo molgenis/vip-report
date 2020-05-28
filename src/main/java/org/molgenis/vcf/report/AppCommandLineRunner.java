@@ -60,7 +60,7 @@ public class AppCommandLineRunner implements CommandLineRunner {
     }
 
     for (String arg : args) {
-      if (arg.equals(OPT_DEBUG) || arg.equals(OPT_DEBUG_LONG)) {
+      if (arg.equals('-' + OPT_DEBUG) || arg.equals('-' + OPT_DEBUG_LONG)) {
         Logger rootLogger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
         if (!(rootLogger instanceof ch.qos.logback.classic.Logger)) {
           throw new ClassCastException("Expected root logger to be a logback logger");
