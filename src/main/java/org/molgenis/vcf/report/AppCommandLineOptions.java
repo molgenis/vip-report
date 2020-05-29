@@ -16,6 +16,10 @@ class AppCommandLineOptions {
   static final String OPT_OUTPUT_LONG = "output";
   static final String OPT_TEMPLATE = "t";
   static final String OPT_TEMPLATE_LONG = "template";
+  static final String OPT_PED = "pd";
+  static final String OPT_PED_LONG = "pedigree";
+  static final String OPT_PHENOTYPES = "ph";
+  static final String OPT_PHENOTYPES_LONG = "phenotypes";
   static final String OPT_FORCE = "f";
   static final String OPT_FORCE_LONG = "force";
   static final String OPT_DEBUG = "d";
@@ -52,6 +56,18 @@ class AppCommandLineOptions {
             .desc("Report template file (.html).")
             .build());
     appOptions.addOption(
+        Option.builder(OPT_PED)
+            .hasArg(true)
+            .longOpt(OPT_PED_LONG)
+            .desc("Pedigree file (.ped) .")
+            .build());
+    appOptions.addOption(
+        Option.builder(OPT_PHENOTYPES)
+            .hasArg(true)
+            .longOpt(OPT_PHENOTYPES_LONG)
+            .desc("Phenotypes for the samples in the VCF file.")
+            .build());
+    appOptions.addOption(
         Option.builder(OPT_DEBUG)
             .longOpt(OPT_DEBUG_LONG)
             .desc("Enable debug mode (additional logging and pretty printed report.")
@@ -82,6 +98,7 @@ class AppCommandLineOptions {
     validateInput(commandLine);
     validateOutput(commandLine);
     validateTemplate(commandLine);
+    validatePed(commandLine);
   }
 
   private static void validateInput(CommandLine commandLine) {
@@ -146,6 +163,30 @@ class AppCommandLineOptions {
     if (!templatePathStr.endsWith(".html")) {
       throw new IllegalArgumentException(
           format("Template file '%s' is not a .html file.", templatePathStr));
+    }
+  }
+
+  private static void validatePed(CommandLine commandLine) {
+    if (!commandLine.hasOption(OPT_PED)) {
+      return;
+    }
+    Path templatePath = Path.of(commandLine.getOptionValue(OPT_PED));
+    if (!Files.exists(templatePath)) {
+      throw new IllegalArgumentException(
+          format("Ped file '%s' does not exist.", templatePath.toString()));
+    }
+    if (Files.isDirectory(templatePath)) {
+      throw new IllegalArgumentException(
+          format("Ped file '%s' is a directory.", templatePath.toString()));
+    }
+    if (!Files.isReadable(templatePath)) {
+      throw new IllegalArgumentException(
+          format("Ped file '%s' is not readable.", templatePath.toString()));
+    }
+    String templatePathStr = templatePath.toString();
+    if (!templatePathStr.endsWith(".ped")) {
+      throw new IllegalArgumentException(
+          format("Ped file '%s' is not a .ped file.", templatePathStr));
     }
   }
 }

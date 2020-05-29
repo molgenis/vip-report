@@ -22,7 +22,8 @@ import org.molgenis.vcf.report.model.Record;
 import org.molgenis.vcf.report.model.Report;
 import org.molgenis.vcf.report.model.ReportData;
 import org.molgenis.vcf.report.model.ReportMetadata;
-import org.molgenis.vcf.report.model.Sample;
+import org.phenopackets.schema.v1.Phenopacket;
+import org.phenopackets.schema.v1.core.Pedigree.Person;
 
 @ExtendWith(MockitoExtension.class)
 class ReportGeneratorTest {
@@ -40,13 +41,18 @@ class ReportGeneratorTest {
     int maxNrSamples = 10;
     int maxNrRecords = 100;
 
-    Items<Sample> sampleItems = new Items<>(emptyList(), 3);
+    Items<Person> sampleItems = new Items<>(emptyList(), 3);
     when(htsJdkMapper.mapSamples(any(VCFHeader.class), eq(maxNrSamples))).thenReturn(sampleItems);
 
     Items<Record> recordItems = new Items<>(emptyList(), 5);
     when(htsJdkMapper.mapRecords(any(), eq(maxNrRecords), eq(emptyList()))).thenReturn(recordItems);
 
+    Items<Phenopacket> phenopacketItems = new Items<>(emptyList(), 5);
+    //FIXME
+
     Path inputVcfPath = Paths.get("src", "test", "resources", "example.vcf");
+    Path pedPath = Paths.get("src", "test", "resources", "example.ped");
+    String phenotypes = "hpo:123456";
     String appName = "MyApp";
     String appVersion = "MyVersion";
     String appArgs = "MyArgs";
@@ -55,7 +61,7 @@ class ReportGeneratorTest {
     Report report =
         new Report(
             new ReportMetadata(appName, appVersion, appArgs),
-            new ReportData(sampleItems, recordItems));
-    assertEquals(report, reportGenerator.generateReport(inputVcfPath, reportGeneratorSettings));
+            new ReportData(sampleItems, phenopacketItems, recordItems));
+    assertEquals(report, reportGenerator.generateReport(inputVcfPath, pedPath, phenotypes, reportGeneratorSettings));
   }
 }

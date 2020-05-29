@@ -11,15 +11,15 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.molgenis.vcf.report.model.Items;
-import org.molgenis.vcf.report.model.Sample;
+import org.phenopackets.schema.v1.core.Pedigree.Person;
 
 class HtsJdkToSamplesMapperTest {
 
-  private HtsJdkToSamplesMapper htsJdkToSamplesMapper;
+  private HtsJdkToPersonsMapper htsJdkToPersonsMapper;
 
   @BeforeEach
   void setUpBeforeEach() {
-    htsJdkToSamplesMapper = new HtsJdkToSamplesMapper();
+    htsJdkToPersonsMapper = new HtsJdkToPersonsMapper();
   }
 
   @Test
@@ -34,10 +34,10 @@ class HtsJdkToSamplesMapperTest {
     when(vcfHeader.getSampleNameToOffset()).thenReturn(sampleNameToOffsetMap);
 
     int maxNrSamples = 2;
-    List<Sample> samples = List.of(new Sample("sample0"), new Sample("sample1"));
-    Items<Sample> expectedSampleItems = new Items<>(samples, 3);
+    List<Person> samples = List.of(Person.newBuilder().setIndividualId("sample0").build(), Person.newBuilder().setIndividualId("sample1").build());
+    Items<Person> expectedSampleItems = new Items<>(samples, 3);
     Assertions.assertEquals(
-        expectedSampleItems, htsJdkToSamplesMapper.map(vcfHeader, maxNrSamples));
+        expectedSampleItems, htsJdkToPersonsMapper.map(vcfHeader, maxNrSamples));
   }
 
   @Test
@@ -45,9 +45,9 @@ class HtsJdkToSamplesMapperTest {
     VCFHeader vcfHeader = mock(VCFHeader.class);
     when(vcfHeader.hasGenotypingData()).thenReturn(false);
 
-    Items<Sample> expectedSampleItems = new Items<>(emptyList(), 0);
+    Items<Person> expectedSampleItems = new Items<>(emptyList(), 0);
     int maxNrSamples = 2;
     Assertions.assertEquals(
-        expectedSampleItems, htsJdkToSamplesMapper.map(vcfHeader, maxNrSamples));
+        expectedSampleItems, htsJdkToPersonsMapper.map(vcfHeader, maxNrSamples));
   }
 }

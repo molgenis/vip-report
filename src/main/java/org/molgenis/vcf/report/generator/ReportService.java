@@ -19,8 +19,9 @@ public class ReportService {
 
   public void createReport(Settings settings) {
     Path inputVcfPath = settings.getInputVcfPath();
+    SampleSettings sampleSettings = settings.getSampleSettings();
     Report report =
-        reportGenerator.generateReport(inputVcfPath, settings.getReportGeneratorSettings());
+        reportGenerator.generateReport(inputVcfPath, sampleSettings.getPedigreePath(), sampleSettings.getPhenotypeString(), settings.getReportGeneratorSettings());
 
     Path outputReportPath = settings.getOutputReportPath();
     reportWriter.write(report, outputReportPath, settings.getReportWriterSettings());

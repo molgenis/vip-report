@@ -17,6 +17,7 @@ import org.molgenis.vcf.report.generator.ReportGeneratorSettings;
 import org.molgenis.vcf.report.generator.ReportService;
 import org.molgenis.vcf.report.generator.ReportWriter;
 import org.molgenis.vcf.report.generator.ReportWriterSettings;
+import org.molgenis.vcf.report.generator.SampleSettings;
 import org.molgenis.vcf.report.generator.Settings;
 import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.report.model.Report;
@@ -47,7 +48,7 @@ class ReportServiceTest {
     Report report =
         new Report(
             new ReportMetadata(appName, appVersion, appArguments),
-            new ReportData(new Items<>(emptyList(), 0), new Items<>(emptyList(), 0)));
+            new ReportData(new Items<>(emptyList(), 0), new Items<>(emptyList(), 0), new Items<>(emptyList(), 0)));
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
             appName,
@@ -56,10 +57,11 @@ class ReportServiceTest {
             ReportGeneratorSettings.DEFAULT_MAX_NR_SAMPLES,
             ReportGeneratorSettings.DEFAULT_MAX_NR_RECORDS);
     ReportWriterSettings reportWriterSettings = new ReportWriterSettings(null, true);
+    SampleSettings sampleSettings = new SampleSettings(null,null);
     Settings settings =
         new Settings(
-            inputVcfPath, reportGeneratorSettings, outputReportPath, true, reportWriterSettings);
-    when(reportGenerator.generateReport(inputVcfPath, reportGeneratorSettings)).thenReturn(report);
+            inputVcfPath, reportGeneratorSettings, outputReportPath, true, reportWriterSettings, sampleSettings);
+    when(reportGenerator.generateReport(inputVcfPath, sampleSettings.getPedigreePath(), sampleSettings.getPhenotypeString(), reportGeneratorSettings)).thenReturn(report);
 
     reportService.createReport(settings);
 

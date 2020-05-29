@@ -43,6 +43,8 @@
     <samtools.htsjdk.version>2.21.3</samtools.htsjdk.version>
     <download-maven-plugin.version>1.6.0</download-maven-plugin.version>
     <vip.report.template.version>0.0.1</vip.report.template.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <phenopackets.version>1.0.0</phenopackets.version>
   </properties>
 
   <dependencyManagement>
@@ -86,6 +88,11 @@
     <dependency>
       <groupId>com.github.samtools</groupId>
       <artifactId>htsjdk</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.phenopackets</groupId>
+      <artifactId>phenopacket-schema</artifactId>
+      <version>${phenopackets.version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>

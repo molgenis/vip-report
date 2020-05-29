@@ -87,8 +87,9 @@ public class AppCommandLineRunner implements CommandLineRunner {
       reportService.createReport(settings);
       LOGGER.info("created report '{}'", outputReportPath);
     } catch (Exception e) {
-      LOGGER.error(e.getLocalizedMessage());
-      System.exit(STATUS_MISC_ERROR);
+      throw new RuntimeException(e);
+      //LOGGER.error(e.getLocalizedMessage());
+      //System.exit(STATUS_MISC_ERROR);
     }
   }
 
