@@ -14,7 +14,7 @@ import java.util.Set;
 import lombok.NonNull;
 import org.molgenis.vcf.report.model.Record;
 import org.molgenis.vcf.report.model.RecordSample;
-import org.molgenis.vcf.report.model.Sample;
+import org.phenopackets.schema.v1.core.Pedigree.Person;
 import org.springframework.stereotype.Component;
 
 /**
@@ -30,7 +30,7 @@ public class HtsJdkToRecordMapper {
     this.htsJdkToRecordSampleMapper = requireNonNull(htsJdkToRecordSampleMapper);
   }
 
-  public Record map(VariantContext variantContext, List<Sample> samples) {
+  public Record map(VariantContext variantContext, List<Person> persons) {
     String contig = variantContext.getContig();
     if (contig == null) {
       throw new VcfParseException("Chromosome can't be empty");
@@ -63,13 +63,16 @@ public class HtsJdkToRecordMapper {
     }
 
     List<RecordSample> recordSamples;
-    if (!samples.isEmpty()) {
-      recordSamples = new ArrayList<>(samples.size());
+    if (!persons.isEmpty()) {
+      recordSamples = new ArrayList<>(persons.size());
 
-      List<@NonNull String> sampleNames = samples.stream().map(Sample::getName).collect(toList());
+      List<@NonNull String> sampleNames = persons.stream().map(Person::getIndividualId).collect(toList());
       for (Genotype genotype : variantContext.getGenotypesOrderedBy(sampleNames)) {
-        RecordSample recordSample = htsJdkToRecordSampleMapper.map(genotype);
-        recordSamples.add(recordSample);
+        //Genotype can be null if PED input contains samples that or not in the VCF
+        if (genotype != null) {
+          RecordSample recordSample = htsJdkToRecordSampleMapper.map(genotype);
+          recordSamples.add(recordSample);
+        }
       }
     } else {
       recordSamples = emptyList();
