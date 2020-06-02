@@ -15,15 +15,14 @@ import org.phenopackets.schema.v1.core.OntologyClass;
 import org.phenopackets.schema.v1.core.Pedigree.Person;
 import org.phenopackets.schema.v1.core.Pedigree.Person.AffectedStatus;
 import org.phenopackets.schema.v1.core.PhenotypicFeature;
+import org.springframework.stereotype.Component;
 
+@Component
 public class PhenopacketMapper {
-
-  private PhenopacketMapper() { }
-
   private static final String SAMPLE_PHENOTYPE_SEPARATOR = "/";
   private static final String PHENOTYPE_SEPARATOR = ";";
 
-  public static Items<Phenopacket> createPhenopackets(String phenotypes, List<Person> persons) {
+  public Items<Phenopacket> mapPhenotypes(String phenotypes, List<Person> persons) {
     List<Phenopacket> phenopackets = new ArrayList<>();
     List<SamplePhenotype> phenotypeList = parse(phenotypes);
     for (SamplePhenotype samplePhenotype : phenotypeList) {
@@ -34,7 +33,7 @@ public class PhenopacketMapper {
           break;
         case PER_SAMPLE_STRING:
           for (String phenotype : samplePhenotype.getPhenotypes()) {
-            createPhenopackets(phenopackets, samplePhenotype.getSubjectId(), phenotype.split(";"));
+            mapPhenotypes(phenopackets, samplePhenotype.getSubjectId(), phenotype.split(";"));
           }
           break;
         default:
@@ -44,16 +43,16 @@ public class PhenopacketMapper {
     return new Items(phenopackets, phenopackets.size());
   }
 
-  private static void createPhenopacketsForSamples(
+  private void createPhenopacketsForSamples(
       List<Person> persons, List<Phenopacket> phenopackets, SamplePhenotype samplePhenotype) {
     for (Person person : persons) {
       if (person.getAffectedStatus() != AffectedStatus.UNAFFECTED) {
-        createPhenopackets(phenopackets, person.getIndividualId(), samplePhenotype.getPhenotypes());
+        mapPhenotypes(phenopackets, person.getIndividualId(), samplePhenotype.getPhenotypes());
       }
     }
   }
 
-  private static void createPhenopackets(
+  private  void mapPhenotypes(
       List<Phenopacket> phenopackets, String sampleId, String[] phenotypeString) {
     Builder builder = Phenopacket.newBuilder();
 
@@ -70,7 +69,7 @@ public class PhenopacketMapper {
     phenopackets.add(builder.build());
   }
 
-  private static List<SamplePhenotype> parse(String phenotypesString) {
+  private List<SamplePhenotype> parse(String phenotypesString) {
     if (phenotypesString.contains(SAMPLE_PHENOTYPE_SEPARATOR)) {
       return parseSamplePhenotypes(phenotypesString);
     } else {
@@ -79,7 +78,7 @@ public class PhenopacketMapper {
     }
   }
 
-  private static List<SamplePhenotype> parseSamplePhenotypes(String phenotypesString) {
+  private List<SamplePhenotype> parseSamplePhenotypes(String phenotypesString) {
     List<SamplePhenotype> result = new ArrayList<>();
     for (String samplePhenotypes : phenotypesString.split(",")) {
       if (samplePhenotypes.contains("/")) {
@@ -92,7 +91,7 @@ public class PhenopacketMapper {
           throw new InvalidSamplePhenotypesException(samplePhenotypes);
         }
       } else {
-        throw new MixedPhenotypeStringException();
+        throw new IllegalArgumentException("Mixing general phenotypes for all samples and phenotypes per sample is not allowed.");
       }
     }
     return result;

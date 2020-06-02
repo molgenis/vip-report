@@ -5,10 +5,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.molgenis.vcf.report.model.Items;
 import org.phenopackets.schema.v1.core.Pedigree.Person;
+import org.springframework.stereotype.Component;
 
+@Component
 public class PersonListMerger {
-  public static Items<Person> merge(int maxNrSamples, List<Person> vcfPersons,
-      Map<String, Person> pedigreePersons) {
+  public Items<Person> merge(List<Person> vcfPersons,
+      Map<String, Person> pedigreePersons, int maxNrSamples) {
     vcfPersons
         .forEach(
             person -> {

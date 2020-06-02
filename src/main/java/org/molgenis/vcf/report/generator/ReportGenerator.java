@@ -1,23 +1,22 @@
 package org.molgenis.vcf.report.generator;
 
 import static java.util.Objects.requireNonNull;
-import static org.molgenis.vcf.report.mapper.PhenopacketMapper.createPhenopackets;
 
 import htsjdk.variant.vcf.VCFFileReader;
 import htsjdk.variant.vcf.VCFHeader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import org.apache.logging.log4j.util.Strings;
 import org.molgenis.vcf.report.mapper.HtsJdkMapper;
+import org.molgenis.vcf.report.mapper.PedToPersonMapper;
+import org.molgenis.vcf.report.mapper.PhenopacketMapper;
 import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.report.model.Record;
 import org.molgenis.vcf.report.model.Report;
 import org.molgenis.vcf.report.model.ReportData;
 import org.molgenis.vcf.report.model.ReportMetadata;
-import org.molgenis.vcf.report.utils.PedReader;
-import org.molgenis.vcf.report.utils.PedToPersonsParser;
 import org.molgenis.vcf.report.utils.PersonListMerger;
 import org.phenopackets.schema.v1.Phenopacket;
 import org.phenopackets.schema.v1.core.Pedigree.Person;
@@ -26,9 +25,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class ReportGenerator {
   private final HtsJdkMapper htsJdkMapper;
+  private final PhenopacketMapper phenopacketMapper;
+  private final PedToPersonMapper pedToPersonMapper;
+  private final PersonListMerger personListMerger;
 
-  public ReportGenerator(HtsJdkMapper htsJdkMapper) {
+  public ReportGenerator(HtsJdkMapper htsJdkMapper, PhenopacketMapper phenopacketMapper, PedToPersonMapper pedToPersonMapper, PersonListMerger personListMerger) {
     this.htsJdkMapper = requireNonNull(htsJdkMapper);
+    this.phenopacketMapper = requireNonNull(phenopacketMapper);
+    this.pedToPersonMapper = requireNonNull(pedToPersonMapper);
+    this.personListMerger = requireNonNull(personListMerger);
   }
 
   public Report generateReport(
@@ -53,7 +58,12 @@ public class ReportGenerator {
       String phenotypes,
       ReportGeneratorSettings reportGeneratorSettings) {
     Items<Person> persons = createPersons(vcfFileReader, pedigreePath, reportGeneratorSettings);
-    Items<Phenopacket> phenopackets = createPhenopackets(phenotypes, persons.getItems());
+    Items<Phenopacket> phenopackets;
+    if (!Strings.isEmpty(phenotypes)) {
+      phenopackets = phenopacketMapper.mapPhenotypes(phenotypes, persons.getItems());
+    }else{
+      phenopackets = new Items<>(Collections.emptyList(),0);
+    }
     Items<Record> records =
         createRecords(vcfFileReader, reportGeneratorSettings, persons.getItems());
     ReportMetadata reportMetadata =
@@ -71,16 +81,13 @@ public class ReportGenerator {
     int maxNrSamples = settings.getMaxNrSamples();
     Items<Person> persons = htsJdkMapper.mapSamples(fileHeader, maxNrSamples);
     if (pedigreePath != null) {
-      try (PedReader reader = new PedReader(new FileReader(pedigreePath.toFile()))) {
-        final Map<String, Person> pedigreePersons = PedToPersonsParser.parse(reader, maxNrSamples);
-        persons = PersonListMerger.merge(maxNrSamples, persons.getItems(), pedigreePersons);
-      } catch (IOException e) {
-        // this should never happen since the file was validated in the AppCommandLineOptions
-        throw new IllegalStateException(e);
-      }
+      final Map<String, Person> pedigreePersons = pedToPersonMapper.mapPedFileToPersons(pedigreePath, maxNrSamples);
+      persons = personListMerger.merge(persons.getItems(), pedigreePersons, maxNrSamples);
     }
     return persons;
   }
+
+
 
   private Items<Record> createRecords(
       VCFFileReader vcfFileReader,

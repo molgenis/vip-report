@@ -3,6 +3,8 @@ package org.molgenis.vcf.report.mapper;
 import static java.util.Collections.emptyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.molgenis.vcf.report.mapper.HtsJdkToPersonsMapper.MISSING_PERSON_ID;
+import static org.molgenis.vcf.report.mapper.HtsJdkToPersonsMapper.MISSING;
 
 import htsjdk.variant.vcf.VCFHeader;
 import java.util.HashMap;
@@ -34,7 +36,11 @@ class HtsJdkToSamplesMapperTest {
     when(vcfHeader.getSampleNameToOffset()).thenReturn(sampleNameToOffsetMap);
 
     int maxNrSamples = 2;
-    List<Person> samples = List.of(Person.newBuilder().setIndividualId("sample0").build(), Person.newBuilder().setIndividualId("sample1").build());
+    List<Person> samples = List.of(
+        Person.newBuilder().setIndividualId("sample0").setPaternalId(MISSING_PERSON_ID).setMaternalId(MISSING_PERSON_ID).setFamilyId(
+            MISSING+"0").build(),
+        Person.newBuilder().setIndividualId("sample1").setPaternalId(MISSING_PERSON_ID).setMaternalId(MISSING_PERSON_ID).setFamilyId(
+            MISSING+"1").build());
     Items<Person> expectedSampleItems = new Items<>(samples, 3);
     Assertions.assertEquals(
         expectedSampleItems, htsJdkToPersonsMapper.map(vcfHeader, maxNrSamples));

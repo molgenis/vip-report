@@ -8,9 +8,7 @@ import org.molgenis.vcf.report.utils.PedIndividual.AffectionStatus;
 import org.phenopackets.schema.v1.core.Pedigree.Person;
 import org.phenopackets.schema.v1.core.Pedigree.Person.AffectedStatus;
 import org.phenopackets.schema.v1.core.Sex;
-import org.springframework.stereotype.Component;
 
-@Component
 public class PedToPersonsParser {
   public static Map<String, Person> parse(PedReader reader, int maxNrSamples) {
     final Map<String, Person> pedigreePersons = new HashMap<>();

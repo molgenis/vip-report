@@ -17,8 +17,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class HtsJdkToPersonsMapper {
 
-  private static final String MISSING = "MISSING_";
-  private static final String MISSING_PERSON_ID = "0";
+  static final String MISSING = "MISSING_";
+  static final String MISSING_PERSON_ID = "0";
 
   public Items<Person> map(VCFHeader vcfHeader, int maxNrSamples) {
     List<Person> samples;
