@@ -13,5 +13,5 @@ public class SamplePhenotype {
   String subjectId;
 
   @NonNull
-  List<Phenotype> phenotypes;
+  String[] phenotypes;
 }

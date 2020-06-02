@@ -16,9 +16,6 @@ public interface PhenopacketMixin extends PhenopacketModelMixin {
   Object getSubjectOrBuilder();
 
   @JsonIgnore
-  Object getPhenotypicFeaturesList();
-
-  @JsonIgnore
   Object getPhenotypicFeaturesOrBuilderList();
 
   @JsonIgnore
@@ -111,9 +108,4 @@ public interface PhenopacketMixin extends PhenopacketModelMixin {
   @JsonIgnore
   Object getDefaultInstance();
 
-  @JsonIgnore
-  Object getParserForType();
-
-  @JsonIgnore
-  Object getDefaultInstanceForType();
 }

@@ -9,17 +9,21 @@ import org.phenopackets.schema.v1.core.Individual;
 import org.phenopackets.schema.v1.core.MetaData;
 import org.phenopackets.schema.v1.core.OntologyClass;
 import org.phenopackets.schema.v1.core.Pedigree.Person;
+import org.phenopackets.schema.v1.core.PhenotypicFeature;
 
 public class ObjectMapperConfigurer {
   public static void configure(ObjectMapper objectMapper) {
     objectMapper.addMixIn(Phenopacket.class, PhenopacketMixin.class);
     objectMapper.addMixIn(Person.class, PersonMixin.class);
-    objectMapper.addMixIn(OntologyClass.class, PhenopacketModelMixin.class);
+    objectMapper.addMixIn(PhenotypicFeature.class, PhenotypicFeatureMixin.class);
+    objectMapper.addMixIn(OntologyClass.class, OntologyClassMixin.class);
+
     objectMapper.addMixIn(Individual.class, IndividualMixin.class);
     objectMapper.addMixIn(Timestamp.class, PhenopacketModelMixin.class);
     objectMapper.addMixIn(Age.class, PhenopacketModelMixin.class);
     objectMapper.addMixIn(AgeRange.class, PhenopacketModelMixin.class);
     objectMapper.addMixIn(MetaData.class, PhenopacketModelMixin.class);
+
     objectMapper.setAnnotationIntrospector(new PhenopacketInoreSuperIntrospector());
   }
 }
