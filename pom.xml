@@ -42,10 +42,40 @@
     <commons.cli.version>1.4</commons.cli.version>
     <samtools.htsjdk.version>2.21.3</samtools.htsjdk.version>
     <download-maven-plugin.version>1.6.0</download-maven-plugin.version>
+    <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
     <vip.report.template.version>0.0.1</vip.report.template.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <phenopackets.version>1.0.0</phenopackets.version>
   </properties>
+
+  <profiles>
+    <profile>
+      <id>coverage</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>${jacoco-maven-plugin.version}</version>
+            <executions>
+              <execution>
+                <id>prepare-agent</id>
+                <goals>
+                  <goal>prepare-agent</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>report</id>
+                <goals>
+                  <goal>report</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
   <dependencyManagement>
     <dependencies>
