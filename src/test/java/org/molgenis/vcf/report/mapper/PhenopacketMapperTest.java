@@ -41,10 +41,10 @@ class PhenopacketMapperTest {
 
     List<Phenopacket> expected = new ArrayList<>();
 
-    expected.add(createPhenopacket("id1", Arrays.asList("HPO:123","test:headache","omim:234")));
+    expected.add(createPhenopacket("id1", Arrays.asList("HP:123","test:headache","omim:234")));
 
     Items<Phenopacket> actual = phenopacketMapper
-        .mapPhenotypes("HPO:123;test:headache;omim:234", persons);
+        .mapPhenotypes("HP:123;test:headache;omim:234", persons);
     assertEquals(expected,actual.getItems());
     assertEquals(expected.size(),actual.getItems().size());
   }
@@ -53,19 +53,19 @@ class PhenopacketMapperTest {
   void mapPhenotypesPerSample() {
     List<Phenopacket> expected = new ArrayList<>();
 
-    expected.add(createPhenopacket("sample1", Collections.singletonList("HPO:123")));
+    expected.add(createPhenopacket("sample1", Collections.singletonList("HP:123")));
     expected.add(createPhenopacket("sample2", Arrays.asList("test:headache","omim:234")));
 
     Items<Phenopacket> actual = phenopacketMapper
-        .mapPhenotypes("sample1/HPO:123,sample2/test:headache;omim:234", Collections.emptyList());
+        .mapPhenotypes("sample1/HP:123,sample2/test:headache;omim:234", Collections.emptyList());
     assertEquals(expected,actual.getItems());
     assertEquals(expected.size(),actual.getItems().size());
   }
 
   @Test
   void mapInvalidPhenotypes() {
-    assertThrows(IllegalArgumentException.class, () -> phenopacketMapper
-        .mapPhenotypes("sample1/HPO:123,sample2/headache;omim:234", Collections.emptyList()));
+    assertThrows(IllegalPhenotypeArgumentException.class, () -> phenopacketMapper
+        .mapPhenotypes("sample1/HP:123,sample2/headache;omim:234", Collections.emptyList()));
 
   }
 
@@ -75,7 +75,7 @@ class PhenopacketMapperTest {
     for (String phenotype : phenotypes) {
       PhenotypicFeature phenotypicFeature =
           PhenotypicFeature.newBuilder()
-              .addModifiers(OntologyClass.newBuilder().setId(phenotype).setLabel(phenotype).build())
+              .setType(OntologyClass.newBuilder().setId(phenotype).setLabel(phenotype).build())
               .build();
       builder.addPhenotypicFeatures(phenotypicFeature);
     }

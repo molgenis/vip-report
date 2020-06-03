@@ -64,7 +64,7 @@ public class PhenopacketMapper {
       OntologyClass ontologyClass =
           OntologyClass.newBuilder().setId(phenotype).setLabel(phenotype).build();
       PhenotypicFeature phenotypicFeature =
-          PhenotypicFeature.newBuilder().addModifiers(ontologyClass).build();
+          PhenotypicFeature.newBuilder().setType(ontologyClass).build();
       builder.addPhenotypicFeatures(phenotypicFeature);
     }
     phenopackets.add(builder.build());
