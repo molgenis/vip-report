@@ -41,10 +41,10 @@ class PhenopacketMapperTest {
 
     List<Phenopacket> expected = new ArrayList<>();
 
-    expected.add(createPhenopacket("id1", Arrays.asList("HPO:123","headache","omim234")));
+    expected.add(createPhenopacket("id1", Arrays.asList("HPO:123","test:headache","omim:234")));
 
     Items<Phenopacket> actual = phenopacketMapper
-        .mapPhenotypes("HPO:123;headache;omim234", persons);
+        .mapPhenotypes("HPO:123;test:headache;omim:234", persons);
     assertEquals(expected,actual.getItems());
     assertEquals(expected.size(),actual.getItems().size());
   }
@@ -54,12 +54,19 @@ class PhenopacketMapperTest {
     List<Phenopacket> expected = new ArrayList<>();
 
     expected.add(createPhenopacket("sample1", Collections.singletonList("HPO:123")));
-    expected.add(createPhenopacket("sample2", Arrays.asList("headache","omim234")));
+    expected.add(createPhenopacket("sample2", Arrays.asList("test:headache","omim:234")));
 
     Items<Phenopacket> actual = phenopacketMapper
-        .mapPhenotypes("sample1/HPO:123,sample2/headache;omim234", Collections.emptyList());
+        .mapPhenotypes("sample1/HPO:123,sample2/test:headache;omim:234", Collections.emptyList());
     assertEquals(expected,actual.getItems());
     assertEquals(expected.size(),actual.getItems().size());
+  }
+
+  @Test
+  void mapInvalidPhenotypes() {
+    assertThrows(IllegalArgumentException.class, () -> phenopacketMapper
+        .mapPhenotypes("sample1/HPO:123,sample2/headache;omim:234", Collections.emptyList()));
+
   }
 
   private Phenopacket createPhenopacket(String sampleId, List<String> phenotypes) {

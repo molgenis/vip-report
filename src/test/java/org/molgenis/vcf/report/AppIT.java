@@ -25,7 +25,7 @@ class AppIT {
     String pedFiles = ResourceUtils.getFile("classpath:example.ped").toString() +","+ResourceUtils.getFile("classpath:example2.ped").toString();
     String outputFile = sharedTempDir.resolve("example.vcf.html").toString();
     String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
-    String phenotypes = "Jimmy/HPO:123456,Unknown/Headache,Jane/OMIM23456";
+    String phenotypes = "Jimmy/HPO:123456,Unknown/test:Headache,Jane/OMIM:23456";
 
     String[] args = {"-i", inputFile, "-o", outputFile, "-t", templateFile, "-pd", pedFiles, "-ph", phenotypes};
     SpringApplication.run(App.class, args);

@@ -3,6 +3,8 @@ package org.molgenis.vcf.report.mapper;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.molgenis.vcf.report.UnexpectedEnumException;
 import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.report.model.PhenotypeMode;
@@ -58,6 +60,7 @@ public class PhenopacketMapper {
     builder.setSubject(individual);
 
     for (String phenotype : phenotypeString) {
+      checkPhenotype(phenotype);
       OntologyClass ontologyClass =
           OntologyClass.newBuilder().setId(phenotype).setLabel(phenotype).build();
       PhenotypicFeature phenotypicFeature =
@@ -65,6 +68,14 @@ public class PhenopacketMapper {
       builder.addPhenotypicFeatures(phenotypicFeature);
     }
     phenopackets.add(builder.build());
+  }
+
+  private void checkPhenotype(String phenotype) {
+    Pattern p = Pattern.compile(".+:.+");
+    Matcher m = p.matcher(phenotype);
+    if(!m.matches()){
+      throw new IllegalPhenotypeArgumentException(phenotype);
+    }
   }
 
   private List<SamplePhenotype> parse(String phenotypesString) {
