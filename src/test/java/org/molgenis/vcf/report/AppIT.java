@@ -22,11 +22,12 @@ class AppIT {
   @Test
   void test() throws IOException, JSONException {
     String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
-    String pedFile = ResourceUtils.getFile("classpath:example.ped").toString();
+    String pedFiles = ResourceUtils.getFile("classpath:example.ped").toString() +","+ResourceUtils.getFile("classpath:example2.ped").toString();
     String outputFile = sharedTempDir.resolve("example.vcf.html").toString();
     String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
+    String phenotypes = "Jimmy/HPO:123456,Unknown/Headache,Jane/OMIM23456";
 
-    String[] args = {"-i", inputFile, "-o", outputFile, "-t", templateFile};
+    String[] args = {"-i", inputFile, "-o", outputFile, "-t", templateFile, "-pd", pedFiles, "-ph", phenotypes};
     SpringApplication.run(App.class, args);
 
     String report = Files.readString(Path.of(outputFile));
@@ -35,6 +36,7 @@ class AppIT {
     String expectedReport =
         Files.readString(expectedReportPath)
             .replace("{{ inputPath }}", inputFile.replace("\\", "\\\\"))
+            .replace("{{ pedPaths }}", pedFiles.replace("\\", "\\\\"))
             .replace("{{ outputPath }}", outputFile.replace("\\", "\\\\"))
             .replace("{{ templatePath }}", templateFile.replace("\\", "\\\\"));
 
