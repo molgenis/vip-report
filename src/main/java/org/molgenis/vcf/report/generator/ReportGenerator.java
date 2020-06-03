@@ -38,12 +38,12 @@ public class ReportGenerator {
 
   public Report generateReport(
       Path inputVcfPath,
-      Path pedigreePath,
+      List<Path> pedigreePaths,
       String phenotypes,
       ReportGeneratorSettings reportGeneratorSettings) {
     Report report;
     try (VCFFileReader vcfFileReader = createReader(inputVcfPath)) {
-      report = createReport(vcfFileReader, pedigreePath, phenotypes, reportGeneratorSettings);
+      report = createReport(vcfFileReader, pedigreePaths, phenotypes, reportGeneratorSettings);
     }
     return report;
   }
@@ -54,10 +54,10 @@ public class ReportGenerator {
 
   private Report createReport(
       VCFFileReader vcfFileReader,
-      Path pedigreePath,
+      List<Path> pedigreePaths,
       String phenotypes,
       ReportGeneratorSettings reportGeneratorSettings) {
-    Items<Person> persons = createPersons(vcfFileReader, pedigreePath, reportGeneratorSettings);
+    Items<Person> persons = createPersons(vcfFileReader, pedigreePaths, reportGeneratorSettings);
     Items<Phenopacket> phenopackets;
     if (!Strings.isEmpty(phenotypes)) {
       phenopackets = phenopacketMapper.mapPhenotypes(phenotypes, persons.getItems());
@@ -76,12 +76,12 @@ public class ReportGenerator {
   }
 
   private Items<Person> createPersons(
-      VCFFileReader vcfFileReader, Path pedigreePath, ReportGeneratorSettings settings) {
+      VCFFileReader vcfFileReader, List<Path> pedigreePaths, ReportGeneratorSettings settings) {
     VCFHeader fileHeader = vcfFileReader.getFileHeader();
     int maxNrSamples = settings.getMaxNrSamples();
     Items<Person> persons = htsJdkMapper.mapSamples(fileHeader, maxNrSamples);
-    if (pedigreePath != null) {
-      final Map<String, Person> pedigreePersons = pedToPersonMapper.mapPedFileToPersons(pedigreePath, maxNrSamples);
+    if (pedigreePaths != null) {
+      final Map<String, Person> pedigreePersons = pedToPersonMapper.mapPedFileToPersons(pedigreePaths, maxNrSamples);
       persons = personListMerger.merge(persons.getItems(), pedigreePersons, maxNrSamples);
     }
     return persons;

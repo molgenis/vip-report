@@ -1,9 +1,11 @@
 package org.molgenis.vcf.report;
 
 import static java.lang.String.format;
+import static org.molgenis.vcf.report.utils.PathUtils.parsePaths;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -170,23 +172,25 @@ class AppCommandLineOptions {
     if (!commandLine.hasOption(OPT_PED)) {
       return;
     }
-    Path templatePath = Path.of(commandLine.getOptionValue(OPT_PED));
-    if (!Files.exists(templatePath)) {
+    List<Path> pedPaths = parsePaths(commandLine.getOptionValue(OPT_PED));
+    for(Path pedPath : pedPaths){
+    if (!Files.exists(pedPath)) {
       throw new IllegalArgumentException(
-          format("Ped file '%s' does not exist.", templatePath.toString()));
+          format("Ped file '%s' does not exist.", pedPath.toString()));
     }
-    if (Files.isDirectory(templatePath)) {
+    if (Files.isDirectory(pedPath)) {
       throw new IllegalArgumentException(
-          format("Ped file '%s' is a directory.", templatePath.toString()));
+          format("Ped file '%s' is a directory.", pedPath.toString()));
     }
-    if (!Files.isReadable(templatePath)) {
+    if (!Files.isReadable(pedPath)) {
       throw new IllegalArgumentException(
-          format("Ped file '%s' is not readable.", templatePath.toString()));
+          format("Ped file '%s' is not readable.", pedPath.toString()));
     }
-    String templatePathStr = templatePath.toString();
+    String templatePathStr = pedPath.toString();
     if (!templatePathStr.endsWith(".ped")) {
       throw new IllegalArgumentException(
           format("Ped file '%s' is not a .ped file.", templatePathStr));
+    }
     }
   }
 }

@@ -7,8 +7,11 @@ import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_OUTPUT;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_TEMPLATE;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_PED;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_PHENOTYPES;
+import static org.molgenis.vcf.report.utils.PathUtils.parsePaths;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.cli.CommandLine;
 import org.molgenis.vcf.report.generator.ReportGeneratorSettings;
 import org.molgenis.vcf.report.generator.ReportWriterSettings;
@@ -48,11 +51,11 @@ public class AppCommandLineToSettingsMapper {
       outputPath = Path.of(commandLine.getOptionValue(OPT_INPUT) + ".html");
     }
 
-    Path pedPath;
+    List<Path> pedPaths;
     if (commandLine.hasOption(OPT_PED)) {
-      pedPath = Path.of(commandLine.getOptionValue(OPT_PED));
+      pedPaths = parsePaths(commandLine.getOptionValue(OPT_PED));
     } else {
-      pedPath = null;
+      pedPaths = null;
     }
 
     String phenotypes;
@@ -75,7 +78,7 @@ public class AppCommandLineToSettingsMapper {
             ReportGeneratorSettings.DEFAULT_MAX_NR_SAMPLES,
             ReportGeneratorSettings.DEFAULT_MAX_NR_RECORDS);
     ReportWriterSettings reportWriterSettings = new ReportWriterSettings(templatePath, debugMode);
-    SampleSettings sampleSettings = new SampleSettings(pedPath, phenotypes);
+    SampleSettings sampleSettings = new SampleSettings(pedPaths, phenotypes);
     return new Settings(
         inputPath, reportGeneratorSettings, outputPath, overwriteOutput, reportWriterSettings, sampleSettings);
   }
