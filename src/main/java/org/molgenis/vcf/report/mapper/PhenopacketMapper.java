@@ -7,8 +7,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.molgenis.vcf.report.UnexpectedEnumException;
 import org.molgenis.vcf.report.model.Items;
-import org.molgenis.vcf.report.model.PhenotypeMode;
-import org.molgenis.vcf.report.model.SamplePhenotype;
 import org.molgenis.vcf.report.utils.InvalidSamplePhenotypesException;
 import org.phenopackets.schema.v1.Phenopacket;
 import org.phenopackets.schema.v1.Phenopacket.Builder;

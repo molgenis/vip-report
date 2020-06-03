@@ -1,6 +1,5 @@
-package org.molgenis.vcf.report.model;
+package org.molgenis.vcf.report.mapper;
 
-import java.util.List;
 import lombok.NonNull;
 import lombok.Value;
 
