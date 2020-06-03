@@ -11,7 +11,9 @@ import static org.mockito.Mockito.when;
 import htsjdk.variant.vcf.VCFHeader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +30,6 @@ import org.molgenis.vcf.report.model.Record;
 import org.molgenis.vcf.report.model.Report;
 import org.molgenis.vcf.report.model.ReportData;
 import org.molgenis.vcf.report.model.ReportMetadata;
-import org.molgenis.vcf.report.utils.PedToPersonsParser;
 import org.molgenis.vcf.report.utils.PersonListMerger;
 import org.phenopackets.schema.v1.Phenopacket;
 import org.phenopackets.schema.v1.core.Pedigree.Person;
@@ -62,7 +63,7 @@ class ReportGeneratorTest {
     when(phenopacketMapper.mapPhenotypes(any(),any())).thenReturn(phenopacketItems);
 
     Path inputVcfPath = Paths.get("src", "test", "resources", "example.vcf");
-    Path pedPath = Paths.get("src", "test", "resources", "example.ped");
+    List<Path> pedPath = Collections.singletonList(Paths.get("src", "test", "resources", "example.ped"));
 
     Map<String, Person> pedSampleItems = emptyMap();
     when(pedToPersonMapper.mapPedFileToPersons(pedPath, 10)).thenReturn(pedSampleItems);

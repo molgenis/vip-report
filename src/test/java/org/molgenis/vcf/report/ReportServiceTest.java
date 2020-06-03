@@ -61,7 +61,7 @@ class ReportServiceTest {
     Settings settings =
         new Settings(
             inputVcfPath, reportGeneratorSettings, outputReportPath, true, reportWriterSettings, sampleSettings);
-    when(reportGenerator.generateReport(inputVcfPath, sampleSettings.getPedigreePath(), sampleSettings.getPhenotypeString(), reportGeneratorSettings)).thenReturn(report);
+    when(reportGenerator.generateReport(inputVcfPath, sampleSettings.getPedigreePaths(), sampleSettings.getPhenotypeString(), reportGeneratorSettings)).thenReturn(report);
 
     reportService.createReport(settings);
 
