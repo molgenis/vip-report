@@ -7,22 +7,33 @@ Command-line application to generate a report for any VCF (Variant Call Format) 
 
 ## Usage
 ```
-java -jar vcf-report.jar -i <arg> [-o <arg>] [-f] [-t <arg>] [-d]
- -i,--input <arg>      Input VCF file (.vcf or .vcf.gz).
- -o,--output <arg>     Output report file (.html).
- -f,--force            Override the output file if it already exists.
- -t,--template <arg>   Report template file (.html).
- -d,--debug            Enable debug mode (additional logging and pretty printed report.
-```
-```
-java -jar vcf-report.jar -v
+java -jar vcf-report.jar -i <arg> [-o <arg>] [-f]
+       [-t <arg>] [-pd <arg>] [-ph <arg>] [-d]
+ -i,--input <arg>         Input VCF file (.vcf or .vcf.gz).
+ -o,--output <arg>        Output report file (.html).
+ -f,--force               Override the output file if it already exists.
+ -t,--template <arg>      Report template file (.html).
+ -pd,--pedigree <arg>     Comma separated list of pedigree files (.ped).
+ -ph,--phenotypes <arg>   Semicolon separated list of CURIE* formatted
+                          Phenotypes, either for all the samples, or comma
+                          separated per sample as
+                          'sample1/phenotypes,sample2/phenotypes'
+ -d,--debug               Enable debug mode (additional logging and pretty
+                          printed report.
+
+usage: java -jar vcf-report.jar -v
  -v,--version   Print version.
 ```
+*: [CURIE](https://phenopackets-schema.readthedocs.io/en/latest/resource.html#rstcurie)
+
 ## Examples
 ```
 java -jar vcf-report.jar -i my.vcf.gz
 java -jar vcf-report.jar -i my.vcf.gz -o my-report.html
 java -jar vcf-report.jar -i my.vcf.gz -o my-report.html -t my-template.html
+java -jar vcf-report.jar -i my.vcf.gz -o my-report.html -t my-template.html -p my.ped,my_other.ped
+java -jar vcf-report.jar -i my.vcf.gz -o my-report.html -t my-template.html -pd my.ped,my_other.ped -ph HP:0000001;HP:0000002
+java -jar vcf-report.jar -i my.vcf.gz -o my-report.html -t my-template.html -pd my.ped,my_other.ped -ph sampleId1/HP:0000001;HP:0000002,sampleId2/HP0000001
 java -jar vcf-report.jar -v
 ```
 ## Template
@@ -64,4 +75,34 @@ The resulting report after rendering the template using input data will look lik
 </html>
 ```
 ## API
-The format of the report data is described in the ```org.molgenis.vcf.report.model``` Java classes.
+The format of the variant report data is described in the ```org.molgenis.vcf.report.model``` Java classes.
+
+The format of the phenotype data is described here: [Phenopackets_Person](https://phenopackets-schema.readthedocs.io/en/latest/pedigree.html#person)
+
+The format of the sample data is described here: [Phenopacket](https://phenopackets-schema.readthedocs.io/en/latest/phenopacket.html)
+Please note that only a subset of PhenotypicFeature fields is returned.
+### Example
+```
+"phenotypes": {
+    "items": [
+      {
+        "subject": {
+          "id": "SampleId123"
+        },
+        "phenotypicFeaturesCount": 2,
+        "phenotypicFeaturesList": [
+          {
+            "type": {
+              "id": "HP:123456",
+              "label": "HP:123456"
+            }
+          },
+          {
+            "type": {
+              "id": "HP:234567",
+              "label": "HP:234567"
+            }
+          }
+        ]
+      }
+```

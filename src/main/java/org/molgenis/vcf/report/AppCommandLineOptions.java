@@ -61,13 +61,13 @@ class AppCommandLineOptions {
         Option.builder(OPT_PED)
             .hasArg(true)
             .longOpt(OPT_PED_LONG)
-            .desc("Pedigree file (.ped) .")
+            .desc("Comma separated list of pedigree files (.ped).")
             .build());
     appOptions.addOption(
         Option.builder(OPT_PHENOTYPES)
             .hasArg(true)
             .longOpt(OPT_PHENOTYPES_LONG)
-            .desc("Phenotypes for the samples in the VCF file.")
+            .desc("Semicolon separated list of CURIE formatted Phenotypes, either for all the samples, or comma separated per sample as 'sample1/phenotypes,sample2/phenotypes'")
             .build());
     appOptions.addOption(
         Option.builder(OPT_DEBUG)
