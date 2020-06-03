@@ -32,9 +32,7 @@ public class PhenopacketMapper {
           createPhenopacketsForSamples(persons, phenopackets, samplePhenotype);
           break;
         case PER_SAMPLE_STRING:
-          for (String phenotype : samplePhenotype.getPhenotypes()) {
-            mapPhenotypes(phenopackets, samplePhenotype.getSubjectId(), phenotype.split(";"));
-          }
+          mapPhenotypes(phenopackets, samplePhenotype.getSubjectId(), samplePhenotype.getPhenotypes());
           break;
         default:
           throw new UnexpectedEnumException(mode);
