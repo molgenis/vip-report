@@ -20,12 +20,7 @@ public class ObjectMapperConfigurer {
     objectMapper.addMixIn(Person.class, PersonMixin.class);
     objectMapper.addMixIn(PhenotypicFeature.class, PhenotypicFeatureMixin.class);
     objectMapper.addMixIn(OntologyClass.class, OntologyClassMixin.class);
-
     objectMapper.addMixIn(Individual.class, IndividualMixin.class);
-    objectMapper.addMixIn(Timestamp.class, PhenopacketModelMixin.class);
-    objectMapper.addMixIn(Age.class, PhenopacketModelMixin.class);
-    objectMapper.addMixIn(AgeRange.class, PhenopacketModelMixin.class);
-    objectMapper.addMixIn(MetaData.class, PhenopacketModelMixin.class);
 
     objectMapper.setAnnotationIntrospector(new PhenopacketInoreSuperIntrospector());
   }
