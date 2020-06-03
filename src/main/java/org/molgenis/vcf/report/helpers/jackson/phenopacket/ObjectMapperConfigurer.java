@@ -12,6 +12,9 @@ import org.phenopackets.schema.v1.core.Pedigree.Person;
 import org.phenopackets.schema.v1.core.PhenotypicFeature;
 
 public class ObjectMapperConfigurer {
+
+  private ObjectMapperConfigurer(){}
+
   public static void configure(ObjectMapper objectMapper) {
     objectMapper.addMixIn(Phenopacket.class, PhenopacketMixin.class);
     objectMapper.addMixIn(Person.class, PersonMixin.class);
