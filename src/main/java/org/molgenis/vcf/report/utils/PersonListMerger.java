@@ -18,6 +18,6 @@ public class PersonListMerger {
                 pedigreePersons.put(person.getIndividualId(), person);
               }
             });
-    return new Items(pedigreePersons.values().stream().collect(Collectors.toList()), pedigreePersons.size());
+    return new Items<>(pedigreePersons.values().stream().collect(Collectors.toList()), pedigreePersons.size());
   }
 }

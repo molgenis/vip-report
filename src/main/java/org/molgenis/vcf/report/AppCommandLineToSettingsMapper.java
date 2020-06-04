@@ -10,7 +10,6 @@ import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_PHENOTYPES;
 import static org.molgenis.vcf.report.utils.PathUtils.parsePaths;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.cli.CommandLine;
 import org.molgenis.vcf.report.generator.ReportGeneratorSettings;

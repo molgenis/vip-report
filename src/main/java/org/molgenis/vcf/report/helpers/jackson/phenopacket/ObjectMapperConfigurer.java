@@ -1,12 +1,8 @@
 package org.molgenis.vcf.report.helpers.jackson.phenopacket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.protobuf.Timestamp;
 import org.phenopackets.schema.v1.Phenopacket;
-import org.phenopackets.schema.v1.core.Age;
-import org.phenopackets.schema.v1.core.AgeRange;
 import org.phenopackets.schema.v1.core.Individual;
-import org.phenopackets.schema.v1.core.MetaData;
 import org.phenopackets.schema.v1.core.OntologyClass;
 import org.phenopackets.schema.v1.core.Pedigree.Person;
 import org.phenopackets.schema.v1.core.PhenotypicFeature;

@@ -38,7 +38,7 @@ public class PhenopacketMapper {
           throw new UnexpectedEnumException(mode);
       }
     }
-    return new Items(phenopackets, phenopackets.size());
+    return new Items<>(phenopackets, phenopackets.size());
   }
 
   private void createPhenopacketsForSamples(
