@@ -23,6 +23,7 @@ import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.report.model.Report;
 import org.molgenis.vcf.report.model.ReportData;
 import org.molgenis.vcf.report.model.ReportMetadata;
+import org.phenopackets.schema.v1.core.HtsFile;
 
 @ExtendWith(MockitoExtension.class)
 class ReportServiceTest {
@@ -48,7 +49,7 @@ class ReportServiceTest {
     Report report =
         new Report(
             new ReportMetadata(appName, appVersion, appArguments),
-            new ReportData(new Items<>(emptyList(), 0), new Items<>(emptyList(), 0), new Items<>(emptyList(), 0)));
+            new ReportData(HtsFile.newBuilder().build(), new Items<>(emptyList(), 0), new Items<>(emptyList(), 0), new Items<>(emptyList(), 0)));
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
             appName,

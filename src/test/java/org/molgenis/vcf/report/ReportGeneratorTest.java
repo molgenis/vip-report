@@ -22,6 +22,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.molgenis.vcf.report.generator.ReportGenerator;
 import org.molgenis.vcf.report.generator.ReportGeneratorSettings;
+import org.molgenis.vcf.report.mapper.HtsFileMapper;
 import org.molgenis.vcf.report.mapper.HtsJdkMapper;
 import org.molgenis.vcf.report.mapper.PedToPersonMapper;
 import org.molgenis.vcf.report.mapper.PhenopacketMapper;
@@ -32,6 +33,7 @@ import org.molgenis.vcf.report.model.ReportData;
 import org.molgenis.vcf.report.model.ReportMetadata;
 import org.molgenis.vcf.report.utils.PersonListMerger;
 import org.phenopackets.schema.v1.Phenopacket;
+import org.phenopackets.schema.v1.core.HtsFile;
 import org.phenopackets.schema.v1.core.Pedigree.Person;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,11 +43,14 @@ class ReportGeneratorTest {
   @Mock private PhenopacketMapper phenopacketMapper;
   @Mock private PedToPersonMapper pedToPersonMapper;
   @Mock private PersonListMerger personListMerger;
+  @Mock private HtsFileMapper htsFileMapper;
   private ReportGenerator reportGenerator;
 
   @BeforeEach
   void setUpBeforeEach() {
-    reportGenerator = new ReportGenerator(htsJdkMapper, phenopacketMapper, pedToPersonMapper, personListMerger);
+    reportGenerator =
+        new ReportGenerator(
+            htsJdkMapper, phenopacketMapper, pedToPersonMapper, personListMerger, htsFileMapper);
   }
 
   @Test
@@ -54,22 +59,28 @@ class ReportGeneratorTest {
     int maxNrRecords = 100;
 
     Items<Person> vcfSampleItems = new Items<>(emptyList(), 3);
-    when(htsJdkMapper.mapSamples(any(VCFHeader.class), eq(maxNrSamples))).thenReturn(vcfSampleItems);
+    when(htsJdkMapper.mapSamples(any(VCFHeader.class), eq(maxNrSamples)))
+        .thenReturn(vcfSampleItems);
 
     Items<Record> recordItems = new Items<>(emptyList(), 5);
     when(htsJdkMapper.mapRecords(any(), eq(maxNrRecords), any())).thenReturn(recordItems);
 
     Items<Phenopacket> phenopacketItems = new Items<>(emptyList(), 5);
-    when(phenopacketMapper.mapPhenotypes(any(),any())).thenReturn(phenopacketItems);
+    when(phenopacketMapper.mapPhenotypes(any(), any())).thenReturn(phenopacketItems);
 
     Path inputVcfPath = Paths.get("src", "test", "resources", "example.vcf");
-    List<Path> pedPath = Collections.singletonList(Paths.get("src", "test", "resources", "example.ped"));
+    List<Path> pedPath =
+        Collections.singletonList(Paths.get("src", "test", "resources", "example.ped"));
 
     Map<String, Person> pedSampleItems = emptyMap();
     when(pedToPersonMapper.mapPedFileToPersons(pedPath, 10)).thenReturn(pedSampleItems);
 
     Items<Person> sampleItems = new Items<>(emptyList(), 6);
-    when(personListMerger.merge(vcfSampleItems.getItems(), pedSampleItems, 10)).thenReturn(sampleItems);
+    when(personListMerger.merge(vcfSampleItems.getItems(), pedSampleItems, 10))
+        .thenReturn(sampleItems);
+
+    HtsFile htsFile = HtsFile.newBuilder().build();
+    when(htsFileMapper.map(any(), eq(inputVcfPath.toString()), eq(vcfSampleItems))).thenReturn(htsFile);
 
     String phenotypes = "hpo:123456;omim3456";
     String appName = "MyApp";
@@ -80,7 +91,9 @@ class ReportGeneratorTest {
     Report report =
         new Report(
             new ReportMetadata(appName, appVersion, appArgs),
-            new ReportData(sampleItems, phenopacketItems, recordItems));
-    assertEquals(report, reportGenerator.generateReport(inputVcfPath, pedPath, phenotypes, reportGeneratorSettings));
+            new ReportData(htsFile, sampleItems, phenopacketItems, recordItems));
+    assertEquals(
+        report,
+        reportGenerator.generateReport(inputVcfPath, pedPath, phenotypes, reportGeneratorSettings));
   }
 }
