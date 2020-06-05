@@ -13,6 +13,7 @@ import org.molgenis.vcf.report.mapper.HtsFileMapper;
 import org.molgenis.vcf.report.mapper.HtsJdkMapper;
 import org.molgenis.vcf.report.mapper.PedToPersonMapper;
 import org.molgenis.vcf.report.mapper.PhenopacketMapper;
+import org.molgenis.vcf.report.model.AppMetadata;
 import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.report.model.Record;
 import org.molgenis.vcf.report.model.Report;
@@ -82,11 +83,12 @@ public class ReportGenerator {
 
     Items<Record> records =
         createRecords(vcfFileReader, reportGeneratorSettings, samples.getItems());
+    AppMetadata appMetadata = new AppMetadata(reportGeneratorSettings.getAppName(),
+        reportGeneratorSettings.getAppVersion(),
+        reportGeneratorSettings.getAppArguments());
     ReportMetadata reportMetadata =
         new ReportMetadata(
-            reportGeneratorSettings.getAppName(),
-            reportGeneratorSettings.getAppVersion(),
-            reportGeneratorSettings.getAppArguments(),
+            appMetadata,
             htsFile);
     ReportData reportData = new ReportData(samples, phenopackets, records);
     return new Report(reportMetadata, reportData);

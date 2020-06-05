@@ -26,6 +26,7 @@ import org.molgenis.vcf.report.mapper.HtsFileMapper;
 import org.molgenis.vcf.report.mapper.HtsJdkMapper;
 import org.molgenis.vcf.report.mapper.PedToPersonMapper;
 import org.molgenis.vcf.report.mapper.PhenopacketMapper;
+import org.molgenis.vcf.report.model.AppMetadata;
 import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.report.model.Record;
 import org.molgenis.vcf.report.model.Report;
@@ -89,7 +90,7 @@ class ReportGeneratorTest {
         new ReportGeneratorSettings(appName, appVersion, appArgs, maxNrSamples, maxNrRecords);
     Report report =
         new Report(
-            new ReportMetadata(appName, appVersion, appArgs, htsFile),
+            new ReportMetadata(new AppMetadata(appName, appVersion, appArgs), htsFile),
             new ReportData(sampleItems, phenopacketItems, recordItems));
     assertEquals(
         report,
