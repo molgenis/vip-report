@@ -89,8 +89,8 @@ class ReportGeneratorTest {
         new ReportGeneratorSettings(appName, appVersion, appArgs, maxNrSamples, maxNrRecords);
     Report report =
         new Report(
-            new ReportMetadata(appName, appVersion, appArgs),
-            new ReportData(htsFile, sampleItems, phenopacketItems, recordItems));
+            new ReportMetadata(appName, appVersion, appArgs, htsFile),
+            new ReportData(sampleItems, phenopacketItems, recordItems));
     assertEquals(
         report,
         reportGenerator.generateReport(inputVcfPath, pedPath, phenotypes, reportGeneratorSettings));

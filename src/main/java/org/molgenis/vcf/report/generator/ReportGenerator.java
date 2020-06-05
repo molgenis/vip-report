@@ -22,7 +22,6 @@ import org.molgenis.vcf.report.model.Sample;
 import org.molgenis.vcf.report.utils.PersonListMerger;
 import org.phenopackets.schema.v1.Phenopacket;
 import org.phenopackets.schema.v1.core.HtsFile;
-import org.phenopackets.schema.v1.core.Pedigree.Person;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -87,8 +86,9 @@ public class ReportGenerator {
         new ReportMetadata(
             reportGeneratorSettings.getAppName(),
             reportGeneratorSettings.getAppVersion(),
-            reportGeneratorSettings.getAppArguments());
-    ReportData reportData = new ReportData(htsFile, samples, phenopackets, records);
+            reportGeneratorSettings.getAppArguments(),
+            htsFile);
+    ReportData reportData = new ReportData(samples, phenopackets, records);
     return new Report(reportMetadata, reportData);
   }
 

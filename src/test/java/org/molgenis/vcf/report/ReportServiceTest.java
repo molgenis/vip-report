@@ -48,8 +48,8 @@ class ReportServiceTest {
     Path outputReportPath = sharedTempDir.resolve("example.vcf.html");
     Report report =
         new Report(
-            new ReportMetadata(appName, appVersion, appArguments),
-            new ReportData(HtsFile.newBuilder().build(), new Items<>(emptyList(), 0), new Items<>(emptyList(), 0), new Items<>(emptyList(), 0)));
+            new ReportMetadata(appName, appVersion, appArguments, HtsFile.newBuilder().build()),
+            new ReportData(new Items<>(emptyList(), 0), new Items<>(emptyList(), 0), new Items<>(emptyList(), 0)));
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
             appName,

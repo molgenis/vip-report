@@ -2,12 +2,9 @@ package org.molgenis.vcf.report.mapper;
 
 import htsjdk.variant.vcf.VCFContigHeaderLine;
 import htsjdk.variant.vcf.VCFHeader;
-import java.util.HashMap;
 import java.util.Map;
-import org.molgenis.vcf.report.model.Items;
 import org.phenopackets.schema.v1.core.HtsFile;
 import org.phenopackets.schema.v1.core.HtsFile.HtsFormat;
-import org.phenopackets.schema.v1.core.Pedigree.Person;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,7 +12,7 @@ public class HtsFileMapper {
 
   private static final String BUILD_GRCH_38 = "GRCh38";
   private static final String BUILD_GRCH_37 = "GRCh37";
-  private static final String BUILD_GRCH_36 = "GRCh36";
+  private static final String BUILD_GRCH_36 = "NCBI36";
   private static final String BUILD_HG_19 = "hg19";
   private static final String BUILD_HG_18 = "hg18";
   private static final String BUILD_B_38 = "b38";
