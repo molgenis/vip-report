@@ -24,30 +24,48 @@ import org.phenopackets.schema.v1.core.PhenotypicFeature;
 @ExtendWith(MockitoExtension.class)
 class PhenopacketMapperTest {
 
-  @Mock
-  private PhenopacketMapper phenopacketMapper;
+  @Mock private PhenopacketMapper phenopacketMapper;
 
   @BeforeEach
-  void setUpBeforeEach(){
+  void setUpBeforeEach() {
     phenopacketMapper = new PhenopacketMapper();
   }
 
   @Test
   void mapPhenotypesGeneral() {
     List<Sample> samples = new ArrayList<>();
-    samples.add(new Sample(Person.newBuilder().setIndividualId("id1").setFamilyId("fam1").setMaternalId("maternal1").setPaternalId("paternal1").setSex(
-        org.phenopackets.schema.v1.core.Sex.MALE).setAffectedStatus(AffectedStatus.AFFECTED).build(), -1));
-    samples.add(new Sample(Person.newBuilder().setIndividualId("id2").setFamilyId("fam1").setMaternalId("maternal2").setPaternalId("paternal2").setSex(
-        org.phenopackets.schema.v1.core.Sex.FEMALE).setAffectedStatus(AffectedStatus.UNAFFECTED).build(), -1));
+    samples.add(
+        new Sample(
+            Person.newBuilder()
+                .setIndividualId("id1")
+                .setFamilyId("fam1")
+                .setMaternalId("maternal1")
+                .setPaternalId("paternal1")
+                .setSex(org.phenopackets.schema.v1.core.Sex.MALE)
+                .setAffectedStatus(AffectedStatus.AFFECTED)
+                .build(),
+            -1));
+    samples.add(
+        new Sample(
+            Person.newBuilder()
+                .setIndividualId("id2")
+                .setFamilyId("fam1")
+                .setMaternalId("maternal2")
+                .setPaternalId("paternal2")
+                .setSex(org.phenopackets.schema.v1.core.Sex.FEMALE)
+                .setAffectedStatus(AffectedStatus.UNAFFECTED)
+                .build(),
+            -1));
 
     List<Phenopacket> expected = new ArrayList<>();
 
-    expected.add(createPhenopacket("id1", Arrays.asList("HP:123","test:headache","omim:234")));
+    expected.add(createPhenopacket("id1", Arrays.asList("HP:123", "test:headache", "omim:234")));
 
-    Items<Phenopacket> actual = phenopacketMapper
-        .mapPhenotypes("HP:123;test:headache;omim:234", samples);
-    assertEquals(expected,actual.getItems());
-    assertEquals(expected.size(),actual.getItems().size());
+    Items<Phenopacket> actual =
+        phenopacketMapper.mapPhenotypes("HP:123;test:headache;omim:234", samples);
+    assertAll(
+        () -> assertEquals(expected, actual.getItems()),
+        () -> assertEquals(expected.size(), actual.getItems().size()));
   }
 
   @Test
@@ -55,19 +73,24 @@ class PhenopacketMapperTest {
     List<Phenopacket> expected = new ArrayList<>();
 
     expected.add(createPhenopacket("sample1", Collections.singletonList("HP:123")));
-    expected.add(createPhenopacket("sample2", Arrays.asList("test:headache","omim:234")));
+    expected.add(createPhenopacket("sample2", Arrays.asList("test:headache", "omim:234")));
 
-    Items<Phenopacket> actual = phenopacketMapper
-        .mapPhenotypes("sample1/HP:123,sample2/test:headache;omim:234", Collections.emptyList());
-    assertEquals(expected,actual.getItems());
-    assertEquals(expected.size(),actual.getItems().size());
+    Items<Phenopacket> actual =
+        phenopacketMapper.mapPhenotypes(
+            "sample1/HP:123,sample2/test:headache;omim:234", Collections.emptyList());
+    assertAll(
+        () -> assertEquals(expected, actual.getItems()),
+        () -> assertEquals(expected.size(), actual.getItems().size()));
   }
 
   @Test
   void mapInvalidPhenotypes() {
-    assertThrows(IllegalPhenotypeArgumentException.class, () -> phenopacketMapper
-        .mapPhenotypes("sample1/HP:123,sample2/headache;omim:234", Collections.emptyList()));
-
+    List<Sample> samples = Collections.emptyList();
+    assertThrows(
+        IllegalPhenotypeArgumentException.class,
+        () -> {
+          phenopacketMapper.mapPhenotypes("sample1/HP:123,sample2/headache;omim:234", samples);
+        });
   }
 
   private Phenopacket createPhenopacket(String sampleId, List<String> phenotypes) {

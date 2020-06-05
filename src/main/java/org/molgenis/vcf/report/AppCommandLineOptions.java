@@ -1,6 +1,9 @@
 package org.molgenis.vcf.report;
 
 import static java.lang.String.format;
+import static org.molgenis.vcf.report.mapper.PhenopacketMapper.PHENOTYPE_SEPARATOR;
+import static org.molgenis.vcf.report.mapper.PhenopacketMapper.SAMPLE_PHENOTYPE_SEPARATOR;
+import static org.molgenis.vcf.report.mapper.PhenopacketMapper.checkPhenotype;
 import static org.molgenis.vcf.report.utils.PathUtils.parsePaths;
 
 import java.nio.file.Files;
@@ -9,6 +12,7 @@ import java.util.List;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+import org.molgenis.vcf.report.utils.InvalidSamplePhenotypesException;
 
 class AppCommandLineOptions {
 
@@ -61,13 +65,14 @@ class AppCommandLineOptions {
         Option.builder(OPT_PED)
             .hasArg(true)
             .longOpt(OPT_PED_LONG)
-            .desc("Comma separated list of pedigree files (.ped).")
+            .desc("Comma-separated list of pedigree files (.ped).")
             .build());
     appOptions.addOption(
         Option.builder(OPT_PHENOTYPES)
             .hasArg(true)
             .longOpt(OPT_PHENOTYPES_LONG)
-            .desc("Semicolon separated list of CURIE formatted Phenotypes, either for all the samples, or comma separated per sample as 'sample1/phenotypes,sample2/phenotypes'")
+            .desc(
+                "Comma-separated list of sample-phenotypes (e.g. HPO:123 or HPO:123;HPO:234 or sample0/HPO:123,sample1/HPO:234). Phenotypes are CURIE formatted (prefix:reference) and separated by a semicolon.")
             .build());
     appOptions.addOption(
         Option.builder(OPT_DEBUG)
@@ -101,6 +106,30 @@ class AppCommandLineOptions {
     validateOutput(commandLine);
     validateTemplate(commandLine);
     validatePed(commandLine);
+    validatePhenotypes(commandLine);
+  }
+
+  private static void validatePhenotypes(CommandLine commandLine) {
+    if (!commandLine.hasOption(OPT_PHENOTYPES)) {
+      return;
+    }
+    String phenotypesString = commandLine.getOptionValue(OPT_PHENOTYPES);
+    if (phenotypesString.contains(SAMPLE_PHENOTYPE_SEPARATOR)) {
+      for (String samplePhenotypes : phenotypesString.split(",")) {
+        if (samplePhenotypes.contains("/")) {
+          if (samplePhenotypes.split("/").length != 2) {
+            throw new InvalidSamplePhenotypesException(samplePhenotypes);
+          }
+        } else {
+          throw new MixedPhenotypesException();
+        }
+      }
+    } else {
+      String[] phenotypes = phenotypesString.split(PHENOTYPE_SEPARATOR);
+      for (String phenotype : phenotypes) {
+        checkPhenotype(phenotype);
+      }
+    }
   }
 
   private static void validateInput(CommandLine commandLine) {
@@ -173,24 +202,24 @@ class AppCommandLineOptions {
       return;
     }
     List<Path> pedPaths = parsePaths(commandLine.getOptionValue(OPT_PED));
-    for(Path pedPath : pedPaths){
-    if (!Files.exists(pedPath)) {
-      throw new IllegalArgumentException(
-          format("Ped file '%s' does not exist.", pedPath.toString()));
-    }
-    if (Files.isDirectory(pedPath)) {
-      throw new IllegalArgumentException(
-          format("Ped file '%s' is a directory.", pedPath.toString()));
-    }
-    if (!Files.isReadable(pedPath)) {
-      throw new IllegalArgumentException(
-          format("Ped file '%s' is not readable.", pedPath.toString()));
-    }
-    String templatePathStr = pedPath.toString();
-    if (!templatePathStr.endsWith(".ped")) {
-      throw new IllegalArgumentException(
-          format("Ped file '%s' is not a .ped file.", templatePathStr));
-    }
+    for (Path pedPath : pedPaths) {
+      if (!Files.exists(pedPath)) {
+        throw new IllegalArgumentException(
+            format("Ped file '%s' does not exist.", pedPath.toString()));
+      }
+      if (Files.isDirectory(pedPath)) {
+        throw new IllegalArgumentException(
+            format("Ped file '%s' is a directory.", pedPath.toString()));
+      }
+      if (!Files.isReadable(pedPath)) {
+        throw new IllegalArgumentException(
+            format("Ped file '%s' is not readable.", pedPath.toString()));
+      }
+      String templatePathStr = pedPath.toString();
+      if (!templatePathStr.endsWith(".ped")) {
+        throw new IllegalArgumentException(
+            format("Ped file '%s' is not a .ped file.", templatePathStr));
+      }
     }
   }
 }

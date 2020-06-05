@@ -13,11 +13,8 @@ java -jar vcf-report.jar -i <arg> [-o <arg>] [-f]
  -o,--output <arg>        Output report file (.html).
  -f,--force               Override the output file if it already exists.
  -t,--template <arg>      Report template file (.html).
- -pd,--pedigree <arg>     Comma separated list of pedigree files (.ped).
- -ph,--phenotypes <arg>   Semicolon separated list of CURIE* formatted
-                          Phenotypes, either for all the samples, or comma
-                          separated per sample as
-                          'sample1/phenotypes,sample2/phenotypes'
+ -pd,--pedigree <arg>     Comma-separated list of pedigree files (.ped).
+ -ph,--phenotypes <arg>   Comma-separated list of sample-phenotypes (e.g. HPO:123 or HPO:123;HPO:234 or sample0/HPO:123,sample1/HPO:234). Phenotypes are CURIE formatted (prefix:reference) and separated by a semicolon.
  -d,--debug               Enable debug mode (additional logging and pretty
                           printed report.
 
@@ -33,7 +30,7 @@ java -jar vcf-report.jar -i my.vcf.gz -o my-report.html
 java -jar vcf-report.jar -i my.vcf.gz -o my-report.html -t my-template.html
 java -jar vcf-report.jar -i my.vcf.gz -o my-report.html -t my-template.html -p my.ped,my_other.ped
 java -jar vcf-report.jar -i my.vcf.gz -o my-report.html -t my-template.html -pd my.ped,my_other.ped -ph HP:0000001;HP:0000002
-java -jar vcf-report.jar -i my.vcf.gz -o my-report.html -t my-template.html -pd my.ped,my_other.ped -ph sampleId1/HP:0000001;HP:0000002,sampleId2/HP0000001
+java -jar vcf-report.jar -i my.vcf.gz -o my-report.html -t my-template.html -pd my.ped,my_other.ped -ph sampleId1/HP:0000001;HP:0000002,sampleId2/HP:0000001
 java -jar vcf-report.jar -v
 ```
 ## Template

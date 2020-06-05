@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.molgenis.vcf.report.MixedPhenotypesException;
 import org.molgenis.vcf.report.UnexpectedEnumException;
 import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.report.model.Sample;
@@ -20,8 +21,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PhenopacketMapper {
-  private static final String SAMPLE_PHENOTYPE_SEPARATOR = "/";
-  private static final String PHENOTYPE_SEPARATOR = ";";
+  public static final String SAMPLE_PHENOTYPE_SEPARATOR = "/";
+  public static final String PHENOTYPE_SEPARATOR = ";";
 
   public Items<Phenopacket> mapPhenotypes(String phenotypes, List<Sample> samples) {
     List<Phenopacket> phenopackets = new ArrayList<>();
@@ -52,7 +53,7 @@ public class PhenopacketMapper {
     }
   }
 
-  private  void mapPhenotypes(
+  private void mapPhenotypes(
       List<Phenopacket> phenopackets, String sampleId, String[] phenotypeString) {
     Builder builder = Phenopacket.newBuilder();
 
@@ -70,7 +71,7 @@ public class PhenopacketMapper {
     phenopackets.add(builder.build());
   }
 
-  private void checkPhenotype(String phenotype) {
+  public static void checkPhenotype(String phenotype) {
     Pattern p = Pattern.compile(".+:.+");
     Matcher m = p.matcher(phenotype);
     if(!m.matches()){
@@ -100,7 +101,7 @@ public class PhenopacketMapper {
           throw new InvalidSamplePhenotypesException(samplePhenotypes);
         }
       } else {
-        throw new IllegalArgumentException("Mixing general phenotypes for all samples and phenotypes per sample is not allowed.");
+        throw new MixedPhenotypesException();
       }
     }
     return result;

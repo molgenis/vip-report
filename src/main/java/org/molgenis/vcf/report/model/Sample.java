@@ -13,7 +13,8 @@ public class Sample {
   @NonNull
   Pedigree.Person person;
 
+  //index of the sample in the VCF, -1 means the sample is not available in the file.
   @JsonProperty("index")
   @NonNull
-  Integer index;
+  int index;
 }

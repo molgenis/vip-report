@@ -8,6 +8,7 @@ import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_FORCE;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_INPUT;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_OUTPUT;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_PED;
+import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_PHENOTYPES;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_TEMPLATE;
 
 import java.io.FileNotFoundException;
@@ -17,6 +18,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.molgenis.vcf.report.mapper.IllegalPhenotypeArgumentException;
+import org.molgenis.vcf.report.utils.InvalidSamplePhenotypesException;
 import org.springframework.util.ResourceUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -136,6 +139,44 @@ class AppCommandLineOptionsTest {
             IllegalArgumentException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
 
     assertEquals("Input file 'notexists.vcf' does not exist.", exception.getMessage());
+  }
+
+  @Test
+  void validateCommandLineInputDir() throws FileNotFoundException {
+    String pedFiles =
+        ResourceUtils.getFile("classpath:example.ped").toString()
+            + ","
+            + ResourceUtils.getFile("classpath:example2.ped").toString();
+    String outputFile = sharedTempDir.resolve("example.vcf.html").toString();
+    String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
+
+    CommandLine cmd = mock(CommandLine.class);
+    doReturn(sharedTempDir.toString()).when(cmd).getOptionValue(OPT_INPUT);
+
+    IllegalArgumentException exception =
+        assertThrows(
+            IllegalArgumentException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
+    assertEquals(
+        "Input file '" + sharedTempDir.toString() + "' is a directory.", exception.getMessage());
+  }
+
+  @Test
+  void validateCommandLineInputNotVcf() throws FileNotFoundException {
+    String pedFiles =
+        ResourceUtils.getFile("classpath:example.ped").toString()
+            + ","
+            + ResourceUtils.getFile("classpath:example2.ped").toString();
+    String outputFile = sharedTempDir.resolve("example.vcf.html").toString();
+    String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
+
+    CommandLine cmd = mock(CommandLine.class);
+    doReturn(templateFile).when(cmd).getOptionValue(OPT_INPUT);
+
+    IllegalArgumentException exception =
+        assertThrows(
+            IllegalArgumentException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
+    assertEquals(
+        "Input file '" + templateFile + "' is not a .vcf or .vcf.gz file.", exception.getMessage());
   }
 
   @Test
@@ -281,5 +322,85 @@ class AppCommandLineOptionsTest {
         assertThrows(
             IllegalArgumentException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
     assertEquals("Template file '" + inputFile + "' is not a .html file.", exception.getMessage());
+  }
+
+  @Test
+  void validateCommandLinePheno() throws FileNotFoundException {
+    String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+    String pheno = "HP:123456,HP:23456";
+
+    CommandLine cmd = mock(CommandLine.class);
+    doReturn(true).when(cmd).hasOption(OPT_PHENOTYPES);
+    doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
+    doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
+    doReturn(false).when(cmd).hasOption(OPT_PED);
+    doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
+    doReturn(pheno).when(cmd).getOptionValue(OPT_PHENOTYPES);
+
+    AppCommandLineOptions.validateCommandLine(cmd);
+  }
+
+  @Test
+  void validateCommandLinePhenoSample() throws FileNotFoundException {
+    String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+    String pheno = "sample1/HP:123456;HP:234567,sample2/HP:23456";
+
+    CommandLine cmd = mock(CommandLine.class);
+    doReturn(true).when(cmd).hasOption(OPT_PHENOTYPES);
+    doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
+    doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
+    doReturn(false).when(cmd).hasOption(OPT_PED);
+    doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
+    doReturn(pheno).when(cmd).getOptionValue(OPT_PHENOTYPES);
+
+    AppCommandLineOptions.validateCommandLine(cmd);
+  }
+
+  @Test
+  void validateCommandLinePhenoSampleInvalid() throws FileNotFoundException {
+    String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+    String pheno = "sample1/HP:123456/HP:234567";
+
+    CommandLine cmd = mock(CommandLine.class);
+    doReturn(true).when(cmd).hasOption(OPT_PHENOTYPES);
+    doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
+    doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
+    doReturn(false).when(cmd).hasOption(OPT_PED);
+    doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
+    doReturn(pheno).when(cmd).getOptionValue(OPT_PHENOTYPES);
+
+    assertThrows(InvalidSamplePhenotypesException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
+  }
+
+  @Test
+  void validateCommandLinePhenoNoCurie() throws FileNotFoundException {
+    String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+    String pheno = "HP123456";
+
+    CommandLine cmd = mock(CommandLine.class);
+    doReturn(true).when(cmd).hasOption(OPT_PHENOTYPES);
+    doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
+    doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
+    doReturn(false).when(cmd).hasOption(OPT_PED);
+    doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
+    doReturn(pheno).when(cmd).getOptionValue(OPT_PHENOTYPES);
+
+    assertThrows(IllegalPhenotypeArgumentException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
+  }
+
+  @Test
+  void validateCommandLinePhenoMixed() throws FileNotFoundException {
+    String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+    String pheno = "sample/HP:123456,HP:234567";
+
+    CommandLine cmd = mock(CommandLine.class);
+    doReturn(true).when(cmd).hasOption(OPT_PHENOTYPES);
+    doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
+    doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
+    doReturn(false).when(cmd).hasOption(OPT_PED);
+    doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
+    doReturn(pheno).when(cmd).getOptionValue(OPT_PHENOTYPES);
+
+    assertThrows(MixedPhenotypesException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
   }
 }

@@ -10,9 +10,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.phenopackets.schema.v1.core.HtsFile;
 import org.phenopackets.schema.v1.core.HtsFile.HtsFormat;
 
+@ExtendWith(MockitoExtension.class)
 class HtsFileMapperTest {
 
   @Test

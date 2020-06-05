@@ -20,6 +20,6 @@ public class ObjectMapperConfigurer {
     objectMapper.addMixIn(Individual.class, IndividualMixin.class);
     objectMapper.addMixIn(HtsFile.class, HtsFileMixin.class);
 
-    objectMapper.setAnnotationIntrospector(new PhenopacketInoreSuperIntrospector());
+    objectMapper.setAnnotationIntrospector(new PhenopacketIgnoreSuperIntrospector());
   }
 }

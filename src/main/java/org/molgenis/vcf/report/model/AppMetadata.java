@@ -9,15 +9,15 @@ import lombok.experimental.NonFinal;
 @NonFinal
 public class AppMetadata {
 
-  @JsonProperty("appName")
+  @JsonProperty("name")
   @NonNull
   String appName;
 
-  @JsonProperty("appVersion")
+  @JsonProperty("version")
   @NonNull
   String appVersion;
 
-  @JsonProperty("appArgs")
+  @JsonProperty("args")
   @NonNull
   String appArguments;
 

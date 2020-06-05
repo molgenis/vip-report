@@ -12,10 +12,13 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.report.model.Sample;
 import org.phenopackets.schema.v1.core.Pedigree.Person;
 
+@ExtendWith(MockitoExtension.class)
 class HtsJdkToSamplesMapperTest {
 
   private HtsJdkToPersonsMapper htsJdkToPersonsMapper;
@@ -37,11 +40,24 @@ class HtsJdkToSamplesMapperTest {
     when(vcfHeader.getSampleNameToOffset()).thenReturn(sampleNameToOffsetMap);
 
     int maxNrSamples = 2;
-    List<Sample> samples = List.of(
-        new Sample(Person.newBuilder().setIndividualId("sample0").setPaternalId(MISSING_PERSON_ID).setMaternalId(MISSING_PERSON_ID).setFamilyId(
-            MISSING+"0").build(),0),
-            new Sample(Person.newBuilder().setIndividualId("sample1").setPaternalId(MISSING_PERSON_ID).setMaternalId(MISSING_PERSON_ID).setFamilyId(
-            MISSING+"1").build(), 1));
+    List<Sample> samples =
+        List.of(
+            new Sample(
+                Person.newBuilder()
+                    .setIndividualId("sample0")
+                    .setPaternalId(MISSING_PERSON_ID)
+                    .setMaternalId(MISSING_PERSON_ID)
+                    .setFamilyId(MISSING + "0")
+                    .build(),
+                0),
+            new Sample(
+                Person.newBuilder()
+                    .setIndividualId("sample1")
+                    .setPaternalId(MISSING_PERSON_ID)
+                    .setMaternalId(MISSING_PERSON_ID)
+                    .setFamilyId(MISSING + "1")
+                    .build(),
+                1));
     Items<Sample> expectedSampleItems = new Items<>(samples, 3);
     Assertions.assertEquals(
         expectedSampleItems, htsJdkToPersonsMapper.map(vcfHeader, maxNrSamples));

@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.apache.logging.log4j.util.Strings;
 import org.molgenis.vcf.report.mapper.HtsFileMapper;
 import org.molgenis.vcf.report.mapper.HtsJdkMapper;
 import org.molgenis.vcf.report.mapper.PedToPersonMapper;
@@ -75,7 +74,7 @@ public class ReportGenerator {
     Items<Sample> samples = createPersons(vcfFileReader, pedigreePaths, reportGeneratorSettings);
 
     Items<Phenopacket> phenopackets;
-    if (!Strings.isEmpty(phenotypes)) {
+    if (phenotypes != null && !phenotypes.isEmpty()) {
       phenopackets = phenopacketMapper.mapPhenotypes(phenotypes, samples.getItems());
     }else{
       phenopackets = new Items<>(Collections.emptyList(),0);
