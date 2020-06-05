@@ -19,10 +19,12 @@ import org.molgenis.vcf.report.generator.ReportWriter;
 import org.molgenis.vcf.report.generator.ReportWriterSettings;
 import org.molgenis.vcf.report.generator.SampleSettings;
 import org.molgenis.vcf.report.generator.Settings;
+import org.molgenis.vcf.report.model.AppMetadata;
 import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.report.model.Report;
 import org.molgenis.vcf.report.model.ReportData;
 import org.molgenis.vcf.report.model.ReportMetadata;
+import org.phenopackets.schema.v1.core.HtsFile;
 
 @ExtendWith(MockitoExtension.class)
 class ReportServiceTest {
@@ -47,7 +49,7 @@ class ReportServiceTest {
     Path outputReportPath = sharedTempDir.resolve("example.vcf.html");
     Report report =
         new Report(
-            new ReportMetadata(appName, appVersion, appArguments),
+            new ReportMetadata(new AppMetadata(appName, appVersion, appArguments), HtsFile.newBuilder().build()),
             new ReportData(new Items<>(emptyList(), 0), new Items<>(emptyList(), 0), new Items<>(emptyList(), 0)));
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
