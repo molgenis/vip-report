@@ -7,7 +7,7 @@ import htsjdk.variant.vcf.VCFHeader;
 import java.util.List;
 import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.report.model.Record;
-import org.phenopackets.schema.v1.core.Pedigree.Person;
+import org.molgenis.vcf.report.model.Sample;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -23,11 +23,11 @@ public class HtsJdkMapper {
   }
 
   public Items<Record> mapRecords(
-      Iterable<VariantContext> variantContexts, int maxRecords, List<Person> persons) {
-    return htsJdkToRecordsMapper.map(variantContexts, maxRecords, persons);
+      Iterable<VariantContext> variantContexts, int maxRecords, List<Sample> samples) {
+    return htsJdkToRecordsMapper.map(variantContexts, maxRecords, samples);
   }
 
-  public Items<Person> mapSamples(VCFHeader vcfHeader, int maxSamples) {
+  public Items<Sample> mapSamples(VCFHeader vcfHeader, int maxSamples) {
     return htsJdkToPersonsMapper.map(vcfHeader, maxSamples);
   }
 }

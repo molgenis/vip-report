@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Spliterators;
 import java.util.stream.StreamSupport;
+import org.molgenis.vcf.report.model.Sample;
 import org.molgenis.vcf.report.utils.PedIndividual;
 import org.molgenis.vcf.report.utils.PedIndividual.AffectionStatus;
 import org.molgenis.vcf.report.utils.PedReader;
@@ -18,8 +19,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PedToPersonMapper {
-  public Map<String, Person> mapPedFileToPersons(List<Path> pedigreePaths, int maxNrSamples) {
-    Map<String, Person> persons = new HashMap<>();
+  public Map<String, Sample> mapPedFileToPersons(List<Path> pedigreePaths, int maxNrSamples) {
+    Map<String, Sample> persons = new HashMap<>();
     for (Path pedigreePath : pedigreePaths) {
       try (PedReader reader = new PedReader(new FileReader(pedigreePath.toFile()))) {
         maxNrSamples = maxNrSamples - persons.size();
@@ -34,12 +35,12 @@ public class PedToPersonMapper {
     return persons;
   }
 
-  static Map<String, Person> parse(PedReader reader, int maxNrSamples) {
-    final Map<String, Person> pedigreePersons = new HashMap<>();
+  static Map<String, Sample> parse(PedReader reader, int maxNrSamples) {
+    final Map<String, Sample> pedigreePersons = new HashMap<>();
     StreamSupport.stream(Spliterators.spliteratorUnknownSize(reader.iterator(), 0), false)
         .limit(maxNrSamples)
         .map(PedToPersonMapper::map)
-        .forEach(person -> pedigreePersons.put(person.getIndividualId(), person));
+        .forEach(person -> pedigreePersons.put(person.getIndividualId(), new Sample(person,null,false)));
     return pedigreePersons;
   }
 

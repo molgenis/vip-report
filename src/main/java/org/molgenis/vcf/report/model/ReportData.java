@@ -5,15 +5,14 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.NonFinal;
 import org.phenopackets.schema.v1.Phenopacket;
-import org.phenopackets.schema.v1.core.Pedigree.Person;
 
 @Value
 @NonFinal
 public class ReportData {
 
-  @JsonProperty("persons")
+  @JsonProperty("samples")
   @NonNull
-  Items<Person> persons;
+  Items<Sample> samples;
 
   @JsonProperty("phenotypes")
   @NonNull
