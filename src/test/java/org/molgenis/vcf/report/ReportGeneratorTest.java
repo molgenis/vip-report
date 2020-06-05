@@ -30,6 +30,7 @@ import org.molgenis.vcf.report.model.Record;
 import org.molgenis.vcf.report.model.Report;
 import org.molgenis.vcf.report.model.ReportData;
 import org.molgenis.vcf.report.model.ReportMetadata;
+import org.molgenis.vcf.report.model.Sample;
 import org.molgenis.vcf.report.utils.PersonListMerger;
 import org.phenopackets.schema.v1.Phenopacket;
 import org.phenopackets.schema.v1.core.Pedigree.Person;
@@ -53,7 +54,7 @@ class ReportGeneratorTest {
     int maxNrSamples = 10;
     int maxNrRecords = 100;
 
-    Items<Person> vcfSampleItems = new Items<>(emptyList(), 3);
+    Items<Sample> vcfSampleItems = new Items<>(emptyList(), 3);
     when(htsJdkMapper.mapSamples(any(VCFHeader.class), eq(maxNrSamples))).thenReturn(vcfSampleItems);
 
     Items<Record> recordItems = new Items<>(emptyList(), 5);
@@ -65,10 +66,10 @@ class ReportGeneratorTest {
     Path inputVcfPath = Paths.get("src", "test", "resources", "example.vcf");
     List<Path> pedPath = Collections.singletonList(Paths.get("src", "test", "resources", "example.ped"));
 
-    Map<String, Person> pedSampleItems = emptyMap();
+    Map<String, Sample> pedSampleItems = emptyMap();
     when(pedToPersonMapper.mapPedFileToPersons(pedPath, 10)).thenReturn(pedSampleItems);
 
-    Items<Person> sampleItems = new Items<>(emptyList(), 6);
+    Items<Sample> sampleItems = new Items<>(emptyList(), 6);
     when(personListMerger.merge(vcfSampleItems.getItems(), pedSampleItems, 10)).thenReturn(sampleItems);
 
     String phenotypes = "hpo:123456;omim3456";
