@@ -18,6 +18,7 @@ import org.molgenis.vcf.report.model.Record;
 import org.molgenis.vcf.report.model.Report;
 import org.molgenis.vcf.report.model.ReportData;
 import org.molgenis.vcf.report.model.ReportMetadata;
+import org.molgenis.vcf.report.model.Sample;
 import org.molgenis.vcf.report.utils.PersonListMerger;
 import org.phenopackets.schema.v1.Phenopacket;
 import org.phenopackets.schema.v1.core.HtsFile;
@@ -69,45 +70,38 @@ public class ReportGenerator {
       List<Path> pedigreePaths,
       String phenotypes,
       ReportGeneratorSettings reportGeneratorSettings) {
+    HtsFile htsFile = htsFileMapper.map(vcfFileReader.getFileHeader(), vcfPath.toString());
 
-    Items<Person> persons = createVcfPersons(vcfFileReader, reportGeneratorSettings);
-    HtsFile htsFile = htsFileMapper.map(vcfFileReader.getFileHeader(), vcfPath.toString(), persons);
-    if (pedigreePaths != null) {
-      persons = createPersons(persons, pedigreePaths, reportGeneratorSettings);
-    }
+    Items<Sample> samples = createPersons(vcfFileReader, pedigreePaths, reportGeneratorSettings);
 
     Items<Phenopacket> phenopackets;
     if (!Strings.isEmpty(phenotypes)) {
-      phenopackets = phenopacketMapper.mapPhenotypes(phenotypes, persons.getItems());
-    } else {
-      phenopackets = new Items<>(Collections.emptyList(), 0);
+      phenopackets = phenopacketMapper.mapPhenotypes(phenotypes, samples.getItems());
+    }else{
+      phenopackets = new Items<>(Collections.emptyList(),0);
     }
 
     Items<Record> records =
-        createRecords(vcfFileReader, reportGeneratorSettings, persons.getItems());
+        createRecords(vcfFileReader, reportGeneratorSettings, samples.getItems());
     ReportMetadata reportMetadata =
         new ReportMetadata(
             reportGeneratorSettings.getAppName(),
             reportGeneratorSettings.getAppVersion(),
             reportGeneratorSettings.getAppArguments());
-    ReportData reportData = new ReportData(htsFile, persons, phenopackets, records);
+    ReportData reportData = new ReportData(htsFile, samples, phenopackets, records);
     return new Report(reportMetadata, reportData);
   }
 
-  private Items<Person> createVcfPersons(
-      VCFFileReader vcfFileReader, ReportGeneratorSettings settings) {
+  private Items<Sample> createPersons(
+      VCFFileReader vcfFileReader, List<Path> pedigreePaths, ReportGeneratorSettings settings) {
     VCFHeader fileHeader = vcfFileReader.getFileHeader();
     int maxNrSamples = settings.getMaxNrSamples();
-    return htsJdkMapper.mapSamples(fileHeader, maxNrSamples);
-  }
-
-  private Items<Person> createPersons(
-      Items<Person> persons, List<Path> pedigreePaths, ReportGeneratorSettings settings) {
-    int maxNrSamples = settings.getMaxNrSamples();
-    final Map<String, Person> pedigreePersons =
-        pedToPersonMapper.mapPedFileToPersons(pedigreePaths, maxNrSamples);
-    persons = personListMerger.merge(persons.getItems(), pedigreePersons, maxNrSamples);
-    return persons;
+    Items<Sample> samples = htsJdkMapper.mapSamples(fileHeader, maxNrSamples);
+    if (pedigreePaths != null) {
+      final Map<String, Sample> pedigreePersons = pedToPersonMapper.mapPedFileToPersons(pedigreePaths, maxNrSamples);
+      samples = personListMerger.merge(samples.getItems(), pedigreePersons, maxNrSamples);
+    }
+    return samples;
   }
 
 
@@ -115,7 +109,7 @@ public class ReportGenerator {
   private Items<Record> createRecords(
       VCFFileReader vcfFileReader,
       ReportGeneratorSettings reportGeneratorSettings,
-      List<Person> samples) {
+      List<Sample> samples) {
     int maxNrRecords = reportGeneratorSettings.getMaxNrRecords();
     return htsJdkMapper.mapRecords(vcfFileReader, maxNrRecords, samples);
   }

@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.molgenis.vcf.report.model.Record;
 import org.molgenis.vcf.report.model.RecordSample;
+import org.molgenis.vcf.report.model.Sample;
 import org.phenopackets.schema.v1.core.Pedigree.Person;
 
 @ExtendWith(MockitoExtension.class)
@@ -96,14 +97,14 @@ class HtsJdkToRecordMapperTest {
             List.of("q10", "s50"),
             List.of(recordSample));
 
-    Person sample0 = Person.newBuilder().setIndividualId("sample0").build();
+    Sample sample0 = new Sample(Person.newBuilder().setIndividualId("sample0").build(),0,true);
     Assertions.assertEquals(record, htsJdkToRecordMapper.map(variantContext, List.of(sample0)));
   }
 
   @Test
   void mapMissingContig() {
     VariantContext variantContext = mock(VariantContext.class);
-    List<Person> samples = emptyList();
+    List<Sample> samples = emptyList();
     assertThrows(VcfParseException.class, () -> htsJdkToRecordMapper.map(variantContext, samples));
   }
 }
