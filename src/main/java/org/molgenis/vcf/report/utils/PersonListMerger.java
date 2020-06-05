@@ -18,8 +18,7 @@ public class PersonListMerger {
             Sample merged =
                 new Sample(
                     pedigreeSamples.get(sample.getPerson().getIndividualId()).getPerson(),
-                    sample.getIndex(),
-                    sample.isHasData());
+                    sample.getIndex());
             pedigreeSamples.put(sample.getPerson().getIndividualId(), merged);
           }else{
             pedigreeSamples.put(sample.getPerson().getIndividualId(), sample);

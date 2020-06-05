@@ -49,7 +49,7 @@ class PedToPersonMapperTest {
             .setPaternalId("Jimmy")
             .setSex(org.phenopackets.schema.v1.core.Sex.MALE)
             .setAffectedStatus(AffectedStatus.AFFECTED)
-            .build(), null, false));
+            .build(), -1));
     expected.put(
         "Jimmy",
         new Sample(Person.newBuilder()
@@ -59,7 +59,7 @@ class PedToPersonMapperTest {
             .setPaternalId("0")
             .setSex(org.phenopackets.schema.v1.core.Sex.MALE)
             .setAffectedStatus(AffectedStatus.UNAFFECTED)
-            .build(), null, false));
+            .build(), -1));
     expected.put(
         "Jane",
         new Sample(Person.newBuilder()
@@ -69,7 +69,7 @@ class PedToPersonMapperTest {
             .setPaternalId("0")
             .setSex(org.phenopackets.schema.v1.core.Sex.FEMALE)
             .setAffectedStatus(AffectedStatus.UNAFFECTED)
-            .build(), null, false));
+            .build(), -1));
     expected.put(
         "James",
         new Sample(Person.newBuilder()
@@ -79,7 +79,7 @@ class PedToPersonMapperTest {
             .setPaternalId("0")
             .setSex(org.phenopackets.schema.v1.core.Sex.MALE)
             .setAffectedStatus(AffectedStatus.UNAFFECTED)
-            .build(), null, false));
+            .build(), -1));
     expected.put(
         "Jake",
         new Sample(Person.newBuilder()
@@ -89,7 +89,7 @@ class PedToPersonMapperTest {
             .setPaternalId("0")
             .setSex(org.phenopackets.schema.v1.core.Sex.MALE)
             .setAffectedStatus(AffectedStatus.AFFECTED)
-            .build(), null, false));
+            .build(), -1));
 
     assertEquals(expected,pedToPersonMapper.mapPedFileToPersons(paths, 10));
   }
@@ -110,7 +110,7 @@ class PedToPersonMapperTest {
             .setPaternalId("Jimmy")
             .setSex(org.phenopackets.schema.v1.core.Sex.MALE)
             .setAffectedStatus(AffectedStatus.AFFECTED)
-            .build(), null, false));
+            .build(), -1));
     expected.put(
         "Jimmy",
         new Sample(Person.newBuilder()
@@ -120,7 +120,7 @@ class PedToPersonMapperTest {
             .setPaternalId("0")
             .setSex(org.phenopackets.schema.v1.core.Sex.MALE)
             .setAffectedStatus(AffectedStatus.UNAFFECTED)
-            .build(), null, false));
+            .build(), -1));
 
     assertEquals(expected,pedToPersonMapper.mapPedFileToPersons(paths, 2));
   }
@@ -149,7 +149,7 @@ class PedToPersonMapperTest {
             .setPaternalId("paternal1")
             .setSex(org.phenopackets.schema.v1.core.Sex.MALE)
             .setAffectedStatus(AffectedStatus.AFFECTED)
-            .build(), null, false));
+            .build(), -1));
     expected.put(
         "id2",
         new Sample(Person.newBuilder()
@@ -159,7 +159,7 @@ class PedToPersonMapperTest {
             .setPaternalId("paternal2")
             .setSex(org.phenopackets.schema.v1.core.Sex.FEMALE)
             .setAffectedStatus(AffectedStatus.UNAFFECTED)
-            .build(), null, false));
+            .build(), -1));
 
     assertEquals(expected, pedToPersonMapper.parse(pedReader, 10));
   }
@@ -182,7 +182,7 @@ class PedToPersonMapperTest {
             .setPaternalId("paternal")
             .setSex(org.phenopackets.schema.v1.core.Sex.UNKNOWN_SEX)
             .setAffectedStatus(AffectedStatus.MISSING)
-            .build(), null, false));
+            .build(), -1));
 
     assertEquals(expected, pedToPersonMapper.parse(pedReader, 10));
   }

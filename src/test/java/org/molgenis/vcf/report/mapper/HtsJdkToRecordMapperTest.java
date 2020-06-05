@@ -97,7 +97,7 @@ class HtsJdkToRecordMapperTest {
             List.of("q10", "s50"),
             List.of(recordSample));
 
-    Sample sample0 = new Sample(Person.newBuilder().setIndividualId("sample0").build(),0,true);
+    Sample sample0 = new Sample(Person.newBuilder().setIndividualId("sample0").build(),0);
     Assertions.assertEquals(record, htsJdkToRecordMapper.map(variantContext, List.of(sample0)));
   }
 

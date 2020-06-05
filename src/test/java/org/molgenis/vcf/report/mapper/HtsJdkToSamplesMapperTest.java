@@ -39,9 +39,9 @@ class HtsJdkToSamplesMapperTest {
     int maxNrSamples = 2;
     List<Sample> samples = List.of(
         new Sample(Person.newBuilder().setIndividualId("sample0").setPaternalId(MISSING_PERSON_ID).setMaternalId(MISSING_PERSON_ID).setFamilyId(
-            MISSING+"0").build(),0,true),
+            MISSING+"0").build(),0),
             new Sample(Person.newBuilder().setIndividualId("sample1").setPaternalId(MISSING_PERSON_ID).setMaternalId(MISSING_PERSON_ID).setFamilyId(
-            MISSING+"1").build(), 1, true));
+            MISSING+"1").build(), 1));
     Items<Sample> expectedSampleItems = new Items<>(samples, 3);
     Assertions.assertEquals(
         expectedSampleItems, htsJdkToPersonsMapper.map(vcfHeader, maxNrSamples));

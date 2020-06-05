@@ -14,9 +14,6 @@ public class Sample {
   Pedigree.Person person;
 
   @JsonProperty("index")
-  Integer index;
-
-  @JsonProperty("hasData")
   @NonNull
-  boolean hasData;
+  Integer index;
 }

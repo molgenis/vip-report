@@ -43,7 +43,7 @@ public class HtsJdkToPersonsMapper {
             if (offset < maxNrSamples) {
               // Paternal and maternal ID can be left empty, but this way we keep it consistent with
               // the Persons loaded via the ped files.
-              Sample sample = new Sample(createPerson(sampleName, offset), offset, true);
+              Sample sample = new Sample(createPerson(sampleName, offset), offset);
               samples.set(offset, sample);
             }
           });

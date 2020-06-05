@@ -36,9 +36,9 @@ class PhenopacketMapperTest {
   void mapPhenotypesGeneral() {
     List<Sample> samples = new ArrayList<>();
     samples.add(new Sample(Person.newBuilder().setIndividualId("id1").setFamilyId("fam1").setMaternalId("maternal1").setPaternalId("paternal1").setSex(
-        org.phenopackets.schema.v1.core.Sex.MALE).setAffectedStatus(AffectedStatus.AFFECTED).build(), null, false));
+        org.phenopackets.schema.v1.core.Sex.MALE).setAffectedStatus(AffectedStatus.AFFECTED).build(), -1));
     samples.add(new Sample(Person.newBuilder().setIndividualId("id2").setFamilyId("fam1").setMaternalId("maternal2").setPaternalId("paternal2").setSex(
-        org.phenopackets.schema.v1.core.Sex.FEMALE).setAffectedStatus(AffectedStatus.UNAFFECTED).build(), null, false));
+        org.phenopackets.schema.v1.core.Sex.FEMALE).setAffectedStatus(AffectedStatus.UNAFFECTED).build(), -1));
 
     List<Phenopacket> expected = new ArrayList<>();
 

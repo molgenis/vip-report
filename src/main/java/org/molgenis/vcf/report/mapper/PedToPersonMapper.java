@@ -40,7 +40,7 @@ public class PedToPersonMapper {
     StreamSupport.stream(Spliterators.spliteratorUnknownSize(reader.iterator(), 0), false)
         .limit(maxNrSamples)
         .map(PedToPersonMapper::map)
-        .forEach(person -> pedigreePersons.put(person.getIndividualId(), new Sample(person,null,false)));
+        .forEach(person -> pedigreePersons.put(person.getIndividualId(), new Sample(person,-1)));
     return pedigreePersons;
   }
 
