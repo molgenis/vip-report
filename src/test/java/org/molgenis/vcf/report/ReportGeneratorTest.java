@@ -79,7 +79,7 @@ class ReportGeneratorTest {
     when(personListMerger.merge(vcfSampleItems.getItems(), pedSampleItems, 10)).thenReturn(sampleItems);
 
     HtsFile htsFile = HtsFile.newBuilder().build();
-    when(htsFileMapper.map(any(), eq(inputVcfPath.toString()), eq(vcfSampleItems))).thenReturn(htsFile);
+    when(htsFileMapper.map(any(), eq(inputVcfPath.toString()))).thenReturn(htsFile);
 
     String phenotypes = "hpo:123456;omim3456";
     String appName = "MyApp";

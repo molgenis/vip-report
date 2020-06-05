@@ -23,22 +23,13 @@ public class HtsFileMapper {
   private static final String BUILD_B_36 = "b36";
   private static final String ASSEMBLY_FIELD = "assembly";
 
-  public HtsFile map(VCFHeader fileHeader, String inputFile, Items<Person> persons) {
+  public HtsFile map(VCFHeader fileHeader, String inputFile) {
     String genomeBuild = parseGenomeBuild(fileHeader);
     return HtsFile.newBuilder()
         .setUri(inputFile)
         .setGenomeAssembly(genomeBuild)
-        .putAllIndividualToSampleIdentifiers(getSampleMap(persons))
         .setHtsFormat(HtsFormat.VCF)
         .build();
-  }
-
-  private Map<String, String> getSampleMap(Items<Person> persons) {
-    Map<String, String> sampleMap = new HashMap<>();
-    persons
-        .getItems()
-        .forEach(person -> sampleMap.put(person.getIndividualId(), person.getIndividualId()));
-    return sampleMap;
   }
 
   private String parseGenomeBuild(VCFHeader fileHeader) {

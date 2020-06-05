@@ -29,19 +29,12 @@ class HtsFileMapperTest {
     contigMap.put("assembly", "GRCh38.5");
     when(contig.getGenericFields()).thenReturn(contigMap);
     when(header.getContigLines()).thenReturn(Collections.singletonList(contig));
-    List<Person> persons = Arrays.asList(
-        Person.newBuilder()
-            .setIndividualId("John")
-            .build(),
-        Person.newBuilder()
-            .setIndividualId("Jimmy")
-            .build());
 
     Map<String, String> samples = new HashMap<>();
     samples.put("John","John");
     samples.put("Jimmy","Jimmy");
     HtsFile expected = HtsFile.newBuilder().setHtsFormat(HtsFormat.VCF).setGenomeAssembly("GRCh38").setUri("test.vcf").putAllIndividualToSampleIdentifiers(samples).build();
-    assertEquals(expected, htsFileMapper.map(header, "test.vcf",new Items<>(persons,2)));
+    assertEquals(expected, htsFileMapper.map(header, "test.vcf"));
   }
 
   @Test
@@ -53,19 +46,12 @@ class HtsFileMapperTest {
     contigMap.put("assembly", "hg19");
     when(contig.getGenericFields()).thenReturn(contigMap);
     when(header.getContigLines()).thenReturn(Collections.singletonList(contig));
-    List<Person> persons = Arrays.asList(
-        Person.newBuilder()
-            .setIndividualId("John")
-            .build(),
-        Person.newBuilder()
-            .setIndividualId("Jimmy")
-            .build());
 
     Map<String, String> samples = new HashMap<>();
     samples.put("John","John");
     samples.put("Jimmy","Jimmy");
     HtsFile expected = HtsFile.newBuilder().setHtsFormat(HtsFormat.VCF).setGenomeAssembly("GRCh37").setUri("test.vcf").putAllIndividualToSampleIdentifiers(samples).build();
-    assertEquals(expected, htsFileMapper.map(header, "test.vcf",new Items<>(persons,2)));
+    assertEquals(expected, htsFileMapper.map(header, "test.vcf"));
   }
 
   @Test
@@ -77,18 +63,11 @@ class HtsFileMapperTest {
     contigMap.put("assembly", "B36");
     when(contig.getGenericFields()).thenReturn(contigMap);
     when(header.getContigLines()).thenReturn(Collections.singletonList(contig));
-    List<Person> persons = Arrays.asList(
-        Person.newBuilder()
-            .setIndividualId("John")
-            .build(),
-        Person.newBuilder()
-            .setIndividualId("Jimmy")
-            .build());
 
     Map<String, String> samples = new HashMap<>();
     samples.put("John","John");
     samples.put("Jimmy","Jimmy");
     HtsFile expected = HtsFile.newBuilder().setHtsFormat(HtsFormat.VCF).setGenomeAssembly("GRCh36").setUri("test.vcf").putAllIndividualToSampleIdentifiers(samples).build();
-    assertEquals(expected, htsFileMapper.map(header, "test.vcf",new Items<>(persons,2)));
+    assertEquals(expected, htsFileMapper.map(header, "test.vcf"));
   }
 }
