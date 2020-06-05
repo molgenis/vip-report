@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.report.model.Record;
+import org.molgenis.vcf.report.model.Sample;
 import org.phenopackets.schema.v1.core.Pedigree.Person;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,7 +36,7 @@ class HtsJdkMapperTest {
   void mapSamples() {
     VCFHeader vcfHeader = mock(VCFHeader.class);
     int maxSamples = 123;
-    Items<Person> sampleItems = new Items<>(Collections.emptyList(), maxSamples);
+    Items<Sample> sampleItems = new Items<>(Collections.emptyList(), maxSamples);
     when(htsJdkToPersonsMapper.map(vcfHeader, maxSamples)).thenReturn(sampleItems);
     assertEquals(sampleItems, htsJdkMapper.mapSamples(vcfHeader, maxSamples));
   }
@@ -44,7 +45,7 @@ class HtsJdkMapperTest {
   void mapRecords() {
     Iterable<VariantContext> variantContextIterable = singletonList(mock(VariantContext.class));
     int maxRecords = 123;
-    List<Person> samples = emptyList();
+    List<Sample> samples = emptyList();
     Items<Record> recordItems = new Items<>(Collections.emptyList(), maxRecords);
     when(htsJdkToRecordsMapper.map(variantContextIterable, maxRecords, samples))
         .thenReturn(recordItems);

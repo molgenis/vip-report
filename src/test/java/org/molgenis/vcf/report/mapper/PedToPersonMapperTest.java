@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.molgenis.vcf.report.model.Sample;
 import org.molgenis.vcf.report.utils.PedIndividual;
 import org.molgenis.vcf.report.utils.PedIndividual.AffectionStatus;
 import org.molgenis.vcf.report.utils.PedIndividual.Sex;
@@ -38,57 +39,57 @@ class PedToPersonMapperTest {
     Path pedFile2 = ResourceUtils.getFile("classpath:example2.ped").toPath();
     List<Path> paths = Arrays.asList(pedFile1, pedFile2);
 
-    Map<String, Person> expected = new HashMap();
+    Map<String, Sample> expected = new HashMap();
     expected.put(
         "John",
-        Person.newBuilder()
+        new Sample(Person.newBuilder()
             .setIndividualId("John")
             .setFamilyId("FAM001")
             .setMaternalId("Jane")
             .setPaternalId("Jimmy")
             .setSex(org.phenopackets.schema.v1.core.Sex.MALE)
             .setAffectedStatus(AffectedStatus.AFFECTED)
-            .build());
+            .build(), -1));
     expected.put(
         "Jimmy",
-        Person.newBuilder()
+        new Sample(Person.newBuilder()
             .setIndividualId("Jimmy")
             .setFamilyId("FAM001")
             .setMaternalId("0")
             .setPaternalId("0")
             .setSex(org.phenopackets.schema.v1.core.Sex.MALE)
             .setAffectedStatus(AffectedStatus.UNAFFECTED)
-            .build());
+            .build(), -1));
     expected.put(
         "Jane",
-        Person.newBuilder()
+        new Sample(Person.newBuilder()
             .setIndividualId("Jane")
             .setFamilyId("FAM001")
             .setMaternalId("0")
             .setPaternalId("0")
             .setSex(org.phenopackets.schema.v1.core.Sex.FEMALE)
             .setAffectedStatus(AffectedStatus.UNAFFECTED)
-            .build());
+            .build(), -1));
     expected.put(
         "James",
-        Person.newBuilder()
+        new Sample(Person.newBuilder()
             .setIndividualId("James")
             .setFamilyId("FAM002")
             .setMaternalId("0")
             .setPaternalId("0")
             .setSex(org.phenopackets.schema.v1.core.Sex.MALE)
             .setAffectedStatus(AffectedStatus.UNAFFECTED)
-            .build());
+            .build(), -1));
     expected.put(
         "Jake",
-        Person.newBuilder()
+        new Sample(Person.newBuilder()
             .setIndividualId("Jake")
             .setFamilyId("FAM003")
             .setMaternalId("0")
             .setPaternalId("0")
             .setSex(org.phenopackets.schema.v1.core.Sex.MALE)
             .setAffectedStatus(AffectedStatus.AFFECTED)
-            .build());
+            .build(), -1));
 
     assertEquals(expected,pedToPersonMapper.mapPedFileToPersons(paths, 10));
   }
@@ -99,27 +100,27 @@ class PedToPersonMapperTest {
     Path pedFile2 = ResourceUtils.getFile("classpath:example2.ped").toPath();
     List<Path> paths = Arrays.asList(pedFile1, pedFile2);
 
-    Map<String, Person> expected = new HashMap();
+    Map<String, Sample> expected = new HashMap();
     expected.put(
         "John",
-        Person.newBuilder()
+        new Sample(Person.newBuilder()
             .setIndividualId("John")
             .setFamilyId("FAM001")
             .setMaternalId("Jane")
             .setPaternalId("Jimmy")
             .setSex(org.phenopackets.schema.v1.core.Sex.MALE)
             .setAffectedStatus(AffectedStatus.AFFECTED)
-            .build());
+            .build(), -1));
     expected.put(
         "Jimmy",
-        Person.newBuilder()
+        new Sample(Person.newBuilder()
             .setIndividualId("Jimmy")
             .setFamilyId("FAM001")
             .setMaternalId("0")
             .setPaternalId("0")
             .setSex(org.phenopackets.schema.v1.core.Sex.MALE)
             .setAffectedStatus(AffectedStatus.UNAFFECTED)
-            .build());
+            .build(), -1));
 
     assertEquals(expected,pedToPersonMapper.mapPedFileToPersons(paths, 2));
   }
@@ -138,27 +139,27 @@ class PedToPersonMapperTest {
     List<PedIndividual> pedIndividuals = Arrays.asList(individual1, individual2);
     when(pedReader.iterator()).thenReturn(pedIndividuals.iterator());
 
-    Map<String, Person> expected = new HashMap<>();
+    Map<String, Sample> expected = new HashMap<>();
     expected.put(
         "id1",
-        Person.newBuilder()
+        new Sample(Person.newBuilder()
             .setIndividualId("id1")
             .setFamilyId("fam1")
             .setMaternalId("maternal1")
             .setPaternalId("paternal1")
             .setSex(org.phenopackets.schema.v1.core.Sex.MALE)
             .setAffectedStatus(AffectedStatus.AFFECTED)
-            .build());
+            .build(), -1));
     expected.put(
         "id2",
-        Person.newBuilder()
+        new Sample(Person.newBuilder()
             .setIndividualId("id2")
             .setFamilyId("fam1")
             .setMaternalId("maternal2")
             .setPaternalId("paternal2")
             .setSex(org.phenopackets.schema.v1.core.Sex.FEMALE)
             .setAffectedStatus(AffectedStatus.UNAFFECTED)
-            .build());
+            .build(), -1));
 
     assertEquals(expected, pedToPersonMapper.parse(pedReader, 10));
   }
@@ -171,17 +172,17 @@ class PedToPersonMapperTest {
     List<PedIndividual> pedIndividuals = Arrays.asList(individual);
     when(pedReader.iterator()).thenReturn(pedIndividuals.iterator());
 
-    Map<String, Person> expected = new HashMap<>();
+    Map<String, Sample> expected = new HashMap<>();
     expected.put(
         "id1",
-        Person.newBuilder()
+        new Sample(Person.newBuilder()
             .setIndividualId("id1")
             .setFamilyId("fam1")
             .setMaternalId("maternal")
             .setPaternalId("paternal")
             .setSex(org.phenopackets.schema.v1.core.Sex.UNKNOWN_SEX)
             .setAffectedStatus(AffectedStatus.MISSING)
-            .build());
+            .build(), -1));
 
     assertEquals(expected, pedToPersonMapper.parse(pedReader, 10));
   }

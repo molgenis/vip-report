@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.report.model.Record;
-import org.phenopackets.schema.v1.core.Pedigree.Person;
+import org.molgenis.vcf.report.model.Sample;
 import org.springframework.stereotype.Component;
 
 /**
@@ -24,12 +24,12 @@ public class HtsJdkToRecordsMapper {
   }
 
   public Items<Record> map(
-      Iterable<VariantContext> variantContexts, int maxNrRecords, List<Person> persons) {
+      Iterable<VariantContext> variantContexts, int maxNrRecords, List<Sample> samples) {
     List<Record> records = new ArrayList<>(maxNrRecords);
     long nrRecord = 0;
     for (VariantContext variantContext : variantContexts) {
       if (nrRecord < maxNrRecords) {
-        Record record = htsJdkToRecordMapper.map(variantContext, persons);
+        Record record = htsJdkToRecordMapper.map(variantContext, samples);
         records.add(record);
       }
       ++nrRecord;

@@ -7,6 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.molgenis.vcf.report.UnexpectedEnumException;
 import org.molgenis.vcf.report.model.Items;
+import org.molgenis.vcf.report.model.Sample;
 import org.molgenis.vcf.report.utils.InvalidSamplePhenotypesException;
 import org.phenopackets.schema.v1.Phenopacket;
 import org.phenopackets.schema.v1.Phenopacket.Builder;
@@ -22,14 +23,14 @@ public class PhenopacketMapper {
   private static final String SAMPLE_PHENOTYPE_SEPARATOR = "/";
   private static final String PHENOTYPE_SEPARATOR = ";";
 
-  public Items<Phenopacket> mapPhenotypes(String phenotypes, List<Person> persons) {
+  public Items<Phenopacket> mapPhenotypes(String phenotypes, List<Sample> samples) {
     List<Phenopacket> phenopackets = new ArrayList<>();
     List<SamplePhenotype> phenotypeList = parse(phenotypes);
     for (SamplePhenotype samplePhenotype : phenotypeList) {
       PhenotypeMode mode = samplePhenotype.getMode();
       switch (mode) {
         case STRING:
-          createPhenopacketsForSamples(persons, phenopackets, samplePhenotype);
+          createPhenopacketsForSamples(samples, phenopackets, samplePhenotype);
           break;
         case PER_SAMPLE_STRING:
           mapPhenotypes(phenopackets, samplePhenotype.getSubjectId(), samplePhenotype.getPhenotypes());
@@ -42,8 +43,9 @@ public class PhenopacketMapper {
   }
 
   private void createPhenopacketsForSamples(
-      List<Person> persons, List<Phenopacket> phenopackets, SamplePhenotype samplePhenotype) {
-    for (Person person : persons) {
+      List<Sample> samples, List<Phenopacket> phenopackets, SamplePhenotype samplePhenotype) {
+    for (Sample sample : samples) {
+      Person person = sample.getPerson();
       if (person.getAffectedStatus() != AffectedStatus.UNAFFECTED) {
         mapPhenotypes(phenopackets, person.getIndividualId(), samplePhenotype.getPhenotypes());
       }

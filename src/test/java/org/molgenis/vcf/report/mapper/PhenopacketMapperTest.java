@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.molgenis.vcf.report.model.Items;
+import org.molgenis.vcf.report.model.Sample;
 import org.phenopackets.schema.v1.Phenopacket;
 import org.phenopackets.schema.v1.Phenopacket.Builder;
 import org.phenopackets.schema.v1.core.Individual;
@@ -33,18 +34,18 @@ class PhenopacketMapperTest {
 
   @Test
   void mapPhenotypesGeneral() {
-    List<Person> persons = new ArrayList<>();
-    persons.add(Person.newBuilder().setIndividualId("id1").setFamilyId("fam1").setMaternalId("maternal1").setPaternalId("paternal1").setSex(
-        org.phenopackets.schema.v1.core.Sex.MALE).setAffectedStatus(AffectedStatus.AFFECTED).build());
-    persons.add(Person.newBuilder().setIndividualId("id2").setFamilyId("fam1").setMaternalId("maternal2").setPaternalId("paternal2").setSex(
-        org.phenopackets.schema.v1.core.Sex.FEMALE).setAffectedStatus(AffectedStatus.UNAFFECTED).build());
+    List<Sample> samples = new ArrayList<>();
+    samples.add(new Sample(Person.newBuilder().setIndividualId("id1").setFamilyId("fam1").setMaternalId("maternal1").setPaternalId("paternal1").setSex(
+        org.phenopackets.schema.v1.core.Sex.MALE).setAffectedStatus(AffectedStatus.AFFECTED).build(), -1));
+    samples.add(new Sample(Person.newBuilder().setIndividualId("id2").setFamilyId("fam1").setMaternalId("maternal2").setPaternalId("paternal2").setSex(
+        org.phenopackets.schema.v1.core.Sex.FEMALE).setAffectedStatus(AffectedStatus.UNAFFECTED).build(), -1));
 
     List<Phenopacket> expected = new ArrayList<>();
 
     expected.add(createPhenopacket("id1", Arrays.asList("HP:123","test:headache","omim:234")));
 
     Items<Phenopacket> actual = phenopacketMapper
-        .mapPhenotypes("HP:123;test:headache;omim:234", persons);
+        .mapPhenotypes("HP:123;test:headache;omim:234", samples);
     assertEquals(expected,actual.getItems());
     assertEquals(expected.size(),actual.getItems().size());
   }
