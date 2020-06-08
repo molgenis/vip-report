@@ -9,9 +9,7 @@ import lombok.experimental.NonFinal;
 @NonFinal
 public class Number {
   public enum Type {
-    /**
-     * fixed number exposed through InfoMetadata.number)
-     */
+    /** fixed number exposed through InfoMetadata.number) */
     NUMBER,
     /** one value per alternate allele */
     PER_ALT,

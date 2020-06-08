@@ -18,8 +18,7 @@ import org.molgenis.vcf.report.model.metadata.RecordsMetadata;
 @ExtendWith(MockitoExtension.class)
 class HtsJdkToRecordsMetadataMapperTest {
 
-  @Mock
-  HtsJdkToInfoMetadataMapper htsJdkToInfoMetadataMapper;
+  @Mock HtsJdkToInfoMetadataMapper htsJdkToInfoMetadataMapper;
   private HtsJdkToRecordsMetadataMapper htsJdkToRecordsMetadataMapper;
 
   @BeforeEach
