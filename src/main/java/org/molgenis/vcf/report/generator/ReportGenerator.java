@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import org.molgenis.vcf.report.mapper.HtsFileMapper;
 import org.molgenis.vcf.report.mapper.HtsJdkMapper;
-import org.molgenis.vcf.report.mapper.PedToPersonMapper;
+import org.molgenis.vcf.report.mapper.PedToSamplesMapper;
 import org.molgenis.vcf.report.mapper.PhenopacketMapper;
 import org.molgenis.vcf.report.model.AppMetadata;
 import org.molgenis.vcf.report.model.Items;
@@ -28,19 +28,19 @@ import org.springframework.stereotype.Component;
 public class ReportGenerator {
   private final HtsJdkMapper htsJdkMapper;
   private final PhenopacketMapper phenopacketMapper;
-  private final PedToPersonMapper pedToPersonMapper;
+  private final PedToSamplesMapper pedToSamplesMapper;
   private final PersonListMerger personListMerger;
   private final HtsFileMapper htsFileMapper;
 
   public ReportGenerator(
       HtsJdkMapper htsJdkMapper,
       PhenopacketMapper phenopacketMapper,
-      PedToPersonMapper pedToPersonMapper,
+      PedToSamplesMapper pedToSamplesMapper,
       PersonListMerger personListMerger,
       HtsFileMapper htsFileMapper) {
     this.htsJdkMapper = requireNonNull(htsJdkMapper);
     this.phenopacketMapper = requireNonNull(phenopacketMapper);
-    this.pedToPersonMapper = requireNonNull(pedToPersonMapper);
+    this.pedToSamplesMapper = requireNonNull(pedToSamplesMapper);
     this.personListMerger = requireNonNull(personListMerger);
     this.htsFileMapper = requireNonNull(htsFileMapper);
   }
@@ -99,7 +99,8 @@ public class ReportGenerator {
     int maxNrSamples = settings.getMaxNrSamples();
     Items<Sample> samples = htsJdkMapper.mapSamples(fileHeader, maxNrSamples);
     if (pedigreePaths != null) {
-      final Map<String, Sample> pedigreePersons = pedToPersonMapper.mapPedFileToPersons(pedigreePaths, maxNrSamples);
+      final Map<String, Sample> pedigreePersons = pedToSamplesMapper
+          .mapPedFileToPersons(pedigreePaths, maxNrSamples);
       samples = personListMerger.merge(samples.getItems(), pedigreePersons, maxNrSamples);
     }
     return samples;
