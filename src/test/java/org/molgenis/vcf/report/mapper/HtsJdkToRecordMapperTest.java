@@ -3,11 +3,14 @@ package org.molgenis.vcf.report.mapper;
 import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import htsjdk.variant.variantcontext.Allele;
 import htsjdk.variant.variantcontext.Genotype;
 import htsjdk.variant.variantcontext.VariantContext;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Assertions;
@@ -56,6 +59,30 @@ class HtsJdkToRecordMapperTest {
             emptyList(),
             emptyList());
     Assertions.assertEquals(record, htsJdkToRecordMapper.map(variantContext, emptyList()));
+  }
+
+  @Test
+  void mapMultipleSamples() {
+    String contig = "MyContig";
+    int position = 123;
+
+    VariantContext variantContext = mock(VariantContext.class);
+    when(variantContext.getContig()).thenReturn(contig);
+    when(variantContext.getStart()).thenReturn(position);
+    when(variantContext.getReference()).thenReturn(Allele.REF_C);
+    when(variantContext.getAlternateAlleles()).thenReturn(List.of(Allele.ALT_C, Allele.ALT_T));
+
+    Sample sample1 = new Sample(Person.newBuilder().setIndividualId("c").build(), 0);
+    Sample sample2 = new Sample(Person.newBuilder().setIndividualId("b").build(), 1);
+    Sample sample3 = new Sample(Person.newBuilder().setIndividualId("a").build(), 2);
+    List<Sample> samples = new ArrayList<>();
+    samples.add(sample2);
+    samples.add(sample3);
+    samples.add(sample1);
+
+    htsJdkToRecordMapper.map(variantContext, samples);
+
+    verify(variantContext).getGenotypesOrderedBy(Arrays.asList("c","b","a"));
   }
 
   @Test
