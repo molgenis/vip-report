@@ -6,13 +6,8 @@ import org.molgenis.vcf.report.utils.PedIndividual.Sex;
 class PedIndividualParser {
   public PedIndividual parse(String line) {
     String[] tokens = line.split("\\s+");
-    if (tokens.length < 6) {
-      throw new InvalidPedException(
-          String.format("Invalid PED line, expected 6 columns on line: %s", line));
-    }
-    if (tokens.length > 6) {
-      throw new UnsupportedPedException(
-          String.format("Unsupported PED line, expected 6 columns on line: %s", line));
+    if (tokens.length != 6) {
+      throw new InvalidPedException(line);
     }
 
     Sex sex = parseSex(tokens[4]);
@@ -50,10 +45,7 @@ class PedIndividualParser {
         affectionStatus = AffectionStatus.AFFECTED;
         break;
       default:
-        throw new UnsupportedPedException(
-            String.format(
-                "Phenotype value '%s' that is not an affection status (-9, 0, 1 or 2) is unsupported",
-                token));
+        throw new UnsupportedPedException(token);
     }
     return affectionStatus;
   }

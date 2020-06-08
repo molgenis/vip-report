@@ -23,6 +23,7 @@ import org.molgenis.vcf.report.model.Info;
 import org.molgenis.vcf.report.model.Record;
 import org.molgenis.vcf.report.model.RecordSample;
 import org.molgenis.vcf.report.model.Sample;
+import org.phenopackets.schema.v1.core.Pedigree.Person;
 
 @ExtendWith(MockitoExtension.class)
 class HtsJdkToRecordMapperTest {
@@ -113,9 +114,8 @@ class HtsJdkToRecordMapperTest {
             info,
             List.of(recordSample));
 
-    Sample sample0 = new Sample("sample0");
-    Assertions.assertEquals(
-        record, htsJdkToRecordMapper.map(vcfHeader, variantContext, List.of(sample0)));
+    Sample sample0 = new Sample(Person.newBuilder().setIndividualId("sample0").build(),0);
+    Assertions.assertEquals(record, htsJdkToRecordMapper.map(variantContext, List.of(sample0)));
   }
 
   @Test

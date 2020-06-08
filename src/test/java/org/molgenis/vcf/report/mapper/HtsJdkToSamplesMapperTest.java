@@ -3,6 +3,8 @@ package org.molgenis.vcf.report.mapper;
 import static java.util.Collections.emptyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.molgenis.vcf.report.mapper.HtsJdkToPersonsMapper.MISSING_PERSON_ID;
+import static org.molgenis.vcf.report.mapper.HtsJdkToPersonsMapper.MISSING;
 
 import htsjdk.variant.vcf.VCFHeader;
 import java.util.HashMap;
@@ -10,16 +12,20 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.report.model.Sample;
+import org.phenopackets.schema.v1.core.Pedigree.Person;
 
+@ExtendWith(MockitoExtension.class)
 class HtsJdkToSamplesMapperTest {
 
-  private HtsJdkToSamplesMapper htsJdkToSamplesMapper;
+  private HtsJdkToPersonsMapper htsJdkToPersonsMapper;
 
   @BeforeEach
   void setUpBeforeEach() {
-    htsJdkToSamplesMapper = new HtsJdkToSamplesMapper();
+    htsJdkToPersonsMapper = new HtsJdkToPersonsMapper();
   }
 
   @Test
@@ -34,10 +40,27 @@ class HtsJdkToSamplesMapperTest {
     when(vcfHeader.getSampleNameToOffset()).thenReturn(sampleNameToOffsetMap);
 
     int maxNrSamples = 2;
-    List<Sample> samples = List.of(new Sample("sample0"), new Sample("sample1"));
+    List<Sample> samples =
+        List.of(
+            new Sample(
+                Person.newBuilder()
+                    .setIndividualId("sample0")
+                    .setPaternalId(MISSING_PERSON_ID)
+                    .setMaternalId(MISSING_PERSON_ID)
+                    .setFamilyId(MISSING + "0")
+                    .build(),
+                0),
+            new Sample(
+                Person.newBuilder()
+                    .setIndividualId("sample1")
+                    .setPaternalId(MISSING_PERSON_ID)
+                    .setMaternalId(MISSING_PERSON_ID)
+                    .setFamilyId(MISSING + "1")
+                    .build(),
+                1));
     Items<Sample> expectedSampleItems = new Items<>(samples, 3);
     Assertions.assertEquals(
-        expectedSampleItems, htsJdkToSamplesMapper.map(vcfHeader, maxNrSamples));
+        expectedSampleItems, htsJdkToPersonsMapper.map(vcfHeader, maxNrSamples));
   }
 
   @Test
@@ -45,9 +68,9 @@ class HtsJdkToSamplesMapperTest {
     VCFHeader vcfHeader = mock(VCFHeader.class);
     when(vcfHeader.hasGenotypingData()).thenReturn(false);
 
-    Items<Sample> expectedSampleItems = new Items<>(emptyList(), 0);
+    Items<Person> expectedSampleItems = new Items<>(emptyList(), 0);
     int maxNrSamples = 2;
     Assertions.assertEquals(
-        expectedSampleItems, htsJdkToSamplesMapper.map(vcfHeader, maxNrSamples));
+        expectedSampleItems, htsJdkToPersonsMapper.map(vcfHeader, maxNrSamples));
   }
 }

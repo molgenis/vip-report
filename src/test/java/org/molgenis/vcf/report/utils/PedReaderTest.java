@@ -54,7 +54,7 @@ class PedReaderTest {
 
     try (PedReader pedReader = new PedReader(new StringReader(ped))) {
       Iterator<PedIndividual> iterator = pedReader.iterator();
-      assertThrows(UnsupportedPedException.class, iterator::next);
+      assertThrows(InvalidPedException.class, iterator::next);
     }
   }
 

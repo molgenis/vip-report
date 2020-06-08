@@ -1,12 +1,18 @@
 package org.molgenis.vcf.report;
 
 import static java.lang.String.format;
+import static org.molgenis.vcf.report.mapper.PhenopacketMapper.PHENOTYPE_SEPARATOR;
+import static org.molgenis.vcf.report.mapper.PhenopacketMapper.SAMPLE_PHENOTYPE_SEPARATOR;
+import static org.molgenis.vcf.report.mapper.PhenopacketMapper.checkPhenotype;
+import static org.molgenis.vcf.report.utils.PathUtils.parsePaths;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+import org.molgenis.vcf.report.utils.InvalidSamplePhenotypesException;
 
 class AppCommandLineOptions {
 
@@ -16,6 +22,10 @@ class AppCommandLineOptions {
   static final String OPT_OUTPUT_LONG = "output";
   static final String OPT_TEMPLATE = "t";
   static final String OPT_TEMPLATE_LONG = "template";
+  static final String OPT_PED = "pd";
+  static final String OPT_PED_LONG = "pedigree";
+  static final String OPT_PHENOTYPES = "ph";
+  static final String OPT_PHENOTYPES_LONG = "phenotypes";
   static final String OPT_FORCE = "f";
   static final String OPT_FORCE_LONG = "force";
   static final String OPT_DEBUG = "d";
@@ -52,6 +62,19 @@ class AppCommandLineOptions {
             .desc("Report template file (.html).")
             .build());
     appOptions.addOption(
+        Option.builder(OPT_PED)
+            .hasArg(true)
+            .longOpt(OPT_PED_LONG)
+            .desc("Comma-separated list of pedigree files (.ped).")
+            .build());
+    appOptions.addOption(
+        Option.builder(OPT_PHENOTYPES)
+            .hasArg(true)
+            .longOpt(OPT_PHENOTYPES_LONG)
+            .desc(
+                "Comma-separated list of sample-phenotypes (e.g. HPO:123 or HPO:123;HPO:234 or sample0/HPO:123,sample1/HPO:234). Phenotypes are CURIE formatted (prefix:reference) and separated by a semicolon.")
+            .build());
+    appOptions.addOption(
         Option.builder(OPT_DEBUG)
             .longOpt(OPT_DEBUG_LONG)
             .desc("Enable debug mode (additional logging and pretty printed report.")
@@ -82,6 +105,31 @@ class AppCommandLineOptions {
     validateInput(commandLine);
     validateOutput(commandLine);
     validateTemplate(commandLine);
+    validatePed(commandLine);
+    validatePhenotypes(commandLine);
+  }
+
+  private static void validatePhenotypes(CommandLine commandLine) {
+    if (!commandLine.hasOption(OPT_PHENOTYPES)) {
+      return;
+    }
+    String phenotypesString = commandLine.getOptionValue(OPT_PHENOTYPES);
+    if (phenotypesString.contains(SAMPLE_PHENOTYPE_SEPARATOR)) {
+      for (String samplePhenotypes : phenotypesString.split(",")) {
+        if (samplePhenotypes.contains("/")) {
+          if (samplePhenotypes.split("/").length != 2) {
+            throw new InvalidSamplePhenotypesException(samplePhenotypes);
+          }
+        } else {
+          throw new MixedPhenotypesException();
+        }
+      }
+    } else {
+      String[] phenotypes = phenotypesString.split(PHENOTYPE_SEPARATOR);
+      for (String phenotype : phenotypes) {
+        checkPhenotype(phenotype);
+      }
+    }
   }
 
   private static void validateInput(CommandLine commandLine) {
@@ -146,6 +194,32 @@ class AppCommandLineOptions {
     if (!templatePathStr.endsWith(".html")) {
       throw new IllegalArgumentException(
           format("Template file '%s' is not a .html file.", templatePathStr));
+    }
+  }
+
+  private static void validatePed(CommandLine commandLine) {
+    if (!commandLine.hasOption(OPT_PED)) {
+      return;
+    }
+    List<Path> pedPaths = parsePaths(commandLine.getOptionValue(OPT_PED));
+    for (Path pedPath : pedPaths) {
+      if (!Files.exists(pedPath)) {
+        throw new IllegalArgumentException(
+            format("Ped file '%s' does not exist.", pedPath.toString()));
+      }
+      if (Files.isDirectory(pedPath)) {
+        throw new IllegalArgumentException(
+            format("Ped file '%s' is a directory.", pedPath.toString()));
+      }
+      if (!Files.isReadable(pedPath)) {
+        throw new IllegalArgumentException(
+            format("Ped file '%s' is not readable.", pedPath.toString()));
+      }
+      String templatePathStr = pedPath.toString();
+      if (!templatePathStr.endsWith(".ped")) {
+        throw new IllegalArgumentException(
+            format("Ped file '%s' is not a .ped file.", templatePathStr));
+      }
     }
   }
 }
