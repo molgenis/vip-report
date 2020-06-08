@@ -4,6 +4,7 @@ import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import htsjdk.variant.vcf.VCFHeader;
@@ -40,11 +41,13 @@ class ReportGeneratorTest {
     int maxNrSamples = 10;
     int maxNrRecords = 100;
 
+    VCFHeader vcfHeader = mock(VCFHeader.class);
     Items<Sample> sampleItems = new Items<>(emptyList(), 3);
-    when(htsJdkMapper.mapSamples(any(VCFHeader.class), eq(maxNrSamples))).thenReturn(sampleItems);
+    when(htsJdkMapper.mapSamples(any(), eq(maxNrSamples))).thenReturn(sampleItems);
 
     Items<Record> recordItems = new Items<>(emptyList(), 5);
-    when(htsJdkMapper.mapRecords(any(), eq(maxNrRecords), eq(emptyList()))).thenReturn(recordItems);
+    when(htsJdkMapper.mapRecords(any(), any(), eq(maxNrRecords), eq(emptyList())))
+        .thenReturn(recordItems);
 
     Path inputVcfPath = Paths.get("src", "test", "resources", "example.vcf");
     String appName = "MyApp";

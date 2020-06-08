@@ -23,8 +23,11 @@ public class HtsJdkMapper {
   }
 
   public Items<Record> mapRecords(
-      Iterable<VariantContext> variantContexts, int maxRecords, List<Sample> samples) {
-    return htsJdkToRecordsMapper.map(variantContexts, maxRecords, samples);
+      VCFHeader vcfHeader,
+      Iterable<VariantContext> variantContexts,
+      int maxRecords,
+      List<Sample> samples) {
+    return htsJdkToRecordsMapper.map(vcfHeader, variantContexts, maxRecords, samples);
   }
 
   public Items<Sample> mapSamples(VCFHeader vcfHeader, int maxSamples) {

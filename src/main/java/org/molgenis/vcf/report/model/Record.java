@@ -2,6 +2,7 @@ package org.molgenis.vcf.report.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
+import java.util.Map;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.NonFinal;
@@ -34,6 +35,9 @@ public class Record {
 
   @JsonProperty("f")
   List<String> filterStatus;
+
+  @JsonProperty("n")
+  Info info;
 
   @JsonProperty("s")
   List<RecordSample> recordSamples;

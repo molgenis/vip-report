@@ -62,6 +62,7 @@ public class ReportGenerator {
       ReportGeneratorSettings reportGeneratorSettings,
       List<Sample> samples) {
     int maxNrRecords = reportGeneratorSettings.getMaxNrRecords();
-    return htsJdkMapper.mapRecords(vcfFileReader, maxNrRecords, samples);
+    return htsJdkMapper.mapRecords(
+        vcfFileReader.getFileHeader(), vcfFileReader, maxNrRecords, samples);
   }
 }

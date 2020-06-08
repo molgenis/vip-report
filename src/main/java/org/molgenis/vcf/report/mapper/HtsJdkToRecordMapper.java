@@ -6,12 +6,14 @@ import static java.util.stream.Collectors.toList;
 
 import htsjdk.variant.variantcontext.Genotype;
 import htsjdk.variant.variantcontext.VariantContext;
+import htsjdk.variant.vcf.VCFHeader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import lombok.NonNull;
+import org.molgenis.vcf.report.model.Info;
 import org.molgenis.vcf.report.model.Record;
 import org.molgenis.vcf.report.model.RecordSample;
 import org.molgenis.vcf.report.model.Sample;
@@ -24,13 +26,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class HtsJdkToRecordMapper {
 
+  private final HtsJdkToInfoMapper htsJdkToInfoMapper;
   private final HtsJdkToRecordSampleMapper htsJdkToRecordSampleMapper;
 
-  public HtsJdkToRecordMapper(HtsJdkToRecordSampleMapper htsJdkToRecordSampleMapper) {
+  public HtsJdkToRecordMapper(
+      HtsJdkToInfoMapper htsJdkToInfoMapper,
+      HtsJdkToRecordSampleMapper htsJdkToRecordSampleMapper) {
+    this.htsJdkToInfoMapper = requireNonNull(htsJdkToInfoMapper);
     this.htsJdkToRecordSampleMapper = requireNonNull(htsJdkToRecordSampleMapper);
   }
 
-  public Record map(VariantContext variantContext, List<Sample> samples) {
+  public Record map(VCFHeader vcfHeader, VariantContext variantContext, List<Sample> samples) {
     String contig = variantContext.getContig();
     if (contig == null) {
       throw new VcfParseException("Chromosome can't be empty");
@@ -62,6 +68,8 @@ public class HtsJdkToRecordMapper {
       filters = emptyList();
     }
 
+    Info info = htsJdkToInfoMapper.map(vcfHeader, variantContext.getAttributes());
+
     List<RecordSample> recordSamples;
     if (!samples.isEmpty()) {
       recordSamples = new ArrayList<>(samples.size());
@@ -76,6 +84,14 @@ public class HtsJdkToRecordMapper {
     }
 
     return new Record(
-        contig, start, ids, referenceAllele, alternateAlleles, quality, filters, recordSamples);
+        contig,
+        start,
+        ids,
+        referenceAllele,
+        alternateAlleles,
+        quality,
+        filters,
+        info,
+        recordSamples);
   }
 }
