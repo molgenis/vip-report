@@ -18,7 +18,7 @@ import org.phenopackets.schema.v1.core.Sex;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PedToPersonMapper {
+public class PedToSamplesMapper {
   public Map<String, Sample> mapPedFileToPersons(List<Path> pedigreePaths, int maxNrSamples) {
     Map<String, Sample> persons = new HashMap<>();
     for (Path pedigreePath : pedigreePaths) {
@@ -39,7 +39,7 @@ public class PedToPersonMapper {
     final Map<String, Sample> pedigreePersons = new HashMap<>();
     StreamSupport.stream(Spliterators.spliteratorUnknownSize(reader.iterator(), 0), false)
         .limit(maxNrSamples)
-        .map(PedToPersonMapper::map)
+        .map(PedToSamplesMapper::map)
         .forEach(person -> pedigreePersons.put(person.getIndividualId(), new Sample(person,-1)));
     return pedigreePersons;
   }

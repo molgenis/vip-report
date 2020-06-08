@@ -10,14 +10,15 @@ import htsjdk.variant.vcf.VCFHeader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.NonNull;
 import org.molgenis.vcf.report.model.Info;
 import org.molgenis.vcf.report.model.Record;
 import org.molgenis.vcf.report.model.RecordSample;
 import org.molgenis.vcf.report.model.Sample;
-import org.phenopackets.schema.v1.core.Pedigree.Person;
 import org.springframework.stereotype.Component;
 
 /**
@@ -75,7 +76,7 @@ public class HtsJdkToRecordMapper {
     if (!samples.isEmpty()) {
       recordSamples = new ArrayList<>(samples.size());
 
-      List<@NonNull String> sampleNames = samples.stream().map(Sample::getPerson).map(Person::getIndividualId).collect(toList());
+      List<@NonNull String> sampleNames = getOrderedVcfSampleNames(samples);
       for (Genotype genotype : variantContext.getGenotypesOrderedBy(sampleNames)) {
         //Genotype can be null if PED input contains samples that or not in the VCF
         if (genotype != null) {
@@ -97,5 +98,11 @@ public class HtsJdkToRecordMapper {
         filters,
         info,
         recordSamples);
+  }
+
+  private List<String> getOrderedVcfSampleNames(List<Sample> samples) {
+    return samples.stream().filter(sample -> sample.getIndex() != -1)
+        .sorted(Comparator.comparingInt(Sample::getIndex))
+        .map(sample -> sample.getPerson().getIndividualId()).collect(Collectors.toList());
   }
 }

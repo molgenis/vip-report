@@ -23,7 +23,7 @@ import org.molgenis.vcf.report.generator.ReportGenerator;
 import org.molgenis.vcf.report.generator.ReportGeneratorSettings;
 import org.molgenis.vcf.report.mapper.HtsFileMapper;
 import org.molgenis.vcf.report.mapper.HtsJdkMapper;
-import org.molgenis.vcf.report.mapper.PedToPersonMapper;
+import org.molgenis.vcf.report.mapper.PedToSamplesMapper;
 import org.molgenis.vcf.report.mapper.PhenopacketMapper;
 import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.report.model.Record;
@@ -42,7 +42,7 @@ class ReportGeneratorTest {
 
   @Mock private HtsJdkMapper htsJdkMapper;
   @Mock private PhenopacketMapper phenopacketMapper;
-  @Mock private PedToPersonMapper pedToPersonMapper;
+  @Mock private PedToSamplesMapper pedToSamplesMapper;
   @Mock private PersonListMerger personListMerger;
   @Mock private HtsFileMapper htsFileMapper;
   private ReportGenerator reportGenerator;
@@ -51,7 +51,7 @@ class ReportGeneratorTest {
   void setUpBeforeEach() {
     reportGenerator =
         new ReportGenerator(
-            htsJdkMapper, phenopacketMapper, pedToPersonMapper, personListMerger, htsFileMapper);
+            htsJdkMapper, phenopacketMapper, pedToSamplesMapper, personListMerger, htsFileMapper);
   }
 
   @Test
@@ -77,7 +77,7 @@ class ReportGeneratorTest {
         Collections.singletonList(Paths.get("src", "test", "resources", "example.ped"));
 
     Map<String, Sample> pedSampleItems = emptyMap();
-    when(pedToPersonMapper.mapPedFileToPersons(pedPath, 10)).thenReturn(pedSampleItems);
+    when(pedToSamplesMapper.mapPedFileToPersons(pedPath, 10)).thenReturn(pedSampleItems);
 
     Items<Sample> sampleItems = new Items<>(emptyList(), 6);
     when(personListMerger.merge(vcfSampleItems.getItems(), pedSampleItems, 10))
