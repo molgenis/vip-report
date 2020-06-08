@@ -114,8 +114,9 @@ class HtsJdkToRecordMapperTest {
             info,
             List.of(recordSample));
 
-    Sample sample0 = new Sample(Person.newBuilder().setIndividualId("sample0").build(),0);
-    Assertions.assertEquals(record, htsJdkToRecordMapper.map(variantContext, List.of(sample0)));
+    Sample sample0 = new Sample(Person.newBuilder().setIndividualId("sample0").build(), 0);
+    Assertions.assertEquals(
+        record, htsJdkToRecordMapper.map(vcfHeader, variantContext, List.of(sample0)));
   }
 
   @Test

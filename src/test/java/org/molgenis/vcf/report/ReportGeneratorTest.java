@@ -5,14 +5,12 @@ import static java.util.Collections.emptyMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import htsjdk.variant.vcf.VCFHeader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,7 +34,6 @@ import org.molgenis.vcf.report.model.Sample;
 import org.molgenis.vcf.report.utils.PersonListMerger;
 import org.phenopackets.schema.v1.Phenopacket;
 import org.phenopackets.schema.v1.core.HtsFile;
-import org.phenopackets.schema.v1.core.Pedigree.Person;
 
 @ExtendWith(MockitoExtension.class)
 class ReportGeneratorTest {
@@ -61,10 +58,11 @@ class ReportGeneratorTest {
     int maxNrRecords = 100;
 
     Items<Sample> vcfSampleItems = new Items<>(emptyList(), 3);
-    when(htsJdkMapper.mapSamples(any(VCFHeader.class), eq(maxNrSamples))).thenReturn(vcfSampleItems);
+    when(htsJdkMapper.mapSamples(any(VCFHeader.class), eq(maxNrSamples)))
+        .thenReturn(vcfSampleItems);
 
     Items<Record> recordItems = new Items<>(emptyList(), 5);
-    when(htsJdkMapper.mapRecords(any(), eq(maxNrRecords), any())).thenReturn(recordItems);
+    when(htsJdkMapper.mapRecords(any(), any(), eq(maxNrRecords), any())).thenReturn(recordItems);
 
     Items<Phenopacket> phenopacketItems = new Items<>(emptyList(), 5);
     when(phenopacketMapper.mapPhenotypes(any(), any())).thenReturn(phenopacketItems);
@@ -77,7 +75,8 @@ class ReportGeneratorTest {
     when(pedToPersonMapper.mapPedFileToPersons(pedPath, 10)).thenReturn(pedSampleItems);
 
     Items<Sample> sampleItems = new Items<>(emptyList(), 6);
-    when(personListMerger.merge(vcfSampleItems.getItems(), pedSampleItems, 10)).thenReturn(sampleItems);
+    when(personListMerger.merge(vcfSampleItems.getItems(), pedSampleItems, 10))
+        .thenReturn(sampleItems);
 
     HtsFile htsFile = HtsFile.newBuilder().build();
     when(htsFileMapper.map(any(), eq(inputVcfPath.toString()))).thenReturn(htsFile);
