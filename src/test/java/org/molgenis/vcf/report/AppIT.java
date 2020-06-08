@@ -9,7 +9,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -54,8 +53,8 @@ class AppIT {
             JSONAssert.assertEquals(
                 expectedApi.replace("window.api = ", ""),
                 actualApi.replace("window.api = ", ""),
-                false),
-        // check the rest of the report
+                true),
+         //check the rest of the report
         () ->
             assertEquals(
                 expectedReport.replace(expectedApi, "[API_VALUE]"),
