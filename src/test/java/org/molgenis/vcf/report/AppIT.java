@@ -1,5 +1,6 @@
 package org.molgenis.vcf.report;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -20,14 +21,19 @@ class AppIT {
   @TempDir Path sharedTempDir;
 
   @Test
-  void test() throws IOException, JSONException {
+  void test() throws IOException {
     String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
-    String pedFiles = ResourceUtils.getFile("classpath:example.ped").toString() +","+ResourceUtils.getFile("classpath:example2.ped").toString();
+    String pedFiles =
+        ResourceUtils.getFile("classpath:example.ped").toString()
+            + ","
+            + ResourceUtils.getFile("classpath:example2.ped").toString();
     String outputFile = sharedTempDir.resolve("example.vcf.html").toString();
     String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
     String phenotypes = "Jimmy/HP:123456,Unknown/test:Headache,Jane/OMIM:23456";
 
-    String[] args = {"-i", inputFile, "-o", outputFile, "-t", templateFile, "-pd", pedFiles, "-ph", phenotypes};
+    String[] args = {
+      "-i", inputFile, "-o", outputFile, "-t", templateFile, "-pd", pedFiles, "-ph", phenotypes
+    };
     SpringApplication.run(App.class, args);
 
     String report = Files.readString(Path.of(outputFile));
@@ -40,14 +46,20 @@ class AppIT {
             .replace("{{ outputPath }}", outputFile.replace("\\", "\\\\"))
             .replace("{{ templatePath }}", templateFile.replace("\\", "\\\\"));
 
-    //check the report api value with JSONAssert
+    // check the report api value with JSONAssert
     String actualApi = getElementValue(report, "script");
     String expectedApi = getElementValue(expectedReport, "script");
-    JSONAssert.assertEquals(
-        expectedApi.replace("window.api = ", ""), actualApi.replace("window.api = ", ""), false);
-
-    //check the rest of the report
-    assertEquals(expectedReport.replace(expectedApi,"[API_VALUE]"), report.replace(actualApi, "[API_VALUE]"));
+    assertAll(
+        () ->
+            JSONAssert.assertEquals(
+                expectedApi.replace("window.api = ", ""),
+                actualApi.replace("window.api = ", ""),
+                false),
+        // check the rest of the report
+        () ->
+            assertEquals(
+                expectedReport.replace(expectedApi, "[API_VALUE]"),
+                report.replace(actualApi, "[API_VALUE]")));
   }
 
   private String getElementValue(String html, String elementName) {
