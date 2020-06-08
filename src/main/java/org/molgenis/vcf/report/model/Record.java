@@ -2,7 +2,6 @@ package org.molgenis.vcf.report.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
-import java.util.Map;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.NonFinal;
