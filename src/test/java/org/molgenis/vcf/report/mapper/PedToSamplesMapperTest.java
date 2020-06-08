@@ -24,13 +24,13 @@ import org.phenopackets.schema.v1.core.Pedigree.Person.AffectedStatus;
 import org.springframework.util.ResourceUtils;
 
 @ExtendWith(MockitoExtension.class)
-class PedToPersonMapperTest {
+class PedToSamplesMapperTest {
 
-  @Mock private PedToPersonMapper pedToPersonMapper;
+  @Mock private PedToSamplesMapper pedToSamplesMapper;
 
   @BeforeEach
   void setUpBeforeEach() {
-    pedToPersonMapper = new PedToPersonMapper();
+    pedToSamplesMapper = new PedToSamplesMapper();
   }
 
   @Test
@@ -91,7 +91,7 @@ class PedToPersonMapperTest {
             .setAffectedStatus(AffectedStatus.AFFECTED)
             .build(), -1));
 
-    assertEquals(expected,pedToPersonMapper.mapPedFileToPersons(paths, 10));
+    assertEquals(expected, pedToSamplesMapper.mapPedFileToPersons(paths, 10));
   }
 
   @Test
@@ -122,7 +122,7 @@ class PedToPersonMapperTest {
             .setAffectedStatus(AffectedStatus.UNAFFECTED)
             .build(), -1));
 
-    assertEquals(expected,pedToPersonMapper.mapPedFileToPersons(paths, 2));
+    assertEquals(expected, pedToSamplesMapper.mapPedFileToPersons(paths, 2));
   }
 
   @Mock private PedReader pedReader;
@@ -161,7 +161,7 @@ class PedToPersonMapperTest {
             .setAffectedStatus(AffectedStatus.UNAFFECTED)
             .build(), -1));
 
-    assertEquals(expected, pedToPersonMapper.parse(pedReader, 10));
+    assertEquals(expected, pedToSamplesMapper.parse(pedReader, 10));
   }
 
   @Test
@@ -184,6 +184,6 @@ class PedToPersonMapperTest {
             .setAffectedStatus(AffectedStatus.MISSING)
             .build(), -1));
 
-    assertEquals(expected, pedToPersonMapper.parse(pedReader, 10));
+    assertEquals(expected, pedToSamplesMapper.parse(pedReader, 10));
   }
 }
