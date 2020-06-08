@@ -8,18 +8,27 @@ import java.util.List;
 import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.report.model.Record;
 import org.molgenis.vcf.report.model.Sample;
+import org.molgenis.vcf.report.model.metadata.RecordsMetadata;
 import org.springframework.stereotype.Component;
 
 @Component
 public class HtsJdkMapper {
 
+  private final HtsJdkToRecordsMetadataMapper htsJdkToRecordsMetadataMapper;
   private final HtsJdkToRecordsMapper htsJdkToRecordsMapper;
   private final HtsJdkToPersonsMapper htsJdkToPersonsMapper;
 
   public HtsJdkMapper(
-      HtsJdkToRecordsMapper htsJdkToRecordsMapper, HtsJdkToPersonsMapper htsJdkToPersonsMapper) {
+      HtsJdkToRecordsMetadataMapper htsJdkToRecordsMetadataMapper,
+      HtsJdkToRecordsMapper htsJdkToRecordsMapper,
+      HtsJdkToPersonsMapper htsJdkToPersonsMapper) {
+    this.htsJdkToRecordsMetadataMapper = requireNonNull(htsJdkToRecordsMetadataMapper);
     this.htsJdkToRecordsMapper = requireNonNull(htsJdkToRecordsMapper);
     this.htsJdkToPersonsMapper = requireNonNull(htsJdkToPersonsMapper);
+  }
+
+  public RecordsMetadata mapRecordsMetadata(VCFHeader vcfHeader) {
+    return htsJdkToRecordsMetadataMapper.map(vcfHeader);
   }
 
   public Items<Record> mapRecords(

@@ -5,6 +5,7 @@ import static java.util.Collections.emptyMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import htsjdk.variant.vcf.VCFHeader;
@@ -24,13 +25,14 @@ import org.molgenis.vcf.report.mapper.HtsFileMapper;
 import org.molgenis.vcf.report.mapper.HtsJdkMapper;
 import org.molgenis.vcf.report.mapper.PedToPersonMapper;
 import org.molgenis.vcf.report.mapper.PhenopacketMapper;
-import org.molgenis.vcf.report.model.metadata.AppMetadata;
 import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.report.model.Record;
 import org.molgenis.vcf.report.model.Report;
 import org.molgenis.vcf.report.model.ReportData;
-import org.molgenis.vcf.report.model.metadata.ReportMetadata;
 import org.molgenis.vcf.report.model.Sample;
+import org.molgenis.vcf.report.model.metadata.AppMetadata;
+import org.molgenis.vcf.report.model.metadata.RecordsMetadata;
+import org.molgenis.vcf.report.model.metadata.ReportMetadata;
 import org.molgenis.vcf.report.utils.PersonListMerger;
 import org.phenopackets.schema.v1.Phenopacket;
 import org.phenopackets.schema.v1.core.HtsFile;
@@ -61,6 +63,9 @@ class ReportGeneratorTest {
     when(htsJdkMapper.mapSamples(any(VCFHeader.class), eq(maxNrSamples)))
         .thenReturn(vcfSampleItems);
 
+    RecordsMetadata recordsMetadata = mock(RecordsMetadata.class);
+    when(htsJdkMapper.mapRecordsMetadata(any())).thenReturn(recordsMetadata);
+
     Items<Record> recordItems = new Items<>(emptyList(), 5);
     when(htsJdkMapper.mapRecords(any(), any(), eq(maxNrRecords), any())).thenReturn(recordItems);
 
@@ -89,7 +94,8 @@ class ReportGeneratorTest {
         new ReportGeneratorSettings(appName, appVersion, appArgs, maxNrSamples, maxNrRecords);
     Report report =
         new Report(
-            new ReportMetadata(new AppMetadata(appName, appVersion, appArgs), htsFile),
+            new ReportMetadata(
+                new AppMetadata(appName, appVersion, appArgs), htsFile, recordsMetadata),
             new ReportData(sampleItems, phenopacketItems, recordItems));
     assertEquals(
         report,

@@ -18,18 +18,23 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.report.model.Record;
 import org.molgenis.vcf.report.model.Sample;
-import org.phenopackets.schema.v1.core.Pedigree.Person;
+import org.molgenis.vcf.report.model.metadata.RecordsMetadata;
 
 @ExtendWith(MockitoExtension.class)
 class HtsJdkMapperTest {
 
-  @Mock private HtsJdkToRecordsMapper htsJdkToRecordsMapper;
+  @Mock
+  private HtsJdkToRecordsMetadataMapper htsJdkToRecordsMetadataMapper;
+  @Mock
+  private HtsJdkToRecordsMapper htsJdkToRecordsMapper;
   @Mock private HtsJdkToPersonsMapper htsJdkToPersonsMapper;
   private HtsJdkMapper htsJdkMapper;
 
   @BeforeEach
   void setUpBeforeEach() {
-    htsJdkMapper = new HtsJdkMapper(htsJdkToRecordsMapper, htsJdkToPersonsMapper);
+    htsJdkMapper =
+        new HtsJdkMapper(
+            htsJdkToRecordsMetadataMapper, htsJdkToRecordsMapper, htsJdkToPersonsMapper);
   }
 
   @Test
@@ -39,6 +44,14 @@ class HtsJdkMapperTest {
     Items<Sample> sampleItems = new Items<>(Collections.emptyList(), maxSamples);
     when(htsJdkToPersonsMapper.map(vcfHeader, maxSamples)).thenReturn(sampleItems);
     assertEquals(sampleItems, htsJdkMapper.mapSamples(vcfHeader, maxSamples));
+  }
+
+  @Test
+  void mapRecordsMetadata() {
+    VCFHeader vcfHeader = mock(VCFHeader.class);
+    RecordsMetadata recordsMetadata = mock(RecordsMetadata.class);
+    when(htsJdkToRecordsMetadataMapper.map(vcfHeader)).thenReturn(recordsMetadata);
+    assertEquals(recordsMetadata, htsJdkMapper.mapRecordsMetadata(vcfHeader));
   }
 
   @Test
