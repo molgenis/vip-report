@@ -10,9 +10,9 @@ import static org.mockito.Mockito.when;
 import htsjdk.variant.variantcontext.Allele;
 import htsjdk.variant.variantcontext.Genotype;
 import htsjdk.variant.variantcontext.VariantContext;
+import htsjdk.variant.vcf.VCFHeader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import htsjdk.variant.vcf.VCFHeader;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -91,9 +91,9 @@ class HtsJdkToRecordMapperTest {
     samples.add(sample3);
     samples.add(sample1);
 
-    htsJdkToRecordMapper.map(variantContext, samples);
+    htsJdkToRecordMapper.map(mock(VCFHeader.class), variantContext, samples);
 
-    verify(variantContext).getGenotypesOrderedBy(Arrays.asList("c","b","a"));
+    verify(variantContext).getGenotypesOrderedBy(Arrays.asList("c", "b", "a"));
   }
 
   @Test

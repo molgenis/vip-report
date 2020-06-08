@@ -8,7 +8,6 @@ import lombok.experimental.NonFinal;
 @Value
 @NonFinal
 public class InfoMetadata {
-
   public enum Type {
     CHARACTER,
     INTEGER,

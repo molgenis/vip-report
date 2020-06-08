@@ -8,27 +8,18 @@ import lombok.experimental.NonFinal;
 @Value
 @NonFinal
 public class Number {
-
   public enum Type {
     /**
      * fixed number exposed through InfoMetadata.number)
      */
     NUMBER,
-    /**
-     * one value per alternate allele
-     */
+    /** one value per alternate allele */
     PER_ALT,
-    /**
-     * one value for each possible allele (including the reference)
-     */
+    /** one value for each possible allele (including the reference) */
     PER_ALT_AND_REF,
-    /**
-     * one value for each possible genotype
-     */
+    /** one value for each possible genotype */
     PER_GENOTYPE,
-    /**
-     * number of possible values varies, is unknown, or is unbounded
-     */
+    /** number of possible values varies, is unknown, or is unbounded */
     OTHER
   }
 

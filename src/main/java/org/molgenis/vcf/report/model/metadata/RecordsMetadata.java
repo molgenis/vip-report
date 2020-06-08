@@ -9,7 +9,6 @@ import lombok.experimental.NonFinal;
 @Value
 @NonFinal
 public class RecordsMetadata {
-
   @JsonProperty("info")
   @NonNull
   List<InfoMetadata> infoMetadataMap;
