@@ -4,17 +4,21 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.NonFinal;
-import org.phenopackets.schema.v1.core.HtsFile;
 
 @Value
 @NonFinal
-public class ReportMetadata {
+public class AppMetadata {
 
-  @JsonProperty("app")
+  @JsonProperty("name")
   @NonNull
-  AppMetadata appMetadata;
+  String appName;
 
-  @JsonProperty("htsFile")
+  @JsonProperty("version")
   @NonNull
-  HtsFile htsFile;
+  String appVersion;
+
+  @JsonProperty("args")
+  @NonNull
+  String appArguments;
+
 }

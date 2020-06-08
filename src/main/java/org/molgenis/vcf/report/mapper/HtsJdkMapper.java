@@ -14,12 +14,12 @@ import org.springframework.stereotype.Component;
 public class HtsJdkMapper {
 
   private final HtsJdkToRecordsMapper htsJdkToRecordsMapper;
-  private final HtsJdkToSamplesMapper htsJdkToSamplesMapper;
+  private final HtsJdkToPersonsMapper htsJdkToPersonsMapper;
 
   public HtsJdkMapper(
-      HtsJdkToRecordsMapper htsJdkToRecordsMapper, HtsJdkToSamplesMapper htsJdkToSamplesMapper) {
+      HtsJdkToRecordsMapper htsJdkToRecordsMapper, HtsJdkToPersonsMapper htsJdkToPersonsMapper) {
     this.htsJdkToRecordsMapper = requireNonNull(htsJdkToRecordsMapper);
-    this.htsJdkToSamplesMapper = requireNonNull(htsJdkToSamplesMapper);
+    this.htsJdkToPersonsMapper = requireNonNull(htsJdkToPersonsMapper);
   }
 
   public Items<Record> mapRecords(
@@ -28,6 +28,6 @@ public class HtsJdkMapper {
   }
 
   public Items<Sample> mapSamples(VCFHeader vcfHeader, int maxSamples) {
-    return htsJdkToSamplesMapper.map(vcfHeader, maxSamples);
+    return htsJdkToPersonsMapper.map(vcfHeader, maxSamples);
   }
 }

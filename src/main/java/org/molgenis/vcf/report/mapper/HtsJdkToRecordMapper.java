@@ -15,6 +15,7 @@ import lombok.NonNull;
 import org.molgenis.vcf.report.model.Record;
 import org.molgenis.vcf.report.model.RecordSample;
 import org.molgenis.vcf.report.model.Sample;
+import org.phenopackets.schema.v1.core.Pedigree.Person;
 import org.springframework.stereotype.Component;
 
 /**
@@ -66,10 +67,13 @@ public class HtsJdkToRecordMapper {
     if (!samples.isEmpty()) {
       recordSamples = new ArrayList<>(samples.size());
 
-      List<@NonNull String> sampleNames = samples.stream().map(Sample::getName).collect(toList());
+      List<@NonNull String> sampleNames = samples.stream().map(Sample::getPerson).map(Person::getIndividualId).collect(toList());
       for (Genotype genotype : variantContext.getGenotypesOrderedBy(sampleNames)) {
-        RecordSample recordSample = htsJdkToRecordSampleMapper.map(genotype);
-        recordSamples.add(recordSample);
+        //Genotype can be null if PED input contains samples that or not in the VCF
+        if (genotype != null) {
+          RecordSample recordSample = htsJdkToRecordSampleMapper.map(genotype);
+          recordSamples.add(recordSample);
+        }
       }
     } else {
       recordSamples = emptyList();

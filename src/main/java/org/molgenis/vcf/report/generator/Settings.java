@@ -14,4 +14,5 @@ public class Settings {
   @NonNull Path outputReportPath;
   boolean overwriteOutputReport;
   @NonNull ReportWriterSettings reportWriterSettings;
+  @NonNull SampleSettings sampleSettings;
 }
