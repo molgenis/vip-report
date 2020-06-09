@@ -12,8 +12,6 @@ public class InvalidPedException extends RuntimeException {
 
   @Override
   public String getMessage() {
-    return format(
-        MESSAGE,
-        argument);
+    return format(MESSAGE, argument);
   }
 }

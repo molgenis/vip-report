@@ -59,7 +59,8 @@ class ReportGeneratorTest {
     int maxNrRecords = 100;
 
     Items<Sample> vcfSampleItems = new Items<>(emptyList(), 3);
-    when(htsJdkMapper.mapSamples(any(VCFHeader.class), eq(maxNrSamples))).thenReturn(vcfSampleItems);
+    when(htsJdkMapper.mapSamples(any(VCFHeader.class), eq(maxNrSamples)))
+        .thenReturn(vcfSampleItems);
 
     Items<Record> recordItems = new Items<>(emptyList(), 5);
     when(htsJdkMapper.mapRecords(any(), eq(maxNrRecords), any())).thenReturn(recordItems);
@@ -75,7 +76,8 @@ class ReportGeneratorTest {
     when(pedToSamplesMapper.mapPedFileToPersons(pedPath, 10)).thenReturn(pedSampleItems);
 
     Items<Sample> sampleItems = new Items<>(emptyList(), 6);
-    when(personListMerger.merge(vcfSampleItems.getItems(), pedSampleItems, 10)).thenReturn(sampleItems);
+    when(personListMerger.merge(vcfSampleItems.getItems(), pedSampleItems, 10))
+        .thenReturn(sampleItems);
 
     HtsFile htsFile = HtsFile.newBuilder().build();
     when(htsFileMapper.map(any(), eq(inputVcfPath.toString()))).thenReturn(htsFile);

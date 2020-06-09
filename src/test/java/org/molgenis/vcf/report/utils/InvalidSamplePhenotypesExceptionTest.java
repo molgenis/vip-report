@@ -8,6 +8,7 @@ class InvalidSamplePhenotypesExceptionTest {
   @Test
   void getMessage() {
     assertEquals(
-        "Invalid phenotype argument: 'test', valid example: 'sample1/phenotype1;phenotype2,sample2/phenotype1'",new InvalidSamplePhenotypesException("test").getMessage());
+        "Invalid phenotype argument: 'test', valid example: 'sample1/phenotype1;phenotype2,sample2/phenotype1'",
+        new InvalidSamplePhenotypesException("test").getMessage());
   }
 }

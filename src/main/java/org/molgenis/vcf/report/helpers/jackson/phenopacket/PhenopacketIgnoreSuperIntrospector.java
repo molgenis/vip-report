@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.google.protobuf.GeneratedMessageV3;
 
 public class PhenopacketIgnoreSuperIntrospector extends JacksonAnnotationIntrospector {
-    @Override
-    public boolean hasIgnoreMarker(final AnnotatedMember m) {
-      return m.getDeclaringClass() == GeneratedMessageV3.class || super.hasIgnoreMarker(m);
-    }
+  @Override
+  public boolean hasIgnoreMarker(final AnnotatedMember m) {
+    return m.getDeclaringClass() == GeneratedMessageV3.class || super.hasIgnoreMarker(m);
+  }
 }

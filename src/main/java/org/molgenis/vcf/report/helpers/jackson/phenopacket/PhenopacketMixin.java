@@ -107,5 +107,4 @@ public interface PhenopacketMixin extends PhenopacketModelMixin {
 
   @JsonIgnore
   Object getDefaultInstance();
-
 }

@@ -49,8 +49,12 @@ class ReportServiceTest {
     Path outputReportPath = sharedTempDir.resolve("example.vcf.html");
     Report report =
         new Report(
-            new ReportMetadata(new AppMetadata(appName, appVersion, appArguments), HtsFile.newBuilder().build()),
-            new ReportData(new Items<>(emptyList(), 0), new Items<>(emptyList(), 0), new Items<>(emptyList(), 0)));
+            new ReportMetadata(
+                new AppMetadata(appName, appVersion, appArguments), HtsFile.newBuilder().build()),
+            new ReportData(
+                new Items<>(emptyList(), 0),
+                new Items<>(emptyList(), 0),
+                new Items<>(emptyList(), 0)));
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
             appName,
@@ -59,11 +63,21 @@ class ReportServiceTest {
             ReportGeneratorSettings.DEFAULT_MAX_NR_SAMPLES,
             ReportGeneratorSettings.DEFAULT_MAX_NR_RECORDS);
     ReportWriterSettings reportWriterSettings = new ReportWriterSettings(null, true);
-    SampleSettings sampleSettings = new SampleSettings(null,null);
+    SampleSettings sampleSettings = new SampleSettings(null, null);
     Settings settings =
         new Settings(
-            inputVcfPath, reportGeneratorSettings, outputReportPath, true, reportWriterSettings, sampleSettings);
-    when(reportGenerator.generateReport(inputVcfPath, sampleSettings.getPedigreePaths(), sampleSettings.getPhenotypeString(), reportGeneratorSettings)).thenReturn(report);
+            inputVcfPath,
+            reportGeneratorSettings,
+            outputReportPath,
+            true,
+            reportWriterSettings,
+            sampleSettings);
+    when(reportGenerator.generateReport(
+            inputVcfPath,
+            sampleSettings.getPedigreePaths(),
+            sampleSettings.getPhenotypeString(),
+            reportGeneratorSettings))
+        .thenReturn(report);
 
     reportService.createReport(settings);
 

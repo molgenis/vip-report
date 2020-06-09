@@ -34,7 +34,8 @@ public class PhenopacketMapper {
           createPhenopacketsForSamples(samples, phenopackets, samplePhenotype);
           break;
         case PER_SAMPLE_STRING:
-          mapPhenotypes(phenopackets, samplePhenotype.getSubjectId(), samplePhenotype.getPhenotypes());
+          mapPhenotypes(
+              phenopackets, samplePhenotype.getSubjectId(), samplePhenotype.getPhenotypes());
           break;
         default:
           throw new UnexpectedEnumException(mode);
@@ -74,7 +75,7 @@ public class PhenopacketMapper {
   public static void checkPhenotype(String phenotype) {
     Pattern p = Pattern.compile(".+:.+");
     Matcher m = p.matcher(phenotype);
-    if(!m.matches()){
+    if (!m.matches()) {
       throw new IllegalPhenotypeArgumentException(phenotype);
     }
   }

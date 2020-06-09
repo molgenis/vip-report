@@ -70,7 +70,7 @@ public class HtsJdkToRecordMapper {
 
       List<@NonNull String> sampleNames = getOrderedVcfSampleNames(samples);
       for (Genotype genotype : variantContext.getGenotypesOrderedBy(sampleNames)) {
-        //Genotype can be null if PED input contains samples that or not in the VCF
+        // Genotype can be null if PED input contains samples that or not in the VCF
         if (genotype != null) {
           RecordSample recordSample = htsJdkToRecordSampleMapper.map(genotype);
           recordSamples.add(recordSample);
@@ -85,8 +85,10 @@ public class HtsJdkToRecordMapper {
   }
 
   private List<String> getOrderedVcfSampleNames(List<Sample> samples) {
-    return samples.stream().filter(sample -> sample.getIndex() != -1)
+    return samples.stream()
+        .filter(sample -> sample.getIndex() != -1)
         .sorted(Comparator.comparingInt(Sample::getIndex))
-        .map(sample -> sample.getPerson().getIndividualId()).collect(Collectors.toList());
+        .map(sample -> sample.getPerson().getIndividualId())
+        .collect(Collectors.toList());
   }
 }

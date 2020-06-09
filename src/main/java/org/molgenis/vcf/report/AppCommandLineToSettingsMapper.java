@@ -79,6 +79,11 @@ public class AppCommandLineToSettingsMapper {
     ReportWriterSettings reportWriterSettings = new ReportWriterSettings(templatePath, debugMode);
     SampleSettings sampleSettings = new SampleSettings(pedPaths, phenotypes);
     return new Settings(
-        inputPath, reportGeneratorSettings, outputPath, overwriteOutput, reportWriterSettings, sampleSettings);
+        inputPath,
+        reportGeneratorSettings,
+        outputPath,
+        overwriteOutput,
+        reportWriterSettings,
+        sampleSettings);
   }
 }
