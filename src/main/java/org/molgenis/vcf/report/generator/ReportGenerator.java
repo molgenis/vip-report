@@ -101,8 +101,8 @@ public class ReportGenerator {
     int maxNrSamples = settings.getMaxNrSamples();
     Items<Sample> samples = htsJdkMapper.mapSamples(fileHeader, maxNrSamples);
     if (pedigreePaths != null) {
-      final Map<String, Sample> pedigreePersons = pedToSamplesMapper
-          .mapPedFileToPersons(pedigreePaths, maxNrSamples);
+      final Map<String, Sample> pedigreePersons =
+          pedToSamplesMapper.mapPedFileToPersons(pedigreePaths, maxNrSamples);
       samples = personListMerger.merge(samples.getItems(), pedigreePersons, maxNrSamples);
     }
     return samples;
