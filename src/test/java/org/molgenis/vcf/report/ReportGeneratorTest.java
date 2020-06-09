@@ -25,13 +25,14 @@ import org.molgenis.vcf.report.mapper.HtsFileMapper;
 import org.molgenis.vcf.report.mapper.HtsJdkMapper;
 import org.molgenis.vcf.report.mapper.PedToSamplesMapper;
 import org.molgenis.vcf.report.mapper.PhenopacketMapper;
-import org.molgenis.vcf.report.model.AppMetadata;
 import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.report.model.Record;
 import org.molgenis.vcf.report.model.Report;
 import org.molgenis.vcf.report.model.ReportData;
-import org.molgenis.vcf.report.model.ReportMetadata;
 import org.molgenis.vcf.report.model.Sample;
+import org.molgenis.vcf.report.model.metadata.AppMetadata;
+import org.molgenis.vcf.report.model.metadata.RecordsMetadata;
+import org.molgenis.vcf.report.model.metadata.ReportMetadata;
 import org.molgenis.vcf.report.utils.PersonListMerger;
 import org.phenopackets.schema.v1.Phenopacket;
 import org.phenopackets.schema.v1.core.HtsFile;
@@ -59,10 +60,14 @@ class ReportGeneratorTest {
     int maxNrRecords = 100;
 
     Items<Sample> vcfSampleItems = new Items<>(emptyList(), 3);
-    when(htsJdkMapper.mapSamples(any(VCFHeader.class), eq(maxNrSamples))).thenReturn(vcfSampleItems);
+    when(htsJdkMapper.mapSamples(any(VCFHeader.class), eq(maxNrSamples)))
+        .thenReturn(vcfSampleItems);
+
+    RecordsMetadata recordsMetadata = mock(RecordsMetadata.class);
+    when(htsJdkMapper.mapRecordsMetadata(any())).thenReturn(recordsMetadata);
 
     Items<Record> recordItems = new Items<>(emptyList(), 5);
-    when(htsJdkMapper.mapRecords(any(), eq(maxNrRecords), any())).thenReturn(recordItems);
+    when(htsJdkMapper.mapRecords(any(), any(), eq(maxNrRecords), any())).thenReturn(recordItems);
 
     Items<Phenopacket> phenopacketItems = new Items<>(emptyList(), 5);
     when(phenopacketMapper.mapPhenotypes(any(), any())).thenReturn(phenopacketItems);
@@ -75,7 +80,8 @@ class ReportGeneratorTest {
     when(pedToSamplesMapper.mapPedFileToPersons(pedPath, 10)).thenReturn(pedSampleItems);
 
     Items<Sample> sampleItems = new Items<>(emptyList(), 6);
-    when(personListMerger.merge(vcfSampleItems.getItems(), pedSampleItems, 10)).thenReturn(sampleItems);
+    when(personListMerger.merge(vcfSampleItems.getItems(), pedSampleItems, 10))
+        .thenReturn(sampleItems);
 
     HtsFile htsFile = HtsFile.newBuilder().build();
     when(htsFileMapper.map(any(), eq(inputVcfPath.toString()))).thenReturn(htsFile);
@@ -88,7 +94,8 @@ class ReportGeneratorTest {
         new ReportGeneratorSettings(appName, appVersion, appArgs, maxNrSamples, maxNrRecords);
     Report report =
         new Report(
-            new ReportMetadata(new AppMetadata(appName, appVersion, appArgs), htsFile),
+            new ReportMetadata(
+                new AppMetadata(appName, appVersion, appArgs), htsFile, recordsMetadata),
             new ReportData(sampleItems, phenopacketItems, recordItems));
     assertEquals(
         report,

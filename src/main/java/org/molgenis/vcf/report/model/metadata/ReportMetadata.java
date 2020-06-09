@@ -1,4 +1,4 @@
-package org.molgenis.vcf.report.model;
+package org.molgenis.vcf.report.model.metadata;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.NonNull;
@@ -17,4 +17,8 @@ public class ReportMetadata {
   @JsonProperty("htsFile")
   @NonNull
   HtsFile htsFile;
+
+  @JsonProperty("records")
+  @NonNull
+  RecordsMetadata recordsMetadata;
 }

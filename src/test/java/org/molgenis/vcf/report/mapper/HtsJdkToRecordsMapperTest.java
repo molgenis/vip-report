@@ -6,6 +6,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 import htsjdk.variant.variantcontext.VariantContext;
+import htsjdk.variant.vcf.VCFHeader;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,9 +39,11 @@ class HtsJdkToRecordsMapperTest {
     Record record1 = mock(Record.class);
     List<Record> records = List.of(record0, record1);
     Items<Record> expectedRecordItems = new Items<>(records, 3);
-    doReturn(record0).when(htsJdkToRecordMapper).map(variantContext0, emptyList());
-    doReturn(record1).when(htsJdkToRecordMapper).map(variantContext1, emptyList());
+    VCFHeader vcfHeader = mock(VCFHeader.class);
+    doReturn(record0).when(htsJdkToRecordMapper).map(vcfHeader, variantContext0, emptyList());
+    doReturn(record1).when(htsJdkToRecordMapper).map(vcfHeader, variantContext1, emptyList());
     assertEquals(
-        expectedRecordItems, htsJdkToRecordsMapper.map(variantContexts, maxNrRecords, emptyList()));
+        expectedRecordItems,
+        htsJdkToRecordsMapper.map(vcfHeader, variantContexts, maxNrRecords, emptyList()));
   }
 }

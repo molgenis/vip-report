@@ -1,4 +1,4 @@
-package org.molgenis.vcf.report.model;
+package org.molgenis.vcf.report.model.metadata;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.NonNull;

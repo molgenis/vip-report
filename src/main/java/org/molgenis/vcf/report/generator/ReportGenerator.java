@@ -12,13 +12,14 @@ import org.molgenis.vcf.report.mapper.HtsFileMapper;
 import org.molgenis.vcf.report.mapper.HtsJdkMapper;
 import org.molgenis.vcf.report.mapper.PedToSamplesMapper;
 import org.molgenis.vcf.report.mapper.PhenopacketMapper;
-import org.molgenis.vcf.report.model.AppMetadata;
 import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.report.model.Record;
 import org.molgenis.vcf.report.model.Report;
 import org.molgenis.vcf.report.model.ReportData;
-import org.molgenis.vcf.report.model.ReportMetadata;
 import org.molgenis.vcf.report.model.Sample;
+import org.molgenis.vcf.report.model.metadata.AppMetadata;
+import org.molgenis.vcf.report.model.metadata.RecordsMetadata;
+import org.molgenis.vcf.report.model.metadata.ReportMetadata;
 import org.molgenis.vcf.report.utils.PersonListMerger;
 import org.phenopackets.schema.v1.Phenopacket;
 import org.phenopackets.schema.v1.core.HtsFile;
@@ -76,19 +77,20 @@ public class ReportGenerator {
     Items<Phenopacket> phenopackets;
     if (phenotypes != null && !phenotypes.isEmpty()) {
       phenopackets = phenopacketMapper.mapPhenotypes(phenotypes, samples.getItems());
-    }else{
-      phenopackets = new Items<>(Collections.emptyList(),0);
+    } else {
+      phenopackets = new Items<>(Collections.emptyList(), 0);
     }
 
+    RecordsMetadata recordsMetadata =
+        htsJdkMapper.mapRecordsMetadata(vcfFileReader.getFileHeader());
     Items<Record> records =
         createRecords(vcfFileReader, reportGeneratorSettings, samples.getItems());
-    AppMetadata appMetadata = new AppMetadata(reportGeneratorSettings.getAppName(),
-        reportGeneratorSettings.getAppVersion(),
-        reportGeneratorSettings.getAppArguments());
-    ReportMetadata reportMetadata =
-        new ReportMetadata(
-            appMetadata,
-            htsFile);
+    AppMetadata appMetadata =
+        new AppMetadata(
+            reportGeneratorSettings.getAppName(),
+            reportGeneratorSettings.getAppVersion(),
+            reportGeneratorSettings.getAppArguments());
+    ReportMetadata reportMetadata = new ReportMetadata(appMetadata, htsFile, recordsMetadata);
     ReportData reportData = new ReportData(samples, phenopackets, records);
     return new Report(reportMetadata, reportData);
   }
@@ -106,13 +108,12 @@ public class ReportGenerator {
     return samples;
   }
 
-
-
   private Items<Record> createRecords(
       VCFFileReader vcfFileReader,
       ReportGeneratorSettings reportGeneratorSettings,
       List<Sample> samples) {
     int maxNrRecords = reportGeneratorSettings.getMaxNrRecords();
-    return htsJdkMapper.mapRecords(vcfFileReader, maxNrRecords, samples);
+    return htsJdkMapper.mapRecords(
+        vcfFileReader.getFileHeader(), vcfFileReader, maxNrRecords, samples);
   }
 }

@@ -1,6 +1,7 @@
 package org.molgenis.vcf.report.mapper;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -9,9 +10,11 @@ import static org.mockito.Mockito.when;
 import htsjdk.variant.variantcontext.Allele;
 import htsjdk.variant.variantcontext.Genotype;
 import htsjdk.variant.variantcontext.VariantContext;
+import htsjdk.variant.vcf.VCFHeader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.molgenis.vcf.report.model.Info;
 import org.molgenis.vcf.report.model.Record;
 import org.molgenis.vcf.report.model.RecordSample;
 import org.molgenis.vcf.report.model.Sample;
@@ -26,13 +30,13 @@ import org.phenopackets.schema.v1.core.Pedigree.Person;
 
 @ExtendWith(MockitoExtension.class)
 class HtsJdkToRecordMapperTest {
-
+  @Mock private HtsJdkToInfoMapper htsJdkToInfoMapper;
   @Mock private HtsJdkToRecordSampleMapper htsJdkToRecordSampleMapper;
   private HtsJdkToRecordMapper htsJdkToRecordMapper;
 
   @BeforeEach
   void setUpBeforeEach() {
-    htsJdkToRecordMapper = new HtsJdkToRecordMapper(htsJdkToRecordSampleMapper);
+    htsJdkToRecordMapper = new HtsJdkToRecordMapper(htsJdkToInfoMapper, htsJdkToRecordSampleMapper);
   }
 
   @Test
@@ -47,6 +51,11 @@ class HtsJdkToRecordMapperTest {
     when(variantContext.getStart()).thenReturn(position);
     when(variantContext.getReference()).thenReturn(Allele.REF_C);
     when(variantContext.getAlternateAlleles()).thenReturn(List.of(Allele.ALT_C, Allele.ALT_T));
+    Map<String, Object> attributes = emptyMap();
+    when(variantContext.getAttributes()).thenReturn(attributes);
+    Info info = new Info();
+    VCFHeader vcfHeader = mock(VCFHeader.class);
+    when(htsJdkToInfoMapper.map(vcfHeader, attributes)).thenReturn(info);
 
     Record record =
         new Record(
@@ -57,8 +66,10 @@ class HtsJdkToRecordMapperTest {
             altAlleles,
             null,
             emptyList(),
+            new Info(),
             emptyList());
-    Assertions.assertEquals(record, htsJdkToRecordMapper.map(variantContext, emptyList()));
+    Assertions.assertEquals(
+        record, htsJdkToRecordMapper.map(vcfHeader, variantContext, emptyList()));
   }
 
   @Test
@@ -80,9 +91,9 @@ class HtsJdkToRecordMapperTest {
     samples.add(sample3);
     samples.add(sample1);
 
-    htsJdkToRecordMapper.map(variantContext, samples);
+    htsJdkToRecordMapper.map(mock(VCFHeader.class), variantContext, samples);
 
-    verify(variantContext).getGenotypesOrderedBy(Arrays.asList("c","b","a"));
+    verify(variantContext).getGenotypesOrderedBy(Arrays.asList("c", "b", "a"));
   }
 
   @Test
@@ -111,6 +122,11 @@ class HtsJdkToRecordMapperTest {
     RecordSample recordSample = mock(RecordSample.class);
     Genotype genotype = mock(Genotype.class);
     when(variantContext.getGenotypesOrderedBy(List.of("sample0"))).thenReturn(List.of(genotype));
+    Map<String, Object> attributes = emptyMap();
+    when(variantContext.getAttributes()).thenReturn(attributes);
+    Info info = new Info();
+    VCFHeader vcfHeader = mock(VCFHeader.class);
+    when(htsJdkToInfoMapper.map(vcfHeader, attributes)).thenReturn(info);
     when(htsJdkToRecordSampleMapper.map(genotype)).thenReturn(recordSample);
 
     Record record =
@@ -122,16 +138,21 @@ class HtsJdkToRecordMapperTest {
             altAlleles,
             quality,
             List.of("q10", "s50"),
+            info,
             List.of(recordSample));
 
-    Sample sample0 = new Sample(Person.newBuilder().setIndividualId("sample0").build(),0);
-    Assertions.assertEquals(record, htsJdkToRecordMapper.map(variantContext, List.of(sample0)));
+    Sample sample0 = new Sample(Person.newBuilder().setIndividualId("sample0").build(), 0);
+    Assertions.assertEquals(
+        record, htsJdkToRecordMapper.map(vcfHeader, variantContext, List.of(sample0)));
   }
 
   @Test
   void mapMissingContig() {
     VariantContext variantContext = mock(VariantContext.class);
     List<Sample> samples = emptyList();
-    assertThrows(VcfParseException.class, () -> htsJdkToRecordMapper.map(variantContext, samples));
+    VCFHeader vcfHeader = mock(VCFHeader.class);
+    assertThrows(
+        VcfParseException.class,
+        () -> htsJdkToRecordMapper.map(vcfHeader, variantContext, samples));
   }
 }
