@@ -35,6 +35,9 @@ public class Record {
   @JsonProperty("f")
   List<String> filterStatus;
 
+  @JsonProperty("n")
+  Info info;
+
   @JsonProperty("s")
   List<RecordSample> recordSamples;
 }

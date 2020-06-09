@@ -1,6 +1,7 @@
 package org.molgenis.vcf.report;
 
 import static java.util.Collections.emptyList;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -19,11 +20,12 @@ import org.molgenis.vcf.report.generator.ReportWriter;
 import org.molgenis.vcf.report.generator.ReportWriterSettings;
 import org.molgenis.vcf.report.generator.SampleSettings;
 import org.molgenis.vcf.report.generator.Settings;
-import org.molgenis.vcf.report.model.AppMetadata;
 import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.report.model.Report;
 import org.molgenis.vcf.report.model.ReportData;
-import org.molgenis.vcf.report.model.ReportMetadata;
+import org.molgenis.vcf.report.model.metadata.AppMetadata;
+import org.molgenis.vcf.report.model.metadata.RecordsMetadata;
+import org.molgenis.vcf.report.model.metadata.ReportMetadata;
 import org.phenopackets.schema.v1.core.HtsFile;
 
 @ExtendWith(MockitoExtension.class)
@@ -50,7 +52,9 @@ class ReportServiceTest {
     Report report =
         new Report(
             new ReportMetadata(
-                new AppMetadata(appName, appVersion, appArguments), HtsFile.newBuilder().build()),
+                new AppMetadata(appName, appVersion, appArguments),
+                HtsFile.newBuilder().build(),
+                mock(RecordsMetadata.class)),
             new ReportData(
                 new Items<>(emptyList(), 0),
                 new Items<>(emptyList(), 0),
