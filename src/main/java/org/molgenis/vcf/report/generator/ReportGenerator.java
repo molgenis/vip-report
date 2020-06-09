@@ -76,19 +76,18 @@ public class ReportGenerator {
     Items<Phenopacket> phenopackets;
     if (phenotypes != null && !phenotypes.isEmpty()) {
       phenopackets = phenopacketMapper.mapPhenotypes(phenotypes, samples.getItems());
-    }else{
-      phenopackets = new Items<>(Collections.emptyList(),0);
+    } else {
+      phenopackets = new Items<>(Collections.emptyList(), 0);
     }
 
     Items<Record> records =
         createRecords(vcfFileReader, reportGeneratorSettings, samples.getItems());
-    AppMetadata appMetadata = new AppMetadata(reportGeneratorSettings.getAppName(),
-        reportGeneratorSettings.getAppVersion(),
-        reportGeneratorSettings.getAppArguments());
-    ReportMetadata reportMetadata =
-        new ReportMetadata(
-            appMetadata,
-            htsFile);
+    AppMetadata appMetadata =
+        new AppMetadata(
+            reportGeneratorSettings.getAppName(),
+            reportGeneratorSettings.getAppVersion(),
+            reportGeneratorSettings.getAppArguments());
+    ReportMetadata reportMetadata = new ReportMetadata(appMetadata, htsFile);
     ReportData reportData = new ReportData(samples, phenopackets, records);
     return new Report(reportMetadata, reportData);
   }
@@ -99,14 +98,12 @@ public class ReportGenerator {
     int maxNrSamples = settings.getMaxNrSamples();
     Items<Sample> samples = htsJdkMapper.mapSamples(fileHeader, maxNrSamples);
     if (pedigreePaths != null) {
-      final Map<String, Sample> pedigreePersons = pedToSamplesMapper
-          .mapPedFileToPersons(pedigreePaths, maxNrSamples);
+      final Map<String, Sample> pedigreePersons =
+          pedToSamplesMapper.mapPedFileToPersons(pedigreePaths, maxNrSamples);
       samples = personListMerger.merge(samples.getItems(), pedigreePersons, maxNrSamples);
     }
     return samples;
   }
-
-
 
   private Items<Record> createRecords(
       VCFFileReader vcfFileReader,

@@ -40,7 +40,7 @@ public class PedToSamplesMapper {
     StreamSupport.stream(Spliterators.spliteratorUnknownSize(reader.iterator(), 0), false)
         .limit(maxNrSamples)
         .map(PedToSamplesMapper::map)
-        .forEach(person -> pedigreePersons.put(person.getIndividualId(), new Sample(person,-1)));
+        .forEach(person -> pedigreePersons.put(person.getIndividualId(), new Sample(person, -1)));
     return pedigreePersons;
   }
 
@@ -56,7 +56,7 @@ public class PedToSamplesMapper {
   }
 
   private static Sex map(PedIndividual.Sex sex) {
-    switch(sex){
+    switch (sex) {
       case MALE:
         return Sex.MALE;
       case FEMALE:
@@ -69,7 +69,7 @@ public class PedToSamplesMapper {
   }
 
   private static AffectedStatus map(AffectionStatus affectionStatus) {
-    switch (affectionStatus){
+    switch (affectionStatus) {
       case AFFECTED:
         return AffectedStatus.AFFECTED;
       case UNAFFECTED:

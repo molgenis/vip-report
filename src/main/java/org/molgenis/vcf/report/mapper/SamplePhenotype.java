@@ -6,11 +6,9 @@ import lombok.Value;
 @Value
 public class SamplePhenotype {
 
-  @NonNull
-  PhenotypeMode mode;
+  @NonNull PhenotypeMode mode;
 
   String subjectId;
 
-  @NonNull
-  String[] phenotypes;
+  @NonNull String[] phenotypes;
 }

@@ -10,7 +10,7 @@ import org.phenopackets.schema.v1.core.PhenotypicFeature;
 
 public class ObjectMapperConfigurer {
 
-  private ObjectMapperConfigurer(){}
+  private ObjectMapperConfigurer() {}
 
   public static void configure(ObjectMapper objectMapper) {
     objectMapper.addMixIn(Phenopacket.class, PhenopacketMixin.class);

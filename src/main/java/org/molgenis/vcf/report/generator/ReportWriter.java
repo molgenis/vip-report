@@ -53,8 +53,7 @@ public class ReportWriter {
 
   private String createScriptTag(Report report, boolean prettyPrint)
       throws JsonProcessingException {
-    ObjectMapper objectMapper =
-        new ObjectMapper();
+    ObjectMapper objectMapper = new ObjectMapper();
     configure(objectMapper);
     objectMapper.setSerializationInclusion(Include.NON_NULL);
     objectMapper.setSerializationInclusion(Include.NON_EMPTY);
