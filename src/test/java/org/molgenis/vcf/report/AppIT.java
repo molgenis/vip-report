@@ -54,7 +54,7 @@ class AppIT {
                 expectedApi.replace("window.api = ", ""),
                 actualApi.replace("window.api = ", ""),
                 true),
-         //check the rest of the report
+        // check the rest of the report
         () ->
             assertEquals(
                 expectedReport.replace(expectedApi, "[API_VALUE]"),

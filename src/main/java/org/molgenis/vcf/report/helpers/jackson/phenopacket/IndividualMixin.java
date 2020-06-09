@@ -2,7 +2,7 @@ package org.molgenis.vcf.report.helpers.jackson.phenopacket;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public interface IndividualMixin extends PhenopacketModelMixin{
+public interface IndividualMixin extends PhenopacketModelMixin {
   @JsonIgnore
   Object getUnknownFields();
 

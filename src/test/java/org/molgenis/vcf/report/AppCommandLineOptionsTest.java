@@ -369,7 +369,9 @@ class AppCommandLineOptionsTest {
     doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
     doReturn(pheno).when(cmd).getOptionValue(OPT_PHENOTYPES);
 
-    assertThrows(InvalidSamplePhenotypesException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
+    assertThrows(
+        InvalidSamplePhenotypesException.class,
+        () -> AppCommandLineOptions.validateCommandLine(cmd));
   }
 
   @Test
@@ -385,7 +387,9 @@ class AppCommandLineOptionsTest {
     doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
     doReturn(pheno).when(cmd).getOptionValue(OPT_PHENOTYPES);
 
-    assertThrows(IllegalPhenotypeArgumentException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
+    assertThrows(
+        IllegalPhenotypeArgumentException.class,
+        () -> AppCommandLineOptions.validateCommandLine(cmd));
   }
 
   @Test
@@ -401,6 +405,7 @@ class AppCommandLineOptionsTest {
     doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
     doReturn(pheno).when(cmd).getOptionValue(OPT_PHENOTYPES);
 
-    assertThrows(MixedPhenotypesException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
+    assertThrows(
+        MixedPhenotypesException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
   }
 }

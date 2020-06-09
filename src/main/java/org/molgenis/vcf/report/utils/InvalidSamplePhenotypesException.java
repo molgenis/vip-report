@@ -4,7 +4,8 @@ import static java.lang.String.format;
 
 public class InvalidSamplePhenotypesException extends RuntimeException {
 
-  private static final String MESSAGE = "Invalid phenotype argument: '%s', valid example: 'sample1/phenotype1;phenotype2,sample2/phenotype1'";
+  private static final String MESSAGE =
+      "Invalid phenotype argument: '%s', valid example: 'sample1/phenotype1;phenotype2,sample2/phenotype1'";
   private final String argument;
 
   public InvalidSamplePhenotypesException(String argument) {
@@ -13,8 +14,6 @@ public class InvalidSamplePhenotypesException extends RuntimeException {
 
   @Override
   public String getMessage() {
-    return format(
-        MESSAGE,
-        argument);
+    return format(MESSAGE, argument);
   }
 }

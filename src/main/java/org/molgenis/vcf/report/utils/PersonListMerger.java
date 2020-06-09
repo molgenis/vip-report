@@ -20,7 +20,7 @@ public class PersonListMerger {
                     pedigreeSamples.get(sample.getPerson().getIndividualId()).getPerson(),
                     sample.getIndex());
             pedigreeSamples.put(sample.getPerson().getIndividualId(), merged);
-          }else{
+          } else {
             pedigreeSamples.put(sample.getPerson().getIndividualId(), sample);
           }
         });

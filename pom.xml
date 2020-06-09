@@ -176,7 +176,9 @@
               <goal>wget</goal>
             </goals>
             <configuration>
-              <url>https://github.com/molgenis/vip-report-template/releases/download/v${vip.report.template.version}/vip-report-template.html</url>
+              <url>
+                https://github.com/molgenis/vip-report-template/releases/download/v${vip.report.template.version}/vip-report-template.html
+              </url>
               <outputDirectory>${project.build.directory}/generated-resources</outputDirectory>
             </configuration>
           </execution>

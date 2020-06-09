@@ -20,5 +20,4 @@ public class AppMetadata {
   @JsonProperty("args")
   @NonNull
   String appArguments;
-
 }

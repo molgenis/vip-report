@@ -28,7 +28,12 @@ class HtsFileMapperTest {
     when(contig.getGenericFields()).thenReturn(contigMap);
     when(header.getContigLines()).thenReturn(Collections.singletonList(contig));
 
-    HtsFile expected = HtsFile.newBuilder().setHtsFormat(HtsFormat.VCF).setGenomeAssembly("GRCh38").setUri("test.vcf").build();
+    HtsFile expected =
+        HtsFile.newBuilder()
+            .setHtsFormat(HtsFormat.VCF)
+            .setGenomeAssembly("GRCh38")
+            .setUri("test.vcf")
+            .build();
     assertEquals(expected, htsFileMapper.map(header, "test.vcf"));
   }
 
@@ -42,7 +47,12 @@ class HtsFileMapperTest {
     when(contig.getGenericFields()).thenReturn(contigMap);
     when(header.getContigLines()).thenReturn(Collections.singletonList(contig));
 
-    HtsFile expected = HtsFile.newBuilder().setHtsFormat(HtsFormat.VCF).setGenomeAssembly("GRCh37").setUri("test.vcf").build();
+    HtsFile expected =
+        HtsFile.newBuilder()
+            .setHtsFormat(HtsFormat.VCF)
+            .setGenomeAssembly("GRCh37")
+            .setUri("test.vcf")
+            .build();
     assertEquals(expected, htsFileMapper.map(header, "test.vcf"));
   }
 
@@ -56,7 +66,12 @@ class HtsFileMapperTest {
     when(contig.getGenericFields()).thenReturn(contigMap);
     when(header.getContigLines()).thenReturn(Collections.singletonList(contig));
 
-    HtsFile expected = HtsFile.newBuilder().setHtsFormat(HtsFormat.VCF).setGenomeAssembly("NCBI36").setUri("test.vcf").build();
+    HtsFile expected =
+        HtsFile.newBuilder()
+            .setHtsFormat(HtsFormat.VCF)
+            .setGenomeAssembly("NCBI36")
+            .setUri("test.vcf")
+            .build();
     assertEquals(expected, htsFileMapper.map(header, "test.vcf"));
   }
 }

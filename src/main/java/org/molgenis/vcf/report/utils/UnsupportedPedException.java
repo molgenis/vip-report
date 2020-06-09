@@ -3,7 +3,8 @@ package org.molgenis.vcf.report.utils;
 import static java.lang.String.format;
 
 public class UnsupportedPedException extends RuntimeException {
-  private static final String MESSAGE = "Phenotype value '%s' that is not an affection status (-9, 0, 1 or 2) is unsupported";
+  private static final String MESSAGE =
+      "Phenotype value '%s' that is not an affection status (-9, 0, 1 or 2) is unsupported";
   private final String token;
 
   public UnsupportedPedException(String token) {
@@ -12,8 +13,6 @@ public class UnsupportedPedException extends RuntimeException {
 
   @Override
   public String getMessage() {
-    return format(
-        MESSAGE,
-        token);
+    return format(MESSAGE, token);
   }
 }
