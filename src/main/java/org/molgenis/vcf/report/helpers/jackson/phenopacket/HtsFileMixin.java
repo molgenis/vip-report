@@ -19,9 +19,6 @@ public interface HtsFileMixin extends PhenopacketModelMixin {
   Object getHtsFormatValue();
 
   @JsonIgnore
-  Object getGenomeAssembly();
-
-  @JsonIgnore
   Object getGenomeAssemblyBytes();
 
   @JsonIgnore
