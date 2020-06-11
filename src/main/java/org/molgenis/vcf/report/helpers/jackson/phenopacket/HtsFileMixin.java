@@ -25,6 +25,9 @@ public interface HtsFileMixin extends PhenopacketModelMixin {
   Object getIndividualToSampleIdentifiersMap();
 
   @JsonIgnore
+  Object getIndividualToSampleIdentifiersCount();
+
+  @JsonIgnore
   Object getIndividualToSampleIdentifiersOrDefault();
 
   @JsonIgnore
