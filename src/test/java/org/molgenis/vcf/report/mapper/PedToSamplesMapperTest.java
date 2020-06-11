@@ -2,6 +2,9 @@ package org.molgenis.vcf.report.mapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
+import static org.molgenis.vcf.report.model.Sex.FEMALE;
+import static org.molgenis.vcf.report.model.Sex.MALE;
+import static org.molgenis.vcf.report.model.Sex.UNKNOWN_SEX;
 
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
@@ -14,13 +17,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.molgenis.vcf.report.model.AffectedStatus;
+import org.molgenis.vcf.report.model.Person;
 import org.molgenis.vcf.report.model.Sample;
 import org.molgenis.vcf.report.utils.PedIndividual;
 import org.molgenis.vcf.report.utils.PedIndividual.AffectionStatus;
 import org.molgenis.vcf.report.utils.PedIndividual.Sex;
 import org.molgenis.vcf.report.utils.PedReader;
-import org.phenopackets.schema.v1.core.Pedigree.Person;
-import org.phenopackets.schema.v1.core.Pedigree.Person.AffectedStatus;
 import org.springframework.util.ResourceUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -43,63 +46,19 @@ class PedToSamplesMapperTest {
     expected.put(
         "John",
         new Sample(
-            Person.newBuilder()
-                .setIndividualId("John")
-                .setFamilyId("FAM001")
-                .setMaternalId("Jane")
-                .setPaternalId("Jimmy")
-                .setSex(org.phenopackets.schema.v1.core.Sex.MALE)
-                .setAffectedStatus(AffectedStatus.AFFECTED)
-                .build(),
-            -1));
+            new Person("FAM001", "John", "Jane", "Jimmy", MALE, AffectedStatus.AFFECTED), -1));
     expected.put(
         "Jimmy",
-        new Sample(
-            Person.newBuilder()
-                .setIndividualId("Jimmy")
-                .setFamilyId("FAM001")
-                .setMaternalId("0")
-                .setPaternalId("0")
-                .setSex(org.phenopackets.schema.v1.core.Sex.MALE)
-                .setAffectedStatus(AffectedStatus.UNAFFECTED)
-                .build(),
-            -1));
+        new Sample(new Person("FAM001", "Jimmy", "0", "0", MALE, AffectedStatus.UNAFFECTED), -1));
     expected.put(
         "Jane",
-        new Sample(
-            Person.newBuilder()
-                .setIndividualId("Jane")
-                .setFamilyId("FAM001")
-                .setMaternalId("0")
-                .setPaternalId("0")
-                .setSex(org.phenopackets.schema.v1.core.Sex.FEMALE)
-                .setAffectedStatus(AffectedStatus.UNAFFECTED)
-                .build(),
-            -1));
+        new Sample(new Person("FAM001", "Jane", "0", "0", FEMALE, AffectedStatus.UNAFFECTED), -1));
     expected.put(
         "James",
-        new Sample(
-            Person.newBuilder()
-                .setIndividualId("James")
-                .setFamilyId("FAM002")
-                .setMaternalId("0")
-                .setPaternalId("0")
-                .setSex(org.phenopackets.schema.v1.core.Sex.MALE)
-                .setAffectedStatus(AffectedStatus.UNAFFECTED)
-                .build(),
-            -1));
+        new Sample(new Person("FAM002", "James", "0", "0", MALE, AffectedStatus.UNAFFECTED), -1));
     expected.put(
         "Jake",
-        new Sample(
-            Person.newBuilder()
-                .setIndividualId("Jake")
-                .setFamilyId("FAM003")
-                .setMaternalId("0")
-                .setPaternalId("0")
-                .setSex(org.phenopackets.schema.v1.core.Sex.MALE)
-                .setAffectedStatus(AffectedStatus.AFFECTED)
-                .build(),
-            -1));
+        new Sample(new Person("FAM003", "Jake", "0", "0", MALE, AffectedStatus.AFFECTED), -1));
 
     assertEquals(expected, pedToSamplesMapper.mapPedFileToPersons(paths, 10));
   }
@@ -114,27 +73,10 @@ class PedToSamplesMapperTest {
     expected.put(
         "John",
         new Sample(
-            Person.newBuilder()
-                .setIndividualId("John")
-                .setFamilyId("FAM001")
-                .setMaternalId("Jane")
-                .setPaternalId("Jimmy")
-                .setSex(org.phenopackets.schema.v1.core.Sex.MALE)
-                .setAffectedStatus(AffectedStatus.AFFECTED)
-                .build(),
-            -1));
+            new Person("FAM001", "John", "Jane", "Jimmy", MALE, AffectedStatus.AFFECTED), -1));
     expected.put(
         "Jimmy",
-        new Sample(
-            Person.newBuilder()
-                .setIndividualId("Jimmy")
-                .setFamilyId("FAM001")
-                .setMaternalId("0")
-                .setPaternalId("0")
-                .setSex(org.phenopackets.schema.v1.core.Sex.MALE)
-                .setAffectedStatus(AffectedStatus.UNAFFECTED)
-                .build(),
-            -1));
+        new Sample(new Person("FAM001", "Jimmy", "0", "0", MALE, AffectedStatus.UNAFFECTED), -1));
 
     assertEquals(expected, pedToSamplesMapper.mapPedFileToPersons(paths, 2));
   }
@@ -157,26 +99,12 @@ class PedToSamplesMapperTest {
     expected.put(
         "id1",
         new Sample(
-            Person.newBuilder()
-                .setIndividualId("id1")
-                .setFamilyId("fam1")
-                .setMaternalId("maternal1")
-                .setPaternalId("paternal1")
-                .setSex(org.phenopackets.schema.v1.core.Sex.MALE)
-                .setAffectedStatus(AffectedStatus.AFFECTED)
-                .build(),
+            new Person("fam1", "id1", "maternal1", "paternal1", MALE, AffectedStatus.AFFECTED),
             -1));
     expected.put(
         "id2",
         new Sample(
-            Person.newBuilder()
-                .setIndividualId("id2")
-                .setFamilyId("fam1")
-                .setMaternalId("maternal2")
-                .setPaternalId("paternal2")
-                .setSex(org.phenopackets.schema.v1.core.Sex.FEMALE)
-                .setAffectedStatus(AffectedStatus.UNAFFECTED)
-                .build(),
+            new Person("fam1", "id2", "maternal2", "paternal2", FEMALE, AffectedStatus.UNAFFECTED),
             -1));
 
     assertEquals(expected, pedToSamplesMapper.parse(pedReader, 10));
@@ -194,14 +122,7 @@ class PedToSamplesMapperTest {
     expected.put(
         "id1",
         new Sample(
-            Person.newBuilder()
-                .setIndividualId("id1")
-                .setFamilyId("fam1")
-                .setMaternalId("maternal")
-                .setPaternalId("paternal")
-                .setSex(org.phenopackets.schema.v1.core.Sex.UNKNOWN_SEX)
-                .setAffectedStatus(AffectedStatus.MISSING)
-                .build(),
+            new Person("fam1", "id1", "maternal", "paternal", UNKNOWN_SEX, AffectedStatus.MISSING),
             -1));
 
     assertEquals(expected, pedToSamplesMapper.parse(pedReader, 10));

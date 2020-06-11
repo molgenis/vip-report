@@ -1,7 +1,6 @@
 package org.molgenis.vcf.report.generator;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.molgenis.vcf.report.helpers.jackson.phenopacket.ObjectMapperConfigurer.configure;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -54,7 +53,6 @@ public class ReportWriter {
   private String createScriptTag(Report report, boolean prettyPrint)
       throws JsonProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();
-    configure(objectMapper);
     objectMapper.setSerializationInclusion(Include.NON_NULL);
     objectMapper.setSerializationInclusion(Include.NON_EMPTY);
     String json;

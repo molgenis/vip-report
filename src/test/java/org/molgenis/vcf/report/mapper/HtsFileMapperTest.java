@@ -12,8 +12,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.phenopackets.schema.v1.core.HtsFile;
-import org.phenopackets.schema.v1.core.HtsFile.HtsFormat;
+import org.molgenis.vcf.report.model.metadata.HtsFile;
 
 @ExtendWith(MockitoExtension.class)
 class HtsFileMapperTest {
@@ -28,12 +27,7 @@ class HtsFileMapperTest {
     when(contig.getGenericFields()).thenReturn(contigMap);
     when(header.getContigLines()).thenReturn(Collections.singletonList(contig));
 
-    HtsFile expected =
-        HtsFile.newBuilder()
-            .setHtsFormat(HtsFormat.VCF)
-            .setGenomeAssembly("GRCh38")
-            .setUri("test.vcf")
-            .build();
+    HtsFile expected = new HtsFile("test.vcf", "VCF", "GRCh38");
     assertEquals(expected, htsFileMapper.map(header, "test.vcf"));
   }
 
@@ -47,12 +41,7 @@ class HtsFileMapperTest {
     when(contig.getGenericFields()).thenReturn(contigMap);
     when(header.getContigLines()).thenReturn(Collections.singletonList(contig));
 
-    HtsFile expected =
-        HtsFile.newBuilder()
-            .setHtsFormat(HtsFormat.VCF)
-            .setGenomeAssembly("GRCh37")
-            .setUri("test.vcf")
-            .build();
+    HtsFile expected = new HtsFile("test.vcf", "VCF", "GRCh37");
     assertEquals(expected, htsFileMapper.map(header, "test.vcf"));
   }
 
@@ -66,12 +55,7 @@ class HtsFileMapperTest {
     when(contig.getGenericFields()).thenReturn(contigMap);
     when(header.getContigLines()).thenReturn(Collections.singletonList(contig));
 
-    HtsFile expected =
-        HtsFile.newBuilder()
-            .setHtsFormat(HtsFormat.VCF)
-            .setGenomeAssembly("NCBI36")
-            .setUri("test.vcf")
-            .build();
+    HtsFile expected = new HtsFile("test.vcf", "VCF", "NCBI36");
     assertEquals(expected, htsFileMapper.map(header, "test.vcf"));
   }
 }

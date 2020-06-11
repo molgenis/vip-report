@@ -6,20 +6,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import lombok.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.molgenis.vcf.report.model.AffectedStatus;
+import org.molgenis.vcf.report.model.Individual;
 import org.molgenis.vcf.report.model.Items;
+import org.molgenis.vcf.report.model.OntologyClass;
+import org.molgenis.vcf.report.model.Person;
+import org.molgenis.vcf.report.model.Phenopacket;
+import org.molgenis.vcf.report.model.PhenotypicFeature;
 import org.molgenis.vcf.report.model.Sample;
-import org.phenopackets.schema.v1.Phenopacket;
-import org.phenopackets.schema.v1.Phenopacket.Builder;
-import org.phenopackets.schema.v1.core.Individual;
-import org.phenopackets.schema.v1.core.OntologyClass;
-import org.phenopackets.schema.v1.core.Pedigree.Person;
-import org.phenopackets.schema.v1.core.Pedigree.Person.AffectedStatus;
-import org.phenopackets.schema.v1.core.PhenotypicFeature;
+import org.molgenis.vcf.report.model.Sex;
 
 @ExtendWith(MockitoExtension.class)
 class PhenopacketMapperTest {
@@ -36,25 +37,12 @@ class PhenopacketMapperTest {
     List<Sample> samples = new ArrayList<>();
     samples.add(
         new Sample(
-            Person.newBuilder()
-                .setIndividualId("id1")
-                .setFamilyId("fam1")
-                .setMaternalId("maternal1")
-                .setPaternalId("paternal1")
-                .setSex(org.phenopackets.schema.v1.core.Sex.MALE)
-                .setAffectedStatus(AffectedStatus.AFFECTED)
-                .build(),
+            new Person("fam1", "id1", "maternal1", "paternal1", Sex.MALE, AffectedStatus.AFFECTED),
             -1));
     samples.add(
         new Sample(
-            Person.newBuilder()
-                .setIndividualId("id2")
-                .setFamilyId("fam1")
-                .setMaternalId("maternal2")
-                .setPaternalId("paternal2")
-                .setSex(org.phenopackets.schema.v1.core.Sex.FEMALE)
-                .setAffectedStatus(AffectedStatus.UNAFFECTED)
-                .build(),
+            new Person(
+                "fam1", "id2", "maternal2", "paternal2", Sex.FEMALE, AffectedStatus.UNAFFECTED),
             -1));
 
     List<Phenopacket> expected = new ArrayList<>();
@@ -94,15 +82,12 @@ class PhenopacketMapperTest {
   }
 
   private Phenopacket createPhenopacket(String sampleId, List<String> phenotypes) {
-    Builder builder = Phenopacket.newBuilder();
-    builder.setSubject(Individual.newBuilder().setId(sampleId).build());
+    @NonNull List<PhenotypicFeature> features = new ArrayList<>();
     for (String phenotype : phenotypes) {
       PhenotypicFeature phenotypicFeature =
-          PhenotypicFeature.newBuilder()
-              .setType(OntologyClass.newBuilder().setId(phenotype).setLabel(phenotype).build())
-              .build();
-      builder.addPhenotypicFeatures(phenotypicFeature);
+          new PhenotypicFeature(new OntologyClass(phenotype, phenotype));
+      features.add(phenotypicFeature);
     }
-    return builder.build();
+    return new Phenopacket(features, new Individual(sampleId));
   }
 }

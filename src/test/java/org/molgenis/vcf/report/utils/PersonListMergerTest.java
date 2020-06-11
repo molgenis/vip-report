@@ -3,6 +3,7 @@ package org.molgenis.vcf.report.utils;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.molgenis.vcf.report.mapper.HtsJdkToPersonsMapper.MISSING_PERSON_ID;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,11 +14,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.molgenis.vcf.report.model.AffectedStatus;
 import org.molgenis.vcf.report.model.Items;
+import org.molgenis.vcf.report.model.Person;
 import org.molgenis.vcf.report.model.Sample;
-import org.phenopackets.schema.v1.core.Pedigree.Person;
-import org.phenopackets.schema.v1.core.Pedigree.Person.AffectedStatus;
-import org.phenopackets.schema.v1.core.Sex;
+import org.molgenis.vcf.report.model.Sex;
 
 @ExtendWith(MockitoExtension.class)
 class PersonListMergerTest {
@@ -35,79 +36,56 @@ class PersonListMergerTest {
     pedigreePersons.put(
         "id1",
         new Sample(
-            Person.newBuilder()
-                .setIndividualId("id1")
-                .setFamilyId("fam1")
-                .setMaternalId("maternal1")
-                .setPaternalId("paternal1")
-                .setSex(org.phenopackets.schema.v1.core.Sex.MALE)
-                .setAffectedStatus(AffectedStatus.AFFECTED)
-                .build(),
+            new Person("fam1", "id1", "maternal1", "paternal1", Sex.MALE, AffectedStatus.AFFECTED),
             -1));
     pedigreePersons.put(
         "id2",
         new Sample(
-            Person.newBuilder()
-                .setIndividualId("id2")
-                .setFamilyId("fam1")
-                .setMaternalId("maternal2")
-                .setPaternalId("paternal2")
-                .setSex(org.phenopackets.schema.v1.core.Sex.FEMALE)
-                .setAffectedStatus(AffectedStatus.UNAFFECTED)
-                .build(),
+            new Person(
+                "fam1", "id2", "maternal2", "paternal2", Sex.FEMALE, AffectedStatus.UNAFFECTED),
             -1));
 
     List<Sample> vcfPersons = new ArrayList<>();
     vcfPersons.add(
         new Sample(
-            Person.newBuilder()
-                .setIndividualId("id1")
-                .setFamilyId("MISSING_0")
-                .setSex(Sex.UNKNOWN_SEX)
-                .setAffectedStatus(AffectedStatus.MISSING)
-                .build(),
+            new Person(
+                "MISSING_0",
+                "id1",
+                MISSING_PERSON_ID,
+                MISSING_PERSON_ID,
+                Sex.UNKNOWN_SEX,
+                AffectedStatus.MISSING),
             0));
     vcfPersons.add(
         new Sample(
-            Person.newBuilder()
-                .setIndividualId("id3")
-                .setFamilyId("MISSING_1")
-                .setSex(Sex.UNKNOWN_SEX)
-                .setAffectedStatus(AffectedStatus.MISSING)
-                .build(),
+            new Person(
+                "MISSING_1",
+                "id3",
+                MISSING_PERSON_ID,
+                MISSING_PERSON_ID,
+                Sex.UNKNOWN_SEX,
+                AffectedStatus.MISSING),
             1));
 
     List<Sample> expected = new ArrayList<>();
     expected.add(
         new Sample(
-            Person.newBuilder()
-                .setIndividualId("id1")
-                .setFamilyId("fam1")
-                .setMaternalId("maternal1")
-                .setPaternalId("paternal1")
-                .setSex(org.phenopackets.schema.v1.core.Sex.MALE)
-                .setAffectedStatus(AffectedStatus.AFFECTED)
-                .build(),
+            new Person("fam1", "id1", "maternal1", "paternal1", Sex.MALE, AffectedStatus.AFFECTED),
             0));
     expected.add(
         new Sample(
-            Person.newBuilder()
-                .setIndividualId("id2")
-                .setFamilyId("fam1")
-                .setMaternalId("maternal2")
-                .setPaternalId("paternal2")
-                .setSex(org.phenopackets.schema.v1.core.Sex.FEMALE)
-                .setAffectedStatus(AffectedStatus.UNAFFECTED)
-                .build(),
+            new Person(
+                "fam1", "id2", "maternal2", "paternal2", Sex.FEMALE, AffectedStatus.UNAFFECTED),
             -1));
     expected.add(
         new Sample(
-            Person.newBuilder()
-                .setIndividualId("id3")
-                .setFamilyId("MISSING_1")
-                .setSex(Sex.UNKNOWN_SEX)
-                .setAffectedStatus(AffectedStatus.MISSING)
-                .build(),
+            new Person(
+                "MISSING_1",
+                "id3",
+                MISSING_PERSON_ID,
+                MISSING_PERSON_ID,
+                Sex.UNKNOWN_SEX,
+                AffectedStatus.MISSING),
             1));
 
     Items<Sample> actual = personListMerger.merge(vcfPersons, pedigreePersons, 10);

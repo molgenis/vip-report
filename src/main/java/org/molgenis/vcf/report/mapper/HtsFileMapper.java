@@ -3,8 +3,7 @@ package org.molgenis.vcf.report.mapper;
 import htsjdk.variant.vcf.VCFContigHeaderLine;
 import htsjdk.variant.vcf.VCFHeader;
 import java.util.Map;
-import org.phenopackets.schema.v1.core.HtsFile;
-import org.phenopackets.schema.v1.core.HtsFile.HtsFormat;
+import org.molgenis.vcf.report.model.metadata.HtsFile;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -22,11 +21,7 @@ public class HtsFileMapper {
 
   public HtsFile map(VCFHeader fileHeader, String inputFile) {
     String genomeBuild = parseGenomeBuild(fileHeader);
-    return HtsFile.newBuilder()
-        .setUri(inputFile)
-        .setGenomeAssembly(genomeBuild)
-        .setHtsFormat(HtsFormat.VCF)
-        .build();
+    return new HtsFile(inputFile, "VCF", genomeBuild);
   }
 
   private String parseGenomeBuild(VCFHeader fileHeader) {

@@ -26,16 +26,16 @@ import org.molgenis.vcf.report.mapper.HtsJdkMapper;
 import org.molgenis.vcf.report.mapper.PedToSamplesMapper;
 import org.molgenis.vcf.report.mapper.PhenopacketMapper;
 import org.molgenis.vcf.report.model.Items;
+import org.molgenis.vcf.report.model.Phenopacket;
 import org.molgenis.vcf.report.model.Record;
 import org.molgenis.vcf.report.model.Report;
 import org.molgenis.vcf.report.model.ReportData;
 import org.molgenis.vcf.report.model.Sample;
 import org.molgenis.vcf.report.model.metadata.AppMetadata;
+import org.molgenis.vcf.report.model.metadata.HtsFile;
 import org.molgenis.vcf.report.model.metadata.RecordsMetadata;
 import org.molgenis.vcf.report.model.metadata.ReportMetadata;
 import org.molgenis.vcf.report.utils.PersonListMerger;
-import org.phenopackets.schema.v1.Phenopacket;
-import org.phenopackets.schema.v1.core.HtsFile;
 
 @ExtendWith(MockitoExtension.class)
 class ReportGeneratorTest {
@@ -83,7 +83,7 @@ class ReportGeneratorTest {
     when(personListMerger.merge(vcfSampleItems.getItems(), pedSampleItems, 10))
         .thenReturn(sampleItems);
 
-    HtsFile htsFile = HtsFile.newBuilder().build();
+    HtsFile htsFile = new HtsFile("test.vcf", "VCF", "GRCh38");
     when(htsFileMapper.map(any(), eq(inputVcfPath.toString()))).thenReturn(htsFile);
 
     String phenotypes = "hpo:123456;omim3456";

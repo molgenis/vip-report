@@ -7,13 +7,8 @@ import lombok.experimental.NonFinal;
 
 @Value
 @NonFinal
-public class Sample {
-  @JsonProperty("person")
+public class Individual {
+  @JsonProperty("id")
   @NonNull
-  Person person;
-
-  // index of the sample in the VCF, -1 means the sample is not available in the file.
-  @JsonProperty("index")
-  @NonNull
-  int index;
+  String id;
 }
