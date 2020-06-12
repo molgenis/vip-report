@@ -1,10 +1,11 @@
 package org.molgenis.vcf.report.mapper;
 
+import static org.molgenis.vcf.report.model.metadata.HtsFormat.VCF;
+
 import htsjdk.variant.vcf.VCFContigHeaderLine;
 import htsjdk.variant.vcf.VCFHeader;
 import java.util.Map;
 import org.molgenis.vcf.report.model.metadata.HtsFile;
-import org.molgenis.vcf.report.model.metadata.HtsFormat;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -22,15 +23,7 @@ public class HtsFileMapper {
 
   public HtsFile map(VCFHeader fileHeader, String inputFile) {
     String genomeBuild = parseGenomeBuild(fileHeader);
-    HtsFormat format = getHtsFormat(inputFile);
-    return new HtsFile(inputFile, format, genomeBuild);
-  }
-
-  private HtsFormat getHtsFormat(String inputFile) {
-    if (inputFile.endsWith(".vcf.gz")) {
-      return HtsFormat.GVCF;
-    }
-    return HtsFormat.VCF;
+    return new HtsFile(inputFile, VCF, genomeBuild);
   }
 
   private String parseGenomeBuild(VCFHeader fileHeader) {
