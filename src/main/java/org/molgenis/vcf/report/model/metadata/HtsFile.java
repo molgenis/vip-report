@@ -7,17 +7,17 @@ import lombok.experimental.NonFinal;
 
 @Value
 @NonFinal
-public class ReportMetadata {
+public class HtsFile {
 
-  @JsonProperty("app")
+  @JsonProperty("uri")
   @NonNull
-  AppMetadata appMetadata;
+  String uri;
 
-  @JsonProperty("htsFile")
+  @JsonProperty("htsFormat")
   @NonNull
-  HtsFile htsFile;
+  HtsFormat htsFormat;
 
-  @JsonProperty("records")
+  @JsonProperty("genomeAssembly")
   @NonNull
-  RecordsMetadata recordsMetadata;
+  String genomeAssembly;
 }

@@ -12,7 +12,9 @@ import org.molgenis.vcf.report.mapper.HtsFileMapper;
 import org.molgenis.vcf.report.mapper.HtsJdkMapper;
 import org.molgenis.vcf.report.mapper.PedToSamplesMapper;
 import org.molgenis.vcf.report.mapper.PhenopacketMapper;
+import org.molgenis.vcf.report.model.metadata.HtsFile;
 import org.molgenis.vcf.report.model.Items;
+import org.molgenis.vcf.report.model.Phenopacket;
 import org.molgenis.vcf.report.model.Record;
 import org.molgenis.vcf.report.model.Report;
 import org.molgenis.vcf.report.model.ReportData;
@@ -21,8 +23,6 @@ import org.molgenis.vcf.report.model.metadata.AppMetadata;
 import org.molgenis.vcf.report.model.metadata.RecordsMetadata;
 import org.molgenis.vcf.report.model.metadata.ReportMetadata;
 import org.molgenis.vcf.report.utils.PersonListMerger;
-import org.phenopackets.schema.v1.Phenopacket;
-import org.phenopackets.schema.v1.core.HtsFile;
 import org.springframework.stereotype.Component;
 
 @Component

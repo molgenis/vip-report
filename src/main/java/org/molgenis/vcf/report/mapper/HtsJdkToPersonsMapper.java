@@ -6,9 +6,11 @@ import htsjdk.variant.vcf.VCFHeader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.molgenis.vcf.report.model.AffectedStatus;
 import org.molgenis.vcf.report.model.Items;
+import org.molgenis.vcf.report.model.Person;
 import org.molgenis.vcf.report.model.Sample;
-import org.phenopackets.schema.v1.core.Pedigree.Person;
+import org.molgenis.vcf.report.model.Sex;
 import org.springframework.stereotype.Component;
 
 /**
@@ -19,7 +21,7 @@ import org.springframework.stereotype.Component;
 public class HtsJdkToPersonsMapper {
 
   static final String MISSING = "MISSING_";
-  static final String MISSING_PERSON_ID = "0";
+  public static final String MISSING_PERSON_ID = "0";
 
   public Items<Sample> map(VCFHeader vcfHeader, int maxNrSamples) {
     List<Sample> samples;
@@ -52,11 +54,12 @@ public class HtsJdkToPersonsMapper {
   }
 
   private Person createPerson(String sampleName, Integer offset) {
-    return Person.newBuilder()
-        .setIndividualId(sampleName)
-        .setPaternalId(MISSING_PERSON_ID)
-        .setMaternalId(MISSING_PERSON_ID)
-        .setFamilyId(MISSING + offset)
-        .build();
+    return new Person(
+        MISSING + offset,
+        sampleName,
+        MISSING_PERSON_ID,
+        MISSING_PERSON_ID,
+        Sex.UNKNOWN_SEX,
+        AffectedStatus.MISSING);
   }
 }

@@ -14,9 +14,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.molgenis.vcf.report.model.AffectedStatus;
 import org.molgenis.vcf.report.model.Items;
+import org.molgenis.vcf.report.model.Person;
 import org.molgenis.vcf.report.model.Sample;
-import org.phenopackets.schema.v1.core.Pedigree.Person;
+import org.molgenis.vcf.report.model.Sex;
 
 @ExtendWith(MockitoExtension.class)
 class HtsJdkToSamplesMapperTest {
@@ -43,20 +45,22 @@ class HtsJdkToSamplesMapperTest {
     List<Sample> samples =
         List.of(
             new Sample(
-                Person.newBuilder()
-                    .setIndividualId("sample0")
-                    .setPaternalId(MISSING_PERSON_ID)
-                    .setMaternalId(MISSING_PERSON_ID)
-                    .setFamilyId(MISSING + "0")
-                    .build(),
+                new Person(
+                    MISSING + "0",
+                    "sample0",
+                    MISSING_PERSON_ID,
+                    MISSING_PERSON_ID,
+                    Sex.UNKNOWN_SEX,
+                    AffectedStatus.MISSING),
                 0),
             new Sample(
-                Person.newBuilder()
-                    .setIndividualId("sample1")
-                    .setPaternalId(MISSING_PERSON_ID)
-                    .setMaternalId(MISSING_PERSON_ID)
-                    .setFamilyId(MISSING + "1")
-                    .build(),
+                new Person(
+                    MISSING + "1",
+                    "sample1",
+                    MISSING_PERSON_ID,
+                    MISSING_PERSON_ID,
+                    Sex.UNKNOWN_SEX,
+                    AffectedStatus.MISSING),
                 1));
     Items<Sample> expectedSampleItems = new Items<>(samples, 3);
     Assertions.assertEquals(
