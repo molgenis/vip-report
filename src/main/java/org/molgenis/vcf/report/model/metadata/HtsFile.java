@@ -15,7 +15,7 @@ public class HtsFile {
 
   @JsonProperty("htsFormat")
   @NonNull
-  String htsFormat;
+  HtsFormat htsFormat;
 
   @JsonProperty("genomeAssembly")
   @NonNull

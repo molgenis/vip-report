@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.molgenis.vcf.report.model.metadata.HtsFormat.VCF;
 
 import htsjdk.variant.vcf.VCFHeader;
 import java.nio.file.Path;
@@ -83,7 +84,7 @@ class ReportGeneratorTest {
     when(personListMerger.merge(vcfSampleItems.getItems(), pedSampleItems, 10))
         .thenReturn(sampleItems);
 
-    HtsFile htsFile = new HtsFile("test.vcf", "VCF", "GRCh38");
+    HtsFile htsFile = new HtsFile("test.vcf", VCF, "GRCh38");
     when(htsFileMapper.map(any(), eq(inputVcfPath.toString()))).thenReturn(htsFile);
 
     String phenotypes = "hpo:123456;omim3456";

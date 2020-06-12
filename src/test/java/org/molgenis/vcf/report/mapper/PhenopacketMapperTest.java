@@ -37,12 +37,12 @@ class PhenopacketMapperTest {
     List<Sample> samples = new ArrayList<>();
     samples.add(
         new Sample(
-            new Person("fam1", "id1", "maternal1", "paternal1", Sex.MALE, AffectedStatus.AFFECTED),
+            new Person("fam1", "id1", "paternal1", "maternal1", Sex.MALE, AffectedStatus.AFFECTED),
             -1));
     samples.add(
         new Sample(
             new Person(
-                "fam1", "id2", "maternal2", "paternal2", Sex.FEMALE, AffectedStatus.UNAFFECTED),
+                "fam1", "id2", "paternal2", "maternal2", Sex.FEMALE, AffectedStatus.UNAFFECTED),
             -1));
 
     List<Phenopacket> expected = new ArrayList<>();

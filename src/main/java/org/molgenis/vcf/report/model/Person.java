@@ -16,13 +16,13 @@ public class Person {
   @NonNull
   String individualId;
 
-  @JsonProperty("maternalId")
-  @NonNull
-  String maternalId;
-
   @JsonProperty("paternalId")
   @NonNull
   String paternalId;
+
+  @JsonProperty("maternalId")
+  @NonNull
+  String maternalId;
 
   @JsonProperty("sex")
   @NonNull

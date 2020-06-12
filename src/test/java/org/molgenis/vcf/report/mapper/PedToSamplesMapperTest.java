@@ -46,7 +46,7 @@ class PedToSamplesMapperTest {
     expected.put(
         "John",
         new Sample(
-            new Person("FAM001", "John", "Jane", "Jimmy", MALE, AffectedStatus.AFFECTED), -1));
+            new Person("FAM001", "John", "Jimmy", "Jane", MALE, AffectedStatus.AFFECTED), -1));
     expected.put(
         "Jimmy",
         new Sample(new Person("FAM001", "Jimmy", "0", "0", MALE, AffectedStatus.UNAFFECTED), -1));
@@ -73,7 +73,7 @@ class PedToSamplesMapperTest {
     expected.put(
         "John",
         new Sample(
-            new Person("FAM001", "John", "Jane", "Jimmy", MALE, AffectedStatus.AFFECTED), -1));
+            new Person("FAM001", "John", "Jimmy", "Jane", MALE, AffectedStatus.AFFECTED), -1));
     expected.put(
         "Jimmy",
         new Sample(new Person("FAM001", "Jimmy", "0", "0", MALE, AffectedStatus.UNAFFECTED), -1));
@@ -99,12 +99,12 @@ class PedToSamplesMapperTest {
     expected.put(
         "id1",
         new Sample(
-            new Person("fam1", "id1", "maternal1", "paternal1", MALE, AffectedStatus.AFFECTED),
+            new Person("fam1", "id1", "paternal1", "maternal1", MALE, AffectedStatus.AFFECTED),
             -1));
     expected.put(
         "id2",
         new Sample(
-            new Person("fam1", "id2", "maternal2", "paternal2", FEMALE, AffectedStatus.UNAFFECTED),
+            new Person("fam1", "id2", "paternal2", "maternal2", FEMALE, AffectedStatus.UNAFFECTED),
             -1));
 
     assertEquals(expected, pedToSamplesMapper.parse(pedReader, 10));
@@ -122,7 +122,7 @@ class PedToSamplesMapperTest {
     expected.put(
         "id1",
         new Sample(
-            new Person("fam1", "id1", "maternal", "paternal", UNKNOWN_SEX, AffectedStatus.MISSING),
+            new Person("fam1", "id1", "paternal", "maternal", UNKNOWN_SEX, AffectedStatus.MISSING),
             -1));
 
     assertEquals(expected, pedToSamplesMapper.parse(pedReader, 10));

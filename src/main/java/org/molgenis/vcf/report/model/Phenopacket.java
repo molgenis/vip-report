@@ -9,7 +9,7 @@ import lombok.experimental.NonFinal;
 @Value
 @NonFinal
 public class Phenopacket {
-  @JsonProperty("phenotypicFeaturesList")
+  @JsonProperty("phenotypicFeatures")
   @NonNull
   List<PhenotypicFeature> phenotypicFeaturesList;
 

@@ -48,8 +48,8 @@ public class PedToSamplesMapper {
     return new Person(
         pedIndividual.getFamilyId(),
         pedIndividual.getId(),
-        pedIndividual.getMaternalId(),
         pedIndividual.getPaternalId(),
+        pedIndividual.getMaternalId(),
         map(pedIndividual.getSex()),
         map(pedIndividual.getAffectionStatus()));
   }

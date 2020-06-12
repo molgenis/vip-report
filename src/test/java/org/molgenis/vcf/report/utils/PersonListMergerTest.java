@@ -36,13 +36,13 @@ class PersonListMergerTest {
     pedigreePersons.put(
         "id1",
         new Sample(
-            new Person("fam1", "id1", "maternal1", "paternal1", Sex.MALE, AffectedStatus.AFFECTED),
+            new Person("fam1", "id1", "paternal1", "maternal1", Sex.MALE, AffectedStatus.AFFECTED),
             -1));
     pedigreePersons.put(
         "id2",
         new Sample(
             new Person(
-                "fam1", "id2", "maternal2", "paternal2", Sex.FEMALE, AffectedStatus.UNAFFECTED),
+                "fam1", "id2", "paternal2", "maternal2", Sex.FEMALE, AffectedStatus.UNAFFECTED),
             -1));
 
     List<Sample> vcfPersons = new ArrayList<>();
@@ -70,12 +70,12 @@ class PersonListMergerTest {
     List<Sample> expected = new ArrayList<>();
     expected.add(
         new Sample(
-            new Person("fam1", "id1", "maternal1", "paternal1", Sex.MALE, AffectedStatus.AFFECTED),
+            new Person("fam1", "id1", "paternal1", "maternal1", Sex.MALE, AffectedStatus.AFFECTED),
             0));
     expected.add(
         new Sample(
             new Person(
-                "fam1", "id2", "maternal2", "paternal2", Sex.FEMALE, AffectedStatus.UNAFFECTED),
+                "fam1", "id2", "paternal2", "maternal2", Sex.FEMALE, AffectedStatus.UNAFFECTED),
             -1));
     expected.add(
         new Sample(

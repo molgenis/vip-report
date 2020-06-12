@@ -4,6 +4,7 @@ import static java.util.Collections.emptyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.molgenis.vcf.report.model.metadata.HtsFormat.VCF;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -53,7 +54,7 @@ class ReportServiceTest {
         new Report(
             new ReportMetadata(
                 new AppMetadata(appName, appVersion, appArguments),
-                new HtsFile(inputVcfPath.toString(), "VCF", "UNKNOWN"),
+                new HtsFile(inputVcfPath.toString(), VCF, "UNKNOWN"),
                 mock(RecordsMetadata.class)),
             new ReportData(
                 new Items<>(emptyList(), 0),

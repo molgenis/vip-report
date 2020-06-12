@@ -31,7 +31,17 @@ class AppIT {
     String phenotypes = "Jimmy/HP:123456,Unknown/test:Headache,Jane/OMIM:23456";
 
     String[] args = {
-      "-i", inputFile, "-o", outputFile, "-t", templateFile, "-pd", pedFiles, "-ph", phenotypes
+      "-i",
+      inputFile,
+      "-o",
+      outputFile,
+      "-t",
+      templateFile,
+      "-pd",
+      pedFiles,
+      "-ph",
+      phenotypes,
+      "-d"
     };
     SpringApplication.run(App.class, args);
 
@@ -62,7 +72,7 @@ class AppIT {
   }
 
   private String getElementValue(String html, String elementName) {
-    Pattern p = Pattern.compile("<" + elementName + ">(.*)</" + elementName + ">");
+    Pattern p = Pattern.compile("<" + elementName + ">(.*)</" + elementName + ">", Pattern.DOTALL);
     Matcher m = p.matcher(html);
     String result = "";
     if (m.find()) {

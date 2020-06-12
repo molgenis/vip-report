@@ -3,6 +3,7 @@ package org.molgenis.vcf.report.mapper;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.molgenis.vcf.report.model.metadata.HtsFormat.VCF;
 
 import htsjdk.variant.vcf.VCFContigHeaderLine;
 import htsjdk.variant.vcf.VCFHeader;
@@ -27,7 +28,7 @@ class HtsFileMapperTest {
     when(contig.getGenericFields()).thenReturn(contigMap);
     when(header.getContigLines()).thenReturn(Collections.singletonList(contig));
 
-    HtsFile expected = new HtsFile("test.vcf", "VCF", "GRCh38");
+    HtsFile expected = new HtsFile("test.vcf", VCF, "GRCh38");
     assertEquals(expected, htsFileMapper.map(header, "test.vcf"));
   }
 
@@ -41,7 +42,7 @@ class HtsFileMapperTest {
     when(contig.getGenericFields()).thenReturn(contigMap);
     when(header.getContigLines()).thenReturn(Collections.singletonList(contig));
 
-    HtsFile expected = new HtsFile("test.vcf", "VCF", "GRCh37");
+    HtsFile expected = new HtsFile("test.vcf", VCF, "GRCh37");
     assertEquals(expected, htsFileMapper.map(header, "test.vcf"));
   }
 
@@ -55,7 +56,7 @@ class HtsFileMapperTest {
     when(contig.getGenericFields()).thenReturn(contigMap);
     when(header.getContigLines()).thenReturn(Collections.singletonList(contig));
 
-    HtsFile expected = new HtsFile("test.vcf", "VCF", "NCBI36");
+    HtsFile expected = new HtsFile("test.vcf", VCF, "NCBI36");
     assertEquals(expected, htsFileMapper.map(header, "test.vcf"));
   }
 }
