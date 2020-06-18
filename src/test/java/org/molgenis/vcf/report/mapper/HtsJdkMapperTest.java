@@ -54,15 +54,15 @@ class HtsJdkMapperTest {
 
   @Test
   void mapRecords() {
-    VCFHeader vcfHeader = mock(VCFHeader.class);
+    RecordsMetadata recordsMetadata = mock(RecordsMetadata.class);
     Iterable<VariantContext> variantContextIterable = singletonList(mock(VariantContext.class));
     int maxRecords = 123;
     List<Sample> samples = emptyList();
     Items<Record> recordItems = new Items<>(Collections.emptyList(), maxRecords);
-    when(htsJdkToRecordsMapper.map(vcfHeader, variantContextIterable, maxRecords, samples))
+    when(htsJdkToRecordsMapper.map(recordsMetadata, variantContextIterable, maxRecords, samples))
         .thenReturn(recordItems);
     assertEquals(
         recordItems,
-        htsJdkMapper.mapRecords(vcfHeader, variantContextIterable, maxRecords, samples));
+        htsJdkMapper.mapRecords(recordsMetadata, variantContextIterable, maxRecords, samples));
   }
 }

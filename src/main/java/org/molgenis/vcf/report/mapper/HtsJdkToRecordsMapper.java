@@ -9,6 +9,7 @@ import java.util.List;
 import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.report.model.Record;
 import org.molgenis.vcf.report.model.Sample;
+import org.molgenis.vcf.report.model.metadata.RecordsMetadata;
 import org.springframework.stereotype.Component;
 
 /**
@@ -25,7 +26,7 @@ public class HtsJdkToRecordsMapper {
   }
 
   public Items<Record> map(
-      VCFHeader vcfHeader,
+      RecordsMetadata recordsMetadata,
       Iterable<VariantContext> variantContexts,
       int maxNrRecords,
       List<Sample> samples) {
@@ -33,7 +34,7 @@ public class HtsJdkToRecordsMapper {
     long nrRecord = 0;
     for (VariantContext variantContext : variantContexts) {
       if (nrRecord < maxNrRecords) {
-        Record record = htsJdkToRecordMapper.map(vcfHeader, variantContext, samples);
+        Record record = htsJdkToRecordMapper.map(recordsMetadata, variantContext, samples);
         records.add(record);
       }
       ++nrRecord;

@@ -1,6 +1,7 @@
 package org.molgenis.vcf.report.model.metadata;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.NonFinal;
@@ -13,7 +14,8 @@ public class InfoMetadata {
     INTEGER,
     FLAG,
     FLOAT,
-    STRING
+    STRING,
+    NESTED
   }
 
   @JsonProperty("id")
@@ -36,4 +38,7 @@ public class InfoMetadata {
 
   @JsonProperty("version")
   String version;
+
+  @JsonProperty("nested")
+  List<InfoMetadata> nestedMetadata;
 }

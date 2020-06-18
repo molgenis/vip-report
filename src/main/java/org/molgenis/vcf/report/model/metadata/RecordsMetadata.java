@@ -11,5 +11,5 @@ import lombok.experimental.NonFinal;
 public class RecordsMetadata {
   @JsonProperty("info")
   @NonNull
-  List<InfoMetadata> infoMetadataMap;
+  List<InfoMetadata> infoMetadataList;
 }

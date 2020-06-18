@@ -10,7 +10,6 @@ import static org.mockito.Mockito.when;
 import htsjdk.variant.variantcontext.Allele;
 import htsjdk.variant.variantcontext.Genotype;
 import htsjdk.variant.variantcontext.VariantContext;
-import htsjdk.variant.vcf.VCFHeader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,6 +25,8 @@ import org.molgenis.vcf.report.model.Info;
 import org.molgenis.vcf.report.model.Record;
 import org.molgenis.vcf.report.model.RecordSample;
 import org.molgenis.vcf.report.model.Sample;
+import org.molgenis.vcf.report.model.metadata.InfoMetadata;
+import org.molgenis.vcf.report.model.metadata.RecordsMetadata;
 import org.phenopackets.schema.v1.core.Pedigree.Person;
 
 @ExtendWith(MockitoExtension.class)
@@ -54,8 +55,10 @@ class HtsJdkToRecordMapperTest {
     Map<String, Object> attributes = emptyMap();
     when(variantContext.getAttributes()).thenReturn(attributes);
     Info info = new Info();
-    VCFHeader vcfHeader = mock(VCFHeader.class);
-    when(htsJdkToInfoMapper.map(vcfHeader, attributes)).thenReturn(info);
+
+    List<InfoMetadata> infoMetadataList = emptyList();
+    RecordsMetadata recordsMetadata = new RecordsMetadata(infoMetadataList);
+    when(htsJdkToInfoMapper.map(infoMetadataList, attributes)).thenReturn(info);
 
     Record record =
         new Record(
@@ -69,7 +72,7 @@ class HtsJdkToRecordMapperTest {
             new Info(),
             emptyList());
     Assertions.assertEquals(
-        record, htsJdkToRecordMapper.map(vcfHeader, variantContext, emptyList()));
+        record, htsJdkToRecordMapper.map(recordsMetadata, variantContext, emptyList()));
   }
 
   @Test
@@ -90,8 +93,7 @@ class HtsJdkToRecordMapperTest {
     samples.add(sample2);
     samples.add(sample3);
     samples.add(sample1);
-
-    htsJdkToRecordMapper.map(mock(VCFHeader.class), variantContext, samples);
+    htsJdkToRecordMapper.map(mock(RecordsMetadata.class), variantContext, samples);
 
     verify(variantContext).getGenotypesOrderedBy(Arrays.asList("c", "b", "a"));
   }
@@ -125,8 +127,9 @@ class HtsJdkToRecordMapperTest {
     Map<String, Object> attributes = emptyMap();
     when(variantContext.getAttributes()).thenReturn(attributes);
     Info info = new Info();
-    VCFHeader vcfHeader = mock(VCFHeader.class);
-    when(htsJdkToInfoMapper.map(vcfHeader, attributes)).thenReturn(info);
+    List<InfoMetadata> infoMetadataList = emptyList();
+    RecordsMetadata recordsMetadata = new RecordsMetadata(infoMetadataList);
+    when(htsJdkToInfoMapper.map(infoMetadataList, attributes)).thenReturn(info);
     when(htsJdkToRecordSampleMapper.map(genotype)).thenReturn(recordSample);
 
     Record record =
@@ -143,16 +146,16 @@ class HtsJdkToRecordMapperTest {
 
     Sample sample0 = new Sample(Person.newBuilder().setIndividualId("sample0").build(), 0);
     Assertions.assertEquals(
-        record, htsJdkToRecordMapper.map(vcfHeader, variantContext, List.of(sample0)));
+        record, htsJdkToRecordMapper.map(recordsMetadata, variantContext, List.of(sample0)));
   }
 
   @Test
   void mapMissingContig() {
     VariantContext variantContext = mock(VariantContext.class);
     List<Sample> samples = emptyList();
-    VCFHeader vcfHeader = mock(VCFHeader.class);
+    RecordsMetadata recordsMetadata = mock(RecordsMetadata.class);
     assertThrows(
         VcfParseException.class,
-        () -> htsJdkToRecordMapper.map(vcfHeader, variantContext, samples));
+        () -> htsJdkToRecordMapper.map(recordsMetadata, variantContext, samples));
   }
 }

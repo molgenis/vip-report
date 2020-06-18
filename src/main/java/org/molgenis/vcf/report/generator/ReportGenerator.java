@@ -2,6 +2,7 @@ package org.molgenis.vcf.report.generator;
 
 import static java.util.Objects.requireNonNull;
 
+import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.vcf.VCFFileReader;
 import htsjdk.variant.vcf.VCFHeader;
 import java.nio.file.Path;
@@ -84,7 +85,7 @@ public class ReportGenerator {
     RecordsMetadata recordsMetadata =
         htsJdkMapper.mapRecordsMetadata(vcfFileReader.getFileHeader());
     Items<Record> records =
-        createRecords(vcfFileReader, reportGeneratorSettings, samples.getItems());
+        createRecords(recordsMetadata, vcfFileReader, reportGeneratorSettings, samples.getItems());
     AppMetadata appMetadata =
         new AppMetadata(
             reportGeneratorSettings.getAppName(),
@@ -109,11 +110,11 @@ public class ReportGenerator {
   }
 
   private Items<Record> createRecords(
-      VCFFileReader vcfFileReader,
+      RecordsMetadata recordsMetadata,
+      Iterable<VariantContext> variantContexts,
       ReportGeneratorSettings reportGeneratorSettings,
       List<Sample> samples) {
     int maxNrRecords = reportGeneratorSettings.getMaxNrRecords();
-    return htsJdkMapper.mapRecords(
-        vcfFileReader.getFileHeader(), vcfFileReader, maxNrRecords, samples);
+    return htsJdkMapper.mapRecords(recordsMetadata, variantContexts, maxNrRecords, samples);
   }
 }
