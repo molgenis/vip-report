@@ -8,13 +8,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Spliterators;
 import java.util.stream.StreamSupport;
+import org.molgenis.vcf.report.model.AffectedStatus;
+import org.molgenis.vcf.report.model.Person;
 import org.molgenis.vcf.report.model.Sample;
+import org.molgenis.vcf.report.model.Sex;
 import org.molgenis.vcf.report.utils.PedIndividual;
 import org.molgenis.vcf.report.utils.PedIndividual.AffectionStatus;
 import org.molgenis.vcf.report.utils.PedReader;
-import org.phenopackets.schema.v1.core.Pedigree.Person;
-import org.phenopackets.schema.v1.core.Pedigree.Person.AffectedStatus;
-import org.phenopackets.schema.v1.core.Sex;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -45,14 +45,13 @@ public class PedToSamplesMapper {
   }
 
   static Person map(PedIndividual pedIndividual) {
-    return Person.newBuilder()
-        .setFamilyId(pedIndividual.getFamilyId())
-        .setIndividualId(pedIndividual.getId())
-        .setMaternalId(pedIndividual.getMaternalId())
-        .setPaternalId(pedIndividual.getPaternalId())
-        .setSex(map(pedIndividual.getSex()))
-        .setAffectedStatus(map(pedIndividual.getAffectionStatus()))
-        .build();
+    return new Person(
+        pedIndividual.getFamilyId(),
+        pedIndividual.getId(),
+        pedIndividual.getPaternalId(),
+        pedIndividual.getMaternalId(),
+        map(pedIndividual.getSex()),
+        map(pedIndividual.getAffectionStatus()));
   }
 
   private static Sex map(PedIndividual.Sex sex) {

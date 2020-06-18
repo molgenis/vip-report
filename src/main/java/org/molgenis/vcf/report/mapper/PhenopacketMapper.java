@@ -5,18 +5,18 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import lombok.NonNull;
 import org.molgenis.vcf.report.MixedPhenotypesException;
 import org.molgenis.vcf.report.UnexpectedEnumException;
+import org.molgenis.vcf.report.model.AffectedStatus;
+import org.molgenis.vcf.report.model.Individual;
 import org.molgenis.vcf.report.model.Items;
+import org.molgenis.vcf.report.model.OntologyClass;
+import org.molgenis.vcf.report.model.Person;
+import org.molgenis.vcf.report.model.Phenopacket;
+import org.molgenis.vcf.report.model.PhenotypicFeature;
 import org.molgenis.vcf.report.model.Sample;
 import org.molgenis.vcf.report.utils.InvalidSamplePhenotypesException;
-import org.phenopackets.schema.v1.Phenopacket;
-import org.phenopackets.schema.v1.Phenopacket.Builder;
-import org.phenopackets.schema.v1.core.Individual;
-import org.phenopackets.schema.v1.core.OntologyClass;
-import org.phenopackets.schema.v1.core.Pedigree.Person;
-import org.phenopackets.schema.v1.core.Pedigree.Person.AffectedStatus;
-import org.phenopackets.schema.v1.core.PhenotypicFeature;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -56,20 +56,17 @@ public class PhenopacketMapper {
 
   private void mapPhenotypes(
       List<Phenopacket> phenopackets, String sampleId, String[] phenotypeString) {
-    Builder builder = Phenopacket.newBuilder();
 
-    Individual individual = Individual.newBuilder().setId(sampleId).build();
-    builder.setSubject(individual);
+    Individual individual = new Individual(sampleId);
 
+    @NonNull List<PhenotypicFeature> features = new ArrayList<>();
     for (String phenotype : phenotypeString) {
       checkPhenotype(phenotype);
-      OntologyClass ontologyClass =
-          OntologyClass.newBuilder().setId(phenotype).setLabel(phenotype).build();
-      PhenotypicFeature phenotypicFeature =
-          PhenotypicFeature.newBuilder().setType(ontologyClass).build();
-      builder.addPhenotypicFeatures(phenotypicFeature);
+      OntologyClass ontologyClass = new OntologyClass(phenotype, phenotype);
+      PhenotypicFeature phenotypicFeature = new PhenotypicFeature(ontologyClass);
+      features.add(phenotypicFeature);
     }
-    phenopackets.add(builder.build());
+    phenopackets.add(new Phenopacket(features, individual));
   }
 
   public static void checkPhenotype(String phenotype) {

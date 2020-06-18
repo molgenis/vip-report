@@ -4,6 +4,7 @@ import static java.util.Collections.emptyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.molgenis.vcf.report.model.metadata.HtsFormat.VCF;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,9 +25,9 @@ import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.report.model.Report;
 import org.molgenis.vcf.report.model.ReportData;
 import org.molgenis.vcf.report.model.metadata.AppMetadata;
+import org.molgenis.vcf.report.model.metadata.HtsFile;
 import org.molgenis.vcf.report.model.metadata.RecordsMetadata;
 import org.molgenis.vcf.report.model.metadata.ReportMetadata;
-import org.phenopackets.schema.v1.core.HtsFile;
 
 @ExtendWith(MockitoExtension.class)
 class ReportServiceTest {
@@ -53,7 +54,7 @@ class ReportServiceTest {
         new Report(
             new ReportMetadata(
                 new AppMetadata(appName, appVersion, appArguments),
-                HtsFile.newBuilder().build(),
+                new HtsFile(inputVcfPath.toString(), VCF, "UNKNOWN"),
                 mock(RecordsMetadata.class)),
             new ReportData(
                 new Items<>(emptyList(), 0),

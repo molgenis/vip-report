@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.molgenis.vcf.report.mapper.HtsJdkToPersonsMapper.MISSING_PERSON_ID;
 
 import htsjdk.variant.variantcontext.Allele;
 import htsjdk.variant.variantcontext.Genotype;
@@ -21,13 +22,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.molgenis.vcf.report.model.AffectedStatus;
 import org.molgenis.vcf.report.model.Info;
+import org.molgenis.vcf.report.model.Person;
 import org.molgenis.vcf.report.model.Record;
 import org.molgenis.vcf.report.model.RecordSample;
 import org.molgenis.vcf.report.model.Sample;
+import org.molgenis.vcf.report.model.Sex;
 import org.molgenis.vcf.report.model.metadata.InfoMetadata;
 import org.molgenis.vcf.report.model.metadata.RecordsMetadata;
-import org.phenopackets.schema.v1.core.Pedigree.Person;
 
 @ExtendWith(MockitoExtension.class)
 class HtsJdkToRecordMapperTest {
@@ -86,9 +89,36 @@ class HtsJdkToRecordMapperTest {
     when(variantContext.getReference()).thenReturn(Allele.REF_C);
     when(variantContext.getAlternateAlleles()).thenReturn(List.of(Allele.ALT_C, Allele.ALT_T));
 
-    Sample sample1 = new Sample(Person.newBuilder().setIndividualId("c").build(), 0);
-    Sample sample2 = new Sample(Person.newBuilder().setIndividualId("b").build(), 1);
-    Sample sample3 = new Sample(Person.newBuilder().setIndividualId("a").build(), 2);
+    Sample sample1 =
+        new Sample(
+            new Person(
+                "family",
+                "c",
+                MISSING_PERSON_ID,
+                MISSING_PERSON_ID,
+                Sex.UNKNOWN_SEX,
+                AffectedStatus.MISSING),
+            0);
+    Sample sample2 =
+        new Sample(
+            new Person(
+                "family",
+                "b",
+                MISSING_PERSON_ID,
+                MISSING_PERSON_ID,
+                Sex.UNKNOWN_SEX,
+                AffectedStatus.MISSING),
+            1);
+    Sample sample3 =
+        new Sample(
+            new Person(
+                "family",
+                "a",
+                MISSING_PERSON_ID,
+                MISSING_PERSON_ID,
+                Sex.UNKNOWN_SEX,
+                AffectedStatus.MISSING),
+            2);
     List<Sample> samples = new ArrayList<>();
     samples.add(sample2);
     samples.add(sample3);
@@ -144,7 +174,16 @@ class HtsJdkToRecordMapperTest {
             info,
             List.of(recordSample));
 
-    Sample sample0 = new Sample(Person.newBuilder().setIndividualId("sample0").build(), 0);
+    Sample sample0 =
+        new Sample(
+            new Person(
+                "family",
+                "sample0",
+                MISSING_PERSON_ID,
+                MISSING_PERSON_ID,
+                Sex.UNKNOWN_SEX,
+                AffectedStatus.MISSING),
+            0);
     Assertions.assertEquals(
         record, htsJdkToRecordMapper.map(recordsMetadata, variantContext, List.of(sample0)));
   }

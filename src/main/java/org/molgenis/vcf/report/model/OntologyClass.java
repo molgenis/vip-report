@@ -7,13 +7,12 @@ import lombok.experimental.NonFinal;
 
 @Value
 @NonFinal
-public class Sample {
-  @JsonProperty("person")
+public class OntologyClass {
+  @JsonProperty("id")
   @NonNull
-  Person person;
+  String id;
 
-  // index of the sample in the VCF, -1 means the sample is not available in the file.
-  @JsonProperty("index")
+  @JsonProperty("label")
   @NonNull
-  int index;
+  String label;
 }
