@@ -2,8 +2,6 @@ package org.molgenis.vcf.report.mapper.info;
 
 import static java.util.stream.Collectors.toList;
 
-import htsjdk.variant.vcf.VCFHeaderLineCount;
-import htsjdk.variant.vcf.VCFHeaderLineType;
 import htsjdk.variant.vcf.VCFInfoHeaderLine;
 import java.util.Arrays;
 import java.util.Collections;
@@ -68,32 +66,7 @@ public class SnpEffInfoMetadataMapper extends AbstractInfoMetadataMapper {
       throw new IllegalArgumentException(
           String.format("Can't map ##INFO=<ID=%s,...>", vcfInfoHeaderLine.getID()));
     }
-    validateCountType(vcfInfoHeaderLine);
-    validateType(vcfInfoHeaderLine);
-  }
-
-  private void validateCountType(VCFInfoHeaderLine vcfInfoHeaderLine) {
-    VCFHeaderLineCount countType = vcfInfoHeaderLine.getCountType();
-    if (countType != VCFHeaderLineCount.UNBOUNDED) {
-      String number =
-          countType == VCFHeaderLineCount.INTEGER
-              ? String.valueOf(vcfInfoHeaderLine.getCount())
-              : countType.toString();
-
-      throw new IllegalArgumentException(
-          String.format(
-              "Expected ##INFO=<ID=%s,Number=%s,...> to be of Number '%s'",
-              vcfInfoHeaderLine.getID(), number, '.'));
-    }
-  }
-
-  private void validateType(VCFInfoHeaderLine vcfInfoHeaderLine) {
-    VCFHeaderLineType type = vcfInfoHeaderLine.getType();
-    if (type != VCFHeaderLineType.String) {
-      throw new IllegalArgumentException(
-          String.format(
-              "Expected ##INFO=<ID=%s,...,Type=%s,...> to be of type %s",
-              vcfInfoHeaderLine.getID(), type, VCFHeaderLineType.String));
-    }
+    InfoMetadataUtils.validateNumberUnbounded(vcfInfoHeaderLine);
+    InfoMetadataUtils.validateTypeString(vcfInfoHeaderLine);
   }
 }
