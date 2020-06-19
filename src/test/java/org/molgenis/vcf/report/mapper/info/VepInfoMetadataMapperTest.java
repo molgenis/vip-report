@@ -1,4 +1,4 @@
-package org.molgenis.vcf.report.mapper;
+package org.molgenis.vcf.report.mapper.info;
 
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
