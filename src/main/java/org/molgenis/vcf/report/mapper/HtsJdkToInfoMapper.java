@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.toList;
 
 import htsjdk.variant.vcf.VCFConstants;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -125,8 +126,8 @@ public class HtsJdkToInfoMapper {
     return mappedValue;
   }
 
-  private Object mapNestedAttributeToInfo(InfoMetadata infoMetadata, String stringValue) {
-    Object mappedValue;
+  private Collection<Object> mapNestedAttributeToInfo(
+      InfoMetadata infoMetadata, String stringValue) {
     String[] tokens = stringValue.split("\\|", -1);
     List<InfoMetadata> nestedInfoMetadataList = infoMetadata.getNestedMetadata();
 
@@ -135,8 +136,9 @@ public class HtsJdkToInfoMapper {
       InfoMetadata nestedInfoMetadata = nestedInfoMetadataList.get(i);
       attributes.put(nestedInfoMetadata.getId(), tokens[i]);
     }
-    mappedValue = map(nestedInfoMetadataList, attributes);
-    return mappedValue;
+
+    Info nestedInfo = map(nestedInfoMetadataList, attributes);
+    return new ArrayList<>(nestedInfo.values());
   }
 
   private static boolean isSingleValue(InfoMetadata infoMetadata) {

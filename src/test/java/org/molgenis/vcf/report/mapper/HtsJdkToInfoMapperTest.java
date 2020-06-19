@@ -107,13 +107,9 @@ class HtsJdkToInfoMapperTest {
             null,
             emptyList());
 
-    Info nestedInfo0 = new Info();
-    nestedInfo0.put(nestedKey0, "a");
-    nestedInfo0.put(nestedKey1, 0);
-
     String key = "attr";
     Info info = new Info();
-    info.put(key, nestedInfo0);
+    info.put(key, asList("a", 0));
 
     InfoMetadata infoMetadata =
         new InfoMetadata(
@@ -154,17 +150,9 @@ class HtsJdkToInfoMapperTest {
             null,
             emptyList());
 
-    Info nestedInfo0 = new Info();
-    nestedInfo0.put(nestedKey0, "a");
-    nestedInfo0.put(nestedKey1, 0);
-
-    Info nestedInfo1 = new Info();
-    nestedInfo1.put(nestedKey0, "b");
-    nestedInfo1.put(nestedKey1, 1);
-
     String key = "attr";
     Info info = new Info();
-    info.put(key, asList(nestedInfo0, nestedInfo1));
+    info.put(key, asList(asList("a", 0), asList("b", 1)));
 
     InfoMetadata infoMetadata =
         new InfoMetadata(
