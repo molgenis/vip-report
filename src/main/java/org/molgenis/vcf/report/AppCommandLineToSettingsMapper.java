@@ -4,9 +4,9 @@ import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_DEBUG;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_FORCE;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_INPUT;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_OUTPUT;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_TEMPLATE;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_PED;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_PHENOTYPES;
+import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_TEMPLATE;
 import static org.molgenis.vcf.report.utils.PathUtils.parsePaths;
 
 import java.nio.file.Path;

@@ -3,7 +3,6 @@ package org.molgenis.vcf.report.mapper;
 import static java.util.Objects.requireNonNull;
 
 import htsjdk.variant.variantcontext.VariantContext;
-import htsjdk.variant.vcf.VCFHeader;
 import java.util.ArrayList;
 import java.util.List;
 import org.molgenis.vcf.report.model.Items;
