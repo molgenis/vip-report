@@ -38,7 +38,8 @@ public class HtsJdkToRecordMapper {
     this.htsJdkToRecordSampleMapper = requireNonNull(htsJdkToRecordSampleMapper);
   }
 
-  public Record map(RecordsMetadata recordsMetadata, VariantContext variantContext, List<Sample> samples) {
+  public Record map(
+      RecordsMetadata recordsMetadata, VariantContext variantContext, List<Sample> samples) {
     String contig = variantContext.getContig();
     if (contig == null) {
       throw new VcfParseException("Chromosome can't be empty");
@@ -70,7 +71,9 @@ public class HtsJdkToRecordMapper {
       filters = emptyList();
     }
 
-    Info info = htsJdkToInfoMapper.map(recordsMetadata.getInfoMetadataList(), variantContext.getAttributes());
+    Info info =
+        htsJdkToInfoMapper.map(
+            recordsMetadata.getInfoMetadataList(), variantContext.getAttributes());
 
     List<RecordSample> recordSamples;
     if (!samples.isEmpty()) {

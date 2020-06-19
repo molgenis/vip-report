@@ -29,6 +29,5 @@ public class Number {
   @JsonProperty("count")
   Integer count;
 
-  @JsonIgnore
-  char separator;
+  @JsonIgnore char separator;
 }
