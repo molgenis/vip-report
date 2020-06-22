@@ -6,7 +6,6 @@ import static java.util.stream.Collectors.toList;
 
 import htsjdk.variant.variantcontext.Genotype;
 import htsjdk.variant.variantcontext.VariantContext;
-import htsjdk.variant.vcf.VCFHeader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,6 +18,7 @@ import org.molgenis.vcf.report.model.Info;
 import org.molgenis.vcf.report.model.Record;
 import org.molgenis.vcf.report.model.RecordSample;
 import org.molgenis.vcf.report.model.Sample;
+import org.molgenis.vcf.report.model.metadata.RecordsMetadata;
 import org.springframework.stereotype.Component;
 
 /**
@@ -38,7 +38,8 @@ public class HtsJdkToRecordMapper {
     this.htsJdkToRecordSampleMapper = requireNonNull(htsJdkToRecordSampleMapper);
   }
 
-  public Record map(VCFHeader vcfHeader, VariantContext variantContext, List<Sample> samples) {
+  public Record map(
+      RecordsMetadata recordsMetadata, VariantContext variantContext, List<Sample> samples) {
     String contig = variantContext.getContig();
     if (contig == null) {
       throw new VcfParseException("Chromosome can't be empty");
@@ -70,7 +71,9 @@ public class HtsJdkToRecordMapper {
       filters = emptyList();
     }
 
-    Info info = htsJdkToInfoMapper.map(vcfHeader, variantContext.getAttributes());
+    Info info =
+        htsJdkToInfoMapper.map(
+            recordsMetadata.getInfoMetadataList(), variantContext.getAttributes());
 
     List<RecordSample> recordSamples;
     if (!samples.isEmpty()) {

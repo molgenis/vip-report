@@ -2,6 +2,7 @@ package org.molgenis.vcf.report.generator;
 
 import static java.util.Objects.requireNonNull;
 
+import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.vcf.VCFFileReader;
 import htsjdk.variant.vcf.VCFHeader;
 import java.nio.file.Path;
@@ -12,7 +13,6 @@ import org.molgenis.vcf.report.mapper.HtsFileMapper;
 import org.molgenis.vcf.report.mapper.HtsJdkMapper;
 import org.molgenis.vcf.report.mapper.PedToSamplesMapper;
 import org.molgenis.vcf.report.mapper.PhenopacketMapper;
-import org.molgenis.vcf.report.model.metadata.HtsFile;
 import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.report.model.Phenopacket;
 import org.molgenis.vcf.report.model.Record;
@@ -20,6 +20,7 @@ import org.molgenis.vcf.report.model.Report;
 import org.molgenis.vcf.report.model.ReportData;
 import org.molgenis.vcf.report.model.Sample;
 import org.molgenis.vcf.report.model.metadata.AppMetadata;
+import org.molgenis.vcf.report.model.metadata.HtsFile;
 import org.molgenis.vcf.report.model.metadata.RecordsMetadata;
 import org.molgenis.vcf.report.model.metadata.ReportMetadata;
 import org.molgenis.vcf.report.utils.PersonListMerger;
@@ -84,7 +85,7 @@ public class ReportGenerator {
     RecordsMetadata recordsMetadata =
         htsJdkMapper.mapRecordsMetadata(vcfFileReader.getFileHeader());
     Items<Record> records =
-        createRecords(vcfFileReader, reportGeneratorSettings, samples.getItems());
+        createRecords(recordsMetadata, vcfFileReader, reportGeneratorSettings, samples.getItems());
     AppMetadata appMetadata =
         new AppMetadata(
             reportGeneratorSettings.getAppName(),
@@ -109,11 +110,11 @@ public class ReportGenerator {
   }
 
   private Items<Record> createRecords(
-      VCFFileReader vcfFileReader,
+      RecordsMetadata recordsMetadata,
+      Iterable<VariantContext> variantContexts,
       ReportGeneratorSettings reportGeneratorSettings,
       List<Sample> samples) {
     int maxNrRecords = reportGeneratorSettings.getMaxNrRecords();
-    return htsJdkMapper.mapRecords(
-        vcfFileReader.getFileHeader(), vcfFileReader, maxNrRecords, samples);
+    return htsJdkMapper.mapRecords(recordsMetadata, variantContexts, maxNrRecords, samples);
   }
 }

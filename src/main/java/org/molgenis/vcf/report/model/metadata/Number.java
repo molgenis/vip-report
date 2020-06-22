@@ -1,5 +1,6 @@
 package org.molgenis.vcf.report.model.metadata;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.NonNull;
 import lombok.Value;
@@ -27,4 +28,6 @@ public class Number {
 
   @JsonProperty("count")
   Integer count;
+
+  @JsonIgnore char separator;
 }
