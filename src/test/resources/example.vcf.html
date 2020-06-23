@@ -53,16 +53,49 @@
           "description": "Ancestral Allele"
         },
         {
-          "id": "DB",
-          "type": "FLAG",
-          "description": "dbSNP membership, build 129"
+          'id': 'DB',
+          'type': 'FLAG',
+          'description': 'dbSNP membership, build 129'
         },
         {
-          "id": "H2",
-          "type": "FLAG",
-          "description": "HapMap2 membership"
+          'id': 'H2',
+          'type': 'FLAG',
+          'description': 'HapMap2 membership'
         }
-      ]
+      ],
+      'format': [{
+        'id': 'GT',
+        'number': {
+          'type': 'NUMBER',
+          'count': 1
+        },
+        'type': 'STRING',
+        'description': 'Genotype'
+      }, {
+        'id': 'GQ',
+        'number': {
+          'type': 'NUMBER',
+          'count': 1
+        },
+        'type': 'INTEGER',
+        'description': 'Genotype Quality'
+      }, {
+        'id': 'DP',
+        'number': {
+          'type': 'NUMBER',
+          'count': 1
+        },
+        'type': 'INTEGER',
+        'description': 'Read Depth'
+      }, {
+        'id': 'HQ',
+        'number': {
+          'type': 'NUMBER',
+          'count': 2
+        },
+        'type': 'INTEGER',
+        'description': 'Haplotype Quality'
+      }]
     }
   },
   "data": {

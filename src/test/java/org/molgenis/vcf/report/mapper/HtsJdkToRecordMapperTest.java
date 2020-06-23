@@ -29,6 +29,7 @@ import org.molgenis.vcf.report.model.Record;
 import org.molgenis.vcf.report.model.RecordSample;
 import org.molgenis.vcf.report.model.Sample;
 import org.molgenis.vcf.report.model.Sex;
+import org.molgenis.vcf.report.model.metadata.FormatMetadata;
 import org.molgenis.vcf.report.model.metadata.InfoMetadata;
 import org.molgenis.vcf.report.model.metadata.RecordsMetadata;
 
@@ -60,7 +61,8 @@ class HtsJdkToRecordMapperTest {
     Info info = new Info();
 
     List<InfoMetadata> infoMetadataList = emptyList();
-    RecordsMetadata recordsMetadata = new RecordsMetadata(infoMetadataList);
+    List<FormatMetadata> formatMetadataList = emptyList();
+    RecordsMetadata recordsMetadata = new RecordsMetadata(infoMetadataList, formatMetadataList);
     when(htsJdkToInfoMapper.map(infoMetadataList, attributes)).thenReturn(info);
 
     Record record =
@@ -158,7 +160,8 @@ class HtsJdkToRecordMapperTest {
     when(variantContext.getAttributes()).thenReturn(attributes);
     Info info = new Info();
     List<InfoMetadata> infoMetadataList = emptyList();
-    RecordsMetadata recordsMetadata = new RecordsMetadata(infoMetadataList);
+    List<FormatMetadata> formatMetadataList = emptyList();
+    RecordsMetadata recordsMetadata = new RecordsMetadata(infoMetadataList, formatMetadataList);
     when(htsJdkToInfoMapper.map(infoMetadataList, attributes)).thenReturn(info);
     when(htsJdkToRecordSampleMapper.map(genotype)).thenReturn(recordSample);
 
