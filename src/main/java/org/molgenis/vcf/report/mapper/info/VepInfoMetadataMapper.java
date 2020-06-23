@@ -51,19 +51,10 @@ public class VepInfoMetadataMapper extends AbstractInfoMetadataMapper {
   protected InfoMetadata mapNestedId(String id) {
     InfoMetadata infoMetadata;
     switch (id) {
-      case "EXON":
-      case "INTRON":
-        infoMetadata =
-            new InfoMetadata(
-                id,
-                new Number(Type.NUMBER, 2, '/'),
-                InfoMetadata.Type.INTEGER,
-                id,
-                null,
-                null,
-                Collections.emptyList());
-        break;
+      case "Consequence":
       case "Existing_variation":
+      case "CLIN_SIG":
+      case "FLAGS":
         infoMetadata =
             new InfoMetadata(
                 id,
@@ -75,6 +66,7 @@ public class VepInfoMetadataMapper extends AbstractInfoMetadataMapper {
                 Collections.emptyList());
         break;
       case "PHENO":
+      case "SOMATIC":
         infoMetadata =
             new InfoMetadata(
                 id,
