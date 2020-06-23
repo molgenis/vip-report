@@ -1,6 +1,7 @@
 package org.molgenis.vcf.report.mapper;
 
 import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
 import htsjdk.variant.vcf.VCFConstants;
@@ -292,6 +293,11 @@ public class HtsJdkToInfoMapper {
     String stringValue;
     if (value == null) {
       stringValue = null;
+    } else if (value instanceof List<?>) {
+      // workaround for issue where HtsJdk returns a value that is supposed to be a single string
+      // value as a list
+      // example: ##INFO=<ID=ANN_ALLELE,Number=1,Type=String,...> and ANN_ALLELE=A,A
+      stringValue = ((List<?>) value).stream().map(Object::toString).collect(joining(","));
     } else {
       String rawStringValue = (String) value;
       if (!rawStringValue.isEmpty() && !rawStringValue.equals(VCFConstants.MISSING_VALUE_v4)) {
