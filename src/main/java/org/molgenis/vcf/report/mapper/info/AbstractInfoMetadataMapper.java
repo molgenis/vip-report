@@ -4,6 +4,7 @@ import htsjdk.variant.vcf.VCFInfoHeaderLine;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.molgenis.vcf.report.model.metadata.CompoundMetadata;
 import org.molgenis.vcf.report.model.metadata.InfoMetadata;
 import org.molgenis.vcf.report.model.metadata.Number;
 import org.molgenis.vcf.report.model.metadata.Number.Type;
@@ -33,7 +34,7 @@ public abstract class AbstractInfoMetadataMapper implements InfoMetadataMapper {
     return InfoMetadata.builder()
         .id(id)
         .number(new Number(Type.NUMBER, 1, ','))
-        .type(InfoMetadata.Type.STRING)
+        .type(CompoundMetadata.Type.STRING)
         .description(id)
         .build();
   }

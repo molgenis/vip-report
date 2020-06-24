@@ -4,6 +4,7 @@ import htsjdk.variant.vcf.VCFHeaderLineType;
 import htsjdk.variant.vcf.VCFInfoHeaderLine;
 import org.molgenis.vcf.report.UnexpectedEnumException;
 import org.molgenis.vcf.report.mapper.MapperUtils;
+import org.molgenis.vcf.report.model.metadata.CompoundMetadata;
 import org.molgenis.vcf.report.model.metadata.CompoundMetadata.Type;
 import org.molgenis.vcf.report.model.metadata.InfoMetadata;
 import org.molgenis.vcf.report.model.metadata.Number;
@@ -21,7 +22,7 @@ public class DefaultInfoMetadataMapper implements InfoMetadataMapper {
 
   public InfoMetadata map(VCFInfoHeaderLine vcfInfoHeaderLine) {
     String id = vcfInfoHeaderLine.getID();
-    InfoMetadata.Type type = mapType(vcfInfoHeaderLine.getType());
+    CompoundMetadata.Type type = mapType(vcfInfoHeaderLine.getType());
     Number number = type != Type.FLAG ? MapperUtils.mapNumber(vcfInfoHeaderLine) : null;
 
     return InfoMetadata.builder()
@@ -34,8 +35,8 @@ public class DefaultInfoMetadataMapper implements InfoMetadataMapper {
         .build();
   }
 
-  private InfoMetadata.Type mapType(VCFHeaderLineType vcfHeaderLineType) {
-    InfoMetadata.Type type;
+  private CompoundMetadata.Type mapType(VCFHeaderLineType vcfHeaderLineType) {
+    CompoundMetadata.Type type;
     switch (vcfHeaderLineType) {
       case Integer:
         type = Type.INTEGER;

@@ -39,7 +39,7 @@ public class SnpEffInfoMetadataMapper extends AbstractInfoMetadataMapper {
     return InfoMetadata.builder()
         .id(vcfInfoHeaderLine.getID())
         .number(new Number(Type.OTHER, null, ','))
-        .type(InfoMetadata.Type.NESTED)
+        .type(CompoundMetadata.Type.NESTED)
         .description(vcfInfoHeaderLine.getDescription())
         .source(vcfInfoHeaderLine.getSource())
         .version(vcfInfoHeaderLine.getVersion())

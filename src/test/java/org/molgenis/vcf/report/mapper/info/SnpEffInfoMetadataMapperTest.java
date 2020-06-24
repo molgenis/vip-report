@@ -12,6 +12,7 @@ import htsjdk.variant.vcf.VCFHeaderLineType;
 import htsjdk.variant.vcf.VCFInfoHeaderLine;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.molgenis.vcf.report.model.metadata.CompoundMetadata;
 import org.molgenis.vcf.report.model.metadata.InfoMetadata;
 import org.molgenis.vcf.report.model.metadata.Number;
 import org.molgenis.vcf.report.model.metadata.Number.Type;
@@ -61,21 +62,21 @@ class SnpEffInfoMetadataMapperTest {
         InfoMetadata.builder()
             .id("X")
             .number(new Number(Type.NUMBER, 1, ','))
-            .type(InfoMetadata.Type.STRING)
+            .type(CompoundMetadata.Type.STRING)
             .description("X")
             .build();
     InfoMetadata yInfoMetadata =
         InfoMetadata.builder()
             .id("Y")
             .number(new Number(Type.NUMBER, 1, ','))
-            .type(InfoMetadata.Type.STRING)
+            .type(CompoundMetadata.Type.STRING)
             .description("Y")
             .build();
     InfoMetadata infoMetadata =
         InfoMetadata.builder()
             .id("ANN")
             .number(new Number(Type.OTHER, null, ','))
-            .type(InfoMetadata.Type.NESTED)
+            .type(CompoundMetadata.Type.NESTED)
             .description("Functional annotations: 'X | Y'")
             .nestedMetadata(asList(xInfoMetadata, yInfoMetadata))
             .build();
