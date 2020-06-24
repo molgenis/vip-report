@@ -5,6 +5,8 @@ import static java.util.stream.Collectors.toList;
 import htsjdk.variant.vcf.VCFInfoHeaderLine;
 import java.util.Arrays;
 import java.util.List;
+import org.molgenis.vcf.report.model.Info;
+import org.molgenis.vcf.report.model.metadata.CompoundMetadata;
 import org.molgenis.vcf.report.model.metadata.InfoMetadata;
 import org.molgenis.vcf.report.model.metadata.Number;
 import org.molgenis.vcf.report.model.metadata.Number.Type;
@@ -21,20 +23,22 @@ public class RlvInfoMetadataMapper extends AbstractInfoMetadataMapper {
     return vcfInfoHeaderLine.getID().equals(INFO_ID);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public InfoMetadata map(VCFInfoHeaderLine vcfInfoHeaderLine) {
     validate(vcfInfoHeaderLine);
 
     List<InfoMetadata> nestedInfoMetaData = mapNested(vcfInfoHeaderLine);
 
-    return new InfoMetadata(
-        vcfInfoHeaderLine.getID(),
-        new Number(Type.OTHER, null, ','),
-        InfoMetadata.Type.NESTED,
-        vcfInfoHeaderLine.getDescription(),
-        vcfInfoHeaderLine.getSource(),
-        vcfInfoHeaderLine.getVersion(),
-        nestedInfoMetaData);
+    return InfoMetadata.builder()
+        .id(vcfInfoHeaderLine.getID())
+        .number(new Number(Type.OTHER, null, ','))
+        .type(InfoMetadata.Type.NESTED)
+        .description(vcfInfoHeaderLine.getDescription())
+        .source(vcfInfoHeaderLine.getSource())
+        .version(vcfInfoHeaderLine.getVersion())
+        .nestedMetadata((List<CompoundMetadata<Info>>) (List<?>) nestedInfoMetaData)
+        .build();
   }
 
   @Override

@@ -30,13 +30,11 @@ public abstract class AbstractInfoMetadataMapper implements InfoMetadataMapper {
   }
 
   protected InfoMetadata createNestedInfoMetadata(String id) {
-    return new InfoMetadata(
-        id,
-        new Number(Type.NUMBER, 1, ','),
-        InfoMetadata.Type.STRING,
-        id,
-        null,
-        null,
-        Collections.emptyList());
+    return InfoMetadata.builder()
+        .id(id)
+        .number(new Number(Type.NUMBER, 1, ','))
+        .type(InfoMetadata.Type.STRING)
+        .description(id)
+        .build();
   }
 }

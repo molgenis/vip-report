@@ -29,6 +29,7 @@ import org.molgenis.vcf.report.model.Record;
 import org.molgenis.vcf.report.model.RecordSample;
 import org.molgenis.vcf.report.model.Sample;
 import org.molgenis.vcf.report.model.Sex;
+import org.molgenis.vcf.report.model.metadata.CompoundMetadata;
 import org.molgenis.vcf.report.model.metadata.FormatMetadata;
 import org.molgenis.vcf.report.model.metadata.InfoMetadata;
 import org.molgenis.vcf.report.model.metadata.RecordsMetadata;
@@ -44,6 +45,7 @@ class HtsJdkToRecordMapperTest {
     htsJdkToRecordMapper = new HtsJdkToRecordMapper(htsJdkToInfoMapper, htsJdkToRecordSampleMapper);
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   void map() {
     String contig = "MyContig";
@@ -63,7 +65,9 @@ class HtsJdkToRecordMapperTest {
     List<InfoMetadata> infoMetadataList = emptyList();
     List<FormatMetadata> formatMetadataList = emptyList();
     RecordsMetadata recordsMetadata = new RecordsMetadata(infoMetadataList, formatMetadataList);
-    when(htsJdkToInfoMapper.map(infoMetadataList, attributes)).thenReturn(info);
+    when(htsJdkToInfoMapper.map(
+        (List<CompoundMetadata<Info>>) (List<?>) infoMetadataList, attributes))
+        .thenReturn(info);
 
     Record record =
         new Record(
@@ -130,6 +134,7 @@ class HtsJdkToRecordMapperTest {
     verify(variantContext).getGenotypesOrderedBy(Arrays.asList("c", "b", "a"));
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   void mapWithIdentifiersQualityFilters() {
     String contig = "MyContig";
@@ -162,8 +167,10 @@ class HtsJdkToRecordMapperTest {
     List<InfoMetadata> infoMetadataList = emptyList();
     List<FormatMetadata> formatMetadataList = emptyList();
     RecordsMetadata recordsMetadata = new RecordsMetadata(infoMetadataList, formatMetadataList);
-    when(htsJdkToInfoMapper.map(infoMetadataList, attributes)).thenReturn(info);
-    when(htsJdkToRecordSampleMapper.map(genotype)).thenReturn(recordSample);
+    when(htsJdkToInfoMapper
+        .map((List<CompoundMetadata<Info>>) (List<?>) infoMetadataList, attributes))
+        .thenReturn(info);
+    when(htsJdkToRecordSampleMapper.map(emptyList(), genotype)).thenReturn(recordSample);
 
     Record record =
         new Record(

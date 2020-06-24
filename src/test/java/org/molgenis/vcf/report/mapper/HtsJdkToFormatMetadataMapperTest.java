@@ -40,7 +40,12 @@ class HtsJdkToFormatMetadataMapperTest {
     when(vcfFormatHeaderLine.getDescription()).thenReturn(description);
 
     FormatMetadata formatMetadata =
-        new FormatMetadata(id, new Number(Type.NUMBER, count, ','), type, description);
+        FormatMetadata.builder()
+            .id(id)
+            .number(new Number(Type.NUMBER, count, ','))
+            .type(type)
+            .description(description)
+            .build();
     assertEquals(formatMetadata, htsJdkToFormatMetadataMapper.map(vcfFormatHeaderLine));
   }
 

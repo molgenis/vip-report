@@ -4,11 +4,13 @@ import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.molgenis.vcf.report.model.Format;
 import org.molgenis.vcf.report.model.Genotype;
 import org.molgenis.vcf.report.model.RecordSample;
+import org.molgenis.vcf.report.model.metadata.CompoundMetadata;
+import org.molgenis.vcf.report.model.metadata.FormatMetadata;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,7 +18,7 @@ import org.springframework.stereotype.Component;
  * @see RecordSample
  */
 @Component
-public class HtsJdkToRecordSampleMapper {
+public class HtsJdkToRecordSampleMapper extends HtsJdkToCompoundMapper<Format> {
 
   private final HtsJdkToGenotypeTypeMapper htsJdkGenotypeTypeMapper;
 
@@ -24,9 +26,11 @@ public class HtsJdkToRecordSampleMapper {
     this.htsJdkGenotypeTypeMapper = requireNonNull(htsJdkGenotypeTypeMapper);
   }
 
-  public RecordSample map(htsjdk.variant.variantcontext.Genotype htsJdkGenotype) {
+  public RecordSample map(
+      List<FormatMetadata> formatMetadataList,
+      htsjdk.variant.variantcontext.Genotype htsJdkGenotype) {
     Genotype genotype = mapGenotype(htsJdkGenotype);
-    Map<String, Object> dataMap = mapData(htsJdkGenotype);
+    Map<String, Object> dataMap = mapData(formatMetadataList, htsJdkGenotype);
     return new RecordSample(genotype, dataMap);
   }
 
@@ -48,21 +52,45 @@ public class HtsJdkToRecordSampleMapper {
     return genotype;
   }
 
-  private Map<String, Object> mapData(htsjdk.variant.variantcontext.Genotype htsJdkGenotype) {
-    Map<String, Object> dataMap = new LinkedHashMap<>();
+  private Map<String, Object> mapData(
+      List<FormatMetadata> formatMetadataList,
+      htsjdk.variant.variantcontext.Genotype htsJdkGenotype) {
+    @SuppressWarnings("unchecked")
+    Format format =
+        map(
+            (List<CompoundMetadata<Format>>) (List<?>) formatMetadataList,
+            htsJdkGenotype.getExtendedAttributes());
+
     if (htsJdkGenotype.hasGQ()) {
-      dataMap.put("GQ", htsJdkGenotype.getGQ());
+      format.put("GQ", htsJdkGenotype.getGQ());
     }
     if (htsJdkGenotype.hasAD()) {
-      dataMap.put("AD", Arrays.stream(htsJdkGenotype.getAD()).boxed().collect(toList()));
+      format.put("AD", Arrays.stream(htsJdkGenotype.getAD()).boxed().collect(toList()));
     }
     if (htsJdkGenotype.hasDP()) {
-      dataMap.put("DP", htsJdkGenotype.getDP());
+      format.put("DP", htsJdkGenotype.getDP());
     }
     if (htsJdkGenotype.hasPL()) {
-      dataMap.put("PL", Arrays.stream(htsJdkGenotype.getPL()).boxed().collect(toList()));
+      format.put("PL", Arrays.stream(htsJdkGenotype.getPL()).boxed().collect(toList()));
     }
-    dataMap.putAll(htsJdkGenotype.getExtendedAttributes());
-    return dataMap;
+
+    return format;
+  }
+
+  @Override
+  public Format map(
+      List<CompoundMetadata<Format>> compoundMetadataList, Map<String, Object> attributes) {
+    Format format = new Format();
+    attributes.forEach(
+        (key, value) -> {
+          CompoundMetadata<Format> compoundMetadata =
+              compoundMetadataList.stream()
+                  .filter(aCompoundMetadata -> aCompoundMetadata.getId().equals(key))
+                  .findFirst()
+                  .orElse(null);
+          Object mappedValue = mapAttribute(compoundMetadata, value);
+          format.put(key, mappedValue);
+        });
+    return format;
   }
 }

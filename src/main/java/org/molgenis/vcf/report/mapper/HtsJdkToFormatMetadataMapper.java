@@ -15,7 +15,13 @@ public class HtsJdkToFormatMetadataMapper {
     Number number = MapperUtils.mapNumber(vcfFormatHeaderLine);
     FormatMetadata.Type type = mapType(vcfFormatHeaderLine.getType());
     String description = vcfFormatHeaderLine.getDescription();
-    return new FormatMetadata(id, number, type, description);
+
+    return FormatMetadata.builder()
+        .id(id)
+        .number(number)
+        .type(type)
+        .description(description)
+        .build();
   }
 
   private FormatMetadata.Type mapType(VCFHeaderLineType vcfHeaderLineType) {

@@ -1,33 +1,13 @@
 package org.molgenis.vcf.report.model.metadata;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.NonFinal;
+import lombok.experimental.SuperBuilder;
+import org.molgenis.vcf.report.model.Format;
 
 @Value
 @NonFinal
-public class FormatMetadata {
+@SuperBuilder
+public class FormatMetadata extends CompoundMetadata<Format> {
 
-  public enum Type {
-    CHARACTER,
-    INTEGER,
-    FLOAT,
-    STRING,
-  }
-
-  @JsonProperty("id")
-  @NonNull
-  String id;
-
-  @JsonProperty("number")
-  Number number;
-
-  @JsonProperty("type")
-  @NonNull
-  Type type;
-
-  @JsonProperty("description")
-  @NonNull
-  String description;
 }

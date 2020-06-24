@@ -3,8 +3,9 @@ package org.molgenis.vcf.report.mapper.info;
 import static java.util.Arrays.asList;
 
 import htsjdk.variant.vcf.VCFInfoHeaderLine;
-import java.util.Collections;
 import java.util.List;
+import org.molgenis.vcf.report.model.Info;
+import org.molgenis.vcf.report.model.metadata.CompoundMetadata;
 import org.molgenis.vcf.report.model.metadata.InfoMetadata;
 import org.molgenis.vcf.report.model.metadata.Number;
 import org.molgenis.vcf.report.model.metadata.Number.Type;
@@ -24,20 +25,22 @@ public class VepInfoMetadataMapper extends AbstractInfoMetadataMapper {
     return description.startsWith(INFO_DESCRIPTION_PREFIX);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public InfoMetadata map(VCFInfoHeaderLine vcfInfoHeaderLine) {
     validate(vcfInfoHeaderLine);
 
     List<InfoMetadata> nestedInfoMetaData = mapNested(vcfInfoHeaderLine);
 
-    return new InfoMetadata(
-        vcfInfoHeaderLine.getID(),
-        new Number(Type.OTHER, null, ','),
-        InfoMetadata.Type.NESTED,
-        vcfInfoHeaderLine.getDescription(),
-        vcfInfoHeaderLine.getSource(),
-        vcfInfoHeaderLine.getVersion(),
-        nestedInfoMetaData);
+    return InfoMetadata.builder()
+        .id(vcfInfoHeaderLine.getID())
+        .number(new Number(Type.OTHER, null, ','))
+        .type(CompoundMetadata.Type.NESTED)
+        .description(vcfInfoHeaderLine.getDescription())
+        .source(vcfInfoHeaderLine.getSource())
+        .version(vcfInfoHeaderLine.getVersion())
+        .nestedMetadata((List<CompoundMetadata<Info>>) (List<?>) nestedInfoMetaData)
+        .build();
   }
 
   @Override
@@ -56,38 +59,32 @@ public class VepInfoMetadataMapper extends AbstractInfoMetadataMapper {
       case "CLIN_SIG":
       case "FLAGS":
         infoMetadata =
-            new InfoMetadata(
-                id,
-                new Number(Type.OTHER, null, '&'),
-                InfoMetadata.Type.STRING,
-                id,
-                null,
-                null,
-                Collections.emptyList());
+            InfoMetadata.builder()
+                .id(id)
+                .number(new Number(Type.OTHER, null, '&'))
+                .type(CompoundMetadata.Type.STRING)
+                .description(id)
+                .build();
         break;
       case "PHENO":
       case "SOMATIC":
         infoMetadata =
-            new InfoMetadata(
-                id,
-                new Number(Type.OTHER, null, '&'),
-                InfoMetadata.Type.INTEGER,
-                id,
-                null,
-                null,
-                Collections.emptyList());
+            InfoMetadata.builder()
+                .id(id)
+                .number(new Number(Type.OTHER, null, '&'))
+                .type(CompoundMetadata.Type.INTEGER)
+                .description(id)
+                .build();
         break;
       case "STRAND":
       case "HGNC_ID":
         infoMetadata =
-            new InfoMetadata(
-                id,
-                new Number(Type.NUMBER, 1, ','),
-                InfoMetadata.Type.INTEGER,
-                id,
-                null,
-                null,
-                Collections.emptyList());
+            InfoMetadata.builder()
+                .id(id)
+                .number(new Number(Type.NUMBER, 1, ','))
+                .type(CompoundMetadata.Type.INTEGER)
+                .description(id)
+                .build();
         break;
       case "gnomAD_AF":
       case "gnomAD_AFR_AF":
@@ -99,14 +96,12 @@ public class VepInfoMetadataMapper extends AbstractInfoMetadataMapper {
       case "gnomAD_OTH_AF":
       case "gnomAD_SAS_AF":
         infoMetadata =
-            new InfoMetadata(
-                id,
-                new Number(Type.NUMBER, 1, ','),
-                InfoMetadata.Type.FLOAT,
-                id,
-                null,
-                null,
-                Collections.emptyList());
+            InfoMetadata.builder()
+                .id(id)
+                .number(new Number(Type.NUMBER, 1, ','))
+                .type(CompoundMetadata.Type.FLOAT)
+                .description(id)
+                .build();
         break;
       default:
         infoMetadata = super.createNestedInfoMetadata(id);

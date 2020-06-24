@@ -1,6 +1,5 @@
 package org.molgenis.vcf.report.mapper;
 
-import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -18,8 +17,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.molgenis.vcf.report.mapper.info.DefaultInfoMetadataMapper;
+import org.molgenis.vcf.report.model.metadata.CompoundMetadata.Type;
 import org.molgenis.vcf.report.model.metadata.InfoMetadata;
-import org.molgenis.vcf.report.model.metadata.InfoMetadata.Type;
 import org.molgenis.vcf.report.model.metadata.Number;
 
 @ExtendWith(MockitoExtension.class)
@@ -60,7 +59,14 @@ class DefaultInfoMetadataMapperTest {
     when(vcfInfoHeaderLine.getVersion()).thenReturn(version);
 
     assertEquals(
-        new InfoMetadata(id, number, type, description, source, version, emptyList()),
+        InfoMetadata.builder()
+            .id(id)
+            .number(number)
+            .type(type)
+            .description(description)
+            .source(source)
+            .version(version)
+            .build(),
         defaultInfoMetadataMapper.map(vcfInfoHeaderLine));
   }
 

@@ -2,11 +2,10 @@ package org.molgenis.vcf.report.mapper.info;
 
 import htsjdk.variant.vcf.VCFHeaderLineType;
 import htsjdk.variant.vcf.VCFInfoHeaderLine;
-import java.util.Collections;
 import org.molgenis.vcf.report.UnexpectedEnumException;
 import org.molgenis.vcf.report.mapper.MapperUtils;
+import org.molgenis.vcf.report.model.metadata.CompoundMetadata.Type;
 import org.molgenis.vcf.report.model.metadata.InfoMetadata;
-import org.molgenis.vcf.report.model.metadata.InfoMetadata.Type;
 import org.molgenis.vcf.report.model.metadata.Number;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -25,14 +24,14 @@ public class DefaultInfoMetadataMapper implements InfoMetadataMapper {
     InfoMetadata.Type type = mapType(vcfInfoHeaderLine.getType());
     Number number = type != Type.FLAG ? MapperUtils.mapNumber(vcfInfoHeaderLine) : null;
 
-    return new InfoMetadata(
-        id,
-        number,
-        type,
-        vcfInfoHeaderLine.getDescription(),
-        vcfInfoHeaderLine.getSource(),
-        vcfInfoHeaderLine.getVersion(),
-        Collections.emptyList());
+    return InfoMetadata.builder()
+        .id(id)
+        .number(number)
+        .type(type)
+        .description(vcfInfoHeaderLine.getDescription())
+        .source(vcfInfoHeaderLine.getSource())
+        .version(vcfInfoHeaderLine.getVersion())
+        .build();
   }
 
   private InfoMetadata.Type mapType(VCFHeaderLineType vcfHeaderLineType) {

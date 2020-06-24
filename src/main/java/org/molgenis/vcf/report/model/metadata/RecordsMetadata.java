@@ -13,6 +13,7 @@ public class RecordsMetadata {
   @JsonProperty("info")
   @NonNull
   List<InfoMetadata> infoMetadataList;
+
   @JsonProperty("format")
   @NonNull
   List<FormatMetadata> formatMetadataList;

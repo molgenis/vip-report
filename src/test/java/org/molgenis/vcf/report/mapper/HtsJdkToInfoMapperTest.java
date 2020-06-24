@@ -14,8 +14,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.molgenis.vcf.report.model.Info;
+import org.molgenis.vcf.report.model.metadata.CompoundMetadata;
+import org.molgenis.vcf.report.model.metadata.CompoundMetadata.Type;
 import org.molgenis.vcf.report.model.metadata.InfoMetadata;
-import org.molgenis.vcf.report.model.metadata.InfoMetadata.Type;
 import org.molgenis.vcf.report.model.metadata.Number;
 
 class HtsJdkToInfoMapperTest {
@@ -32,27 +33,25 @@ class HtsJdkToInfoMapperTest {
     Object value = "value";
     Info info = new Info();
     info.put(key, value);
-    List<InfoMetadata> infoMetadataList = emptyList();
+    List<CompoundMetadata<Info>> infoMetadataList = emptyList();
     assertEquals(info, htsJdkToInfoMapper.map(infoMetadataList, singletonMap(key, value)));
   }
 
   @ParameterizedTest
   @MethodSource("map")
-  void map(Type type, Object value, int count, Object expectedValue) {
+  void map(CompoundMetadata.Type type, Object value, int count, Object expectedValue) {
     String key = "attr";
     Info info = new Info();
     info.put(key, expectedValue);
 
     InfoMetadata infoMetadata =
-        new InfoMetadata(
-            key,
-            new Number(Number.Type.NUMBER, count, ','),
-            type,
-            "My Description",
-            null,
-            null,
-            emptyList());
-    List<InfoMetadata> infoMetadataList = singletonList(infoMetadata);
+        InfoMetadata.builder()
+            .id(key)
+            .number(new Number(Number.Type.NUMBER, count, ','))
+            .type(type)
+            .description("My Description")
+            .build();
+    List<CompoundMetadata<Info>> infoMetadataList = singletonList(infoMetadata);
     assertEquals(info, htsJdkToInfoMapper.map(infoMetadataList, singletonMap(key, value)));
   }
 
@@ -89,40 +88,35 @@ class HtsJdkToInfoMapperTest {
 
     String nestedKey0 = "nestedAttr0";
     InfoMetadata nestedInfoMetadata0 =
-        new InfoMetadata(
-            nestedKey0,
-            new Number(Number.Type.NUMBER, 1, ','),
-            Type.STRING,
-            nestedKey0,
-            null,
-            null,
-            emptyList());
+        InfoMetadata.builder()
+            .id(nestedKey0)
+            .number(new Number(Number.Type.NUMBER, 1, ','))
+            .type(Type.STRING)
+            .description(nestedKey0)
+            .build();
 
     String nestedKey1 = "nestedAttr1";
     InfoMetadata nestedInfoMetadata1 =
-        new InfoMetadata(
-            nestedKey1,
-            new Number(Number.Type.NUMBER, 1, ','),
-            Type.INTEGER,
-            nestedKey0,
-            null,
-            null,
-            emptyList());
+        InfoMetadata.builder()
+            .id(nestedKey1)
+            .number(new Number(Number.Type.NUMBER, 1, ','))
+            .type(Type.INTEGER)
+            .description(nestedKey1)
+            .build();
 
     String key = "attr";
     Info info = new Info();
     info.put(key, asList("a", 0));
 
     InfoMetadata infoMetadata =
-        new InfoMetadata(
-            key,
-            new Number(Number.Type.NUMBER, 1, ','),
-            Type.NESTED,
-            "My Description",
-            null,
-            null,
-            asList(nestedInfoMetadata0, nestedInfoMetadata1));
-    List<InfoMetadata> infoMetadataList = singletonList(infoMetadata);
+        InfoMetadata.builder()
+            .id(key)
+            .number(new Number(Number.Type.NUMBER, 1, ','))
+            .type(Type.NESTED)
+            .description("My Description")
+            .nestedMetadata(asList(nestedInfoMetadata0, nestedInfoMetadata1))
+            .build();
+    List<CompoundMetadata<Info>> infoMetadataList = singletonList(infoMetadata);
     assertEquals(info, htsJdkToInfoMapper.map(infoMetadataList, singletonMap(key, value)));
   }
 
@@ -132,40 +126,35 @@ class HtsJdkToInfoMapperTest {
 
     String nestedKey0 = "nestedAttr0";
     InfoMetadata nestedInfoMetadata0 =
-        new InfoMetadata(
-            nestedKey0,
-            new Number(Number.Type.NUMBER, 1, ','),
-            Type.STRING,
-            nestedKey0,
-            null,
-            null,
-            emptyList());
+        InfoMetadata.builder()
+            .id(nestedKey0)
+            .number(new Number(Number.Type.NUMBER, 1, ','))
+            .type(Type.STRING)
+            .description(nestedKey0)
+            .build();
 
     String nestedKey1 = "nestedAttr1";
     InfoMetadata nestedInfoMetadata1 =
-        new InfoMetadata(
-            nestedKey1,
-            new Number(Number.Type.NUMBER, 1, ','),
-            Type.INTEGER,
-            nestedKey0,
-            null,
-            null,
-            emptyList());
+        InfoMetadata.builder()
+            .id(nestedKey1)
+            .number(new Number(Number.Type.NUMBER, 1, ','))
+            .type(Type.INTEGER)
+            .description(nestedKey1)
+            .build();
 
     String key = "attr";
     Info info = new Info();
     info.put(key, asList(asList("a", 0), asList("b", 1)));
 
     InfoMetadata infoMetadata =
-        new InfoMetadata(
-            key,
-            new Number(Number.Type.OTHER, null, ','),
-            Type.NESTED,
-            "My Description",
-            null,
-            null,
-            asList(nestedInfoMetadata0, nestedInfoMetadata1));
-    List<InfoMetadata> infoMetadataList = singletonList(infoMetadata);
+        InfoMetadata.builder()
+            .id(key)
+            .number(new Number(Number.Type.OTHER, null, ','))
+            .type(Type.NESTED)
+            .description("My Description")
+            .nestedMetadata(asList(nestedInfoMetadata0, nestedInfoMetadata1))
+            .build();
+    List<CompoundMetadata<Info>> infoMetadataList = singletonList(infoMetadata);
     assertEquals(info, htsJdkToInfoMapper.map(infoMetadataList, singletonMap(key, value)));
   }
 }

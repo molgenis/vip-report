@@ -1,6 +1,7 @@
 package org.molgenis.vcf.report.mapper;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -65,7 +66,7 @@ class HtsJdkToRecordSampleMapperTest {
     dataMap.put("XX", "val");
 
     RecordSample recordSample = new RecordSample(genotype, dataMap);
-    assertEquals(recordSample, htsJdkToRecordSampleMapper.map(htsJdkGenotype));
+    assertEquals(recordSample, htsJdkToRecordSampleMapper.map(emptyList(), htsJdkGenotype));
   }
 
   @Test
@@ -74,6 +75,6 @@ class HtsJdkToRecordSampleMapperTest {
         mock(htsjdk.variant.variantcontext.Genotype.class);
 
     RecordSample recordSample = new RecordSample(null, emptyMap());
-    assertEquals(recordSample, htsJdkToRecordSampleMapper.map(htsJdkGenotype));
+    assertEquals(recordSample, htsJdkToRecordSampleMapper.map(emptyList(), htsJdkGenotype));
   }
 }
