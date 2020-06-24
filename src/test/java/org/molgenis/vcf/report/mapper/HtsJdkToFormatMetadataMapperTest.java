@@ -7,8 +7,11 @@ import static org.mockito.Mockito.when;
 import htsjdk.variant.vcf.VCFFormatHeaderLine;
 import htsjdk.variant.vcf.VCFHeaderLineCount;
 import htsjdk.variant.vcf.VCFHeaderLineType;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.molgenis.vcf.report.model.metadata.FormatMetadata;
 import org.molgenis.vcf.report.model.metadata.Number;
 import org.molgenis.vcf.report.model.metadata.Number.Type;
@@ -22,8 +25,9 @@ class HtsJdkToFormatMetadataMapperTest {
     htsJdkToFormatMetadataMapper = new HtsJdkToFormatMetadataMapper();
   }
 
-  @Test
-  void map() {
+  @ParameterizedTest
+  @MethodSource("map")
+  void map(VCFHeaderLineType vcfHeaderLineType, FormatMetadata.Type type) {
     String id = "MyId";
     String description = "My Description";
     int count = 1;
@@ -32,12 +36,19 @@ class HtsJdkToFormatMetadataMapperTest {
     when(vcfFormatHeaderLine.getID()).thenReturn(id);
     when(vcfFormatHeaderLine.getCountType()).thenReturn(VCFHeaderLineCount.INTEGER);
     when(vcfFormatHeaderLine.getCount()).thenReturn(count);
-    when(vcfFormatHeaderLine.getType()).thenReturn(VCFHeaderLineType.String);
+    when(vcfFormatHeaderLine.getType()).thenReturn(vcfHeaderLineType);
     when(vcfFormatHeaderLine.getDescription()).thenReturn(description);
 
     FormatMetadata formatMetadata =
-        new FormatMetadata(
-            id, new Number(Type.NUMBER, count, ','), FormatMetadata.Type.STRING, description);
+        new FormatMetadata(id, new Number(Type.NUMBER, count, ','), type, description);
     assertEquals(formatMetadata, htsJdkToFormatMetadataMapper.map(vcfFormatHeaderLine));
+  }
+
+  private static Stream<Arguments> map() {
+    return Stream.of(
+        Arguments.of(VCFHeaderLineType.String, FormatMetadata.Type.STRING),
+        Arguments.of(VCFHeaderLineType.Float, FormatMetadata.Type.FLOAT),
+        Arguments.of(VCFHeaderLineType.Integer, FormatMetadata.Type.INTEGER),
+        Arguments.of(VCFHeaderLineType.Character, FormatMetadata.Type.CHARACTER));
   }
 }
