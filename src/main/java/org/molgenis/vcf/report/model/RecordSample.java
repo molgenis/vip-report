@@ -1,7 +1,7 @@
 package org.molgenis.vcf.report.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.NonNull;
+import java.util.Map;
 import lombok.Value;
 import lombok.experimental.NonFinal;
 
@@ -10,6 +10,9 @@ import lombok.experimental.NonFinal;
 public class RecordSample {
 
   @JsonProperty("gt")
-  @NonNull
   Genotype genotype;
+
+  // additional genotype data
+  @JsonProperty("f")
+  Map<String, Object> dataMap;
 }
