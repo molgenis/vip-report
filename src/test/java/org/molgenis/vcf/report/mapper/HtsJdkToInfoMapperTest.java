@@ -18,6 +18,7 @@ import org.molgenis.vcf.report.model.metadata.CompoundMetadata;
 import org.molgenis.vcf.report.model.metadata.CompoundMetadata.Type;
 import org.molgenis.vcf.report.model.metadata.InfoMetadata;
 import org.molgenis.vcf.report.model.metadata.Number;
+import org.molgenis.vcf.report.model.metadata.Number.NumberBuilder;
 
 class HtsJdkToInfoMapperTest {
   private HtsJdkToInfoMapper htsJdkToInfoMapper;
@@ -44,10 +45,16 @@ class HtsJdkToInfoMapperTest {
     Info info = new Info();
     info.put(key, expectedValue);
 
+    NumberBuilder numberBuilder = Number.builder().type(Number.Type.NUMBER).count(count);
+    if (count > 1) {
+      numberBuilder.separator(',');
+    }
+    Number number = numberBuilder.build();
+
     InfoMetadata infoMetadata =
         InfoMetadata.builder()
             .id(key)
-            .number(new Number(Number.Type.NUMBER, count, ','))
+            .number(number)
             .type(type)
             .description("My Description")
             .build();
@@ -90,7 +97,7 @@ class HtsJdkToInfoMapperTest {
     InfoMetadata nestedInfoMetadata0 =
         InfoMetadata.builder()
             .id(nestedKey0)
-            .number(new Number(Number.Type.NUMBER, 1, ','))
+            .number(Number.builder().type(Number.Type.NUMBER).count(1).build())
             .type(Type.STRING)
             .description(nestedKey0)
             .build();
@@ -99,7 +106,7 @@ class HtsJdkToInfoMapperTest {
     InfoMetadata nestedInfoMetadata1 =
         InfoMetadata.builder()
             .id(nestedKey1)
-            .number(new Number(Number.Type.NUMBER, 1, ','))
+            .number(Number.builder().type(Number.Type.NUMBER).count(1).build())
             .type(Type.INTEGER)
             .description(nestedKey1)
             .build();
@@ -111,7 +118,7 @@ class HtsJdkToInfoMapperTest {
     InfoMetadata infoMetadata =
         InfoMetadata.builder()
             .id(key)
-            .number(new Number(Number.Type.NUMBER, 1, ','))
+            .number(Number.builder().type(Number.Type.NUMBER).count(1).build())
             .type(Type.NESTED)
             .description("My Description")
             .nestedMetadata(asList(nestedInfoMetadata0, nestedInfoMetadata1))
@@ -128,7 +135,7 @@ class HtsJdkToInfoMapperTest {
     InfoMetadata nestedInfoMetadata0 =
         InfoMetadata.builder()
             .id(nestedKey0)
-            .number(new Number(Number.Type.NUMBER, 1, ','))
+            .number(Number.builder().type(Number.Type.NUMBER).count(1).build())
             .type(Type.STRING)
             .description(nestedKey0)
             .build();
@@ -137,7 +144,7 @@ class HtsJdkToInfoMapperTest {
     InfoMetadata nestedInfoMetadata1 =
         InfoMetadata.builder()
             .id(nestedKey1)
-            .number(new Number(Number.Type.NUMBER, 1, ','))
+            .number(Number.builder().type(Number.Type.NUMBER).count(1).build())
             .type(Type.INTEGER)
             .description(nestedKey1)
             .build();
@@ -149,7 +156,7 @@ class HtsJdkToInfoMapperTest {
     InfoMetadata infoMetadata =
         InfoMetadata.builder()
             .id(key)
-            .number(new Number(Number.Type.OTHER, null, ','))
+            .number(Number.builder().type(Number.Type.OTHER).separator(',').build())
             .type(Type.NESTED)
             .description("My Description")
             .nestedMetadata(asList(nestedInfoMetadata0, nestedInfoMetadata1))

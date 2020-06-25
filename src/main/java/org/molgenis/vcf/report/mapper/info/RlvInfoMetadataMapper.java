@@ -32,7 +32,7 @@ public class RlvInfoMetadataMapper extends AbstractInfoMetadataMapper {
 
     return InfoMetadata.builder()
         .id(vcfInfoHeaderLine.getID())
-        .number(new Number(Type.OTHER, null, ','))
+        .number(Number.builder().type(Type.OTHER).separator(',').build())
         .type(CompoundMetadata.Type.NESTED)
         .description(vcfInfoHeaderLine.getDescription())
         .source(vcfInfoHeaderLine.getSource())

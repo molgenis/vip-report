@@ -2,12 +2,14 @@ package org.molgenis.vcf.report.model.metadata;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.NonFinal;
 
 @Value
 @NonFinal
+@Builder
 public class Number {
   public enum Type {
     /** fixed number exposed through InfoMetadata.number) */
@@ -29,5 +31,6 @@ public class Number {
   @JsonProperty("count")
   Integer count;
 
-  @JsonIgnore char separator;
+  @JsonIgnore
+  Character separator;
 }

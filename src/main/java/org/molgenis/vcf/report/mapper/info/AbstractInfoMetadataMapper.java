@@ -33,7 +33,7 @@ public abstract class AbstractInfoMetadataMapper implements InfoMetadataMapper {
   protected InfoMetadata createNestedInfoMetadata(String id) {
     return InfoMetadata.builder()
         .id(id)
-        .number(new Number(Type.NUMBER, 1, ','))
+        .number(Number.builder().type(Type.NUMBER).count(1).build())
         .type(CompoundMetadata.Type.STRING)
         .description(id)
         .build();

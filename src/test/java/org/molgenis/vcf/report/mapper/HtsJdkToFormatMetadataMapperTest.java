@@ -42,7 +42,7 @@ class HtsJdkToFormatMetadataMapperTest {
     FormatMetadata formatMetadata =
         FormatMetadata.builder()
             .id(id)
-            .number(new Number(Type.NUMBER, count, ','))
+            .number(Number.builder().type(Type.NUMBER).count(count).build())
             .type(type)
             .description(description)
             .build();

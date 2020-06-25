@@ -34,7 +34,7 @@ public class VepInfoMetadataMapper extends AbstractInfoMetadataMapper {
 
     return InfoMetadata.builder()
         .id(vcfInfoHeaderLine.getID())
-        .number(new Number(Type.OTHER, null, ','))
+        .number(Number.builder().type(Type.OTHER).separator(',').build())
         .type(CompoundMetadata.Type.NESTED)
         .description(vcfInfoHeaderLine.getDescription())
         .source(vcfInfoHeaderLine.getSource())
@@ -61,7 +61,7 @@ public class VepInfoMetadataMapper extends AbstractInfoMetadataMapper {
         infoMetadata =
             InfoMetadata.builder()
                 .id(id)
-                .number(new Number(Type.OTHER, null, '&'))
+                .number(Number.builder().type(Type.OTHER).separator('&').build())
                 .type(CompoundMetadata.Type.STRING)
                 .description(id)
                 .build();
@@ -71,7 +71,7 @@ public class VepInfoMetadataMapper extends AbstractInfoMetadataMapper {
         infoMetadata =
             InfoMetadata.builder()
                 .id(id)
-                .number(new Number(Type.OTHER, null, '&'))
+                .number(Number.builder().type(Type.OTHER).separator('&').build())
                 .type(CompoundMetadata.Type.INTEGER)
                 .description(id)
                 .build();
@@ -81,7 +81,7 @@ public class VepInfoMetadataMapper extends AbstractInfoMetadataMapper {
         infoMetadata =
             InfoMetadata.builder()
                 .id(id)
-                .number(new Number(Type.NUMBER, 1, ','))
+                .number(Number.builder().type(Type.NUMBER).count(1).build())
                 .type(CompoundMetadata.Type.INTEGER)
                 .description(id)
                 .build();
@@ -98,7 +98,7 @@ public class VepInfoMetadataMapper extends AbstractInfoMetadataMapper {
         infoMetadata =
             InfoMetadata.builder()
                 .id(id)
-                .number(new Number(Type.NUMBER, 1, ','))
+                .number(Number.builder().type(Type.NUMBER).count(1).build())
                 .type(CompoundMetadata.Type.FLOAT)
                 .description(id)
                 .build();

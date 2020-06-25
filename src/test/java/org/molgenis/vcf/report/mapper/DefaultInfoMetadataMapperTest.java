@@ -77,26 +77,26 @@ class DefaultInfoMetadataMapperTest {
             VCFHeaderLineType.String,
             VCFHeaderLineCount.UNBOUNDED,
             Type.STRING,
-            new Number(Number.Type.OTHER, null, ',')),
+            Number.builder().type(Number.Type.OTHER).separator(',').build()),
         Arguments.of(
             VCFHeaderLineType.Float,
             VCFHeaderLineCount.A,
             Type.FLOAT,
-            new Number(Number.Type.PER_ALT, null, ',')),
+            Number.builder().type(Number.Type.PER_ALT).separator(',').build()),
         Arguments.of(
             VCFHeaderLineType.Integer,
             VCFHeaderLineCount.R,
             Type.INTEGER,
-            new Number(Number.Type.PER_ALT_AND_REF, null, ',')),
+            Number.builder().type(Number.Type.PER_ALT_AND_REF).separator(',').build()),
         Arguments.of(
             VCFHeaderLineType.Character,
             VCFHeaderLineCount.G,
             Type.CHARACTER,
-            new Number(Number.Type.PER_GENOTYPE, null, ',')),
+            Number.builder().type(Number.Type.PER_GENOTYPE).separator(',').build()),
         Arguments.of(
             VCFHeaderLineType.Character,
             VCFHeaderLineCount.INTEGER,
             Type.CHARACTER,
-            new Number(Number.Type.NUMBER, 2, ',')));
+            Number.builder().type(Number.Type.NUMBER).count(2).separator(',').build()));
   }
 }

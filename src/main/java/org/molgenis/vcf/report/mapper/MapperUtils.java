@@ -4,6 +4,7 @@ import htsjdk.variant.vcf.VCFCompoundHeaderLine;
 import htsjdk.variant.vcf.VCFHeaderLineCount;
 import org.molgenis.vcf.report.UnexpectedEnumException;
 import org.molgenis.vcf.report.model.metadata.Number;
+import org.molgenis.vcf.report.model.metadata.Number.NumberBuilder;
 
 public class MapperUtils {
 
@@ -12,13 +13,19 @@ public class MapperUtils {
 
   public static Number mapNumber(VCFCompoundHeaderLine vcfCompoundHeaderLine) {
     Number.Type numberType = MapperUtils.mapNumberType(vcfCompoundHeaderLine.getCountType());
-    Integer count;
+
+    NumberBuilder numberBuilder = Number.builder();
+    numberBuilder.type(numberType);
     if (numberType == Number.Type.NUMBER) {
-      count = vcfCompoundHeaderLine.getCount();
+      int count = vcfCompoundHeaderLine.getCount();
+      numberBuilder.count(count);
+      if (count > 1) {
+        numberBuilder.separator(',');
+      }
     } else {
-      count = null;
+      numberBuilder.separator(',');
     }
-    return new Number(numberType, count, ',');
+    return numberBuilder.build();
   }
 
   public static Number.Type mapNumberType(VCFHeaderLineCount countType) {

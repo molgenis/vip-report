@@ -51,21 +51,21 @@ class RlvInfoMetadataMapperTest {
     InfoMetadata xInfoMetadata =
         InfoMetadata.builder()
             .id("X")
-            .number(new Number(Type.NUMBER, 1, ','))
+            .number(Number.builder().type(Type.NUMBER).count(1).build())
             .type(CompoundMetadata.Type.STRING)
             .description("X")
             .build();
     InfoMetadata yInfoMetadata =
         InfoMetadata.builder()
             .id("Y")
-            .number(new Number(Type.NUMBER, 1, ','))
+            .number(Number.builder().type(Type.NUMBER).count(1).build())
             .type(CompoundMetadata.Type.STRING)
             .description("Y")
             .build();
     InfoMetadata infoMetadata =
         InfoMetadata.builder()
             .id("RLV")
-            .number(new Number(Type.OTHER, null, ','))
+            .number(Number.builder().type(Type.OTHER).separator(',').build())
             .type(CompoundMetadata.Type.NESTED)
             .description("X | Y")
             .nestedMetadata(asList(xInfoMetadata, yInfoMetadata))
