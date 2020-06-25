@@ -8,6 +8,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.molgenis.vcf.report.model.Info;
+import org.molgenis.vcf.report.model.metadata.CompoundMetadata;
 import org.molgenis.vcf.report.model.metadata.InfoMetadata;
 import org.molgenis.vcf.report.model.metadata.Number;
 import org.molgenis.vcf.report.model.metadata.Number.Type;
@@ -27,20 +29,22 @@ public class SnpEffInfoMetadataMapper extends AbstractInfoMetadataMapper {
         && INFO_DESCRIPTION_PATTERN.matcher(vcfInfoHeaderLine.getDescription()).matches();
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public InfoMetadata map(VCFInfoHeaderLine vcfInfoHeaderLine) {
     validate(vcfInfoHeaderLine);
 
     List<InfoMetadata> nestedInfoMetaData = mapNested(vcfInfoHeaderLine);
 
-    return new InfoMetadata(
-        vcfInfoHeaderLine.getID(),
-        new Number(Type.OTHER, null, ','),
-        InfoMetadata.Type.NESTED,
-        vcfInfoHeaderLine.getDescription(),
-        vcfInfoHeaderLine.getSource(),
-        vcfInfoHeaderLine.getVersion(),
-        nestedInfoMetaData);
+    return InfoMetadata.builder()
+        .id(vcfInfoHeaderLine.getID())
+        .number(Number.builder().type(Type.OTHER).separator(',').build())
+        .type(CompoundMetadata.Type.NESTED)
+        .description(vcfInfoHeaderLine.getDescription())
+        .source(vcfInfoHeaderLine.getSource())
+        .version(vcfInfoHeaderLine.getVersion())
+        .nestedMetadata((List<CompoundMetadata<Info>>) (List<?>) nestedInfoMetaData)
+        .build();
   }
 
   @Override

@@ -1,6 +1,5 @@
 package org.molgenis.vcf.report.mapper;
 
-import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -18,8 +17,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.molgenis.vcf.report.mapper.info.DefaultInfoMetadataMapper;
+import org.molgenis.vcf.report.model.metadata.CompoundMetadata.Type;
 import org.molgenis.vcf.report.model.metadata.InfoMetadata;
-import org.molgenis.vcf.report.model.metadata.InfoMetadata.Type;
 import org.molgenis.vcf.report.model.metadata.Number;
 
 @ExtendWith(MockitoExtension.class)
@@ -60,7 +59,14 @@ class DefaultInfoMetadataMapperTest {
     when(vcfInfoHeaderLine.getVersion()).thenReturn(version);
 
     assertEquals(
-        new InfoMetadata(id, number, type, description, source, version, emptyList()),
+        InfoMetadata.builder()
+            .id(id)
+            .number(number)
+            .type(type)
+            .description(description)
+            .source(source)
+            .version(version)
+            .build(),
         defaultInfoMetadataMapper.map(vcfInfoHeaderLine));
   }
 
@@ -71,26 +77,26 @@ class DefaultInfoMetadataMapperTest {
             VCFHeaderLineType.String,
             VCFHeaderLineCount.UNBOUNDED,
             Type.STRING,
-            new Number(Number.Type.OTHER, null, ',')),
+            Number.builder().type(Number.Type.OTHER).separator(',').build()),
         Arguments.of(
             VCFHeaderLineType.Float,
             VCFHeaderLineCount.A,
             Type.FLOAT,
-            new Number(Number.Type.PER_ALT, null, ',')),
+            Number.builder().type(Number.Type.PER_ALT).separator(',').build()),
         Arguments.of(
             VCFHeaderLineType.Integer,
             VCFHeaderLineCount.R,
             Type.INTEGER,
-            new Number(Number.Type.PER_ALT_AND_REF, null, ',')),
+            Number.builder().type(Number.Type.PER_ALT_AND_REF).separator(',').build()),
         Arguments.of(
             VCFHeaderLineType.Character,
             VCFHeaderLineCount.G,
             Type.CHARACTER,
-            new Number(Number.Type.PER_GENOTYPE, null, ',')),
+            Number.builder().type(Number.Type.PER_GENOTYPE).separator(',').build()),
         Arguments.of(
             VCFHeaderLineType.Character,
             VCFHeaderLineCount.INTEGER,
             Type.CHARACTER,
-            new Number(Number.Type.NUMBER, 2, ',')));
+            Number.builder().type(Number.Type.NUMBER).count(2).separator(',').build()));
   }
 }

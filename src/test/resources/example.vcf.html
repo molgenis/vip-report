@@ -53,412 +53,399 @@
           "description": "Ancestral Allele"
         },
         {
-          "id": "DB",
-          "type": "FLAG",
-          "description": "dbSNP membership, build 129"
+          'id': 'DB',
+          'type': 'FLAG',
+          'description': 'dbSNP membership, build 129'
         },
         {
-          "id": "H2",
-          "type": "FLAG",
-          "description": "HapMap2 membership"
+          'id': 'H2',
+          'type': 'FLAG',
+          'description': 'HapMap2 membership'
         }
-      ]
+      ],
+      'format': [{
+        'id': 'GT',
+        'number': {
+          'type': 'NUMBER',
+          'count': 1
+        },
+        'type': 'STRING',
+        'description': 'Genotype'
+      }, {
+        'id': 'GQ',
+        'number': {
+          'type': 'NUMBER',
+          'count': 1
+        },
+        'type': 'INTEGER',
+        'description': 'Genotype Quality'
+      }, {
+        'id': 'DP',
+        'number': {
+          'type': 'NUMBER',
+          'count': 1
+        },
+        'type': 'INTEGER',
+        'description': 'Read Depth'
+      }, {
+        'id': 'HQ',
+        'number': {
+          'type': 'NUMBER',
+          'count': 2
+        },
+        'type': 'INTEGER',
+        'description': 'Haplotype Quality'
+      }]
     }
   },
-  "data": {
-    "samples": {
-      "items": [
-        {
-          "person": {
-            "familyId": "FAM003",
-            "individualId": "Jake",
-            "maternalId": "0",
-            "paternalId": "0",
-            "sex": "MALE",
-            "affectedStatus": "AFFECTED"
-          },
-          "index": -1
+  'data': {
+    'samples': {
+      'items': [{
+        'person': {
+          'familyId': 'FAM003',
+          'individualId': 'Jake',
+          'paternalId': '0',
+          'maternalId': '0',
+          'sex': 'MALE',
+          'affectedStatus': 'AFFECTED'
         },
-        {
-          "person": {
-            "familyId": "MISSING_0",
-            "individualId": "NA00001",
-            "maternalId": "0",
-            "paternalId": "0",
-            "sex": "UNKNOWN_SEX",
-            "affectedStatus": "MISSING"
-          },
-          "index": 0
+        'index': -1
+      }, {
+        'person': {
+          'familyId': 'MISSING_0',
+          'individualId': 'NA00001',
+          'paternalId': '0',
+          'maternalId': '0',
+          'sex': 'UNKNOWN_SEX',
+          'affectedStatus': 'MISSING'
         },
-        {
-          "person": {
-            "familyId": "MISSING_1",
-            "individualId": "NA00002",
-            "maternalId": "0",
-            "paternalId": "0",
-            "sex": "UNKNOWN_SEX",
-            "affectedStatus": "MISSING"
-          },
-          "index": 1
+        'index': 0
+      }, {
+        'person': {
+          'familyId': 'MISSING_1',
+          'individualId': 'NA00002',
+          'paternalId': '0',
+          'maternalId': '0',
+          'sex': 'UNKNOWN_SEX',
+          'affectedStatus': 'MISSING'
         },
-        {
-          "person": {
-            "familyId": "FAM002",
-            "individualId": "James",
-            "maternalId": "0",
-            "paternalId": "0",
-            "sex": "MALE",
-            "affectedStatus": "UNAFFECTED"
-          },
-          "index": -1
+        'index': 1
+      }, {
+        'person': {
+          'familyId': 'FAM002',
+          'individualId': 'James',
+          'paternalId': '0',
+          'maternalId': '0',
+          'sex': 'MALE',
+          'affectedStatus': 'UNAFFECTED'
         },
-        {
-          "person": {
-            "familyId": "FAM001",
-            "individualId": "John",
-            "maternalId": "Jane",
-            "paternalId": "Jimmy",
-            "sex": "MALE",
-            "affectedStatus": "AFFECTED"
-          },
-          "index": -1
+        'index': -1
+      }, {
+        'person': {
+          'familyId': 'FAM001',
+          'individualId': 'John',
+          'paternalId': 'Jimmy',
+          'maternalId': 'Jane',
+          'sex': 'MALE',
+          'affectedStatus': 'AFFECTED'
         },
-        {
-          "person": {
-            "familyId": "MISSING_2",
-            "individualId": "NA00003",
-            "maternalId": "0",
-            "paternalId": "0",
-            "sex": "UNKNOWN_SEX",
-            "affectedStatus": "MISSING"
-          },
-          "index": 2
+        'index': -1
+      }, {
+        'person': {
+          'familyId': 'MISSING_2',
+          'individualId': 'NA00003',
+          'paternalId': '0',
+          'maternalId': '0',
+          'sex': 'UNKNOWN_SEX',
+          'affectedStatus': 'MISSING'
         },
-        {
-          "person": {
-            "familyId": "FAM001",
-            "individualId": "Jane",
-            "maternalId": "0",
-            "paternalId": "0",
-            "sex": "FEMALE",
-            "affectedStatus": "UNAFFECTED"
-          },
-          "index": -1
+        'index': 2
+      }, {
+        'person': {
+          'familyId': 'FAM001',
+          'individualId': 'Jane',
+          'paternalId': '0',
+          'maternalId': '0',
+          'sex': 'FEMALE',
+          'affectedStatus': 'UNAFFECTED'
         },
-        {
-          "person": {
-            "familyId": "FAM001",
-            "individualId": "Jimmy",
-            "maternalId": "0",
-            "paternalId": "0",
-            "sex": "MALE",
-            "affectedStatus": "UNAFFECTED"
-          },
-          "index": -1
-        }
-      ],
-      "total": 8
+        'index': -1
+      }, {
+        'person': {
+          'familyId': 'FAM001',
+          'individualId': 'Jimmy',
+          'paternalId': '0',
+          'maternalId': '0',
+          'sex': 'MALE',
+          'affectedStatus': 'UNAFFECTED'
+        },
+        'index': -1
+      }],
+      'total': 8
     },
-    "phenotypes": {
-      "items": [
-        {
-          "phenotypicFeaturesList": [
-            {
-              "type": {
-                "id": "HP:123456",
-                "label": "HP:123456"
-              }
-            }
-          ],
-          "subject": {
-            "id": "Jimmy"
+    'phenotypes': {
+      'items': [{
+        'phenotypicFeaturesList': [{
+          'type': {
+            'id': 'HP:123456',
+            'label': 'HP:123456'
           }
-        },
-        {
-          "phenotypicFeaturesList": [
-            {
-              "type": {
-                "id": "test:Headache",
-                "label": "test:Headache"
-              }
-            }
-          ],
-          "subject": {
-            "id": "Unknown"
-          }
-        },
-        {
-          "phenotypicFeaturesList": [
-            {
-              "type": {
-                "id": "OMIM:23456",
-                "label": "OMIM:23456"
-              }
-            }
-          ],
-          "subject": {
-            "id": "Jane"
-          }
+        }],
+        'subject': {
+          'id': 'Jimmy'
         }
-      ],
-      "total": 3
+      }, {
+        'phenotypicFeaturesList': [{
+          'type': {
+            'id': 'test:Headache',
+            'label': 'test:Headache'
+          }
+        }],
+        'subject': {
+          'id': 'Unknown'
+        }
+      }, {
+        'phenotypicFeaturesList': [{
+          'type': {
+            'id': 'OMIM:23456',
+            'label': 'OMIM:23456'
+          }
+        }],
+        'subject': {
+          'id': 'Jane'
+        }
+      }],
+      'total': 3
     },
-    "records": {
-      "items": [
-        {
-          "c": "20",
-          "p": 14370,
-          "i": [
-            "rs6054257"
-          ],
-          "r": "G",
-          "a": [
-            "A"
-          ],
-          "q": 29,
-          "n": {
-            "H2": true,
-            "DP": 14,
-            "NS": 3,
-            "AF": [
-              0.5
-            ],
-            "DB": true
-          },
-          "s": [
-            {
-              "gt": {
-                "a": [
-                  "G",
-                  "G"
-                ],
-                "p": true,
-                "t": "hom_r"
-              }
-            },
-            {
-              "gt": {
-                "a": [
-                  "A",
-                  "G"
-                ],
-                "p": true,
-                "t": "het"
-              }
-            },
-            {
-              "gt": {
-                "a": [
-                  "A",
-                  "A"
-                ],
-                "p": false,
-                "t": "hom_a"
-              }
-            }
-          ]
+    'records': {
+      'items': [{
+        'c': '20',
+        'p': 14370,
+        'i': ['rs6054257'],
+        'r': 'G',
+        'a': ['A'],
+        'q': 29.0,
+        'n': {
+          'H2': true,
+          'DP': 14,
+          'NS': 3,
+          'AF': [0.5],
+          'DB': true
         },
-        {
-          "c": "20",
-          "p": 17330,
-          "r": "T",
-          "a": [
-            "A"
-          ],
-          "q": 3,
-          "f": [
-            "q10"
-          ],
-          "n": {
-            "DP": 11,
-            "NS": 3,
-            "AF": [
-              0.017
-            ]
+        's': [{
+          'gt': {
+            'a': ['G', 'G'],
+            'p': true,
+            't': 'hom_r'
           },
-          "s": [
-            {
-              "gt": {
-                "a": [
-                  "T",
-                  "T"
-                ],
-                "p": true,
-                "t": "hom_r"
-              }
-            },
-            {
-              "gt": {
-                "a": [
-                  "T",
-                  "A"
-                ],
-                "p": true,
-                "t": "het"
-              }
-            },
-            {
-              "gt": {
-                "a": [
-                  "T",
-                  "T"
-                ],
-                "p": false,
-                "t": "hom_r"
-              }
-            }
-          ]
+          'f': {
+            'HQ': [51, 51],
+            'GQ': 48,
+            'DP': 1
+          }
+        }, {
+          'gt': {
+            'a': ['A', 'G'],
+            'p': true,
+            't': 'het'
+          },
+          'f': {
+            'HQ': [51, 51],
+            'GQ': 48,
+            'DP': 8
+          }
+        }, {
+          'gt': {
+            'a': ['A', 'A'],
+            'p': false,
+            't': 'hom_a'
+          },
+          'f': {
+            'HQ': [null, null],
+            'GQ': 43,
+            'DP': 5
+          }
+        }]
+      }, {
+        'c': '20',
+        'p': 17330,
+        'r': 'T',
+        'a': ['A'],
+        'q': 3.0,
+        'f': ['q10'],
+        'n': {
+          'DP': 11,
+          'NS': 3,
+          'AF': [0.017]
         },
-        {
-          "c": "20",
-          "p": 1110696,
-          "i": [
-            "rs6040355"
-          ],
-          "r": "A",
-          "a": [
-            "G",
-            "T"
-          ],
-          "q": 67,
-          "n": {
-            "AA": "T",
-            "DP": 10,
-            "NS": 2,
-            "AF": [
-              0.333,
-              0.667
-            ],
-            "DB": true
+        's': [{
+          'gt': {
+            'a': ['T', 'T'],
+            'p': true,
+            't': 'hom_r'
           },
-          "s": [
-            {
-              "gt": {
-                "a": [
-                  "G",
-                  "T"
-                ],
-                "p": true,
-                "t": "het"
-              }
-            },
-            {
-              "gt": {
-                "a": [
-                  "T",
-                  "G"
-                ],
-                "p": true,
-                "t": "het"
-              }
-            },
-            {
-              "gt": {
-                "a": [
-                  "T",
-                  "T"
-                ],
-                "p": false,
-                "t": "hom_a"
-              }
-            }
-          ]
+          'f': {
+            'HQ': [58, 50],
+            'GQ': 49,
+            'DP': 3
+          }
+        }, {
+          'gt': {
+            'a': ['T', 'A'],
+            'p': true,
+            't': 'het'
+          },
+          'f': {
+            'HQ': [65, 3],
+            'GQ': 3,
+            'DP': 5
+          }
+        }, {
+          'gt': {
+            'a': ['T', 'T'],
+            'p': false,
+            't': 'hom_r'
+          },
+          'f': {
+            'GQ': 41,
+            'DP': 3
+          }
+        }]
+      }, {
+        'c': '20',
+        'p': 1110696,
+        'i': ['rs6040355'],
+        'r': 'A',
+        'a': ['G', 'T'],
+        'q': 67.0,
+        'n': {
+          'AA': 'T',
+          'DP': 10,
+          'NS': 2,
+          'AF': [0.333, 0.667],
+          'DB': true
         },
-        {
-          "c": "20",
-          "p": 1230237,
-          "r": "T",
-          "q": 47,
-          "n": {
-            "AA": "T",
-            "DP": 13,
-            "NS": 3
+        's': [{
+          'gt': {
+            'a': ['G', 'T'],
+            'p': true,
+            't': 'het'
           },
-          "s": [
-            {
-              "gt": {
-                "a": [
-                  "T",
-                  "T"
-                ],
-                "p": true,
-                "t": "hom_r"
-              }
-            },
-            {
-              "gt": {
-                "a": [
-                  "T",
-                  "T"
-                ],
-                "p": true,
-                "t": "hom_r"
-              }
-            },
-            {
-              "gt": {
-                "a": [
-                  "T",
-                  "T"
-                ],
-                "p": false,
-                "t": "hom_r"
-              }
-            }
-          ]
+          'f': {
+            'HQ': [23, 27],
+            'GQ': 21,
+            'DP': 6
+          }
+        }, {
+          'gt': {
+            'a': ['T', 'G'],
+            'p': true,
+            't': 'het'
+          },
+          'f': {
+            'HQ': [18, 2],
+            'GQ': 2,
+            'DP': 0
+          }
+        }, {
+          'gt': {
+            'a': ['T', 'T'],
+            'p': false,
+            't': 'hom_a'
+          },
+          'f': {
+            'GQ': 35,
+            'DP': 4
+          }
+        }]
+      }, {
+        'c': '20',
+        'p': 1230237,
+        'r': 'T',
+        'q': 47.0,
+        'n': {
+          'AA': 'T',
+          'DP': 13,
+          'NS': 3
         },
-        {
-          "c": "20",
-          "p": 1234567,
-          "i": [
-            "microsat1"
-          ],
-          "r": "GTC",
-          "a": [
-            "G",
-            "GTCT"
-          ],
-          "q": 50,
-          "n": {
-            "AA": "G",
-            "DP": 9,
-            "NS": 3
+        's': [{
+          'gt': {
+            'a': ['T', 'T'],
+            'p': true,
+            't': 'hom_r'
           },
-          "s": [
-            {
-              "gt": {
-                "a": [
-                  "GTC",
-                  "G"
-                ],
-                "p": false,
-                "t": "het"
-              }
-            },
-            {
-              "gt": {
-                "a": [
-                  "GTC",
-                  "GTCT"
-                ],
-                "p": false,
-                "t": "het"
-              }
-            },
-            {
-              "gt": {
-                "a": [
-                  "G",
-                  "G"
-                ],
-                "p": false,
-                "t": "hom_a"
-              }
-            }
-          ]
-        }
-      ],
-      "total": 5
+          'f': {
+            'HQ': [56, 60],
+            'GQ': 54,
+            'DP': 7
+          }
+        }, {
+          'gt': {
+            'a': ['T', 'T'],
+            'p': true,
+            't': 'hom_r'
+          },
+          'f': {
+            'HQ': [51, 51],
+            'GQ': 48,
+            'DP': 4
+          }
+        }, {
+          'gt': {
+            'a': ['T', 'T'],
+            'p': false,
+            't': 'hom_r'
+          },
+          'f': {
+            'GQ': 61,
+            'DP': 2
+          }
+        }]
+      }, {
+        'c': '20',
+        'p': 1234567,
+        'i': ['microsat1'],
+        'r': 'GTC',
+        'a': ['G', 'GTCT'],
+        'q': 50.0,
+        'n': {
+          'AA': 'G',
+          'DP': 9,
+          'NS': 3
+        },
+        's': [{
+          'gt': {
+            'a': ['GTC', 'G'],
+            'p': false,
+            't': 'het'
+          },
+          'f': {
+            'GQ': 35,
+            'DP': 4
+          }
+        }, {
+          'gt': {
+            'a': ['GTC', 'GTCT'],
+            'p': false,
+            't': 'het'
+          },
+          'f': {
+            'GQ': 17,
+            'DP': 2
+          }
+        }, {
+          'gt': {
+            'a': ['G', 'G'],
+            'p': false,
+            't': 'hom_a'
+          },
+          'f': {
+            'GQ': 40,
+            'DP': 3
+          }
+        }]
+      }],
+      'total': 5
     }
   }
 }</script></head>

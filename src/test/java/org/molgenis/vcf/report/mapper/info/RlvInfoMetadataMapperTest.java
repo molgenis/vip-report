@@ -10,9 +10,9 @@ import static org.mockito.Mockito.when;
 import htsjdk.variant.vcf.VCFHeaderLineCount;
 import htsjdk.variant.vcf.VCFHeaderLineType;
 import htsjdk.variant.vcf.VCFInfoHeaderLine;
-import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.molgenis.vcf.report.model.metadata.CompoundMetadata;
 import org.molgenis.vcf.report.model.metadata.InfoMetadata;
 import org.molgenis.vcf.report.model.metadata.Number;
 import org.molgenis.vcf.report.model.metadata.Number.Type;
@@ -49,32 +49,27 @@ class RlvInfoMetadataMapperTest {
     when(vcfInfoHeaderLine.getDescription()).thenReturn("X | Y");
 
     InfoMetadata xInfoMetadata =
-        new InfoMetadata(
-            "X",
-            new Number(Type.NUMBER, 1, ','),
-            InfoMetadata.Type.STRING,
-            "X",
-            null,
-            null,
-            Collections.emptyList());
+        InfoMetadata.builder()
+            .id("X")
+            .number(Number.builder().type(Type.NUMBER).count(1).build())
+            .type(CompoundMetadata.Type.STRING)
+            .description("X")
+            .build();
     InfoMetadata yInfoMetadata =
-        new InfoMetadata(
-            "Y",
-            new Number(Type.NUMBER, 1, ','),
-            InfoMetadata.Type.STRING,
-            "Y",
-            null,
-            null,
-            Collections.emptyList());
+        InfoMetadata.builder()
+            .id("Y")
+            .number(Number.builder().type(Type.NUMBER).count(1).build())
+            .type(CompoundMetadata.Type.STRING)
+            .description("Y")
+            .build();
     InfoMetadata infoMetadata =
-        new InfoMetadata(
-            "RLV",
-            new Number(Type.OTHER, null, ','),
-            InfoMetadata.Type.NESTED,
-            "X | Y",
-            null,
-            null,
-            asList(xInfoMetadata, yInfoMetadata));
+        InfoMetadata.builder()
+            .id("RLV")
+            .number(Number.builder().type(Type.OTHER).separator(',').build())
+            .type(CompoundMetadata.Type.NESTED)
+            .description("X | Y")
+            .nestedMetadata(asList(xInfoMetadata, yInfoMetadata))
+            .build();
     assertEquals(infoMetadata, rlvInfoMetadataMapper.map(vcfInfoHeaderLine));
   }
 }

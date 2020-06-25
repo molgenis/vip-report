@@ -18,6 +18,7 @@ import org.molgenis.vcf.report.model.Info;
 import org.molgenis.vcf.report.model.Record;
 import org.molgenis.vcf.report.model.RecordSample;
 import org.molgenis.vcf.report.model.Sample;
+import org.molgenis.vcf.report.model.metadata.CompoundMetadata;
 import org.molgenis.vcf.report.model.metadata.RecordsMetadata;
 import org.springframework.stereotype.Component;
 
@@ -71,9 +72,11 @@ public class HtsJdkToRecordMapper {
       filters = emptyList();
     }
 
+    @SuppressWarnings("unchecked")
     Info info =
         htsJdkToInfoMapper.map(
-            recordsMetadata.getInfoMetadataList(), variantContext.getAttributes());
+            (List<CompoundMetadata<Info>>) (List<?>) recordsMetadata.getInfoMetadataList(),
+            variantContext.getAttributes());
 
     List<RecordSample> recordSamples;
     if (!samples.isEmpty()) {
@@ -83,7 +86,8 @@ public class HtsJdkToRecordMapper {
       for (Genotype genotype : variantContext.getGenotypesOrderedBy(sampleNames)) {
         // Genotype can be null if PED input contains samples that or not in the VCF
         if (genotype != null) {
-          RecordSample recordSample = htsJdkToRecordSampleMapper.map(genotype);
+          RecordSample recordSample =
+              htsJdkToRecordSampleMapper.map(recordsMetadata.getFormatMetadataList(), genotype);
           recordSamples.add(recordSample);
         }
       }

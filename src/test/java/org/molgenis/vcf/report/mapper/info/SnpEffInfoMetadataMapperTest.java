@@ -1,16 +1,18 @@
 package org.molgenis.vcf.report.mapper.info;
 
 import static java.util.Arrays.asList;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import htsjdk.variant.vcf.VCFHeaderLineCount;
 import htsjdk.variant.vcf.VCFHeaderLineType;
 import htsjdk.variant.vcf.VCFInfoHeaderLine;
-import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.molgenis.vcf.report.model.metadata.CompoundMetadata;
 import org.molgenis.vcf.report.model.metadata.InfoMetadata;
 import org.molgenis.vcf.report.model.metadata.Number;
 import org.molgenis.vcf.report.model.metadata.Number.Type;
@@ -28,8 +30,7 @@ class SnpEffInfoMetadataMapperTest {
   void canMap() {
     VCFInfoHeaderLine vcfInfoHeaderLine = mock(VCFInfoHeaderLine.class);
     when(vcfInfoHeaderLine.getID()).thenReturn("ANN");
-    when(vcfInfoHeaderLine.getDescription())
-        .thenReturn("Functional annotations: 'X | Y'");
+    when(vcfInfoHeaderLine.getDescription()).thenReturn("Functional annotations: 'X | Y'");
     assertTrue(snpEffInfoMetadataMapper.canMap(vcfInfoHeaderLine));
   }
 
@@ -37,8 +38,7 @@ class SnpEffInfoMetadataMapperTest {
   void canMapFalseType() {
     VCFInfoHeaderLine vcfInfoHeaderLine = mock(VCFInfoHeaderLine.class);
     when(vcfInfoHeaderLine.getID()).thenReturn("CSQ");
-    when(vcfInfoHeaderLine.getDescription())
-        .thenReturn("My Description");
+    when(vcfInfoHeaderLine.getDescription()).thenReturn("My Description");
     assertFalse(snpEffInfoMetadataMapper.canMap(vcfInfoHeaderLine));
   }
 
@@ -46,8 +46,7 @@ class SnpEffInfoMetadataMapperTest {
   void canMapFalseDescription() {
     VCFInfoHeaderLine vcfInfoHeaderLine = mock(VCFInfoHeaderLine.class);
     when(vcfInfoHeaderLine.getID()).thenReturn("ANN");
-    when(vcfInfoHeaderLine.getDescription())
-        .thenReturn("My Description");
+    when(vcfInfoHeaderLine.getDescription()).thenReturn("My Description");
     assertFalse(snpEffInfoMetadataMapper.canMap(vcfInfoHeaderLine));
   }
 
@@ -57,36 +56,30 @@ class SnpEffInfoMetadataMapperTest {
     when(vcfInfoHeaderLine.getID()).thenReturn("ANN");
     when(vcfInfoHeaderLine.getCountType()).thenReturn(VCFHeaderLineCount.UNBOUNDED);
     when(vcfInfoHeaderLine.getType()).thenReturn(VCFHeaderLineType.String);
-    when(vcfInfoHeaderLine.getDescription())
-        .thenReturn("Functional annotations: 'X | Y'");
+    when(vcfInfoHeaderLine.getDescription()).thenReturn("Functional annotations: 'X | Y'");
 
     InfoMetadata xInfoMetadata =
-        new InfoMetadata(
-            "X",
-            new Number(Type.NUMBER, 1, ','),
-            InfoMetadata.Type.STRING,
-            "X",
-            null,
-            null,
-            Collections.emptyList());
+        InfoMetadata.builder()
+            .id("X")
+            .number(Number.builder().type(Type.NUMBER).count(1).build())
+            .type(CompoundMetadata.Type.STRING)
+            .description("X")
+            .build();
     InfoMetadata yInfoMetadata =
-        new InfoMetadata(
-            "Y",
-            new Number(Type.NUMBER, 1, ','),
-            InfoMetadata.Type.STRING,
-            "Y",
-            null,
-            null,
-            Collections.emptyList());
+        InfoMetadata.builder()
+            .id("Y")
+            .number(Number.builder().type(Type.NUMBER).count(1).build())
+            .type(CompoundMetadata.Type.STRING)
+            .description("Y")
+            .build();
     InfoMetadata infoMetadata =
-        new InfoMetadata(
-            "ANN",
-            new Number(Type.OTHER, null, ','),
-            InfoMetadata.Type.NESTED,
-            "Functional annotations: 'X | Y'",
-            null,
-            null,
-            asList(xInfoMetadata, yInfoMetadata));
+        InfoMetadata.builder()
+            .id("ANN")
+            .number(Number.builder().type(Number.Type.OTHER).separator(',').build())
+            .type(CompoundMetadata.Type.NESTED)
+            .description("Functional annotations: 'X | Y'")
+            .nestedMetadata(asList(xInfoMetadata, yInfoMetadata))
+            .build();
     assertEquals(infoMetadata, snpEffInfoMetadataMapper.map(vcfInfoHeaderLine));
   }
 }
