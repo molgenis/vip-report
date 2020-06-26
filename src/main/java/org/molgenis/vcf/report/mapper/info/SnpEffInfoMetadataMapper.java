@@ -62,7 +62,19 @@ public class SnpEffInfoMetadataMapper extends AbstractInfoMetadataMapper {
 
   @Override
   protected InfoMetadata mapNestedId(String id) {
-    return super.createNestedInfoMetadata(id);
+    InfoMetadata infoMetadata;
+    if ("Annotation".equals(id)) {
+      infoMetadata =
+          InfoMetadata.builder()
+              .id(id)
+              .number(Number.builder().type(Type.OTHER).separator('&').build())
+              .type(CompoundMetadata.Type.STRING)
+              .description(id)
+              .build();
+    } else {
+      infoMetadata = super.createNestedInfoMetadata(id);
+    }
+    return infoMetadata;
   }
 
   private void validate(VCFInfoHeaderLine vcfInfoHeaderLine) {
