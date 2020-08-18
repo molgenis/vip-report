@@ -67,6 +67,7 @@ public class VepInfoMetadataMapper extends AbstractInfoMetadataMapper {
                 .build();
         break;
       case "PHENO":
+      case "PUBMED":
       case "SOMATIC":
         infoMetadata =
             InfoMetadata.builder()
