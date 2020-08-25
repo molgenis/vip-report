@@ -15,6 +15,8 @@ java -jar vcf-report.jar -i <arg> [-o <arg>] [-f]
  -t,--template <arg>      Report template file (.html).
  -pd,--pedigree <arg>     Comma-separated list of pedigree files (.ped).
  -ph,--phenotypes <arg>   Comma-separated list of sample-phenotypes (e.g. HPO:123 or HPO:123;HPO:234 or sample0/HPO:123,sample1/HPO:234). Phenotypes are CURIE formatted (prefix:reference) and separated by a semicolon.
+ -mr,--max_records <arg>   Integer stating the maximum number of records to be available in the report. Default: 100
+ -ms,--max_samples <arg>   Integer stating the maximum number of samples to be available in the report. Default: 100
  -d,--debug               Enable debug mode (additional logging and pretty
                           printed report.
 
@@ -28,9 +30,10 @@ usage: java -jar vcf-report.jar -v
 java -jar vcf-report.jar -i my.vcf.gz
 java -jar vcf-report.jar -i my.vcf.gz -o my-report.html
 java -jar vcf-report.jar -i my.vcf.gz -o my-report.html -t my-template.html
-java -jar vcf-report.jar -i my.vcf.gz -o my-report.html -t my-template.html -p my.ped,my_other.ped
+java -jar vcf-report.jar -i my.vcf.gz -o my-report.html -t my-template.html -pd my.ped,my_other.ped
 java -jar vcf-report.jar -i my.vcf.gz -o my-report.html -t my-template.html -pd my.ped,my_other.ped -ph HP:0000001;HP:0000002
 java -jar vcf-report.jar -i my.vcf.gz -o my-report.html -t my-template.html -pd my.ped,my_other.ped -ph sampleId1/HP:0000001;HP:0000002,sampleId2/HP:0000001
+java -jar vcf-report.jar -i my.vcf.gz -o my-report.html -t my-template.html -pd my.ped,my_other.ped -ph sampleId1/HP:0000001;HP:0000002,sampleId2/HP:0000001 -mr 1000 -ms 10
 java -jar vcf-report.jar -v
 ```
 ## Template
