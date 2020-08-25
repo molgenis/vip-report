@@ -47,6 +47,20 @@ class HtsFileMapperTest {
   }
 
   @Test
+  void mapB37_G1K() {
+    HtsFileMapper htsFileMapper = new HtsFileMapper();
+    VCFHeader header = mock(VCFHeader.class);
+    VCFContigHeaderLine contig = mock(VCFContigHeaderLine.class);
+    Map<String, String> contigMap = new HashMap<>();
+    contigMap.put("assembly", "human_g1k_v37_phiX.fasta");
+    when(contig.getGenericFields()).thenReturn(contigMap);
+    when(header.getContigLines()).thenReturn(Collections.singletonList(contig));
+
+    HtsFile expected = new HtsFile("test.vcf", VCF, "GRCh37");
+    assertEquals(expected, htsFileMapper.map(header, "test.vcf"));
+  }
+
+  @Test
   void mapB36() {
     HtsFileMapper htsFileMapper = new HtsFileMapper();
     VCFHeader header = mock(VCFHeader.class);
