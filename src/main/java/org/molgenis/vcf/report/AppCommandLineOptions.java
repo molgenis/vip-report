@@ -26,6 +26,10 @@ class AppCommandLineOptions {
   static final String OPT_PED_LONG = "pedigree";
   static final String OPT_PHENOTYPES = "ph";
   static final String OPT_PHENOTYPES_LONG = "phenotypes";
+  static final String OPT_MAX_RECORDS = "mr";
+  static final String OPT_MAX_RECORDS_LONG = "max_records";
+  static final String OPT_MAX_SAMPLES = "ms";
+  static final String OPT_MAX_SAMPLES_LONG = "max_samples";
   static final String OPT_FORCE = "f";
   static final String OPT_FORCE_LONG = "force";
   static final String OPT_DEBUG = "d";
@@ -75,12 +79,25 @@ class AppCommandLineOptions {
                 "Comma-separated list of sample-phenotypes (e.g. HPO:123 or HPO:123;HPO:234 or sample0/HPO:123,sample1/HPO:234). Phenotypes are CURIE formatted (prefix:reference) and separated by a semicolon.")
             .build());
     appOptions.addOption(
+        Option.builder(OPT_MAX_RECORDS)
+            .hasArg(true)
+            .longOpt(OPT_MAX_RECORDS_LONG)
+            .desc(
+                "Integer stating the maximum number of records to be available in the report.")
+            .build());
+    appOptions.addOption(
+        Option.builder(OPT_MAX_SAMPLES)
+            .hasArg(true)
+            .longOpt(OPT_MAX_SAMPLES_LONG)
+            .desc(
+                "Integer stating the maximum number of samples to be available in the report.")
+            .build());
+    appOptions.addOption(
         Option.builder(OPT_DEBUG)
             .longOpt(OPT_DEBUG_LONG)
             .desc("Enable debug mode (additional logging and pretty printed report.")
             .build());
     APP_OPTIONS = appOptions;
-
     Options appVersionOptions = new Options();
     appVersionOptions.addOption(
         Option.builder(OPT_VERSION)
@@ -107,6 +124,28 @@ class AppCommandLineOptions {
     validateTemplate(commandLine);
     validatePed(commandLine);
     validatePhenotypes(commandLine);
+    validateMaxRecords(commandLine);
+    validateMaxSamples(commandLine);
+  }
+
+  private static void validateMaxSamples(CommandLine commandLine) {
+    validateInteger(commandLine, OPT_MAX_SAMPLES);
+  }
+
+  private static void validateInteger(CommandLine commandLine, String option) {
+    if (!commandLine.hasOption(option)) {
+      return;
+    }
+    String maxSamplesString = commandLine.getOptionValue(option);
+    try {
+      Integer.parseInt(maxSamplesString);
+    } catch (NumberFormatException e) {
+      throw new InvalidIntegerException(OPT_MAX_RECORDS_LONG, maxSamplesString);
+    }
+  }
+
+  private static void validateMaxRecords(CommandLine commandLine) {
+    validateInteger(commandLine, OPT_MAX_RECORDS);
   }
 
   private static void validatePhenotypes(CommandLine commandLine) {
