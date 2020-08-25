@@ -19,6 +19,7 @@ public class HtsFileMapper {
   private static final String BUILD_B_38 = "b38";
   private static final String BUILD_B_37 = "b37";
   private static final String BUILD_B_36 = "b36";
+  private static final String BUILD_G1K_V37_PHIX = "human_g1k_v37_phiX.fasta";
   private static final String ASSEMBLY_FIELD = "assembly";
 
   public HtsFile map(VCFHeader fileHeader, String inputFile) {
@@ -39,7 +40,8 @@ public class HtsFileMapper {
           genomeBuild = BUILD_GRCH_36;
         } else if (assembly.equalsIgnoreCase(BUILD_B_37)
             || assembly.startsWith(BUILD_GRCH_37)
-            || assembly.equals(BUILD_HG_19)) {
+            || assembly.equals(BUILD_HG_19)
+            || assembly.equals(BUILD_G1K_V37_PHIX)) {
           genomeBuild = BUILD_GRCH_37;
         } else if (assembly.equalsIgnoreCase(BUILD_B_38) || assembly.startsWith(BUILD_GRCH_38)) {
           genomeBuild = BUILD_GRCH_38;
