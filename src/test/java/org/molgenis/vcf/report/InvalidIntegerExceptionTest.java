@@ -8,7 +8,7 @@ class InvalidIntegerExceptionTest {
   @Test
   void getMessage() {
     assertEquals(
-        "Invalid integer value 'NotAnInt' for option 'OPT_TEST'",
+        "Invalid value 'NotAnInt' for option 'OPT_TEST', value must be a positive integer.",
         new InvalidIntegerException("OPT_TEST","NotAnInt").getMessage());
   }
 }
