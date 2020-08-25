@@ -3,6 +3,8 @@ package org.molgenis.vcf.report;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_DEBUG;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_FORCE;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_INPUT;
+import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_MAX_RECORDS;
+import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_MAX_SAMPLES;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_OUTPUT;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_PED;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_PHENOTYPES;
@@ -64,6 +66,20 @@ public class AppCommandLineToSettingsMapper {
       phenotypes = null;
     }
 
+    int maxRecords;
+    if (commandLine.hasOption(OPT_MAX_RECORDS)) {
+      maxRecords = Integer.parseInt(commandLine.getOptionValue(OPT_MAX_RECORDS));
+    } else {
+      maxRecords = ReportGeneratorSettings.DEFAULT_MAX_NR_RECORDS;
+    }
+
+    int maxSamples;
+    if (commandLine.hasOption(OPT_MAX_SAMPLES)) {
+      maxSamples = Integer.parseInt(commandLine.getOptionValue(OPT_MAX_SAMPLES));
+    } else {
+      maxSamples = ReportGeneratorSettings.DEFAULT_MAX_NR_SAMPLES;
+    }
+
     boolean overwriteOutput = commandLine.hasOption(OPT_FORCE);
 
     boolean debugMode = commandLine.hasOption(OPT_DEBUG);
@@ -74,8 +90,9 @@ public class AppCommandLineToSettingsMapper {
             appName,
             appVersion,
             appArgs,
-            ReportGeneratorSettings.DEFAULT_MAX_NR_SAMPLES,
-            ReportGeneratorSettings.DEFAULT_MAX_NR_RECORDS);
+            maxSamples,
+            maxRecords
+            );
     ReportWriterSettings reportWriterSettings = new ReportWriterSettings(templatePath, debugMode);
     SampleSettings sampleSettings = new SampleSettings(pedPaths, phenotypes);
     return new Settings(
