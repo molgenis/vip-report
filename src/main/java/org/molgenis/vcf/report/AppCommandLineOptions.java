@@ -137,6 +137,10 @@ class AppCommandLineOptions {
     validateInteger(commandLine, OPT_MAX_SAMPLES);
   }
 
+  private static void validateMaxRecords(CommandLine commandLine) {
+    validateInteger(commandLine, OPT_MAX_RECORDS);
+  }
+
   private static void validateInteger(CommandLine commandLine, String option) {
     if (!commandLine.hasOption(option)) {
       return;
@@ -145,15 +149,11 @@ class AppCommandLineOptions {
     try {
       int value = Integer.parseInt(maxSamplesString);
       if (value < 0) {
-        throw new InvalidIntegerException(OPT_MAX_RECORDS_LONG, maxSamplesString);
+        throw new InvalidIntegerException(option, maxSamplesString);
       }
     } catch (NumberFormatException e) {
-      throw new InvalidIntegerException(OPT_MAX_RECORDS_LONG, maxSamplesString);
+      throw new InvalidIntegerException(option, maxSamplesString);
     }
-  }
-
-  private static void validateMaxRecords(CommandLine commandLine) {
-    validateInteger(commandLine, OPT_MAX_RECORDS);
   }
 
   private static void validatePhenotypes(CommandLine commandLine) {
