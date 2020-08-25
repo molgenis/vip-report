@@ -5,7 +5,7 @@ import static java.util.Objects.requireNonNull;
 
 public class InvalidIntegerException extends IllegalArgumentException {
   private static final String INVALID_INTEGER_MESSAGE =
-      "Invalid integer value '%s' for option '%s'";
+      "Invalid integer value '%s' for option '%s', value must be 0 or more.";
   private final String stringValue;
   private final String opt;
 

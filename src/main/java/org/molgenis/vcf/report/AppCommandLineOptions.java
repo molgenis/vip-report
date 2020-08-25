@@ -12,6 +12,7 @@ import java.util.List;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+import org.molgenis.vcf.report.generator.ReportGeneratorSettings;
 import org.molgenis.vcf.report.utils.InvalidSamplePhenotypesException;
 
 class AppCommandLineOptions {
@@ -83,14 +84,18 @@ class AppCommandLineOptions {
             .hasArg(true)
             .longOpt(OPT_MAX_RECORDS_LONG)
             .desc(
-                "Integer stating the maximum number of records to be available in the report.")
+                format(
+                    "Integer stating the maximum number of records to be available in the report. Default: %s",
+                    ReportGeneratorSettings.DEFAULT_MAX_NR_RECORDS))
             .build());
     appOptions.addOption(
         Option.builder(OPT_MAX_SAMPLES)
             .hasArg(true)
             .longOpt(OPT_MAX_SAMPLES_LONG)
             .desc(
-                "Integer stating the maximum number of samples to be available in the report.")
+                format(
+                    "Integer stating the maximum number of samples to be available in the report. Default: %s",
+                    ReportGeneratorSettings.DEFAULT_MAX_NR_SAMPLES))
             .build());
     appOptions.addOption(
         Option.builder(OPT_DEBUG)
@@ -138,7 +143,10 @@ class AppCommandLineOptions {
     }
     String maxSamplesString = commandLine.getOptionValue(option);
     try {
-      Integer.parseInt(maxSamplesString);
+      int value = Integer.parseInt(maxSamplesString);
+      if (value < 0) {
+        throw new InvalidIntegerException(OPT_MAX_RECORDS_LONG, maxSamplesString);
+      }
     } catch (NumberFormatException e) {
       throw new InvalidIntegerException(OPT_MAX_RECORDS_LONG, maxSamplesString);
     }
