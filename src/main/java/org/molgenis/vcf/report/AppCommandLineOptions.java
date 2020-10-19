@@ -77,7 +77,7 @@ class AppCommandLineOptions {
             .hasArg(true)
             .longOpt(OPT_PHENOTYPES_LONG)
             .desc(
-                "Comma-separated list of sample-phenotypes (e.g. HPO:123 or HPO:123;HPO:234 or sample0/HPO:123,sample1/HPO:234). Phenotypes are CURIE formatted (prefix:reference) and separated by a semicolon.")
+                "Comma-separated list of sample-phenotypes (e.g. HP:123 or HP:123;HP:234 or sample0/HP:123,sample1/HP:234). Phenotypes are CURIE formatted (prefix:reference) and separated by a semicolon.")
             .build());
     appOptions.addOption(
         Option.builder(OPT_MAX_RECORDS)
