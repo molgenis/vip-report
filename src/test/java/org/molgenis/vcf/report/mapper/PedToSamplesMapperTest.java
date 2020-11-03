@@ -45,20 +45,34 @@ class PedToSamplesMapperTest {
     Map<String, Sample> expected = new HashMap();
     expected.put(
         "John",
-        new Sample(
-            new Person("FAM001", "John", "Jimmy", "Jane", MALE, AffectedStatus.AFFECTED), -1));
+        Sample.builder()
+            .person(new Person("FAM001", "John", "Jimmy", "Jane", MALE, AffectedStatus.AFFECTED))
+            .index(-1)
+            .build());
     expected.put(
         "Jimmy",
-        new Sample(new Person("FAM001", "Jimmy", "0", "0", MALE, AffectedStatus.UNAFFECTED), -1));
+        Sample.builder()
+            .person(new Person("FAM001", "Jimmy", "0", "0", MALE, AffectedStatus.UNAFFECTED))
+            .index(-1)
+            .build());
     expected.put(
         "Jane",
-        new Sample(new Person("FAM001", "Jane", "0", "0", FEMALE, AffectedStatus.UNAFFECTED), -1));
+        Sample.builder()
+            .person(new Person("FAM001", "Jane", "0", "0", FEMALE, AffectedStatus.UNAFFECTED))
+            .index(-1)
+            .build());
     expected.put(
         "James",
-        new Sample(new Person("FAM002", "James", "0", "0", MALE, AffectedStatus.UNAFFECTED), -1));
+        Sample.builder()
+            .person(new Person("FAM002", "James", "0", "0", MALE, AffectedStatus.UNAFFECTED))
+            .index(-1)
+            .build());
     expected.put(
         "Jake",
-        new Sample(new Person("FAM003", "Jake", "0", "0", MALE, AffectedStatus.AFFECTED), -1));
+        Sample.builder()
+            .person(new Person("FAM003", "Jake", "0", "0", MALE, AffectedStatus.AFFECTED))
+            .index(-1)
+            .build());
 
     assertEquals(expected, pedToSamplesMapper.mapPedFileToPersons(paths, 10));
   }
@@ -72,11 +86,16 @@ class PedToSamplesMapperTest {
     Map<String, Sample> expected = new HashMap();
     expected.put(
         "John",
-        new Sample(
-            new Person("FAM001", "John", "Jimmy", "Jane", MALE, AffectedStatus.AFFECTED), -1));
+        Sample.builder()
+            .person(new Person("FAM001", "John", "Jimmy", "Jane", MALE, AffectedStatus.AFFECTED))
+            .index(-1)
+            .build());
     expected.put(
         "Jimmy",
-        new Sample(new Person("FAM001", "Jimmy", "0", "0", MALE, AffectedStatus.UNAFFECTED), -1));
+        Sample.builder()
+            .person(new Person("FAM001", "Jimmy", "0", "0", MALE, AffectedStatus.UNAFFECTED))
+            .index(-1)
+            .build());
 
     assertEquals(expected, pedToSamplesMapper.mapPedFileToPersons(paths, 2));
   }
@@ -98,14 +117,19 @@ class PedToSamplesMapperTest {
     Map<String, Sample> expected = new HashMap<>();
     expected.put(
         "id1",
-        new Sample(
-            new Person("fam1", "id1", "paternal1", "maternal1", MALE, AffectedStatus.AFFECTED),
-            -1));
+        Sample.builder()
+            .person(
+                new Person("fam1", "id1", "paternal1", "maternal1", MALE, AffectedStatus.AFFECTED))
+            .index(-1)
+            .build());
     expected.put(
         "id2",
-        new Sample(
-            new Person("fam1", "id2", "paternal2", "maternal2", FEMALE, AffectedStatus.UNAFFECTED),
-            -1));
+        Sample.builder()
+            .person(
+                new Person(
+                    "fam1", "id2", "paternal2", "maternal2", FEMALE, AffectedStatus.UNAFFECTED))
+            .index(-1)
+            .build());
 
     assertEquals(expected, pedToSamplesMapper.parse(pedReader, 10));
   }
@@ -121,9 +145,12 @@ class PedToSamplesMapperTest {
     Map<String, Sample> expected = new HashMap<>();
     expected.put(
         "id1",
-        new Sample(
-            new Person("fam1", "id1", "paternal", "maternal", UNKNOWN_SEX, AffectedStatus.MISSING),
-            -1));
+        Sample.builder()
+            .person(
+                new Person(
+                    "fam1", "id1", "paternal", "maternal", UNKNOWN_SEX, AffectedStatus.MISSING))
+            .index(-1)
+            .build());
 
     assertEquals(expected, pedToSamplesMapper.parse(pedReader, 10));
   }

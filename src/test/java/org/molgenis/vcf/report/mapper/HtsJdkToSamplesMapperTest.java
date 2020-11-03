@@ -3,8 +3,8 @@ package org.molgenis.vcf.report.mapper;
 import static java.util.Collections.emptyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.molgenis.vcf.report.mapper.HtsJdkToPersonsMapper.MISSING_PERSON_ID;
 import static org.molgenis.vcf.report.mapper.HtsJdkToPersonsMapper.MISSING;
+import static org.molgenis.vcf.report.mapper.HtsJdkToPersonsMapper.MISSING_PERSON_ID;
 
 import htsjdk.variant.vcf.VCFHeader;
 import java.util.HashMap;
@@ -43,25 +43,20 @@ class HtsJdkToSamplesMapperTest {
 
     int maxNrSamples = 2;
     List<Sample> samples =
-        List.of(
-            new Sample(
-                new Person(
-                    MISSING + "0",
-                    "sample0",
-                    MISSING_PERSON_ID,
-                    MISSING_PERSON_ID,
-                    Sex.UNKNOWN_SEX,
-                    AffectedStatus.MISSING),
-                0),
-            new Sample(
-                new Person(
-                    MISSING + "1",
-                    "sample1",
-                    MISSING_PERSON_ID,
-                    MISSING_PERSON_ID,
-                    Sex.UNKNOWN_SEX,
-                    AffectedStatus.MISSING),
-                1));
+        List.of(Sample.builder().person(new Person(
+                MISSING + "0",
+                "sample0",
+                MISSING_PERSON_ID,
+                MISSING_PERSON_ID,
+                Sex.UNKNOWN_SEX,
+                AffectedStatus.MISSING)).index(0).build(),
+            Sample.builder().person(new Person(
+                MISSING + "1",
+                "sample1",
+                MISSING_PERSON_ID,
+                MISSING_PERSON_ID,
+                Sex.UNKNOWN_SEX,
+                AffectedStatus.MISSING)).index(1).build());
     Items<Sample> expectedSampleItems = new Items<>(samples, 3);
     Assertions.assertEquals(
         expectedSampleItems, htsJdkToPersonsMapper.map(vcfHeader, maxNrSamples));

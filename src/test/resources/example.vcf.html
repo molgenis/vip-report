@@ -8,7 +8,7 @@
     "app": {
       "name": "vcf-report-test",
       "version": "test-version",
-      "args": "-i {{ inputPath }} -o {{ outputPath }} -t {{ templatePath }} -pd {{ pedPaths }} -ph Jimmy/HP:123456,Unknown/test:Headache,Jane/OMIM:23456 -d"
+      'args': '-i {{ inputPath }} -o {{ outputPath }} -t {{ templatePath }} -pb NA00001 -pd {{ pedPaths }} -ph Jimmy/HP:123456,Unknown/test:Headache,Jane/OMIM:23456 -d'
     },
     "htsFile": {
       "htsFormat": "VCF",
@@ -109,7 +109,8 @@
           'sex': 'MALE',
           'affectedStatus': 'AFFECTED'
         },
-        'index': -1
+        'index': -1,
+        'proband': false
       }, {
         'person': {
           'familyId': 'MISSING_0',
@@ -119,7 +120,8 @@
           'sex': 'UNKNOWN_SEX',
           'affectedStatus': 'MISSING'
         },
-        'index': 0
+        'index': 0,
+        'proband': true
       }, {
         'person': {
           'familyId': 'MISSING_1',
@@ -129,7 +131,8 @@
           'sex': 'UNKNOWN_SEX',
           'affectedStatus': 'MISSING'
         },
-        'index': 1
+        'index': 1,
+        'proband': false
       }, {
         'person': {
           'familyId': 'FAM002',
@@ -139,7 +142,8 @@
           'sex': 'MALE',
           'affectedStatus': 'UNAFFECTED'
         },
-        'index': -1
+        'index': -1,
+        'proband': false
       }, {
         'person': {
           'familyId': 'FAM001',
@@ -149,7 +153,8 @@
           'sex': 'MALE',
           'affectedStatus': 'AFFECTED'
         },
-        'index': -1
+        'index': -1,
+        'proband': false
       }, {
         'person': {
           'familyId': 'MISSING_2',
@@ -159,7 +164,8 @@
           'sex': 'UNKNOWN_SEX',
           'affectedStatus': 'MISSING'
         },
-        'index': 2
+        'index': 2,
+        'proband': false
       }, {
         'person': {
           'familyId': 'FAM001',
@@ -169,7 +175,8 @@
           'sex': 'FEMALE',
           'affectedStatus': 'UNAFFECTED'
         },
-        'index': -1
+        'index': -1,
+        'proband': false
       }, {
         'person': {
           'familyId': 'FAM001',
@@ -179,7 +186,8 @@
           'sex': 'MALE',
           'affectedStatus': 'UNAFFECTED'
         },
-        'index': -1
+        'index': -1,
+        'proband': false
       }],
       'total': 8
     },

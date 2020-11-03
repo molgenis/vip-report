@@ -16,9 +16,10 @@ public class PersonListMerger {
           if (pedigreeSamples.containsKey(sample.getPerson().getIndividualId())
               && pedigreeSamples.size() < maxNrSamples) {
             Sample merged =
-                new Sample(
-                    pedigreeSamples.get(sample.getPerson().getIndividualId()).getPerson(),
-                    sample.getIndex());
+                Sample.builder()
+                    .person(pedigreeSamples.get(sample.getPerson().getIndividualId()).getPerson())
+                    .index(sample.getIndex())
+                    .build();
             pedigreeSamples.put(sample.getPerson().getIndividualId(), merged);
           } else {
             pedigreeSamples.put(sample.getPerson().getIndividualId(), sample);

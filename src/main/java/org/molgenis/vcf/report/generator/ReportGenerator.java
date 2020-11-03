@@ -49,14 +49,11 @@ public class ReportGenerator {
 
   public Report generateReport(
       Path inputVcfPath,
-      List<Path> pedigreePaths,
-      String phenotypes,
+      SampleSettings sampleSettings,
       ReportGeneratorSettings reportGeneratorSettings) {
     Report report;
     try (VCFFileReader vcfFileReader = createReader(inputVcfPath)) {
-      report =
-          createReport(
-              vcfFileReader, inputVcfPath, pedigreePaths, phenotypes, reportGeneratorSettings);
+      report = createReport(vcfFileReader, inputVcfPath, sampleSettings, reportGeneratorSettings);
     }
     return report;
   }
@@ -68,14 +65,19 @@ public class ReportGenerator {
   private Report createReport(
       VCFFileReader vcfFileReader,
       Path vcfPath,
-      List<Path> pedigreePaths,
-      String phenotypes,
+      SampleSettings sampleSettings,
       ReportGeneratorSettings reportGeneratorSettings) {
     HtsFile htsFile = htsFileMapper.map(vcfFileReader.getFileHeader(), vcfPath.toString());
 
-    Items<Sample> samples = createPersons(vcfFileReader, pedigreePaths, reportGeneratorSettings);
+    Items<Sample> samples =
+        createPersons(
+            vcfFileReader,
+            sampleSettings.getProbandNames(),
+            sampleSettings.getPedigreePaths(),
+            reportGeneratorSettings);
 
     Items<Phenopacket> phenopackets;
+    String phenotypes = sampleSettings.getPhenotypeString();
     if (phenotypes != null && !phenotypes.isEmpty()) {
       phenopackets = phenopacketMapper.mapPhenotypes(phenotypes, samples.getItems());
     } else {
@@ -97,16 +99,31 @@ public class ReportGenerator {
   }
 
   private Items<Sample> createPersons(
-      VCFFileReader vcfFileReader, List<Path> pedigreePaths, ReportGeneratorSettings settings) {
+      VCFFileReader vcfFileReader,
+      List<String> probandNames,
+      List<Path> pedigreePaths,
+      ReportGeneratorSettings settings) {
     VCFHeader fileHeader = vcfFileReader.getFileHeader();
     int maxNrSamples = settings.getMaxNrSamples();
-    Items<Sample> samples = htsJdkMapper.mapSamples(fileHeader, maxNrSamples);
+    Items<Sample> sampleItems = htsJdkMapper.mapSamples(fileHeader, maxNrSamples);
     if (pedigreePaths != null) {
       final Map<String, Sample> pedigreePersons =
           pedToSamplesMapper.mapPedFileToPersons(pedigreePaths, maxNrSamples);
-      samples = personListMerger.merge(samples.getItems(), pedigreePersons, maxNrSamples);
+      sampleItems = personListMerger.merge(sampleItems.getItems(), pedigreePersons, maxNrSamples);
     }
-    return samples;
+    if (!probandNames.isEmpty()) {
+      sampleItems
+          .getItems()
+          .forEach(
+              sample -> {
+                if (probandNames.contains(sample.getPerson().getIndividualId())) {
+                  sample.setProband(true);
+                }
+              });
+    } else {
+      sampleItems.getItems().forEach(sample -> sample.setProband(true));
+    }
+    return sampleItems;
   }
 
   private Items<Record> createRecords(

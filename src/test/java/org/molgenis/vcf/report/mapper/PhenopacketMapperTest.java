@@ -1,6 +1,8 @@
 package org.molgenis.vcf.report.mapper;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,14 +38,19 @@ class PhenopacketMapperTest {
   void mapPhenotypesGeneral() {
     List<Sample> samples = new ArrayList<>();
     samples.add(
-        new Sample(
-            new Person("fam1", "id1", "paternal1", "maternal1", Sex.MALE, AffectedStatus.AFFECTED),
-            -1));
+        Sample.builder()
+            .person(
+                new Person(
+                    "fam1", "id1", "paternal1", "maternal1", Sex.MALE, AffectedStatus.AFFECTED))
+            .index(-1)
+            .build());
     samples.add(
-        new Sample(
-            new Person(
-                "fam1", "id2", "paternal2", "maternal2", Sex.FEMALE, AffectedStatus.UNAFFECTED),
-            -1));
+        Sample.builder()
+            .person(
+                new Person(
+                    "fam1", "id2", "paternal2", "maternal2", Sex.FEMALE, AffectedStatus.UNAFFECTED))
+            .index(-1)
+            .build());
 
     List<Phenopacket> expected = new ArrayList<>();
 

@@ -6,6 +6,7 @@ import lombok.Value;
 
 @Value
 public class SampleSettings {
+  List<String> probandNames;
   List<Path> pedigreePaths;
   String phenotypeString;
 }

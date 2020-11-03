@@ -95,36 +95,27 @@ class HtsJdkToRecordMapperTest {
     when(variantContext.getReference()).thenReturn(Allele.REF_C);
     when(variantContext.getAlternateAlleles()).thenReturn(List.of(Allele.ALT_C, Allele.ALT_T));
 
-    Sample sample1 =
-        new Sample(
-            new Person(
-                "family",
-                "c",
-                MISSING_PERSON_ID,
-                MISSING_PERSON_ID,
-                Sex.UNKNOWN_SEX,
-                AffectedStatus.MISSING),
-            0);
-    Sample sample2 =
-        new Sample(
-            new Person(
-                "family",
-                "b",
-                MISSING_PERSON_ID,
-                MISSING_PERSON_ID,
-                Sex.UNKNOWN_SEX,
-                AffectedStatus.MISSING),
-            1);
-    Sample sample3 =
-        new Sample(
-            new Person(
-                "family",
-                "a",
-                MISSING_PERSON_ID,
-                MISSING_PERSON_ID,
-                Sex.UNKNOWN_SEX,
-                AffectedStatus.MISSING),
-            2);
+    Sample sample1 = Sample.builder().person(new Person(
+        "family",
+        "c",
+        MISSING_PERSON_ID,
+        MISSING_PERSON_ID,
+        Sex.UNKNOWN_SEX,
+        AffectedStatus.MISSING)).index(0).build();
+    Sample sample2 = Sample.builder().person(new Person(
+        "family",
+        "b",
+        MISSING_PERSON_ID,
+        MISSING_PERSON_ID,
+        Sex.UNKNOWN_SEX,
+        AffectedStatus.MISSING)).index(1).build();
+    Sample sample3 = Sample.builder().person(new Person(
+        "family",
+        "a",
+        MISSING_PERSON_ID,
+        MISSING_PERSON_ID,
+        Sex.UNKNOWN_SEX,
+        AffectedStatus.MISSING)).index(2).build();
     List<Sample> samples = new ArrayList<>();
     samples.add(sample2);
     samples.add(sample3);
@@ -184,16 +175,13 @@ class HtsJdkToRecordMapperTest {
             info,
             List.of(recordSample));
 
-    Sample sample0 =
-        new Sample(
-            new Person(
-                "family",
-                "sample0",
-                MISSING_PERSON_ID,
-                MISSING_PERSON_ID,
-                Sex.UNKNOWN_SEX,
-                AffectedStatus.MISSING),
-            0);
+    Sample sample0 = Sample.builder().person(new Person(
+        "family",
+        "sample0",
+        MISSING_PERSON_ID,
+        MISSING_PERSON_ID,
+        Sex.UNKNOWN_SEX,
+        AffectedStatus.MISSING)).index(0).build();
     Assertions.assertEquals(
         record, htsJdkToRecordMapper.map(recordsMetadata, variantContext, List.of(sample0)));
   }
