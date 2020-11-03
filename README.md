@@ -15,7 +15,7 @@ java -jar vcf-report.jar -i <arg> [-o <arg>] [-f]
  -t,--template <arg>      Report template file (.html).
  -pb,--probands <arg>     Comma-separated list of proband names.
  -pd,--pedigree <arg>     Comma-separated list of pedigree files (.ped).
- -ph,--phenotypes <arg>   Comma-separated list of sample-phenotypes (e.g. HPO:123 or HPO:123;HPO:234 or sample0/HPO:123,sample1/HPO:234). Phenotypes are CURIE formatted (prefix:reference) and separated by a semicolon.
+ -ph,--phenotypes <arg>   Comma-separated list of sample-phenotypes (e.g. HP:123 or HP:123;HP:234 or sample0/HP:123,sample1/HP:234). Phenotypes are CURIE formatted (prefix:reference) and separated by a semicolon.
  -mr,--max_records <arg>   Integer stating the maximum number of records to be available in the report. Default: 100
  -ms,--max_samples <arg>   Integer stating the maximum number of samples to be available in the report. Default: 100
  -d,--debug               Enable debug mode (additional logging and pretty
