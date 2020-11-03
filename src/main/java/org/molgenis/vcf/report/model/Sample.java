@@ -1,13 +1,16 @@
 package org.molgenis.vcf.report.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NonNull;
-import lombok.Value;
 import lombok.experimental.NonFinal;
 
-@Value
+@Data
 @NonFinal
+@Builder
 public class Sample {
+
   @JsonProperty("person")
   @NonNull
   Person person;
@@ -16,4 +19,8 @@ public class Sample {
   @JsonProperty("index")
   @NonNull
   int index;
+
+  @JsonProperty("proband")
+  @NonNull
+  boolean proband;
 }

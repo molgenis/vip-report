@@ -22,6 +22,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.molgenis.vcf.report.generator.ReportGenerator;
 import org.molgenis.vcf.report.generator.ReportGeneratorSettings;
+import org.molgenis.vcf.report.generator.SampleSettings;
 import org.molgenis.vcf.report.mapper.HtsFileMapper;
 import org.molgenis.vcf.report.mapper.HtsJdkMapper;
 import org.molgenis.vcf.report.mapper.PedToSamplesMapper;
@@ -98,8 +99,11 @@ class ReportGeneratorTest {
             new ReportMetadata(
                 new AppMetadata(appName, appVersion, appArgs), htsFile, recordsMetadata),
             new ReportData(sampleItems, phenopacketItems, recordItems));
+
     assertEquals(
         report,
-        reportGenerator.generateReport(inputVcfPath, pedPath, phenotypes, reportGeneratorSettings));
+        reportGenerator
+            .generateReport(inputVcfPath, new SampleSettings(emptyList(), pedPath, phenotypes),
+                reportGeneratorSettings));
   }
 }

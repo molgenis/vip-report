@@ -35,58 +35,74 @@ class PersonListMergerTest {
     Map<String, Sample> pedigreePersons = new HashMap<>();
     pedigreePersons.put(
         "id1",
-        new Sample(
-            new Person("fam1", "id1", "paternal1", "maternal1", Sex.MALE, AffectedStatus.AFFECTED),
-            -1));
+        Sample.builder()
+            .person(
+                new Person(
+                    "fam1", "id1", "paternal1", "maternal1", Sex.MALE, AffectedStatus.AFFECTED))
+            .index(-1)
+            .build());
     pedigreePersons.put(
         "id2",
-        new Sample(
-            new Person(
-                "fam1", "id2", "paternal2", "maternal2", Sex.FEMALE, AffectedStatus.UNAFFECTED),
-            -1));
+        Sample.builder()
+            .person(
+                new Person(
+                    "fam1", "id2", "paternal2", "maternal2", Sex.FEMALE, AffectedStatus.UNAFFECTED))
+            .index(-1)
+            .build());
 
     List<Sample> vcfPersons = new ArrayList<>();
     vcfPersons.add(
-        new Sample(
-            new Person(
-                "MISSING_0",
-                "id1",
-                MISSING_PERSON_ID,
-                MISSING_PERSON_ID,
-                Sex.UNKNOWN_SEX,
-                AffectedStatus.MISSING),
-            0));
+        Sample.builder()
+            .person(
+                new Person(
+                    "MISSING_0",
+                    "id1",
+                    MISSING_PERSON_ID,
+                    MISSING_PERSON_ID,
+                    Sex.UNKNOWN_SEX,
+                    AffectedStatus.MISSING))
+            .index(0)
+            .build());
     vcfPersons.add(
-        new Sample(
-            new Person(
-                "MISSING_1",
-                "id3",
-                MISSING_PERSON_ID,
-                MISSING_PERSON_ID,
-                Sex.UNKNOWN_SEX,
-                AffectedStatus.MISSING),
-            1));
+        Sample.builder()
+            .person(
+                new Person(
+                    "MISSING_1",
+                    "id3",
+                    MISSING_PERSON_ID,
+                    MISSING_PERSON_ID,
+                    Sex.UNKNOWN_SEX,
+                    AffectedStatus.MISSING))
+            .index(1)
+            .build());
 
     List<Sample> expected = new ArrayList<>();
     expected.add(
-        new Sample(
-            new Person("fam1", "id1", "paternal1", "maternal1", Sex.MALE, AffectedStatus.AFFECTED),
-            0));
+        Sample.builder()
+            .person(
+                new Person(
+                    "fam1", "id1", "paternal1", "maternal1", Sex.MALE, AffectedStatus.AFFECTED))
+            .index(0)
+            .build());
     expected.add(
-        new Sample(
-            new Person(
-                "fam1", "id2", "paternal2", "maternal2", Sex.FEMALE, AffectedStatus.UNAFFECTED),
-            -1));
+        Sample.builder()
+            .person(
+                new Person(
+                    "fam1", "id2", "paternal2", "maternal2", Sex.FEMALE, AffectedStatus.UNAFFECTED))
+            .index(-1)
+            .build());
     expected.add(
-        new Sample(
-            new Person(
-                "MISSING_1",
-                "id3",
-                MISSING_PERSON_ID,
-                MISSING_PERSON_ID,
-                Sex.UNKNOWN_SEX,
-                AffectedStatus.MISSING),
-            1));
+        Sample.builder()
+            .person(
+                new Person(
+                    "MISSING_1",
+                    "id3",
+                    MISSING_PERSON_ID,
+                    MISSING_PERSON_ID,
+                    Sex.UNKNOWN_SEX,
+                    AffectedStatus.MISSING))
+            .index(1)
+            .build());
 
     Items<Sample> actual = personListMerger.merge(vcfPersons, pedigreePersons, 10);
     assertAll(

@@ -68,7 +68,7 @@ class ReportServiceTest {
             ReportGeneratorSettings.DEFAULT_MAX_NR_SAMPLES,
             ReportGeneratorSettings.DEFAULT_MAX_NR_RECORDS);
     ReportWriterSettings reportWriterSettings = new ReportWriterSettings(null, true);
-    SampleSettings sampleSettings = new SampleSettings(null, null);
+    SampleSettings sampleSettings = new SampleSettings(null, null, null);
     Settings settings =
         new Settings(
             inputVcfPath,
@@ -77,11 +77,7 @@ class ReportServiceTest {
             true,
             reportWriterSettings,
             sampleSettings);
-    when(reportGenerator.generateReport(
-            inputVcfPath,
-            sampleSettings.getPedigreePaths(),
-            sampleSettings.getPhenotypeString(),
-            reportGeneratorSettings))
+    when(reportGenerator.generateReport(inputVcfPath, sampleSettings, reportGeneratorSettings))
         .thenReturn(report);
 
     reportService.createReport(settings);

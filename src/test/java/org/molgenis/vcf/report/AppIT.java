@@ -28,20 +28,23 @@ class AppIT {
             + ResourceUtils.getFile("classpath:example2.ped").toString();
     String outputFile = sharedTempDir.resolve("example.vcf.html").toString();
     String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
+    String probands = "NA00001";
     String phenotypes = "Jimmy/HP:123456,Unknown/test:Headache,Jane/OMIM:23456";
 
     String[] args = {
-      "-i",
-      inputFile,
-      "-o",
-      outputFile,
-      "-t",
-      templateFile,
-      "-pd",
-      pedFiles,
-      "-ph",
-      phenotypes,
-      "-d"
+        "-i",
+        inputFile,
+        "-o",
+        outputFile,
+        "-t",
+        templateFile,
+        "-pb",
+        probands,
+        "-pd",
+        pedFiles,
+        "-ph",
+        phenotypes,
+        "-d"
     };
     SpringApplication.run(App.class, args);
 

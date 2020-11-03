@@ -23,6 +23,8 @@ class AppCommandLineOptions {
   static final String OPT_OUTPUT_LONG = "output";
   static final String OPT_TEMPLATE = "t";
   static final String OPT_TEMPLATE_LONG = "template";
+  static final String OPT_PROBANDS = "pb";
+  static final String OPT_PROBANDS_LONG = "probands";
   static final String OPT_PED = "pd";
   static final String OPT_PED_LONG = "pedigree";
   static final String OPT_PHENOTYPES = "ph";
@@ -65,6 +67,12 @@ class AppCommandLineOptions {
             .hasArg(true)
             .longOpt(OPT_TEMPLATE_LONG)
             .desc("Report template file (.html).")
+            .build());
+    appOptions.addOption(
+        Option.builder(OPT_PROBANDS)
+            .hasArg(true)
+            .longOpt(OPT_PROBANDS_LONG)
+            .desc("Comma-separated list of proband names.")
             .build());
     appOptions.addOption(
         Option.builder(OPT_PED)
@@ -127,6 +135,7 @@ class AppCommandLineOptions {
     validateInput(commandLine);
     validateOutput(commandLine);
     validateTemplate(commandLine);
+    validateProbands(commandLine);
     validatePed(commandLine);
     validatePhenotypes(commandLine);
     validateMaxRecords(commandLine);
@@ -242,6 +251,10 @@ class AppCommandLineOptions {
       throw new IllegalArgumentException(
           format("Template file '%s' is not a .html file.", templatePathStr));
     }
+  }
+
+  private static void validateProbands(@SuppressWarnings("unused") CommandLine commandLine) {
+    // no op
   }
 
   private static void validatePed(CommandLine commandLine) {
