@@ -79,6 +79,7 @@ public class VepInfoMetadataMapper extends AbstractInfoMetadataMapper {
         break;
       case "STRAND":
       case "HGNC_ID":
+      case "HPO":
         infoMetadata =
             InfoMetadata.builder()
                 .id(id)
