@@ -58,6 +58,7 @@ public class VepInfoMetadataMapper extends AbstractInfoMetadataMapper {
       case "Existing_variation":
       case "CLIN_SIG":
       case "FLAGS":
+      case "HPO":
         infoMetadata =
             InfoMetadata.builder()
                 .id(id)
@@ -79,7 +80,6 @@ public class VepInfoMetadataMapper extends AbstractInfoMetadataMapper {
         break;
       case "STRAND":
       case "HGNC_ID":
-      case "HPO":
         infoMetadata =
             InfoMetadata.builder()
                 .id(id)
