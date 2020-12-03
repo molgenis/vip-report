@@ -78,8 +78,8 @@ class VepInfoMetadataMapperTest {
         .build();
     InfoMetadata hpoMetadata = InfoMetadata.builder()
         .id("HPO")
-        .number(Number.builder().type(Type.NUMBER).count(1).build())
-        .type(CompoundMetadata.Type.INTEGER)
+        .number(Number.builder().type(Type.OTHER).separator('&').build())
+        .type(CompoundMetadata.Type.STRING)
         .description("HPO")
         .build();
     InfoMetadata infoMetadata =
