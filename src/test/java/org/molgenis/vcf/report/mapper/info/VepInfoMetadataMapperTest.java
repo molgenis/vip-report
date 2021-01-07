@@ -48,7 +48,8 @@ class VepInfoMetadataMapperTest {
     when(vcfInfoHeaderLine.getCountType()).thenReturn(VCFHeaderLineCount.UNBOUNDED);
     when(vcfInfoHeaderLine.getType()).thenReturn(VCFHeaderLineType.String);
     when(vcfInfoHeaderLine.getDescription())
-        .thenReturn("Consequence annotations from Ensembl VEP. Format: X|Y|Consequence|PUBMED|HPO");
+        .thenReturn(
+            "Consequence annotations from Ensembl VEP. Format: X|Y|Consequence|PUBMED|HPO|InheritanceModesGene");
 
     InfoMetadata xInfoMetadata =
         InfoMetadata.builder()
@@ -64,34 +65,49 @@ class VepInfoMetadataMapperTest {
             .type(CompoundMetadata.Type.STRING)
             .description("Y")
             .build();
-    InfoMetadata consequenceMetadata = InfoMetadata.builder()
-        .id("Consequence")
-        .number(Number.builder().type(Type.OTHER).separator('&').build())
-        .type(CompoundMetadata.Type.STRING)
-        .description("Consequence")
-        .build();
-    InfoMetadata pubmedMetadata = InfoMetadata.builder()
-        .id("PUBMED")
-        .number(Number.builder().type(Type.OTHER).separator('&').build())
-        .type(CompoundMetadata.Type.INTEGER)
-        .description("PUBMED")
-        .build();
-    InfoMetadata hpoMetadata = InfoMetadata.builder()
-        .id("HPO")
-        .number(Number.builder().type(Type.OTHER).separator('&').build())
-        .type(CompoundMetadata.Type.STRING)
-        .description("HPO")
-        .build();
+    InfoMetadata consequenceMetadata =
+        InfoMetadata.builder()
+            .id("Consequence")
+            .number(Number.builder().type(Type.OTHER).separator('&').build())
+            .type(CompoundMetadata.Type.STRING)
+            .description("Consequence")
+            .build();
+    InfoMetadata pubmedMetadata =
+        InfoMetadata.builder()
+            .id("PUBMED")
+            .number(Number.builder().type(Type.OTHER).separator('&').build())
+            .type(CompoundMetadata.Type.INTEGER)
+            .description("PUBMED")
+            .build();
+    InfoMetadata hpoMetadata =
+        InfoMetadata.builder()
+            .id("HPO")
+            .number(Number.builder().type(Type.OTHER).separator('&').build())
+            .type(CompoundMetadata.Type.STRING)
+            .description("HPO")
+            .build();
+    InfoMetadata inheritanceModesGeneMetadata =
+        InfoMetadata.builder()
+            .id("InheritanceModesGene")
+            .number(Number.builder().type(Type.OTHER).separator('&').build())
+            .type(CompoundMetadata.Type.STRING)
+            .description("InheritanceModesGene")
+            .build();
     InfoMetadata infoMetadata =
         InfoMetadata.builder()
             .id("CSQ")
             .number(Number.builder().type(Number.Type.OTHER).separator(',').build())
             .type(CompoundMetadata.Type.NESTED)
             .description(
-                "Consequence annotations from Ensembl VEP. Format: X|Y|Consequence|PUBMED|HPO")
+                "Consequence annotations from Ensembl VEP. Format: X|Y|Consequence|PUBMED|HPO|InheritanceModesGene")
             .nestedMetadata(
-                asList(xInfoMetadata, yInfoMetadata, consequenceMetadata, pubmedMetadata,
-                    hpoMetadata))
+                asList(
+                    xInfoMetadata,
+                    yInfoMetadata,
+                    consequenceMetadata,
+                    pubmedMetadata,
+                    hpoMetadata,
+                    inheritanceModesGeneMetadata))
             .build();
     assertEquals(infoMetadata, vepInfoMetadataMapper.map(vcfInfoHeaderLine));
   }
