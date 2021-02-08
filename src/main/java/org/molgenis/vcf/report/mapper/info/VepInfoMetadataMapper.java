@@ -80,12 +80,20 @@ public class VepInfoMetadataMapper extends AbstractInfoMetadataMapper {
                 .build();
         break;
       case "STRAND":
-      case "HGNC_ID":
         infoMetadata =
             InfoMetadata.builder()
                 .id(id)
                 .number(Number.builder().type(Type.NUMBER).count(1).build())
                 .type(CompoundMetadata.Type.INTEGER)
+                .description(id)
+                .build();
+        break;
+      case "HGNC_ID":
+        infoMetadata =
+            InfoMetadata.builder()
+                .id(id)
+                .number(Number.builder().type(Type.NUMBER).count(1).build())
+                .type(CompoundMetadata.Type.STRING)
                 .description(id)
                 .build();
         break;
