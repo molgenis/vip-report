@@ -7,13 +7,9 @@ import lombok.experimental.NonFinal;
 
 @Value
 @NonFinal
-public class ReportData {
+public class Base85 {
 
-  @JsonProperty("samples")
+  @JsonProperty("vcfGz")
   @NonNull
-  Items<Sample> samples;
-
-  @JsonProperty("phenotypes")
-  @NonNull
-  Items<Phenopacket> phenopackets;
+  String vcfGz;
 }
