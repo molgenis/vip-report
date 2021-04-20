@@ -61,11 +61,14 @@ class AppIT {
     // check the report api value with JSONAssert
     String actualApi = getElementValue(report, "script");
     String expectedApi = getElementValue(expectedReport, "script");
+
     assertAll(
         () ->
             JSONAssert.assertEquals(
-                expectedApi.replace("window.api = ", ""),
-                actualApi.replace("window.api = ", ""),
+                expectedApi.replace("window.api = ", "").replaceAll("\"vcfGz\" : \".*?\"",
+                    "\"vcfGz\" : \"data_that_differs_per_os_due_to_gzip\""),
+                actualApi.replace("window.api = ", "").replaceAll("\"vcfGz\" : \".*?\"",
+                    "\"vcfGz\" : \"data_that_differs_per_os_due_to_gzip\""),
                 true),
         // check the rest of the report
         () ->

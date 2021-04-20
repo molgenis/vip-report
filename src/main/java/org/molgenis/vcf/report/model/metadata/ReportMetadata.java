@@ -16,8 +16,4 @@ public class ReportMetadata {
   @JsonProperty("htsFile")
   @NonNull
   HtsFile htsFile;
-
-  @JsonProperty("records")
-  @NonNull
-  RecordsMetadata recordsMetadata;
 }

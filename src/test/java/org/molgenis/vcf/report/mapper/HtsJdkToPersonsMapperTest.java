@@ -21,7 +21,7 @@ import org.molgenis.vcf.report.model.Sample;
 import org.molgenis.vcf.report.model.Sex;
 
 @ExtendWith(MockitoExtension.class)
-class HtsJdkToSamplesMapperTest {
+class HtsJdkToPersonsMapperTest {
 
   private HtsJdkToPersonsMapper htsJdkToPersonsMapper;
 

@@ -17,4 +17,8 @@ public class Report {
   @JsonProperty("data")
   @NonNull
   ReportData reportData;
+
+  @JsonProperty("base85")
+  @NonNull
+  Base85 base85;
 }

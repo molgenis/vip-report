@@ -100,8 +100,7 @@ public class AppCommandLineToSettingsMapper {
             appVersion,
             appArgs,
             maxSamples,
-            maxRecords
-            );
+            maxRecords);
     ReportWriterSettings reportWriterSettings = new ReportWriterSettings(templatePath, debugMode);
     SampleSettings sampleSettings = new SampleSettings(probandNames, pedPaths, phenotypes);
     return new Settings(
