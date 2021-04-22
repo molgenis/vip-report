@@ -1,5 +1,6 @@
 package org.molgenis.vcf.report.generator;
 
+import java.nio.file.Path;
 import lombok.NonNull;
 import lombok.Value;
 
@@ -14,4 +15,5 @@ public class ReportGeneratorSettings {
   @NonNull String appArguments;
   int maxNrSamples;
   int maxNrRecords;
+  Path referencePath;
 }

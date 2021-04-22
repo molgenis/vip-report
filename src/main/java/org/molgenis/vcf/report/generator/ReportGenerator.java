@@ -6,8 +6,13 @@ import htsjdk.variant.vcf.VCFFileReader;
 import htsjdk.variant.vcf.VCFHeader;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.molgenis.vcf.report.fasta.ContigInterval;
+import org.molgenis.vcf.report.fasta.FastaSlice;
+import org.molgenis.vcf.report.fasta.VcfFastaSlicer;
+import org.molgenis.vcf.report.fasta.VcfFastaSlicerFactory;
 import org.molgenis.vcf.report.mapper.HtsFileMapper;
 import org.molgenis.vcf.report.mapper.HtsJdkToPersonsMapper;
 import org.molgenis.vcf.report.mapper.PedToSamplesMapper;
@@ -33,6 +38,7 @@ public class ReportGenerator {
   private final PersonListMerger personListMerger;
   private final HtsFileMapper htsFileMapper;
   private final Base85Encoder base85Encoder;
+  private final VcfFastaSlicerFactory vcfFastaSlicerFactory;
 
   public ReportGenerator(
       HtsJdkToPersonsMapper htsJdkToPersonsMapper,
@@ -40,13 +46,15 @@ public class ReportGenerator {
       PedToSamplesMapper pedToSamplesMapper,
       PersonListMerger personListMerger,
       HtsFileMapper htsFileMapper,
-      Base85Encoder base85Encoder) {
+      Base85Encoder base85Encoder,
+      VcfFastaSlicerFactory vcfFastaSlicerFactory) {
     this.htsJdkToPersonsMapper = requireNonNull(htsJdkToPersonsMapper);
     this.phenopacketMapper = requireNonNull(phenopacketMapper);
     this.pedToSamplesMapper = requireNonNull(pedToSamplesMapper);
     this.personListMerger = requireNonNull(personListMerger);
     this.htsFileMapper = requireNonNull(htsFileMapper);
     this.base85Encoder = requireNonNull(base85Encoder);
+    this.vcfFastaSlicerFactory = requireNonNull(vcfFastaSlicerFactory);
   }
 
   public Report generateReport(
@@ -93,8 +101,31 @@ public class ReportGenerator {
             reportGeneratorSettings.getAppArguments());
     ReportMetadata reportMetadata = new ReportMetadata(appMetadata, htsFile);
     ReportData reportData = new ReportData(samples, phenopackets);
-    Base85 base85 = new Base85(base85Encoder.encode(vcfPath));
+
+    Map<String, String> fastaGzMap;
+    Path referencePath = reportGeneratorSettings.getReferencePath();
+    if (referencePath != null) {
+      VcfFastaSlicer vcfFastaSlicer = vcfFastaSlicerFactory.create(referencePath);
+      List<FastaSlice> fastaGzSlices = vcfFastaSlicer.generate(vcfFileReader, 250);
+      fastaGzMap = new LinkedHashMap<>();
+      fastaGzSlices.forEach(
+          fastaSlice -> {
+            String key = getFastaSliceIdentifier(fastaSlice);
+            String base85FastaGz =
+                org.molgenis.vcf.report.utils.Base85.getRfc1924Encoder()
+                    .encodeToString(fastaSlice.getFastaGz());
+            fastaGzMap.put(key, base85FastaGz);
+          });
+    } else {
+      fastaGzMap = null;
+    }
+    Base85 base85 = new Base85(base85Encoder.encode(vcfPath), fastaGzMap);
     return new Report(reportMetadata, reportData, base85);
+  }
+
+  private static String getFastaSliceIdentifier(FastaSlice fastaSlice) {
+    ContigInterval interval = fastaSlice.getInterval();
+    return interval.getContig() + ':' + interval.getStart() + '-' + interval.getStop();
   }
 
   private Items<Sample> createPersons(

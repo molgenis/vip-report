@@ -55,14 +55,14 @@ class ReportServiceTest {
                 new AppMetadata(appName, appVersion, appArguments),
                 new HtsFile(inputVcfPath.toString(), VCF, "UNKNOWN")),
             new ReportData(new Items<>(emptyList(), 0), new Items<>(emptyList(), 0)),
-            new Base85("str"));
+            new Base85("str", null));
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
             appName,
             appVersion,
             appArguments,
             ReportGeneratorSettings.DEFAULT_MAX_NR_SAMPLES,
-            ReportGeneratorSettings.DEFAULT_MAX_NR_RECORDS);
+            ReportGeneratorSettings.DEFAULT_MAX_NR_RECORDS, null);
     ReportWriterSettings reportWriterSettings = new ReportWriterSettings(null, true);
     SampleSettings sampleSettings = new SampleSettings(null, null, null);
     Settings settings =
