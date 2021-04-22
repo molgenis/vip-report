@@ -33,6 +33,8 @@ class AppCommandLineOptions {
   static final String OPT_MAX_RECORDS_LONG = "max_records";
   static final String OPT_MAX_SAMPLES = "ms";
   static final String OPT_MAX_SAMPLES_LONG = "max_samples";
+  static final String OPT_REFERENCE = "r";
+  static final String OPT_REFERENCE_LONG = "reference";
   static final String OPT_FORCE = "f";
   static final String OPT_FORCE_LONG = "force";
   static final String OPT_DEBUG = "d";
@@ -106,6 +108,12 @@ class AppCommandLineOptions {
                     ReportGeneratorSettings.DEFAULT_MAX_NR_SAMPLES))
             .build());
     appOptions.addOption(
+        Option.builder(OPT_REFERENCE)
+            .hasArg(true)
+            .longOpt(OPT_REFERENCE_LONG)
+            .desc("Reference sequence file (.fasta.gz, .fna.gz, .ffn.gz, .faa.gz or .frn.gz).")
+            .build());
+    appOptions.addOption(
         Option.builder(OPT_DEBUG)
             .longOpt(OPT_DEBUG_LONG)
             .desc("Enable debug mode (additional logging and pretty printed report.")
@@ -140,6 +148,34 @@ class AppCommandLineOptions {
     validatePhenotypes(commandLine);
     validateMaxRecords(commandLine);
     validateMaxSamples(commandLine);
+    validateReference(commandLine);
+  }
+
+  static void validateReference(CommandLine commandLine) {
+    if (!commandLine.hasOption(OPT_REFERENCE)) {
+      return;
+    }
+
+    String optionValue = commandLine.getOptionValue(OPT_REFERENCE);
+    Path referencePath = Path.of(optionValue);
+    validateFilePath(referencePath, "Reference");
+
+    String referencePathStr = referencePath.toString();
+    if (!referencePathStr.endsWith(".fasta.gz")
+        && !referencePathStr.endsWith(".fna.gz")
+        && !referencePathStr.endsWith(".fnn.gz")
+        && !referencePathStr.endsWith(".faa.gz")
+        && !referencePathStr.endsWith(".frn.gz")) {
+      throw new IllegalArgumentException(
+          format("Input file '%s' is not a .fasta.gz, .fna.gz, .fnn.gz, .faa.gz or .frn.gz file.",
+              referencePathStr));
+    }
+
+    Path referenceIndexPath = Path.of(optionValue + ".fai");
+    validateFilePath(referenceIndexPath, "Reference .fai");
+
+    Path referenceGzipIndexPath = Path.of(optionValue + ".gzi");
+    validateFilePath(referenceGzipIndexPath, "Reference .gzi");
   }
 
   private static void validateMaxSamples(CommandLine commandLine) {
@@ -190,18 +226,8 @@ class AppCommandLineOptions {
 
   private static void validateInput(CommandLine commandLine) {
     Path inputPath = Path.of(commandLine.getOptionValue(OPT_INPUT));
-    if (!Files.exists(inputPath)) {
-      throw new IllegalArgumentException(
-          format("Input file '%s' does not exist.", inputPath.toString()));
-    }
-    if (Files.isDirectory(inputPath)) {
-      throw new IllegalArgumentException(
-          format("Input file '%s' is a directory.", inputPath.toString()));
-    }
-    if (!Files.isReadable(inputPath)) {
-      throw new IllegalArgumentException(
-          format("Input file '%s' is not readable.", inputPath.toString()));
-    }
+    validateFilePath(inputPath, "Input");
+
     String inputPathStr = inputPath.toString();
     if (!inputPathStr.endsWith(".vcf") && !inputPathStr.endsWith(".vcf.gz")) {
       throw new IllegalArgumentException(
@@ -234,18 +260,8 @@ class AppCommandLineOptions {
     }
 
     Path templatePath = Path.of(commandLine.getOptionValue(OPT_TEMPLATE));
-    if (!Files.exists(templatePath)) {
-      throw new IllegalArgumentException(
-          format("Template file '%s' does not exist.", templatePath.toString()));
-    }
-    if (Files.isDirectory(templatePath)) {
-      throw new IllegalArgumentException(
-          format("Template file '%s' is a directory.", templatePath.toString()));
-    }
-    if (!Files.isReadable(templatePath)) {
-      throw new IllegalArgumentException(
-          format("Template file '%s' is not readable.", templatePath.toString()));
-    }
+    validateFilePath(templatePath, "Template");
+
     String templatePathStr = templatePath.toString();
     if (!templatePathStr.endsWith(".html")) {
       throw new IllegalArgumentException(
@@ -263,23 +279,27 @@ class AppCommandLineOptions {
     }
     List<Path> pedPaths = parsePaths(commandLine.getOptionValue(OPT_PED));
     for (Path pedPath : pedPaths) {
-      if (!Files.exists(pedPath)) {
-        throw new IllegalArgumentException(
-            format("Ped file '%s' does not exist.", pedPath.toString()));
-      }
-      if (Files.isDirectory(pedPath)) {
-        throw new IllegalArgumentException(
-            format("Ped file '%s' is a directory.", pedPath.toString()));
-      }
-      if (!Files.isReadable(pedPath)) {
-        throw new IllegalArgumentException(
-            format("Ped file '%s' is not readable.", pedPath.toString()));
-      }
+      validateFilePath(pedPath, "Ped");
       String templatePathStr = pedPath.toString();
       if (!templatePathStr.endsWith(".ped")) {
         throw new IllegalArgumentException(
             format("Ped file '%s' is not a .ped file.", templatePathStr));
       }
+    }
+  }
+
+  private static void validateFilePath(Path filePath, String prefix) {
+    if (!Files.exists(filePath)) {
+      throw new IllegalArgumentException(
+          format("%s file '%s' does not exist.", prefix, filePath.toString()));
+    }
+    if (Files.isDirectory(filePath)) {
+      throw new IllegalArgumentException(
+          format("%s file '%s' is a directory.", prefix, filePath.toString()));
+    }
+    if (!Files.isReadable(filePath)) {
+      throw new IllegalArgumentException(
+          format("%s file '%s' is not readable.", prefix, filePath.toString()));
     }
   }
 }

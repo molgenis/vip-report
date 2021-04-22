@@ -11,6 +11,7 @@ import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_MAX_SAMPLES;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_OUTPUT;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_PED;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_PHENOTYPES;
+import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_REFERENCE;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_TEMPLATE;
 
 import java.io.FileNotFoundException;
@@ -433,7 +434,6 @@ class AppCommandLineOptionsTest {
   void validateCommandLineMaxSamplesNoInt() throws FileNotFoundException {
     String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
 
-
     CommandLine cmd = mock(CommandLine.class);
     doReturn(true).when(cmd).hasOption(OPT_MAX_SAMPLES);
     doReturn(false).when(cmd).hasOption(OPT_MAX_RECORDS);
@@ -480,5 +480,84 @@ class AppCommandLineOptionsTest {
 
     assertThrows(
         InvalidIntegerException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
+  }
+
+  @Test
+  void validateReference() throws FileNotFoundException {
+    String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+    String referenceFile = ResourceUtils.getFile("classpath:example.fasta.gz").toString();
+
+    CommandLine cmd = mock(CommandLine.class);
+    doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
+    doReturn(false).when(cmd).hasOption(OPT_MAX_RECORDS);
+    doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
+    doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
+    doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
+    doReturn(false).when(cmd).hasOption(OPT_PED);
+    doReturn(true).when(cmd).hasOption(OPT_REFERENCE);
+    doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
+    doReturn(referenceFile).when(cmd).getOptionValue(OPT_REFERENCE);
+
+    AppCommandLineOptions.validateCommandLine(cmd);
+  }
+
+  @Test
+  void validateReferenceNotExists() throws FileNotFoundException {
+    String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+    String referenceFile = "invalid.fasta.gz";
+
+    CommandLine cmd = mock(CommandLine.class);
+    doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
+    doReturn(false).when(cmd).hasOption(OPT_MAX_RECORDS);
+    doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
+    doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
+    doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
+    doReturn(false).when(cmd).hasOption(OPT_PED);
+    doReturn(true).when(cmd).hasOption(OPT_REFERENCE);
+    doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
+    doReturn(referenceFile).when(cmd).getOptionValue(OPT_REFERENCE);
+
+    assertThrows(
+        IllegalArgumentException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
+  }
+
+  @Test
+  void validateReferenceInvalidFileType() throws FileNotFoundException {
+    String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+    String referenceFile = "invalid.fasta";
+
+    CommandLine cmd = mock(CommandLine.class);
+    doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
+    doReturn(false).when(cmd).hasOption(OPT_MAX_RECORDS);
+    doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
+    doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
+    doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
+    doReturn(false).when(cmd).hasOption(OPT_PED);
+    doReturn(true).when(cmd).hasOption(OPT_REFERENCE);
+    doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
+    doReturn(referenceFile).when(cmd).getOptionValue(OPT_REFERENCE);
+
+    assertThrows(
+        IllegalArgumentException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
+  }
+
+  @Test
+  void validateReferenceNoIndex() throws FileNotFoundException {
+    String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+    String referenceFile = ResourceUtils.getFile("classpath:example_no_index.fasta.gz").toString();
+
+    CommandLine cmd = mock(CommandLine.class);
+    doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
+    doReturn(false).when(cmd).hasOption(OPT_MAX_RECORDS);
+    doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
+    doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
+    doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
+    doReturn(false).when(cmd).hasOption(OPT_PED);
+    doReturn(true).when(cmd).hasOption(OPT_REFERENCE);
+    doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
+    doReturn(referenceFile).when(cmd).getOptionValue(OPT_REFERENCE);
+
+    assertThrows(
+        IllegalArgumentException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
   }
 }

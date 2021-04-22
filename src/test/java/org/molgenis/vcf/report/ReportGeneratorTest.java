@@ -5,6 +5,8 @@ import static java.util.Collections.emptyMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.molgenis.vcf.report.model.metadata.HtsFormat.VCF;
 
@@ -19,6 +21,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.molgenis.vcf.report.fasta.ContigInterval;
+import org.molgenis.vcf.report.fasta.FastaSlice;
+import org.molgenis.vcf.report.fasta.VcfFastaSlicer;
+import org.molgenis.vcf.report.fasta.VcfFastaSlicerFactory;
 import org.molgenis.vcf.report.generator.Base85Encoder;
 import org.molgenis.vcf.report.generator.ReportGenerator;
 import org.molgenis.vcf.report.generator.ReportGeneratorSettings;
@@ -45,12 +51,16 @@ class ReportGeneratorTest {
   private HtsJdkToPersonsMapper htsJdkToPersonsMapper;
   @Mock
   private PhenopacketMapper phenopacketMapper;
-  @Mock private PedToSamplesMapper pedToSamplesMapper;
-  @Mock private PersonListMerger personListMerger;
+  @Mock
+  private PedToSamplesMapper pedToSamplesMapper;
+  @Mock
+  private PersonListMerger personListMerger;
   @Mock
   private HtsFileMapper htsFileMapper;
   @Mock
   private Base85Encoder base85Encoder;
+  @Mock
+  private VcfFastaSlicerFactory vcfFastaSlicerFactory;
   private ReportGenerator reportGenerator;
 
   @BeforeEach
@@ -61,7 +71,9 @@ class ReportGeneratorTest {
             phenopacketMapper,
             pedToSamplesMapper,
             personListMerger,
-            htsFileMapper, base85Encoder);
+            htsFileMapper,
+            base85Encoder,
+            vcfFastaSlicerFactory);
   }
 
   @Test
@@ -79,6 +91,7 @@ class ReportGeneratorTest {
     Path inputVcfPath = Paths.get("src", "test", "resources", "example.vcf");
     List<Path> pedPath =
         Collections.singletonList(Paths.get("src", "test", "resources", "example.ped"));
+    Path referencePath = Paths.get("src", "test", "resources", "example.fasta.gz");
 
     Map<String, Sample> pedSampleItems = emptyMap();
     when(pedToSamplesMapper.mapPedFileToPersons(pedPath, 10)).thenReturn(pedSampleItems);
@@ -90,20 +103,26 @@ class ReportGeneratorTest {
     HtsFile htsFile = new HtsFile("test.vcf", VCF, "GRCh38");
     when(htsFileMapper.map(any(), eq(inputVcfPath.toString()))).thenReturn(htsFile);
 
+    VcfFastaSlicer vcfFastaSlicer = mock(VcfFastaSlicer.class);
+    FastaSlice fastaSlice = new FastaSlice(new ContigInterval("1", 2, 3), new byte[]{0});
+    when(vcfFastaSlicer.generate(any(), eq(250))).thenReturn(List.of(fastaSlice));
+    when(vcfFastaSlicerFactory.create(referencePath)).thenReturn(vcfFastaSlicer);
+
     String vcfGzBase85 = "vcfGzBase85";
-    when(base85Encoder.encode(inputVcfPath)).thenReturn(vcfGzBase85);
+    doReturn(vcfGzBase85).when(base85Encoder).encode(inputVcfPath);
 
     String phenotypes = "hpo:123456;omim3456";
     String appName = "MyApp";
     String appVersion = "MyVersion";
     String appArgs = "MyArgs";
     ReportGeneratorSettings reportGeneratorSettings =
-        new ReportGeneratorSettings(appName, appVersion, appArgs, maxNrSamples, maxNrRecords);
+        new ReportGeneratorSettings(appName, appVersion, appArgs, maxNrSamples, maxNrRecords,
+            referencePath);
     Report report =
         new Report(
-            new ReportMetadata(
-                new AppMetadata(appName, appVersion, appArgs), htsFile),
-            new ReportData(sampleItems, phenopacketItems), new Base85(vcfGzBase85));
+            new ReportMetadata(new AppMetadata(appName, appVersion, appArgs), htsFile),
+            new ReportData(sampleItems, phenopacketItems),
+            new Base85(vcfGzBase85, Map.of("1:2-3", "00")));
 
     assertEquals(
         report,
