@@ -119,7 +119,8 @@ public class ReportGenerator {
     } else {
       fastaGzMap = null;
     }
-    Base85 base85 = new Base85(base85Encoder.encode(vcfPath), fastaGzMap);
+    // TODO calculate genesGz
+    Base85 base85 = new Base85(base85Encoder.encode(vcfPath), fastaGzMap, null);
     return new Report(reportMetadata, reportData, base85);
   }
 

@@ -16,4 +16,7 @@ public class Base85 {
 
   @JsonProperty("fastaGz")
   Map<String, String> fastaGz;
+
+  @JsonProperty("genesGz")
+  String genesGz;
 }
