@@ -2,6 +2,7 @@ package org.molgenis.vcf.report;
 
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_DEBUG;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_FORCE;
+import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_GENES;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_INPUT;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_MAX_RECORDS;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_MAX_SAMPLES;
@@ -98,6 +99,14 @@ public class AppCommandLineToSettingsMapper {
       referencePath = null;
     }
 
+    Path genesPath;
+    if (commandLine.hasOption(OPT_GENES)) {
+      String genesPathValue = commandLine.getOptionValue(OPT_GENES);
+      genesPath = Path.of(genesPathValue);
+    } else {
+      genesPath = null;
+    }
+
     boolean overwriteOutput = commandLine.hasOption(OPT_FORCE);
 
     boolean debugMode = commandLine.hasOption(OPT_DEBUG);
@@ -105,7 +114,7 @@ public class AppCommandLineToSettingsMapper {
     String appArgs = String.join(" ", args);
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
-            appName, appVersion, appArgs, maxSamples, maxRecords, referencePath);
+            appName, appVersion, appArgs, maxSamples, maxRecords, referencePath, genesPath);
     ReportWriterSettings reportWriterSettings = new ReportWriterSettings(templatePath, debugMode);
     SampleSettings sampleSettings = new SampleSettings(probandNames, pedPaths, phenotypes);
     return new Settings(

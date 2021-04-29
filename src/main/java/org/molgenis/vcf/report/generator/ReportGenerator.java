@@ -13,6 +13,8 @@ import org.molgenis.vcf.report.fasta.ContigInterval;
 import org.molgenis.vcf.report.fasta.FastaSlice;
 import org.molgenis.vcf.report.fasta.VcfFastaSlicer;
 import org.molgenis.vcf.report.fasta.VcfFastaSlicerFactory;
+import org.molgenis.vcf.report.genes.GenesFilter;
+import org.molgenis.vcf.report.genes.GenesFilterFactory;
 import org.molgenis.vcf.report.mapper.HtsFileMapper;
 import org.molgenis.vcf.report.mapper.HtsJdkToPersonsMapper;
 import org.molgenis.vcf.report.mapper.PedToSamplesMapper;
@@ -39,6 +41,7 @@ public class ReportGenerator {
   private final HtsFileMapper htsFileMapper;
   private final Base85Encoder base85Encoder;
   private final VcfFastaSlicerFactory vcfFastaSlicerFactory;
+  private final GenesFilterFactory genesFilterFactory;
 
   public ReportGenerator(
       HtsJdkToPersonsMapper htsJdkToPersonsMapper,
@@ -47,7 +50,8 @@ public class ReportGenerator {
       PersonListMerger personListMerger,
       HtsFileMapper htsFileMapper,
       Base85Encoder base85Encoder,
-      VcfFastaSlicerFactory vcfFastaSlicerFactory) {
+      VcfFastaSlicerFactory vcfFastaSlicerFactory,
+      GenesFilterFactory genesFilterFactory) {
     this.htsJdkToPersonsMapper = requireNonNull(htsJdkToPersonsMapper);
     this.phenopacketMapper = requireNonNull(phenopacketMapper);
     this.pedToSamplesMapper = requireNonNull(pedToSamplesMapper);
@@ -55,6 +59,7 @@ public class ReportGenerator {
     this.htsFileMapper = requireNonNull(htsFileMapper);
     this.base85Encoder = requireNonNull(base85Encoder);
     this.vcfFastaSlicerFactory = requireNonNull(vcfFastaSlicerFactory);
+    this.genesFilterFactory = requireNonNull(genesFilterFactory);
   }
 
   public Report generateReport(
@@ -119,8 +124,18 @@ public class ReportGenerator {
     } else {
       fastaGzMap = null;
     }
-    // TODO calculate genesGz
-    Base85 base85 = new Base85(base85Encoder.encode(vcfPath), fastaGzMap, null);
+
+    Path genesPath = reportGeneratorSettings.getGenesPath();
+    String genesGz;
+    if (genesPath != null) {
+      GenesFilter genesFilter = genesFilterFactory.create(genesPath);
+      genesGz = org.molgenis.vcf.report.utils.Base85.getRfc1924Encoder()
+          .encodeToString((genesFilter.filter(vcfFileReader, 250)));
+    } else {
+      genesGz = null;
+    }
+
+    Base85 base85 = new Base85(base85Encoder.encode(vcfPath), fastaGzMap, genesGz);
     return new Report(reportMetadata, reportData, base85);
   }
 

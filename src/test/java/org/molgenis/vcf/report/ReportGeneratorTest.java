@@ -29,6 +29,7 @@ import org.molgenis.vcf.report.generator.Base85Encoder;
 import org.molgenis.vcf.report.generator.ReportGenerator;
 import org.molgenis.vcf.report.generator.ReportGeneratorSettings;
 import org.molgenis.vcf.report.generator.SampleSettings;
+import org.molgenis.vcf.report.genes.GenesFilterFactory;
 import org.molgenis.vcf.report.mapper.HtsFileMapper;
 import org.molgenis.vcf.report.mapper.HtsJdkToPersonsMapper;
 import org.molgenis.vcf.report.mapper.PedToSamplesMapper;
@@ -61,6 +62,8 @@ class ReportGeneratorTest {
   private Base85Encoder base85Encoder;
   @Mock
   private VcfFastaSlicerFactory vcfFastaSlicerFactory;
+  @Mock
+  private GenesFilterFactory genesFilterFactory;
   private ReportGenerator reportGenerator;
 
   @BeforeEach
@@ -73,7 +76,8 @@ class ReportGeneratorTest {
             personListMerger,
             htsFileMapper,
             base85Encoder,
-            vcfFastaSlicerFactory);
+            vcfFastaSlicerFactory,
+            genesFilterFactory);
   }
 
   @Test
@@ -117,12 +121,12 @@ class ReportGeneratorTest {
     String appArgs = "MyArgs";
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(appName, appVersion, appArgs, maxNrSamples, maxNrRecords,
-            referencePath);
+            referencePath, null);
     Report report =
         new Report(
             new ReportMetadata(new AppMetadata(appName, appVersion, appArgs), htsFile),
             new ReportData(sampleItems, phenopacketItems),
-            new Base85(vcfGzBase85, Map.of("1:2-3", "00")));
+            new Base85(vcfGzBase85, Map.of("1:2-3", "00"), null));
 
     assertEquals(
         report,
