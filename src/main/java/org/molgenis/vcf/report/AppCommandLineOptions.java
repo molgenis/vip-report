@@ -41,6 +41,8 @@ class AppCommandLineOptions {
   static final String OPT_DEBUG_LONG = "debug";
   static final String OPT_VERSION = "v";
   static final String OPT_VERSION_LONG = "version";
+  static final String OPT_GENES = "g";
+  static final String OPT_GENES_LONG = "genes";
   private static final Options APP_OPTIONS;
   private static final Options APP_VERSION_OPTIONS;
 
@@ -114,9 +116,15 @@ class AppCommandLineOptions {
             .desc("Reference sequence file (.fasta.gz, .fna.gz, .ffn.gz, .faa.gz or .frn.gz).")
             .build());
     appOptions.addOption(
+        Option.builder(OPT_GENES)
+            .hasArg(true)
+            .longOpt(OPT_GENES_LONG)
+            .desc("Genes file to be used as reference track in the genome browser, UCSC NCBI RefSeq format (.txt.gz).")
+            .build());
+    appOptions.addOption(
         Option.builder(OPT_DEBUG)
             .longOpt(OPT_DEBUG_LONG)
-            .desc("Enable debug mode (additional logging and pretty printed report.")
+            .desc("Enable debug mode (additional logging and pretty printed report).")
             .build());
     APP_OPTIONS = appOptions;
     Options appVersionOptions = new Options();
@@ -149,6 +157,7 @@ class AppCommandLineOptions {
     validateMaxRecords(commandLine);
     validateMaxSamples(commandLine);
     validateReference(commandLine);
+    validateGenes(commandLine);
   }
 
   static void validateReference(CommandLine commandLine) {
@@ -171,12 +180,28 @@ class AppCommandLineOptions {
               referencePathStr));
     }
 
+
     Path referenceIndexPath = Path.of(optionValue + ".fai");
     validateFilePath(referenceIndexPath, "Reference .fai");
 
     Path referenceGzipIndexPath = Path.of(optionValue + ".gzi");
     validateFilePath(referenceGzipIndexPath, "Reference .gzi");
   }
+
+  static void validateGenes(CommandLine commandLine) {
+    if (!commandLine.hasOption(OPT_GENES)) {
+      return;
+    }
+
+    String optionValue = commandLine.getOptionValue(OPT_GENES);
+    Path genesPath = Path.of(optionValue);
+    validateFilePath(genesPath, "Genes");
+
+    String genesPathStr = genesPath.toString();
+    if (!genesPathStr.endsWith(".txt.gz")) {
+      throw new IllegalArgumentException(format("Input file '%s' is not a .txt.gz", genesPathStr));
+    }
+    }
 
   private static void validateMaxSamples(CommandLine commandLine) {
     validateInteger(commandLine, OPT_MAX_SAMPLES);

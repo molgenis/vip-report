@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_FORCE;
+import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_GENES;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_INPUT;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_MAX_RECORDS;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_MAX_SAMPLES;
@@ -480,6 +481,26 @@ class AppCommandLineOptionsTest {
 
     assertThrows(
         InvalidIntegerException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
+  }
+
+  @Test
+  void validateGenes() throws FileNotFoundException {
+    String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+    String genesFile = ResourceUtils.getFile("classpath:exampleGene.txt.gz").toString();
+
+    CommandLine cmd = mock(CommandLine.class);
+    doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
+    doReturn(false).when(cmd).hasOption(OPT_MAX_RECORDS);
+    doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
+    doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
+    doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
+    doReturn(false).when(cmd).hasOption(OPT_PED);
+    doReturn(false).when(cmd).hasOption(OPT_REFERENCE);
+    doReturn(true).when(cmd).hasOption(OPT_GENES);
+    doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
+    doReturn(genesFile).when(cmd).getOptionValue(OPT_GENES);
+
+    AppCommandLineOptions.validateCommandLine(cmd);
   }
 
   @Test

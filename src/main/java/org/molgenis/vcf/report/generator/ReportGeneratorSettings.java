@@ -16,4 +16,5 @@ public class ReportGeneratorSettings {
   int maxNrSamples;
   int maxNrRecords;
   Path referencePath;
+  Path genesPath;
 }

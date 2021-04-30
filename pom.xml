@@ -43,8 +43,9 @@
     <samtools.htsjdk.version>2.21.3</samtools.htsjdk.version>
     <download-maven-plugin.version>1.6.0</download-maven-plugin.version>
     <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
-    <vip.report.template.version>2.1.0</vip.report.template.version>
+    <vip.report.template.version>2.2.1</vip.report.template.version>
     <phenopackets.version>1.0.0</phenopackets.version>
+    <opencsv.version>5.2</opencsv.version>
   </properties>
 
   <profiles>
@@ -93,6 +94,11 @@
         <artifactId>junit-jupiter-engine</artifactId>
         <version>${junit-jupiter.version}</version>
       </dependency>
+      <dependency>
+        <groupId>com.opencsv</groupId>
+        <artifactId>opencsv</artifactId>
+        <version>${opencsv.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -117,6 +123,10 @@
     <dependency>
       <groupId>com.github.samtools</groupId>
       <artifactId>htsjdk</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.opencsv</groupId>
+      <artifactId>opencsv</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
