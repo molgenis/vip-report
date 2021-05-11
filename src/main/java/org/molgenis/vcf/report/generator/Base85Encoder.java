@@ -17,6 +17,10 @@ public class Base85Encoder {
 
   public String encode(Path path) {
     byte[] bytes = binaryEncoder.encode(path);
+    return encode(bytes);
+  }
+
+  public String encode(byte[] bytes) {
     return Base85.getRfc1924Encoder().encodeToString(bytes);
   }
 }
