@@ -9,6 +9,8 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.molgenis.vcf.report.bam.BamSlice;
+import org.molgenis.vcf.report.bam.VcfBamSlicerFactory;
 import org.molgenis.vcf.report.fasta.ContigInterval;
 import org.molgenis.vcf.report.fasta.FastaSlice;
 import org.molgenis.vcf.report.fasta.VcfFastaSlicer;
@@ -42,6 +44,7 @@ public class ReportGenerator {
   private final Base85Encoder base85Encoder;
   private final VcfFastaSlicerFactory vcfFastaSlicerFactory;
   private final GenesFilterFactory genesFilterFactory;
+  private final VcfBamSlicerFactory vcfBamSlicerFactory;
 
   public ReportGenerator(
       HtsJdkToPersonsMapper htsJdkToPersonsMapper,
@@ -51,7 +54,8 @@ public class ReportGenerator {
       HtsFileMapper htsFileMapper,
       Base85Encoder base85Encoder,
       VcfFastaSlicerFactory vcfFastaSlicerFactory,
-      GenesFilterFactory genesFilterFactory) {
+      GenesFilterFactory genesFilterFactory,
+      VcfBamSlicerFactory vcfBamSlicerFactory) {
     this.htsJdkToPersonsMapper = requireNonNull(htsJdkToPersonsMapper);
     this.phenopacketMapper = requireNonNull(phenopacketMapper);
     this.pedToSamplesMapper = requireNonNull(pedToSamplesMapper);
@@ -60,6 +64,7 @@ public class ReportGenerator {
     this.base85Encoder = requireNonNull(base85Encoder);
     this.vcfFastaSlicerFactory = requireNonNull(vcfFastaSlicerFactory);
     this.genesFilterFactory = requireNonNull(genesFilterFactory);
+    this.vcfBamSlicerFactory = requireNonNull(vcfBamSlicerFactory);
   }
 
   public Report generateReport(
@@ -129,13 +134,24 @@ public class ReportGenerator {
     String genesGz;
     if (genesPath != null) {
       GenesFilter genesFilter = genesFilterFactory.create(genesPath);
-      genesGz = org.molgenis.vcf.report.utils.Base85.getRfc1924Encoder()
-          .encodeToString((genesFilter.filter(vcfFileReader, 250)));
+      genesGz =
+          org.molgenis.vcf.report.utils.Base85.getRfc1924Encoder()
+              .encodeToString((genesFilter.filter(vcfFileReader, 250)));
     } else {
       genesGz = null;
     }
 
-    Base85 base85 = new Base85(base85Encoder.encode(vcfPath), fastaGzMap, genesGz);
+    Map<String, String> bamMap = new LinkedHashMap<>();
+    sampleSettings
+        .getBamPaths()
+        .forEach(
+            (sampleId, bamPath) -> {
+              BamSlice bamSlice =
+                  vcfBamSlicerFactory.create(bamPath).generate(vcfFileReader, 250, sampleId);
+              bamMap.put(sampleId, base85Encoder.encode(bamSlice.getBam()));
+            });
+
+    Base85 base85 = new Base85(base85Encoder.encode(vcfPath), fastaGzMap, genesGz, bamMap);
     return new Report(reportMetadata, reportData, base85);
   }
 

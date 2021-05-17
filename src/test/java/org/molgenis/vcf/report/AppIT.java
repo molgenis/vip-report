@@ -30,21 +30,24 @@ class AppIT {
     String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
     String probands = "NA00001";
     String phenotypes = "Jimmy/HP:123456,Unknown/test:Headache,Jane/OMIM:23456";
+    String bamFile = ResourceUtils.getFile("classpath:example.bam").toString();
 
     String[] args = {
-        "-i",
-        inputFile,
-        "-o",
-        outputFile,
-        "-t",
-        templateFile,
-        "-pb",
-        probands,
-        "-pd",
-        pedFiles,
-        "-ph",
-        phenotypes,
-        "-d"
+      "-i",
+      inputFile,
+      "-o",
+      outputFile,
+      "-t",
+      templateFile,
+      "-pb",
+      probands,
+      "-pd",
+      pedFiles,
+      "-ph",
+      phenotypes,
+      "-d",
+      "-b",
+      "NA00001=" + bamFile
     };
     SpringApplication.run(App.class, args);
 
@@ -56,7 +59,8 @@ class AppIT {
             .replace("{{ inputPath }}", inputFile.replace("\\", "\\\\"))
             .replace("{{ pedPaths }}", pedFiles.replace("\\", "\\\\"))
             .replace("{{ outputPath }}", outputFile.replace("\\", "\\\\"))
-            .replace("{{ templatePath }}", templateFile.replace("\\", "\\\\"));
+            .replace("{{ templatePath }}", templateFile.replace("\\", "\\\\"))
+            .replace("{{ bamPath }}", bamFile.replace("\\", "\\\\"));
 
     // check the report api value with JSONAssert
     String actualApi = getElementValue(report, "script");
@@ -65,10 +69,22 @@ class AppIT {
     assertAll(
         () ->
             JSONAssert.assertEquals(
-                expectedApi.replace("window.api = ", "").replaceAll("\"vcfGz\" : \".*?\"",
-                    "\"vcfGz\" : \"data_that_differs_per_os_due_to_gzip\""),
-                actualApi.replace("window.api = ", "").replaceAll("\"vcfGz\" : \".*?\"",
-                    "\"vcfGz\" : \"data_that_differs_per_os_due_to_gzip\""),
+                expectedApi
+                    .replace("window.api = ", "")
+                    .replaceAll(
+                        "\"vcfGz\" : \".*?\"",
+                        "\"vcfGz\" : \"data_that_differs_per_os_due_to_gzip\"")
+                    .replaceAll(
+                        "\"NA00001\" : \".*?\"",
+                        "\"NA00001\" : \"data_that_differs_per_os_due_to_gzip\""),
+                actualApi
+                    .replace("window.api = ", "")
+                    .replaceAll(
+                        "\"vcfGz\" : \".*?\"",
+                        "\"vcfGz\" : \"data_that_differs_per_os_due_to_gzip\"")
+                    .replaceAll(
+                        "\"NA00001\" : \".*?\"",
+                        "\"NA00001\" : \"data_that_differs_per_os_due_to_gzip\""),
                 true),
         // check the rest of the report
         () ->

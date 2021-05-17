@@ -11,27 +11,39 @@ import org.springframework.stereotype.Component;
 public class VcfIntervalCalculator {
 
   public List<ContigInterval> calculate(Iterable<VariantContext> variantContexts, int flanking) {
-    Map<String, List<ContigInterval>> intervalMap = computeIntervalMap(variantContexts, flanking);
+    return calculate(variantContexts, flanking, null);
+  }
+
+  public List<ContigInterval> calculate(
+      Iterable<VariantContext> variantContexts, int flanking, String sampleId) {
+    Map<String, List<ContigInterval>> intervalMap =
+        computeIntervalMap(variantContexts, flanking, sampleId);
     List<ContigInterval> intervals = new ArrayList<>();
     intervalMap.forEach((key, value) -> intervals.addAll(mergeIntervals(value)));
     return intervals;
   }
 
   private static Map<String, List<ContigInterval>> computeIntervalMap(
-      Iterable<VariantContext> variantContexts, int flanking) {
+      Iterable<VariantContext> variantContexts, int flanking, String sampleId) {
     Map<String, List<ContigInterval>> intervalMap = new LinkedHashMap<>();
     for (VariantContext variantContext : variantContexts) {
-      String contig = variantContext.getContig();
-      int pos = variantContext.getStart();
-      ContigInterval contigInterval = new ContigInterval(contig, pos - flanking, pos + flanking);
-      intervalMap.computeIfAbsent(contig, k -> new ArrayList<>()).add(contigInterval);
+      if (includeVariantContext(sampleId, variantContext)) {
+        String contig = variantContext.getContig();
+        int pos = variantContext.getStart();
+        ContigInterval contigInterval = new ContigInterval(contig, pos - flanking, pos + flanking);
+        intervalMap.computeIfAbsent(contig, k -> new ArrayList<>()).add(contigInterval);
+      }
     }
     return intervalMap;
   }
 
-  /**
-   * package-private for testability
-   */
+  private static boolean includeVariantContext(String sampleId, VariantContext variantContext) {
+    return sampleId == null
+        || (variantContext.hasGenotype(sampleId)
+            && variantContext.getGenotype(sampleId).isCalled());
+  }
+
+  /** package-private for testability */
   static List<ContigInterval> mergeIntervals(List<ContigInterval> intervals) {
     List<ContigInterval> mergedIntervals = new ArrayList<>();
     if (intervals.size() < 2) {

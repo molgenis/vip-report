@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.molgenis.vcf.report.bam.VcfBamSlicerFactory;
 import org.molgenis.vcf.report.fasta.ContigInterval;
 import org.molgenis.vcf.report.fasta.FastaSlice;
 import org.molgenis.vcf.report.fasta.VcfFastaSlicer;
@@ -48,22 +49,15 @@ import org.molgenis.vcf.report.utils.PersonListMerger;
 @ExtendWith(MockitoExtension.class)
 class ReportGeneratorTest {
 
-  @Mock
-  private HtsJdkToPersonsMapper htsJdkToPersonsMapper;
-  @Mock
-  private PhenopacketMapper phenopacketMapper;
-  @Mock
-  private PedToSamplesMapper pedToSamplesMapper;
-  @Mock
-  private PersonListMerger personListMerger;
-  @Mock
-  private HtsFileMapper htsFileMapper;
-  @Mock
-  private Base85Encoder base85Encoder;
-  @Mock
-  private VcfFastaSlicerFactory vcfFastaSlicerFactory;
-  @Mock
-  private GenesFilterFactory genesFilterFactory;
+  @Mock private HtsJdkToPersonsMapper htsJdkToPersonsMapper;
+  @Mock private PhenopacketMapper phenopacketMapper;
+  @Mock private PedToSamplesMapper pedToSamplesMapper;
+  @Mock private PersonListMerger personListMerger;
+  @Mock private HtsFileMapper htsFileMapper;
+  @Mock private Base85Encoder base85Encoder;
+  @Mock private VcfFastaSlicerFactory vcfFastaSlicerFactory;
+  @Mock private GenesFilterFactory genesFilterFactory;
+  @Mock private VcfBamSlicerFactory vcfBamSlicerFactory;
   private ReportGenerator reportGenerator;
 
   @BeforeEach
@@ -77,7 +71,8 @@ class ReportGeneratorTest {
             htsFileMapper,
             base85Encoder,
             vcfFastaSlicerFactory,
-            genesFilterFactory);
+            genesFilterFactory,
+            vcfBamSlicerFactory);
   }
 
   @Test
@@ -108,7 +103,7 @@ class ReportGeneratorTest {
     when(htsFileMapper.map(any(), eq(inputVcfPath.toString()))).thenReturn(htsFile);
 
     VcfFastaSlicer vcfFastaSlicer = mock(VcfFastaSlicer.class);
-    FastaSlice fastaSlice = new FastaSlice(new ContigInterval("1", 2, 3), new byte[]{0});
+    FastaSlice fastaSlice = new FastaSlice(new ContigInterval("1", 2, 3), new byte[] {0});
     when(vcfFastaSlicer.generate(any(), eq(250))).thenReturn(List.of(fastaSlice));
     when(vcfFastaSlicerFactory.create(referencePath)).thenReturn(vcfFastaSlicer);
 
@@ -120,19 +115,19 @@ class ReportGeneratorTest {
     String appVersion = "MyVersion";
     String appArgs = "MyArgs";
     ReportGeneratorSettings reportGeneratorSettings =
-        new ReportGeneratorSettings(appName, appVersion, appArgs, maxNrSamples, maxNrRecords,
-            referencePath, null);
+        new ReportGeneratorSettings(
+            appName, appVersion, appArgs, maxNrSamples, maxNrRecords, referencePath, null);
     Report report =
         new Report(
             new ReportMetadata(new AppMetadata(appName, appVersion, appArgs), htsFile),
             new ReportData(sampleItems, phenopacketItems),
-            new Base85(vcfGzBase85, Map.of("1:2-3", "00"), null));
+            new Base85(vcfGzBase85, Map.of("1:2-3", "00"), null, Map.of()));
 
     assertEquals(
         report,
         reportGenerator.generateReport(
             inputVcfPath,
-            new SampleSettings(emptyList(), pedPath, phenotypes),
+            new SampleSettings(emptyList(), pedPath, phenotypes, Map.of()),
             reportGeneratorSettings));
   }
 }

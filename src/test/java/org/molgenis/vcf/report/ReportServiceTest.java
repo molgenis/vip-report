@@ -7,6 +7,7 @@ import static org.molgenis.vcf.report.model.metadata.HtsFormat.VCF;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -55,16 +56,18 @@ class ReportServiceTest {
                 new AppMetadata(appName, appVersion, appArguments),
                 new HtsFile(inputVcfPath.toString(), VCF, "UNKNOWN")),
             new ReportData(new Items<>(emptyList(), 0), new Items<>(emptyList(), 0)),
-            new Base85("str", null, null));
+            new Base85("str", null, null, Map.of()));
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
             appName,
             appVersion,
             appArguments,
             ReportGeneratorSettings.DEFAULT_MAX_NR_SAMPLES,
-            ReportGeneratorSettings.DEFAULT_MAX_NR_RECORDS, null, null);
+            ReportGeneratorSettings.DEFAULT_MAX_NR_RECORDS,
+            null,
+            null);
     ReportWriterSettings reportWriterSettings = new ReportWriterSettings(null, true);
-    SampleSettings sampleSettings = new SampleSettings(null, null, null);
+    SampleSettings sampleSettings = new SampleSettings(null, null, null, Map.of());
     Settings settings =
         new Settings(
             inputVcfPath,

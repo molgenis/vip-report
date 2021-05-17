@@ -13,6 +13,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.molgenis.vcf.report.generator.ReportGeneratorSettings;
+import org.molgenis.vcf.report.utils.InvalidSampleBamException;
 import org.molgenis.vcf.report.utils.InvalidSamplePhenotypesException;
 
 class AppCommandLineOptions {
@@ -43,6 +44,8 @@ class AppCommandLineOptions {
   static final String OPT_VERSION_LONG = "version";
   static final String OPT_GENES = "g";
   static final String OPT_GENES_LONG = "genes";
+  static final String OPT_BAM = "b";
+  static final String OPT_BAM_LONG = "bam";
   private static final Options APP_OPTIONS;
   private static final Options APP_VERSION_OPTIONS;
 
@@ -119,7 +122,15 @@ class AppCommandLineOptions {
         Option.builder(OPT_GENES)
             .hasArg(true)
             .longOpt(OPT_GENES_LONG)
-            .desc("Genes file to be used as reference track in the genome browser, UCSC NCBI RefSeq format (.txt.gz).")
+            .desc(
+                "Genes file to be used as reference track in the genome browser, UCSC NCBI RefSeq format (.txt.gz).")
+            .build());
+    appOptions.addOption(
+        Option.builder(OPT_BAM)
+            .hasArg(true)
+            .longOpt(OPT_BAM_LONG)
+            .desc(
+                "Comma-separated list of sample-bam files (e.g. sample0=/path/to/0.bam,sample1=/path/to/1.bam).")
             .build());
     appOptions.addOption(
         Option.builder(OPT_DEBUG)
@@ -158,6 +169,7 @@ class AppCommandLineOptions {
     validateMaxSamples(commandLine);
     validateReference(commandLine);
     validateGenes(commandLine);
+    validateBam(commandLine);
   }
 
   static void validateReference(CommandLine commandLine) {
@@ -176,10 +188,10 @@ class AppCommandLineOptions {
         && !referencePathStr.endsWith(".faa.gz")
         && !referencePathStr.endsWith(".frn.gz")) {
       throw new IllegalArgumentException(
-          format("Input file '%s' is not a .fasta.gz, .fna.gz, .fnn.gz, .faa.gz or .frn.gz file.",
+          format(
+              "Input file '%s' is not a .fasta.gz, .fna.gz, .fnn.gz, .faa.gz or .frn.gz file.",
               referencePathStr));
     }
-
 
     Path referenceIndexPath = Path.of(optionValue + ".fai");
     validateFilePath(referenceIndexPath, "Reference .fai");
@@ -201,7 +213,32 @@ class AppCommandLineOptions {
     if (!genesPathStr.endsWith(".txt.gz")) {
       throw new IllegalArgumentException(format("Input file '%s' is not a .txt.gz", genesPathStr));
     }
+  }
+
+  private static void validateBam(CommandLine commandLine) {
+    if (!commandLine.hasOption(OPT_BAM)) {
+      return;
     }
+
+    String bamString = commandLine.getOptionValue(OPT_BAM);
+    for (String sampleBamString : bamString.split(",")) {
+      String[] tokens = sampleBamString.split("=");
+      if (tokens.length != 2) {
+        throw new InvalidSampleBamException(sampleBamString);
+      }
+
+      String bamPathStr = tokens[1];
+      if (!bamPathStr.endsWith(".bam")) {
+        throw new IllegalArgumentException(
+            format("Input file '%s' is not a .bam file.", bamPathStr));
+      }
+
+      validateFilePath(Path.of(bamPathStr), "bam");
+
+      Path bamIndexPath = Path.of(bamPathStr + ".bai");
+      validateFilePath(bamIndexPath, "Bam .bai");
+    }
+  }
 
   private static void validateMaxSamples(CommandLine commandLine) {
     validateInteger(commandLine, OPT_MAX_SAMPLES);

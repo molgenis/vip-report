@@ -1,5 +1,6 @@
 package org.molgenis.vcf.report;
 
+import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_BAM;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_DEBUG;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_FORCE;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_GENES;
@@ -16,7 +17,9 @@ import static org.molgenis.vcf.report.utils.PathUtils.parsePaths;
 
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.cli.CommandLine;
 import org.molgenis.vcf.report.generator.ReportGeneratorSettings;
 import org.molgenis.vcf.report.generator.ReportWriterSettings;
@@ -107,6 +110,14 @@ public class AppCommandLineToSettingsMapper {
       genesPath = null;
     }
 
+    Map<String, Path> bamPaths;
+    if (commandLine.hasOption(OPT_BAM)) {
+      String bamPathValue = commandLine.getOptionValue(OPT_BAM);
+      bamPaths = toBamPaths(bamPathValue);
+    } else {
+      bamPaths = Map.of();
+    }
+
     boolean overwriteOutput = commandLine.hasOption(OPT_FORCE);
 
     boolean debugMode = commandLine.hasOption(OPT_DEBUG);
@@ -116,7 +127,8 @@ public class AppCommandLineToSettingsMapper {
         new ReportGeneratorSettings(
             appName, appVersion, appArgs, maxSamples, maxRecords, referencePath, genesPath);
     ReportWriterSettings reportWriterSettings = new ReportWriterSettings(templatePath, debugMode);
-    SampleSettings sampleSettings = new SampleSettings(probandNames, pedPaths, phenotypes);
+    SampleSettings sampleSettings =
+        new SampleSettings(probandNames, pedPaths, phenotypes, bamPaths);
     return new Settings(
         inputPath,
         reportGeneratorSettings,
@@ -124,5 +136,17 @@ public class AppCommandLineToSettingsMapper {
         overwriteOutput,
         reportWriterSettings,
         sampleSettings);
+  }
+
+  private Map<String, Path> toBamPaths(String bamPathValue) {
+    Map<String, Path> bamPaths = new LinkedHashMap<>();
+    String[] tokens = bamPathValue.split(",");
+    for (String token : tokens) {
+      int idx = token.indexOf("=");
+      String sampleId = token.substring(0, idx);
+      Path bamPath = Path.of(token.substring(idx + 1));
+      bamPaths.put(sampleId, bamPath);
+    }
+    return bamPaths;
   }
 }

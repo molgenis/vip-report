@@ -19,4 +19,7 @@ public class Base85 {
 
   @JsonProperty("genesGz")
   String genesGz;
+
+  @JsonProperty("bam")
+  Map<String, String> bam;
 }

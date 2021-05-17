@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_BAM;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_FORCE;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_GENES;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_INPUT;
@@ -23,6 +24,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.molgenis.vcf.report.mapper.IllegalPhenotypeArgumentException;
+import org.molgenis.vcf.report.utils.InvalidSampleBamException;
 import org.molgenis.vcf.report.utils.InvalidSamplePhenotypesException;
 import org.springframework.util.ResourceUtils;
 
@@ -115,7 +117,7 @@ class AppCommandLineOptionsTest {
   }
 
   @Test
-  void validateCommandLineOuputDir() throws FileNotFoundException {
+  void validateCommandLineOutputDir() throws FileNotFoundException {
     String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
     String outputFile = sharedTempDir.toString();
 
@@ -578,6 +580,53 @@ class AppCommandLineOptionsTest {
     doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
     doReturn(referenceFile).when(cmd).getOptionValue(OPT_REFERENCE);
 
+    assertThrows(
+        IllegalArgumentException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
+  }
+
+  private CommandLine validateBamInit(String bamPathString) throws FileNotFoundException {
+    String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+
+    CommandLine cmd = mock(CommandLine.class);
+    doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
+    doReturn(false).when(cmd).hasOption(OPT_MAX_RECORDS);
+    doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
+    doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
+    doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
+    doReturn(false).when(cmd).hasOption(OPT_PED);
+    doReturn(false).when(cmd).hasOption(OPT_REFERENCE);
+    doReturn(false).when(cmd).hasOption(OPT_GENES);
+    doReturn(true).when(cmd).hasOption(OPT_BAM);
+    doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
+    doReturn(bamPathString).when(cmd).getOptionValue(OPT_BAM);
+
+    return cmd;
+  }
+
+  @Test
+  void validateBamInvalidValue() throws FileNotFoundException {
+    CommandLine cmd = validateBamInit("my.bam");
+    assertThrows(
+        InvalidSampleBamException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
+  }
+
+  @Test
+  void validateBamInvalidFileTypeValue() throws FileNotFoundException {
+    CommandLine cmd = validateBamInit("sample0=invalid.cram");
+    assertThrows(
+        IllegalArgumentException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
+  }
+
+  @Test
+  void validateBamInvalidFileTypeValueNoIndex() throws FileNotFoundException {
+    CommandLine cmd = validateBamInit("sample0=example_no_index.bam");
+    assertThrows(
+        IllegalArgumentException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
+  }
+
+  @Test
+  void validateBamNotExists() throws FileNotFoundException {
+    CommandLine cmd = validateBamInit("sample0=invalid.bam");
     assertThrows(
         IllegalArgumentException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
   }

@@ -8,7 +8,7 @@
     "app": {
       "name": "vcf-report-test",
       "version": "test-version",
-      'args': '-i {{ inputPath }} -o {{ outputPath }} -t {{ templatePath }} -pb NA00001 -pd {{ pedPaths }} -ph Jimmy/HP:123456,Unknown/test:Headache,Jane/OMIM:23456 -d'
+      'args': '-i {{ inputPath }} -o {{ outputPath }} -t {{ templatePath }} -pb NA00001 -pd {{ pedPaths }} -ph Jimmy/HP:123456,Unknown/test:Headache,Jane/OMIM:23456 -d -b NA00001={{ bamPath }}'
     },
     "htsFile": {
       "htsFormat": "VCF",
@@ -145,7 +145,10 @@
     }
   },
   'base85': {
-    'vcfGz': 'data_that_differs_per_os_due_to_gzip'
+    'vcfGz': 'data_that_differs_per_os_due_to_gzip',
+    'bam': {
+      'NA00001': 'data_that_differs_per_os_due_to_gzip'
+    }
   }
 }</script></head>
 <body>
