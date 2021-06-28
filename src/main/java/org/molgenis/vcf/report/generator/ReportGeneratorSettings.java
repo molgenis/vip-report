@@ -17,4 +17,5 @@ public class ReportGeneratorSettings {
   int maxNrRecords;
   Path referencePath;
   Path genesPath;
+  Path decisionTreePath;
 }

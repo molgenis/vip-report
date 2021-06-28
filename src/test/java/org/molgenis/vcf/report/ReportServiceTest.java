@@ -63,9 +63,7 @@ class ReportServiceTest {
             appVersion,
             appArguments,
             ReportGeneratorSettings.DEFAULT_MAX_NR_SAMPLES,
-            ReportGeneratorSettings.DEFAULT_MAX_NR_RECORDS,
-            null,
-            null);
+            ReportGeneratorSettings.DEFAULT_MAX_NR_RECORDS, null, null, null);
     ReportWriterSettings reportWriterSettings = new ReportWriterSettings(null, true);
     SampleSettings sampleSettings = new SampleSettings(null, null, null, Map.of());
     Settings settings =
