@@ -1,5 +1,6 @@
 package org.molgenis.vcf.report;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
@@ -15,6 +16,7 @@ import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_PED;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_PHENOTYPES;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_REFERENCE;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_TEMPLATE;
+import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_TREE;
 
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
@@ -627,6 +629,48 @@ class AppCommandLineOptionsTest {
   @Test
   void validateBamNotExists() throws FileNotFoundException {
     CommandLine cmd = validateBamInit("sample0=invalid.bam");
+    assertThrows(
+        IllegalArgumentException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
+  }
+
+  private CommandLine validateTreeInit(String treePathString) throws FileNotFoundException {
+    String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+
+    CommandLine cmd = mock(CommandLine.class);
+    doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
+    doReturn(false).when(cmd).hasOption(OPT_MAX_RECORDS);
+    doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
+    doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
+    doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
+    doReturn(false).when(cmd).hasOption(OPT_PED);
+    doReturn(false).when(cmd).hasOption(OPT_REFERENCE);
+    doReturn(false).when(cmd).hasOption(OPT_GENES);
+    doReturn(false).when(cmd).hasOption(OPT_BAM);
+    doReturn(true).when(cmd).hasOption(OPT_TREE);
+    doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
+    doReturn(treePathString).when(cmd).getOptionValue(OPT_TREE);
+
+    return cmd;
+  }
+
+  @Test
+  void validateTreeValidValue() throws FileNotFoundException {
+    String treePath = ResourceUtils.getFile("classpath:tree.json").toString();
+    CommandLine cmd = validateTreeInit(treePath);
+    assertDoesNotThrow(() -> AppCommandLineOptions.validateCommandLine(cmd));
+  }
+
+  @Test
+  void validateTreeInvalidFileTypeValue() throws FileNotFoundException {
+    String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+    CommandLine cmd = validateTreeInit(inputFile);
+    assertThrows(
+        IllegalArgumentException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
+  }
+
+  @Test
+  void validateTreeNotExists() throws FileNotFoundException {
+    CommandLine cmd = validateTreeInit("non_exisitent.json");
     assertThrows(
         IllegalArgumentException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
   }
