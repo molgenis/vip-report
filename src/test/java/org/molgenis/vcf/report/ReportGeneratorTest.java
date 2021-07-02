@@ -123,13 +123,12 @@ class ReportGeneratorTest {
             referencePath, null, treePath);
     String expectedTree = "treeBase85";
         new ReportGeneratorSettings(
-            appName, appVersion, appArgs, maxNrSamples, maxNrRecords, referencePath, null);
+            appName, appVersion, appArgs, maxNrSamples, maxNrRecords, referencePath, null, null);
     Report report =
         new Report(
             new ReportMetadata(new AppMetadata(appName, appVersion, appArgs), htsFile),
             new ReportData(sampleItems, phenopacketItems),
-            new Base85(vcfGzBase85, Map.of("1:2-3", "00"), null, Map.of()));
-            new Base85(vcfGzBase85, Map.of("1:2-3", "00"), null, expectedTree));
+            new Base85(vcfGzBase85, Map.of("1:2-3", "00"), null, Map.of(), expectedTree));
 
     assertEquals(
         report,
