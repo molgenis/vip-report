@@ -88,6 +88,7 @@ class ReportGeneratorTest {
     when(phenopacketMapper.mapPhenotypes(any(), any())).thenReturn(phenopacketItems);
 
     Path inputVcfPath = Paths.get("src", "test", "resources", "example.vcf");
+    Path treePath = Paths.get("src", "test", "resources", "tree.json");
     List<Path> pedPath =
         Collections.singletonList(Paths.get("src", "test", "resources", "example.ped"));
     Path referencePath = Paths.get("src", "test", "resources", "example.fasta.gz");
@@ -110,18 +111,24 @@ class ReportGeneratorTest {
     String vcfGzBase85 = "vcfGzBase85";
     doReturn(vcfGzBase85).when(base85Encoder).encode(inputVcfPath);
 
+    String treeBase85 = "treeBase85";
+    doReturn(treeBase85).when(base85Encoder).encode(treePath);
+
     String phenotypes = "hpo:123456;omim3456";
     String appName = "MyApp";
     String appVersion = "MyVersion";
     String appArgs = "MyArgs";
     ReportGeneratorSettings reportGeneratorSettings =
+        new ReportGeneratorSettings(appName, appVersion, appArgs, maxNrSamples, maxNrRecords,
+            referencePath, null, treePath);
+    String expectedTree = "treeBase85";
         new ReportGeneratorSettings(
-            appName, appVersion, appArgs, maxNrSamples, maxNrRecords, referencePath, null);
+            appName, appVersion, appArgs, maxNrSamples, maxNrRecords, referencePath, null, null);
     Report report =
         new Report(
             new ReportMetadata(new AppMetadata(appName, appVersion, appArgs), htsFile),
             new ReportData(sampleItems, phenopacketItems),
-            new Base85(vcfGzBase85, Map.of("1:2-3", "00"), null, Map.of()));
+            new Base85(vcfGzBase85, Map.of("1:2-3", "00"), null, Map.of(), expectedTree));
 
     assertEquals(
         report,

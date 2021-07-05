@@ -13,6 +13,7 @@ import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_PHENOTYPES;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_PROBANDS;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_REFERENCE;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_TEMPLATE;
+import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_TREE;
 import static org.molgenis.vcf.report.utils.PathUtils.parsePaths;
 
 import java.nio.file.Path;
@@ -110,6 +111,14 @@ public class AppCommandLineToSettingsMapper {
       genesPath = null;
     }
 
+    Path decisionTreePath;
+    if (commandLine.hasOption(OPT_TREE)) {
+      String decisionTreePathValue = commandLine.getOptionValue(OPT_TREE);
+      decisionTreePath = Path.of(decisionTreePathValue);
+    } else {
+      decisionTreePath = null;
+    }
+
     Map<String, Path> bamPaths;
     if (commandLine.hasOption(OPT_BAM)) {
       String bamPathValue = commandLine.getOptionValue(OPT_BAM);
@@ -125,7 +134,7 @@ public class AppCommandLineToSettingsMapper {
     String appArgs = String.join(" ", args);
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
-            appName, appVersion, appArgs, maxSamples, maxRecords, referencePath, genesPath);
+            appName, appVersion, appArgs, maxSamples, maxRecords, referencePath, genesPath, decisionTreePath);
     ReportWriterSettings reportWriterSettings = new ReportWriterSettings(templatePath, debugMode);
     SampleSettings sampleSettings =
         new SampleSettings(probandNames, pedPaths, phenotypes, bamPaths);

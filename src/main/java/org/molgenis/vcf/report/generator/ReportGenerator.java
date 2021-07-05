@@ -151,7 +151,15 @@ public class ReportGenerator {
               bamMap.put(sampleId, base85Encoder.encode(bamSlice.getBam()));
             });
 
-    Base85 base85 = new Base85(base85Encoder.encode(vcfPath), fastaGzMap, genesGz, bamMap);
+    Path decisionTreePath = reportGeneratorSettings.getDecisionTreePath();
+    String decisionTree;
+    if (decisionTreePath != null) {
+      decisionTree = base85Encoder.encode(decisionTreePath);
+    } else {
+      decisionTree = null;
+    }
+
+    Base85 base85 = new Base85(base85Encoder.encode(vcfPath), fastaGzMap, genesGz, bamMap, decisionTree);
     return new Report(reportMetadata, reportData, base85);
   }
 

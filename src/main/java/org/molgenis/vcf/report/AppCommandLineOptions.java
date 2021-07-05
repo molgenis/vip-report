@@ -44,6 +44,8 @@ class AppCommandLineOptions {
   static final String OPT_VERSION_LONG = "version";
   static final String OPT_GENES = "g";
   static final String OPT_GENES_LONG = "genes";
+  static final String OPT_TREE = "dt";
+  static final String OPT_TREE_LONG = "decision_tree";
   static final String OPT_BAM = "b";
   static final String OPT_BAM_LONG = "bam";
   private static final Options APP_OPTIONS;
@@ -133,6 +135,12 @@ class AppCommandLineOptions {
                 "Comma-separated list of sample-bam files (e.g. sample0=/path/to/0.bam,sample1=/path/to/1.bam).")
             .build());
     appOptions.addOption(
+        Option.builder(OPT_TREE)
+            .hasArg(true)
+            .longOpt(OPT_TREE_LONG)
+            .desc("Decision tree file as used in vip-decision-tree (.json).")
+            .build());
+    appOptions.addOption(
         Option.builder(OPT_DEBUG)
             .longOpt(OPT_DEBUG_LONG)
             .desc("Enable debug mode (additional logging and pretty printed report).")
@@ -170,6 +178,7 @@ class AppCommandLineOptions {
     validateReference(commandLine);
     validateGenes(commandLine);
     validateBam(commandLine);
+    validateTree(commandLine);
   }
 
   static void validateReference(CommandLine commandLine) {
@@ -347,6 +356,20 @@ class AppCommandLineOptions {
         throw new IllegalArgumentException(
             format("Ped file '%s' is not a .ped file.", templatePathStr));
       }
+    }
+  }
+
+  private static void validateTree(CommandLine commandLine) {
+    if (!commandLine.hasOption(OPT_TREE)) {
+      return;
+    }
+    Path treePath = Path.of(commandLine.getOptionValue(OPT_TREE));
+    validateFilePath(treePath, "Decision tree");
+
+    String treePathStr = treePath.toString();
+    if (!treePathStr.endsWith(".json")) {
+      throw new IllegalArgumentException(
+          format("Template file '%s' is not a .json file.", treePathStr));
     }
   }
 
