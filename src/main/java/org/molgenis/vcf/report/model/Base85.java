@@ -23,6 +23,6 @@ public class Base85 {
   @JsonProperty("bam")
   Map<String, String> bam;
 
-  @JsonProperty("decisionTree")
-  String decisionTree;
+  @JsonProperty("decisionTreeGz")
+  String decisionTreeGz;
 }
