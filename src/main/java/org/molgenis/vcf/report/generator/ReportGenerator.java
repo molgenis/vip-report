@@ -152,14 +152,14 @@ public class ReportGenerator {
             });
 
     Path decisionTreePath = reportGeneratorSettings.getDecisionTreePath();
-    String decisionTree;
+    String decisionTreeGz;
     if (decisionTreePath != null) {
-      decisionTree = base85Encoder.encode(decisionTreePath);
+      decisionTreeGz = base85Encoder.encode(decisionTreePath);
     } else {
-      decisionTree = null;
+      decisionTreeGz = null;
     }
 
-    Base85 base85 = new Base85(base85Encoder.encode(vcfPath), fastaGzMap, genesGz, bamMap, decisionTree);
+    Base85 base85 = new Base85(base85Encoder.encode(vcfPath), fastaGzMap, genesGz, bamMap, decisionTreeGz);
     return new Report(reportMetadata, reportData, base85);
   }
 
