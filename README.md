@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/molgenis/vip-report.svg?branch=master)](https://travis-ci.org/molgenis/vip-report)
+[![Build Status](https://app.travis-ci.com/molgenis/vip-report.svg?branch=master)](https://app.travis-ci.com/molgenis/vip-report)
 [![Quality Status](https://sonarcloud.io/api/project_badges/measure?project=molgenis_vip-report&metric=alert_status)](https://sonarcloud.io/dashboard?id=molgenis_vip-report)
 # Variant Interpretation Pipeline - VCF Report Generator
 Command-line application to generate a report for any VCF (Variant Call Format) file based on a report template.
