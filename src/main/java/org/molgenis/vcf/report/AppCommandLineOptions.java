@@ -118,7 +118,8 @@ class AppCommandLineOptions {
         Option.builder(OPT_REFERENCE)
             .hasArg(true)
             .longOpt(OPT_REFERENCE_LONG)
-            .desc("Reference sequence file (.fasta.gz, .fna.gz, .ffn.gz, .faa.gz or .frn.gz).")
+            .desc(
+                "Reference sequence file (.fasta.gz, .fna.gz, .fa.gz, .ffn.gz, .faa.gz or .frn.gz).")
             .build());
     appOptions.addOption(
         Option.builder(OPT_GENES)
@@ -193,12 +194,13 @@ class AppCommandLineOptions {
     String referencePathStr = referencePath.toString();
     if (!referencePathStr.endsWith(".fasta.gz")
         && !referencePathStr.endsWith(".fna.gz")
+        && !referencePathStr.endsWith(".fa.gz")
         && !referencePathStr.endsWith(".fnn.gz")
         && !referencePathStr.endsWith(".faa.gz")
         && !referencePathStr.endsWith(".frn.gz")) {
       throw new IllegalArgumentException(
           format(
-              "Input file '%s' is not a .fasta.gz, .fna.gz, .fnn.gz, .faa.gz or .frn.gz file.",
+              "Input file '%s' is not a .fasta.gz, .fna.gz, .fa.gz, .fnn.gz, .faa.gz or .frn.gz file.",
               referencePathStr));
     }
 
