@@ -7,19 +7,39 @@ Command-line application to generate a report for any VCF (Variant Call Format) 
 
 ## Usage
 ```
-java -jar vcf-report.jar -i <arg> [-o <arg>] [-f]
-       [-t <arg>] [-pb <arg>] [-pd <arg>] [-ph <arg>] [-d]
- -i,--input <arg>         Input VCF file (.vcf or .vcf.gz).
- -o,--output <arg>        Output report file (.html).
- -f,--force               Override the output file if it already exists.
- -t,--template <arg>      Report template file (.html).
- -pb,--probands <arg>     Comma-separated list of proband names.
- -pd,--pedigree <arg>     Comma-separated list of pedigree files (.ped).
- -ph,--phenotypes <arg>   Comma-separated list of sample-phenotypes (e.g. HP:123 or HP:123;HP:234 or sample0/HP:123,sample1/HP:234). Phenotypes are CURIE formatted (prefix:reference) and separated by a semicolon.
- -mr,--max_records <arg>   Integer stating the maximum number of records to be available in the report. Default: 100
- -ms,--max_samples <arg>   Integer stating the maximum number of samples to be available in the report. Default: 100
- -d,--debug               Enable debug mode (additional logging and pretty
-                          printed report.
+usage: java -jar vcf-report.jar -i <arg> [-o <arg>] [-f] [-t <arg>] [-pb
+       <arg>] [-pd <arg>] [-ph <arg>] [-mr <arg>] [-ms <arg>] [-r <arg>]
+       [-g <arg>] [-b <arg>] [-dt <arg>] [-d]
+ -i,--input <arg>            Input VCF file (.vcf or .vcf.gz).
+ -o,--output <arg>           Output report file (.html).
+ -f,--force                  Override the output file if it already
+                             exists.
+ -t,--template <arg>         Report template file (.html).
+ -pb,--probands <arg>        Comma-separated list of proband names.
+ -pd,--pedigree <arg>        Comma-separated list of pedigree files
+                             (.ped).
+ -ph,--phenotypes <arg>      Comma-separated list of sample-phenotypes
+                             (e.g. HP:123 or HP:123;HP:234 or
+                             sample0/HP:123,sample1/HP:234). Phenotypes
+                             are CURIE formatted (prefix:reference) and
+                             separated by a semicolon.
+ -mr,--max_records <arg>     Integer stating the maximum number of records
+                             to be available in the report. Default: 100
+ -ms,--max_samples <arg>     Integer stating the maximum number of samples
+                             to be available in the report. Default: 100
+ -r,--reference <arg>        Reference sequence file (.fasta.gz, .fna.gz,
+                             .fa.gz, .ffn.gz, .faa.gz or .frn.gz).
+ -g,--genes <arg>            Genes file to be used as reference track in
+                             the genome browser, UCSC NCBI RefSeq format
+                             (.txt.gz).
+ -b,--bam <arg>              Comma-separated list of sample-bam files
+                             (e.g.
+                             sample0=/path/to/0.bam,sample1=/path/to/1.bam
+                             ).
+ -dt,--decision_tree <arg>   Decision tree file as used in
+                             vip-decision-tree (.json).
+ -d,--debug                  Enable debug mode (additional logging and
+                             pretty printed report).
 
 usage: java -jar vcf-report.jar -v
  -v,--version   Print version.
