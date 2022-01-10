@@ -3,7 +3,7 @@
 # Variant Interpretation Pipeline - VCF Report Generator
 Command-line application to generate a report for any VCF (Variant Call Format) file based on a report template.
 ## Requirements
-- Java 11
+- Java 17
 
 ## Usage
 ```
