@@ -13,7 +13,7 @@
 
   <groupId>org.molgenis</groupId>
   <artifactId>vip-report</artifactId>
-  <version>3.0.0</version>
+  <version>3.0.1</version>
 
   <name>vip-report</name>
   <description>Report generator for Variant Call Format (VCF) files</description>
@@ -41,7 +41,7 @@
     <java.version>17</java.version>
     <commons.cli.version>1.4</commons.cli.version>
     <samtools.htsjdk.version>2.21.3</samtools.htsjdk.version>
-    <download-maven-plugin.version>1.6.0</download-maven-plugin.version>
+    <download-maven-plugin.version>1.6.7</download-maven-plugin.version>
     <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
     <vip.report.template.version>2.7.2</vip.report.template.version>
     <phenopackets.version>1.0.0</phenopackets.version>
@@ -110,7 +110,7 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <optional>true</optional>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>commons-cli</groupId>
@@ -132,17 +132,6 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.junit.vintage</groupId>
-          <artifactId>junit-vintage-engine</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-engine</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.skyscreamer</groupId>
@@ -153,6 +142,25 @@
 
   <build>
     <finalName>vcf-report</finalName>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+            <compilerArgs>
+              <arg>-Xlint</arg>
+            </compilerArgs>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>com.googlecode.maven-download-plugin</groupId>
+          <artifactId>download-maven-plugin</artifactId>
+          <version>${download-maven-plugin.version}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
 
     <plugins>
       <plugin>
@@ -177,6 +185,15 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <!-- By default provided dependencies are included -->
+            <exclude>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+            </exclude>
+          </excludes>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -185,7 +202,6 @@
       <plugin>
         <groupId>com.googlecode.maven-download-plugin</groupId>
         <artifactId>download-maven-plugin</artifactId>
-        <version>${download-maven-plugin.version}</version>
         <executions>
           <execution>
             <id>download-report-template</id>

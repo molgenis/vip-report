@@ -42,7 +42,7 @@ class PedToSamplesMapperTest {
     Path pedFile2 = ResourceUtils.getFile("classpath:example2.ped").toPath();
     List<Path> paths = Arrays.asList(pedFile1, pedFile2);
 
-    Map<String, Sample> expected = new HashMap();
+    Map<String, Sample> expected = new HashMap<>();
     expected.put(
         "John",
         Sample.builder()
@@ -83,7 +83,7 @@ class PedToSamplesMapperTest {
     Path pedFile2 = ResourceUtils.getFile("classpath:example2.ped").toPath();
     List<Path> paths = Arrays.asList(pedFile1, pedFile2);
 
-    Map<String, Sample> expected = new HashMap();
+    Map<String, Sample> expected = new HashMap<>();
     expected.put(
         "John",
         Sample.builder()
@@ -131,7 +131,7 @@ class PedToSamplesMapperTest {
             .index(-1)
             .build());
 
-    assertEquals(expected, pedToSamplesMapper.parse(pedReader, 10));
+    assertEquals(expected, PedToSamplesMapper.parse(pedReader, 10));
   }
 
   @Test
@@ -139,7 +139,7 @@ class PedToSamplesMapperTest {
     PedIndividual individual =
         new PedIndividual(
             "fam1", "id1", "paternal", "maternal", Sex.UNKNOWN, AffectionStatus.UNKNOWN);
-    List<PedIndividual> pedIndividuals = Arrays.asList(individual);
+    List<PedIndividual> pedIndividuals = List.of(individual);
     when(pedReader.iterator()).thenReturn(pedIndividuals.iterator());
 
     Map<String, Sample> expected = new HashMap<>();
@@ -152,6 +152,6 @@ class PedToSamplesMapperTest {
             .index(-1)
             .build());
 
-    assertEquals(expected, pedToSamplesMapper.parse(pedReader, 10));
+    assertEquals(expected, PedToSamplesMapper.parse(pedReader, 10));
   }
 }
