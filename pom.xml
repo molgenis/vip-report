@@ -154,6 +154,11 @@
             </compilerArgs>
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>com.googlecode.maven-download-plugin</groupId>
+          <artifactId>download-maven-plugin</artifactId>
+          <version>${download-maven-plugin.version}</version>
+        </plugin>
       </plugins>
     </pluginManagement>
 
@@ -197,7 +202,6 @@
       <plugin>
         <groupId>com.googlecode.maven-download-plugin</groupId>
         <artifactId>download-maven-plugin</artifactId>
-        <version>${download-maven-plugin.version}</version>
         <executions>
           <execution>
             <id>download-report-template</id>
