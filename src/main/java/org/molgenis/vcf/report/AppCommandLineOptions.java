@@ -322,8 +322,7 @@ class AppCommandLineOptions {
     }
 
     if (!commandLine.hasOption(OPT_FORCE) && Files.exists(outputPath)) {
-      throw new IllegalArgumentException(
-          format("Output file '%s' already exists", outputPath.toString()));
+      throw new IllegalArgumentException(format("Output file '%s' already exists", outputPath));
     }
   }
 
@@ -377,16 +376,13 @@ class AppCommandLineOptions {
 
   private static void validateFilePath(Path filePath, String prefix) {
     if (!Files.exists(filePath)) {
-      throw new IllegalArgumentException(
-          format("%s file '%s' does not exist.", prefix, filePath.toString()));
+      throw new IllegalArgumentException(format("%s file '%s' does not exist.", prefix, filePath));
     }
     if (Files.isDirectory(filePath)) {
-      throw new IllegalArgumentException(
-          format("%s file '%s' is a directory.", prefix, filePath.toString()));
+      throw new IllegalArgumentException(format("%s file '%s' is a directory.", prefix, filePath));
     }
     if (!Files.isReadable(filePath)) {
-      throw new IllegalArgumentException(
-          format("%s file '%s' is not readable.", prefix, filePath.toString()));
+      throw new IllegalArgumentException(format("%s file '%s' is not readable.", prefix, filePath));
     }
   }
 }
