@@ -35,7 +35,7 @@ public class GenesFilter {
     try (Writer writer = new OutputStreamWriter(output, StandardCharsets.UTF_8)) {
       for (GeneLine geneLine : geneLines) {
         for (ContigInterval contigInterval : contigIntervals) {
-          if (geneLine.getChrom().equals(CHROM_PREFIX + contigInterval.getContig())
+          if (geneLine.getChrom().equals(contigInterval.getContig().startsWith(CHROM_PREFIX)? contigInterval.getContig() : CHROM_PREFIX + contigInterval.getContig())
               && ((geneLine.getTxStart() >= contigInterval.getStart()
                       && geneLine.getTxStart()
                           <= contigInterval.getStop()) // feature start in region
