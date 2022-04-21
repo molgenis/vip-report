@@ -1,6 +1,7 @@
 package org.molgenis.vcf.report.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.NonFinal;
@@ -11,7 +12,7 @@ public class ReportData {
 
   @JsonProperty("samples")
   @NonNull
-  Items<Sample> samples;
+  List<Sample> samples;
 
   @JsonProperty("phenotypes")
   @NonNull

@@ -8,21 +8,21 @@ import lombok.experimental.NonFinal;
 
 @Value
 @NonFinal
-public class Base85 {
+public class Binary {
 
-  @JsonProperty("vcfGz")
+  @JsonProperty("vcf")
   @NonNull
-  String vcfGz;
+  Bytes vcf;
 
   @JsonProperty("fastaGz")
-  Map<String, String> fastaGz;
+  Map<String, Bytes> fastaGz;
 
   @JsonProperty("genesGz")
-  String genesGz;
+  Bytes genesGz;
 
   @JsonProperty("bam")
-  Map<String, String> bam;
+  Map<String, Bytes> bam;
 
-  @JsonProperty("decisionTreeGz")
-  String decisionTreeGz;
+  @JsonProperty("decisionTree")
+  Bytes decisionTree;
 }

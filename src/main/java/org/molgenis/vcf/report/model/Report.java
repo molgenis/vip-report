@@ -18,7 +18,7 @@ public class Report {
   @NonNull
   ReportData reportData;
 
-  @JsonProperty("base85")
+  @JsonProperty("binary")
   @NonNull
-  Base85 base85;
+  Binary binary;
 }

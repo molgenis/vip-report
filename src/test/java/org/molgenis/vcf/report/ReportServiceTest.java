@@ -5,6 +5,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.molgenis.vcf.report.model.metadata.HtsFormat.VCF;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -21,7 +23,8 @@ import org.molgenis.vcf.report.generator.ReportWriter;
 import org.molgenis.vcf.report.generator.ReportWriterSettings;
 import org.molgenis.vcf.report.generator.SampleSettings;
 import org.molgenis.vcf.report.generator.Settings;
-import org.molgenis.vcf.report.model.Base85;
+import org.molgenis.vcf.report.model.Binary;
+import org.molgenis.vcf.report.model.Bytes;
 import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.report.model.Report;
 import org.molgenis.vcf.report.model.ReportData;
@@ -44,7 +47,7 @@ class ReportServiceTest {
   }
 
   @Test
-  void createReport() {
+  void createReport() throws IOException {
     String appName = "MyApp";
     String appVersion = "MyVersion";
     String appArguments = "MyArguments";
@@ -55,8 +58,8 @@ class ReportServiceTest {
             new ReportMetadata(
                 new AppMetadata(appName, appVersion, appArguments),
                 new HtsFile(inputVcfPath.toString(), VCF, "UNKNOWN")),
-            new ReportData(new Items<>(emptyList(), 0), new Items<>(emptyList(), 0)),
-            new Base85("str", null, null, Map.of(), null));
+            new ReportData(emptyList(), new Items<>(emptyList(), 0)),
+            new Binary(new Bytes(Files.readAllBytes(inputVcfPath)), null, null, Map.of(), null));
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
             appName,
