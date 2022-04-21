@@ -152,7 +152,7 @@ public class ReportGenerator {
             });
 
     Bytes vcfBytes;
-    if (vcfPath.endsWith(".gz")) {
+    if (vcfPath.toString().endsWith(".gz")) {
       try (GZIPInputStream inputStream = new GZIPInputStream(Files.newInputStream(vcfPath))) {
         vcfBytes = new Bytes(inputStream.readAllBytes());
       }
