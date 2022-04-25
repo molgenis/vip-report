@@ -5,6 +5,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.molgenis.vcf.report.model.metadata.HtsFormat.VCF;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -53,20 +54,26 @@ class ReportServiceTest {
     String appArguments = "MyArguments";
     Path inputVcfPath = Paths.get("src", "test", "resources", "example.vcf");
     Path outputReportPath = sharedTempDir.resolve("example.vcf.html");
+
     Report report =
         new Report(
             new ReportMetadata(
                 new AppMetadata(appName, appVersion, appArguments),
                 new HtsFile(inputVcfPath.toString(), VCF, "UNKNOWN")),
             new ReportData(emptyList(), new Items<>(emptyList(), 0)),
-            new Binary(new Bytes(Files.readAllBytes(inputVcfPath)), null, null, Map.of(), null));
+            new Binary(new Bytes(Files.readAllBytes(inputVcfPath)), null, null, Map.of()),
+            new ObjectMapper()
+                .readValue("{\"name\":\"testtree\", \"description\":\"no need for a valid tree\"}", Map.class));
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
             appName,
             appVersion,
             appArguments,
             ReportGeneratorSettings.DEFAULT_MAX_NR_SAMPLES,
-            ReportGeneratorSettings.DEFAULT_MAX_NR_RECORDS, null, null, null);
+            ReportGeneratorSettings.DEFAULT_MAX_NR_RECORDS,
+            null,
+            null,
+            null);
     ReportWriterSettings reportWriterSettings = new ReportWriterSettings(null, true);
     SampleSettings sampleSettings = new SampleSettings(null, null, null, Map.of());
     Settings settings =

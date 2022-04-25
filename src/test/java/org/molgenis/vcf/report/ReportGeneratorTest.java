@@ -9,6 +9,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.molgenis.vcf.report.model.metadata.HtsFormat.VCF;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import htsjdk.variant.vcf.VCFHeader;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -113,10 +114,8 @@ class ReportGeneratorTest {
     String appVersion = "MyVersion";
     String appArgs = "MyArgs";
     ReportGeneratorSettings reportGeneratorSettings =
-        new ReportGeneratorSettings(appName, appVersion, appArgs, maxNrSamples, maxNrRecords,
-            referencePath, null, treePath);
         new ReportGeneratorSettings(
-            appName, appVersion, appArgs, maxNrSamples, maxNrRecords, referencePath, null, null);
+            appName, appVersion, appArgs, maxNrSamples, maxNrRecords, referencePath, null, treePath);
     Report report =
         new Report(
             new ReportMetadata(new AppMetadata(appName, appVersion, appArgs), htsFile),
@@ -125,8 +124,11 @@ class ReportGeneratorTest {
                 new Bytes(Files.readAllBytes(inputVcfPath)),
                 Map.of("1:2-3", new Bytes(new byte[] {0})),
                 null,
-                Map.of(),
-                new Bytes(Files.readAllBytes(treePath))));
+                Map.of()),
+            new ObjectMapper()
+                .readValue(
+                    "{\"name\":\"testtree\", \"description\":\"no need for a valid tree\"}",
+                    Map.class));
 
     assertEquals(
         report,

@@ -2,6 +2,7 @@ package org.molgenis.vcf.report.generator;
 
 import static java.util.Objects.requireNonNull;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import htsjdk.variant.vcf.VCFFileReader;
 import htsjdk.variant.vcf.VCFHeader;
 import java.io.IOException;
@@ -161,19 +162,20 @@ public class ReportGenerator {
     }
 
     Path decisionTreePath = reportGeneratorSettings.getDecisionTreePath();
-    Bytes decisionTreeBytes;
+    Map<?,?> decisionTree;
     if (decisionTreePath != null) {
       try {
-        decisionTreeBytes = new Bytes(Files.readAllBytes(decisionTreePath));
+        ObjectMapper mapper = new ObjectMapper();
+        decisionTree = mapper.readValue(decisionTreePath.toFile(), Map.class);
       } catch (IOException e) {
         throw new UncheckedIOException(e);
       }
     } else {
-      decisionTreeBytes = null;
+      decisionTree = null;
     }
 
-    Binary binary = new Binary(vcfBytes, fastaGzMap, genesGz, bamMap, decisionTreeBytes);
-    return new Report(reportMetadata, reportData, binary);
+    Binary binary = new Binary(vcfBytes, fastaGzMap, genesGz, bamMap);
+    return new Report(reportMetadata, reportData, binary, decisionTree);
   }
 
   private static String getFastaSliceIdentifier(FastaSlice fastaSlice) {

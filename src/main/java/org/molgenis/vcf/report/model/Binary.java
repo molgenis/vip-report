@@ -22,7 +22,4 @@ public class Binary {
 
   @JsonProperty("bam")
   Map<String, Bytes> bam;
-
-  @JsonProperty("decisionTree")
-  Bytes decisionTree;
 }
