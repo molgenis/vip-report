@@ -16,5 +16,5 @@ public class ReportData {
 
   @JsonProperty("phenotypes")
   @NonNull
-  Items<Phenopacket> phenopackets;
+  List<Phenopacket> phenopackets;
 }

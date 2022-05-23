@@ -116,7 +116,7 @@ public class ReportGenerator {
             reportGeneratorSettings.getAppVersion(),
             reportGeneratorSettings.getAppArguments());
     ReportMetadata reportMetadata = new ReportMetadata(appMetadata, htsFile);
-    ReportData reportData = new ReportData(samples.getItems(), phenopackets);
+    ReportData reportData = new ReportData(samples.getItems(), phenopackets.getItems());
 
     Map<String, Bytes> fastaGzMap;
     Path referencePath = reportGeneratorSettings.getReferencePath();

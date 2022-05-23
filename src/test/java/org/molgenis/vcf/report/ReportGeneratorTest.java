@@ -84,7 +84,8 @@ class ReportGeneratorTest {
     when(htsJdkToPersonsMapper.map(any(VCFHeader.class), eq(maxNrSamples)))
         .thenReturn(vcfSampleItems);
 
-    Items<Phenopacket> phenopacketItems = new Items<>(emptyList(), 5);
+    List<Phenopacket> phenopacketList = emptyList();
+    Items<Phenopacket> phenopacketItems = new Items<>(phenopacketList, 5);
     when(phenopacketMapper.mapPhenotypes(any(), any())).thenReturn(phenopacketItems);
 
     Path inputVcfPath = Paths.get("src", "test", "resources", "example.vcf");
@@ -119,7 +120,7 @@ class ReportGeneratorTest {
     Report report =
         new Report(
             new ReportMetadata(new AppMetadata(appName, appVersion, appArgs), htsFile),
-            new ReportData(sampleList, phenopacketItems),
+            new ReportData(sampleList, phenopacketList),
             new Binary(
                 new Bytes(Files.readAllBytes(inputVcfPath)),
                 Map.of("1:2-3", new Bytes(new byte[] {0})),

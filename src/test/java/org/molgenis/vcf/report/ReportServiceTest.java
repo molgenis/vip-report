@@ -26,7 +26,6 @@ import org.molgenis.vcf.report.generator.SampleSettings;
 import org.molgenis.vcf.report.generator.Settings;
 import org.molgenis.vcf.report.model.Binary;
 import org.molgenis.vcf.report.model.Bytes;
-import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.report.model.Report;
 import org.molgenis.vcf.report.model.ReportData;
 import org.molgenis.vcf.report.model.metadata.AppMetadata;
@@ -60,10 +59,12 @@ class ReportServiceTest {
             new ReportMetadata(
                 new AppMetadata(appName, appVersion, appArguments),
                 new HtsFile(inputVcfPath.toString(), VCF, "UNKNOWN")),
-            new ReportData(emptyList(), new Items<>(emptyList(), 0)),
+            new ReportData(emptyList(), emptyList()),
             new Binary(new Bytes(Files.readAllBytes(inputVcfPath)), null, null, Map.of()),
             new ObjectMapper()
-                .readValue("{\"name\":\"testtree\", \"description\":\"no need for a valid tree\"}", Map.class));
+                .readValue(
+                    "{\"name\":\"testtree\", \"description\":\"no need for a valid tree\"}",
+                    Map.class));
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
             appName,
