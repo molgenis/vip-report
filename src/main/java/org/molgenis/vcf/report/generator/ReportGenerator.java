@@ -5,7 +5,6 @@ import static java.util.Objects.requireNonNull;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import htsjdk.variant.vcf.VCFFileReader;
 import htsjdk.variant.vcf.VCFHeader;
-import htsjdk.variant.vcf.VCFHeaderLine;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
@@ -37,7 +36,6 @@ import org.molgenis.vcf.report.model.Sample;
 import org.molgenis.vcf.report.model.metadata.AppMetadata;
 import org.molgenis.vcf.report.model.metadata.HtsFile;
 import org.molgenis.vcf.report.model.metadata.ReportMetadata;
-import org.molgenis.vcf.report.model.metadata.VipMetadata;
 import org.molgenis.vcf.report.utils.PersonListMerger;
 import org.springframework.stereotype.Component;
 
@@ -112,23 +110,12 @@ public class ReportGenerator {
       phenopackets = new Items<>(Collections.emptyList(), 0);
     }
 
-    VCFHeader vcfHeader = vcfFileReader.getFileHeader();
-    VCFHeaderLine versionHeader = vcfHeader.getMetaDataLine("VIP_Version");
-    VCFHeaderLine commandHeader = vcfHeader.getMetaDataLine("VIP_Command");
-    VipMetadata vipMetadata = null;
-    if (versionHeader != null && commandHeader != null) {
-      vipMetadata =
-          new VipMetadata(
-              versionHeader != null ? versionHeader.getValue() : null,
-              commandHeader != null ? commandHeader.getValue() : null);
-    }
-
     AppMetadata appMetadata =
         new AppMetadata(
             reportGeneratorSettings.getAppName(),
             reportGeneratorSettings.getAppVersion(),
             reportGeneratorSettings.getAppArguments());
-    ReportMetadata reportMetadata = new ReportMetadata(appMetadata, htsFile, vipMetadata);
+    ReportMetadata reportMetadata = new ReportMetadata(appMetadata, htsFile);
     ReportData reportData = new ReportData(samples.getItems(), phenopackets.getItems());
 
     Map<String, Bytes> fastaGzMap;
@@ -175,7 +162,7 @@ public class ReportGenerator {
     }
 
     Path decisionTreePath = reportGeneratorSettings.getDecisionTreePath();
-    Map<?, ?> decisionTree;
+    Map<?,?> decisionTree;
     if (decisionTreePath != null) {
       try {
         ObjectMapper mapper = new ObjectMapper();
