@@ -7,16 +7,11 @@ import lombok.experimental.NonFinal;
 
 @Value
 @NonFinal
-public class ReportMetadata {
+public class VipMetadata {
 
-  @JsonProperty("app")
-  @NonNull
-  AppMetadata appMetadata;
+  @JsonProperty("version")
+  String appVersion;
 
-  @JsonProperty("htsFile")
-  @NonNull
-  HtsFile htsFile;
-
-  @JsonProperty("vip")
-  VipMetadata vipMetadata;
+  @JsonProperty("args")
+  String appArguments;
 }

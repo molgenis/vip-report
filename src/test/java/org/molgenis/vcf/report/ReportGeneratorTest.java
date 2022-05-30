@@ -46,6 +46,7 @@ import org.molgenis.vcf.report.model.Sample;
 import org.molgenis.vcf.report.model.metadata.AppMetadata;
 import org.molgenis.vcf.report.model.metadata.HtsFile;
 import org.molgenis.vcf.report.model.metadata.ReportMetadata;
+import org.molgenis.vcf.report.model.metadata.VipMetadata;
 import org.molgenis.vcf.report.utils.PersonListMerger;
 
 @ExtendWith(MockitoExtension.class)
@@ -119,7 +120,7 @@ class ReportGeneratorTest {
             appName, appVersion, appArgs, maxNrSamples, maxNrRecords, referencePath, null, treePath);
     Report report =
         new Report(
-            new ReportMetadata(new AppMetadata(appName, appVersion, appArgs), htsFile),
+            new ReportMetadata(new AppMetadata(appName, appVersion, appArgs), htsFile, new VipMetadata("1.2.3","-i Input")),
             new ReportData(sampleList, phenopacketList),
             new Binary(
                 new Bytes(Files.readAllBytes(inputVcfPath)),

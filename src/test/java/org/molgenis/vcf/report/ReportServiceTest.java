@@ -31,6 +31,7 @@ import org.molgenis.vcf.report.model.ReportData;
 import org.molgenis.vcf.report.model.metadata.AppMetadata;
 import org.molgenis.vcf.report.model.metadata.HtsFile;
 import org.molgenis.vcf.report.model.metadata.ReportMetadata;
+import org.molgenis.vcf.report.model.metadata.VipMetadata;
 
 @ExtendWith(MockitoExtension.class)
 class ReportServiceTest {
@@ -58,7 +59,7 @@ class ReportServiceTest {
         new Report(
             new ReportMetadata(
                 new AppMetadata(appName, appVersion, appArguments),
-                new HtsFile(inputVcfPath.toString(), VCF, "UNKNOWN")),
+                new HtsFile(inputVcfPath.toString(), VCF, "UNKNOWN"), new VipMetadata("1.2.3", "-i input -o output")),
             new ReportData(emptyList(), emptyList()),
             new Binary(new Bytes(Files.readAllBytes(inputVcfPath)), null, null, Map.of()),
             new ObjectMapper()
