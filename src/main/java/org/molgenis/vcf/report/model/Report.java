@@ -1,6 +1,7 @@
 package org.molgenis.vcf.report.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Map;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.NonFinal;
@@ -18,7 +19,10 @@ public class Report {
   @NonNull
   ReportData reportData;
 
-  @JsonProperty("base85")
+  @JsonProperty("binary")
   @NonNull
-  Base85 base85;
+  Binary binary;
+
+  @JsonProperty("decisionTree")
+  Map<?,?> decisionTree;
 }

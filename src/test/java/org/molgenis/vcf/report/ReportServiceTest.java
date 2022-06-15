@@ -5,6 +5,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.molgenis.vcf.report.model.metadata.HtsFormat.VCF;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -21,8 +24,8 @@ import org.molgenis.vcf.report.generator.ReportWriter;
 import org.molgenis.vcf.report.generator.ReportWriterSettings;
 import org.molgenis.vcf.report.generator.SampleSettings;
 import org.molgenis.vcf.report.generator.Settings;
-import org.molgenis.vcf.report.model.Base85;
-import org.molgenis.vcf.report.model.Items;
+import org.molgenis.vcf.report.model.Binary;
+import org.molgenis.vcf.report.model.Bytes;
 import org.molgenis.vcf.report.model.Report;
 import org.molgenis.vcf.report.model.ReportData;
 import org.molgenis.vcf.report.model.metadata.AppMetadata;
@@ -44,26 +47,34 @@ class ReportServiceTest {
   }
 
   @Test
-  void createReport() {
+  void createReport() throws IOException {
     String appName = "MyApp";
     String appVersion = "MyVersion";
     String appArguments = "MyArguments";
     Path inputVcfPath = Paths.get("src", "test", "resources", "example.vcf");
     Path outputReportPath = sharedTempDir.resolve("example.vcf.html");
+
     Report report =
         new Report(
             new ReportMetadata(
                 new AppMetadata(appName, appVersion, appArguments),
                 new HtsFile(inputVcfPath.toString(), VCF, "UNKNOWN")),
-            new ReportData(new Items<>(emptyList(), 0), new Items<>(emptyList(), 0)),
-            new Base85("str", null, null, Map.of(), null));
+            new ReportData(emptyList(), emptyList()),
+            new Binary(new Bytes(Files.readAllBytes(inputVcfPath)), null, null, Map.of()),
+            new ObjectMapper()
+                .readValue(
+                    "{\"name\":\"testtree\", \"description\":\"no need for a valid tree\"}",
+                    Map.class));
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
             appName,
             appVersion,
             appArguments,
             ReportGeneratorSettings.DEFAULT_MAX_NR_SAMPLES,
-            ReportGeneratorSettings.DEFAULT_MAX_NR_RECORDS, null, null, null);
+            ReportGeneratorSettings.DEFAULT_MAX_NR_RECORDS,
+            null,
+            null,
+            null);
     ReportWriterSettings reportWriterSettings = new ReportWriterSettings(null, true);
     SampleSettings sampleSettings = new SampleSettings(null, null, null, Map.of());
     Settings settings =

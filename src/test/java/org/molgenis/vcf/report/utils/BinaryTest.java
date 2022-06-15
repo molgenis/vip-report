@@ -20,15 +20,16 @@ import org.junit.jupiter.api.Test;
 import org.molgenis.vcf.report.utils.Base85.Decoder;
 
 /**
- * Adapted from https://github.com/Sheep-y/Base85/blob/f14b0e9d6854fba56f0bc6457fa87880953a64c2/java/test/sheepy/util/text/Base85Test.java
+ * Adapted from
+ * https://github.com/Sheep-y/Base85/blob/f14b0e9d6854fba56f0bc6457fa87880953a64c2/java/test/sheepy/util/text/Base85Test.java
  */
-class Base85Test {
+class BinaryTest {
 
   private final Random rng = new Random();
   private final Base85.Encoder rfcE, z85E, a85E;
   private final Base85.Decoder rfcD, z85D, a85D;
 
-  public Base85Test() {
+  public BinaryTest() {
     rfcE = Base85.getRfc1924Encoder();
     rfcD = Base85.getRfc1924Decoder();
     z85E = Base85.getZ85Encoder();

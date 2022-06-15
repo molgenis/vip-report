@@ -5,12 +5,14 @@ import static java.util.Collections.emptyMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.molgenis.vcf.report.model.metadata.HtsFormat.VCF;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import htsjdk.variant.vcf.VCFHeader;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -26,7 +28,6 @@ import org.molgenis.vcf.report.fasta.ContigInterval;
 import org.molgenis.vcf.report.fasta.FastaSlice;
 import org.molgenis.vcf.report.fasta.VcfFastaSlicer;
 import org.molgenis.vcf.report.fasta.VcfFastaSlicerFactory;
-import org.molgenis.vcf.report.generator.Base85Encoder;
 import org.molgenis.vcf.report.generator.ReportGenerator;
 import org.molgenis.vcf.report.generator.ReportGeneratorSettings;
 import org.molgenis.vcf.report.generator.SampleSettings;
@@ -35,7 +36,8 @@ import org.molgenis.vcf.report.mapper.HtsFileMapper;
 import org.molgenis.vcf.report.mapper.HtsJdkToPersonsMapper;
 import org.molgenis.vcf.report.mapper.PedToSamplesMapper;
 import org.molgenis.vcf.report.mapper.PhenopacketMapper;
-import org.molgenis.vcf.report.model.Base85;
+import org.molgenis.vcf.report.model.Binary;
+import org.molgenis.vcf.report.model.Bytes;
 import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.report.model.Phenopacket;
 import org.molgenis.vcf.report.model.Report;
@@ -54,7 +56,6 @@ class ReportGeneratorTest {
   @Mock private PedToSamplesMapper pedToSamplesMapper;
   @Mock private PersonListMerger personListMerger;
   @Mock private HtsFileMapper htsFileMapper;
-  @Mock private Base85Encoder base85Encoder;
   @Mock private VcfFastaSlicerFactory vcfFastaSlicerFactory;
   @Mock private GenesFilterFactory genesFilterFactory;
   @Mock private VcfBamSlicerFactory vcfBamSlicerFactory;
@@ -69,14 +70,13 @@ class ReportGeneratorTest {
             pedToSamplesMapper,
             personListMerger,
             htsFileMapper,
-            base85Encoder,
             vcfFastaSlicerFactory,
             genesFilterFactory,
             vcfBamSlicerFactory);
   }
 
   @Test
-  void generateReport() {
+  void generateReport() throws IOException {
     int maxNrSamples = 10;
     int maxNrRecords = 100;
 
@@ -84,7 +84,8 @@ class ReportGeneratorTest {
     when(htsJdkToPersonsMapper.map(any(VCFHeader.class), eq(maxNrSamples)))
         .thenReturn(vcfSampleItems);
 
-    Items<Phenopacket> phenopacketItems = new Items<>(emptyList(), 5);
+    List<Phenopacket> phenopacketList = emptyList();
+    Items<Phenopacket> phenopacketItems = new Items<>(phenopacketList, 5);
     when(phenopacketMapper.mapPhenotypes(any(), any())).thenReturn(phenopacketItems);
 
     Path inputVcfPath = Paths.get("src", "test", "resources", "example.vcf");
@@ -96,7 +97,8 @@ class ReportGeneratorTest {
     Map<String, Sample> pedSampleItems = emptyMap();
     when(pedToSamplesMapper.mapPedFileToPersons(pedPath, 10)).thenReturn(pedSampleItems);
 
-    Items<Sample> sampleItems = new Items<>(emptyList(), 6);
+    List<Sample> sampleList = emptyList();
+    Items<Sample> sampleItems = new Items<>(sampleList, 6);
     when(personListMerger.merge(vcfSampleItems.getItems(), pedSampleItems, 10))
         .thenReturn(sampleItems);
 
@@ -108,27 +110,26 @@ class ReportGeneratorTest {
     when(vcfFastaSlicer.generate(any(), eq(250))).thenReturn(List.of(fastaSlice));
     when(vcfFastaSlicerFactory.create(referencePath)).thenReturn(vcfFastaSlicer);
 
-    String vcfGzBase85 = "vcfGzBase85";
-    doReturn(vcfGzBase85).when(base85Encoder).encode(inputVcfPath);
-
-    String treeBase85 = "treeBase85";
-    doReturn(treeBase85).when(base85Encoder).encode(treePath);
-
     String phenotypes = "hpo:123456;omim3456";
     String appName = "MyApp";
     String appVersion = "MyVersion";
     String appArgs = "MyArgs";
     ReportGeneratorSettings reportGeneratorSettings =
-        new ReportGeneratorSettings(appName, appVersion, appArgs, maxNrSamples, maxNrRecords,
-            referencePath, null, treePath);
-    String expectedTree = "treeBase85";
         new ReportGeneratorSettings(
-            appName, appVersion, appArgs, maxNrSamples, maxNrRecords, referencePath, null, null);
+            appName, appVersion, appArgs, maxNrSamples, maxNrRecords, referencePath, null, treePath);
     Report report =
         new Report(
             new ReportMetadata(new AppMetadata(appName, appVersion, appArgs), htsFile),
-            new ReportData(sampleItems, phenopacketItems),
-            new Base85(vcfGzBase85, Map.of("1:2-3", "00"), null, Map.of(), expectedTree));
+            new ReportData(sampleList, phenopacketList),
+            new Binary(
+                new Bytes(Files.readAllBytes(inputVcfPath)),
+                Map.of("1:2-3", new Bytes(new byte[] {0})),
+                null,
+                Map.of()),
+            new ObjectMapper()
+                .readValue(
+                    "{\"name\":\"testtree\", \"description\":\"no need for a valid tree\"}",
+                    Map.class));
 
     assertEquals(
         report,

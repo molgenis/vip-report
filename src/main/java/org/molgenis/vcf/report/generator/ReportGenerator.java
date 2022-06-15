@@ -2,13 +2,18 @@ package org.molgenis.vcf.report.generator;
 
 import static java.util.Objects.requireNonNull;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import htsjdk.variant.vcf.VCFFileReader;
 import htsjdk.variant.vcf.VCFHeader;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
 import org.molgenis.vcf.report.bam.BamSlice;
 import org.molgenis.vcf.report.bam.VcfBamSlicerFactory;
 import org.molgenis.vcf.report.fasta.ContigInterval;
@@ -21,7 +26,8 @@ import org.molgenis.vcf.report.mapper.HtsFileMapper;
 import org.molgenis.vcf.report.mapper.HtsJdkToPersonsMapper;
 import org.molgenis.vcf.report.mapper.PedToSamplesMapper;
 import org.molgenis.vcf.report.mapper.PhenopacketMapper;
-import org.molgenis.vcf.report.model.Base85;
+import org.molgenis.vcf.report.model.Binary;
+import org.molgenis.vcf.report.model.Bytes;
 import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.report.model.Phenopacket;
 import org.molgenis.vcf.report.model.Report;
@@ -41,7 +47,6 @@ public class ReportGenerator {
   private final PedToSamplesMapper pedToSamplesMapper;
   private final PersonListMerger personListMerger;
   private final HtsFileMapper htsFileMapper;
-  private final Base85Encoder base85Encoder;
   private final VcfFastaSlicerFactory vcfFastaSlicerFactory;
   private final GenesFilterFactory genesFilterFactory;
   private final VcfBamSlicerFactory vcfBamSlicerFactory;
@@ -52,7 +57,6 @@ public class ReportGenerator {
       PedToSamplesMapper pedToSamplesMapper,
       PersonListMerger personListMerger,
       HtsFileMapper htsFileMapper,
-      Base85Encoder base85Encoder,
       VcfFastaSlicerFactory vcfFastaSlicerFactory,
       GenesFilterFactory genesFilterFactory,
       VcfBamSlicerFactory vcfBamSlicerFactory) {
@@ -61,7 +65,6 @@ public class ReportGenerator {
     this.pedToSamplesMapper = requireNonNull(pedToSamplesMapper);
     this.personListMerger = requireNonNull(personListMerger);
     this.htsFileMapper = requireNonNull(htsFileMapper);
-    this.base85Encoder = requireNonNull(base85Encoder);
     this.vcfFastaSlicerFactory = requireNonNull(vcfFastaSlicerFactory);
     this.genesFilterFactory = requireNonNull(genesFilterFactory);
     this.vcfBamSlicerFactory = requireNonNull(vcfBamSlicerFactory);
@@ -74,6 +77,8 @@ public class ReportGenerator {
     Report report;
     try (VCFFileReader vcfFileReader = createReader(inputVcfPath)) {
       report = createReport(vcfFileReader, inputVcfPath, sampleSettings, reportGeneratorSettings);
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
     }
     return report;
   }
@@ -86,7 +91,8 @@ public class ReportGenerator {
       VCFFileReader vcfFileReader,
       Path vcfPath,
       SampleSettings sampleSettings,
-      ReportGeneratorSettings reportGeneratorSettings) {
+      ReportGeneratorSettings reportGeneratorSettings)
+      throws IOException {
     HtsFile htsFile = htsFileMapper.map(vcfFileReader.getFileHeader(), vcfPath.toString());
 
     Items<Sample> samples =
@@ -110,9 +116,9 @@ public class ReportGenerator {
             reportGeneratorSettings.getAppVersion(),
             reportGeneratorSettings.getAppArguments());
     ReportMetadata reportMetadata = new ReportMetadata(appMetadata, htsFile);
-    ReportData reportData = new ReportData(samples, phenopackets);
+    ReportData reportData = new ReportData(samples.getItems(), phenopackets.getItems());
 
-    Map<String, String> fastaGzMap;
+    Map<String, Bytes> fastaGzMap;
     Path referencePath = reportGeneratorSettings.getReferencePath();
     if (referencePath != null) {
       VcfFastaSlicer vcfFastaSlicer = vcfFastaSlicerFactory.create(referencePath);
@@ -121,46 +127,55 @@ public class ReportGenerator {
       fastaGzSlices.forEach(
           fastaSlice -> {
             String key = getFastaSliceIdentifier(fastaSlice);
-            String base85FastaGz =
-                org.molgenis.vcf.report.utils.Base85.getRfc1924Encoder()
-                    .encodeToString(fastaSlice.getFastaGz());
-            fastaGzMap.put(key, base85FastaGz);
+            fastaGzMap.put(key, new Bytes(fastaSlice.getFastaGz()));
           });
     } else {
       fastaGzMap = null;
     }
 
     Path genesPath = reportGeneratorSettings.getGenesPath();
-    String genesGz;
+    Bytes genesGz;
     if (genesPath != null) {
       GenesFilter genesFilter = genesFilterFactory.create(genesPath);
-      genesGz =
-          org.molgenis.vcf.report.utils.Base85.getRfc1924Encoder()
-              .encodeToString((genesFilter.filter(vcfFileReader, 250)));
+      genesGz = new Bytes(genesFilter.filter(vcfFileReader, 250));
     } else {
       genesGz = null;
     }
 
-    Map<String, String> bamMap = new LinkedHashMap<>();
+    Map<String, Bytes> bamMap = new LinkedHashMap<>();
     sampleSettings
         .getBamPaths()
         .forEach(
             (sampleId, bamPath) -> {
               BamSlice bamSlice =
                   vcfBamSlicerFactory.create(bamPath).generate(vcfFileReader, 250, sampleId);
-              bamMap.put(sampleId, base85Encoder.encode(bamSlice.getBam()));
+              bamMap.put(sampleId, new Bytes(bamSlice.getBam()));
             });
 
-    Path decisionTreePath = reportGeneratorSettings.getDecisionTreePath();
-    String decisionTreeGz;
-    if (decisionTreePath != null) {
-      decisionTreeGz = base85Encoder.encode(decisionTreePath);
+    Bytes vcfBytes;
+    if (vcfPath.toString().endsWith(".gz")) {
+      try (GZIPInputStream inputStream = new GZIPInputStream(Files.newInputStream(vcfPath))) {
+        vcfBytes = new Bytes(inputStream.readAllBytes());
+      }
     } else {
-      decisionTreeGz = null;
+      vcfBytes = new Bytes(Files.readAllBytes(vcfPath));
     }
 
-    Base85 base85 = new Base85(base85Encoder.encode(vcfPath), fastaGzMap, genesGz, bamMap, decisionTreeGz);
-    return new Report(reportMetadata, reportData, base85);
+    Path decisionTreePath = reportGeneratorSettings.getDecisionTreePath();
+    Map<?,?> decisionTree;
+    if (decisionTreePath != null) {
+      try {
+        ObjectMapper mapper = new ObjectMapper();
+        decisionTree = mapper.readValue(decisionTreePath.toFile(), Map.class);
+      } catch (IOException e) {
+        throw new UncheckedIOException(e);
+      }
+    } else {
+      decisionTree = null;
+    }
+
+    Binary binary = new Binary(vcfBytes, fastaGzMap, genesGz, bamMap);
+    return new Report(reportMetadata, reportData, binary, decisionTree);
   }
 
   private static String getFastaSliceIdentifier(FastaSlice fastaSlice) {
