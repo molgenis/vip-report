@@ -1,10 +1,10 @@
 package org.molgenis.vcf.report;
 
 import static java.lang.String.format;
-import static org.molgenis.vcf.report.mapper.PhenopacketMapper.PHENOTYPE_SEPARATOR;
-import static org.molgenis.vcf.report.mapper.PhenopacketMapper.SAMPLE_PHENOTYPE_SEPARATOR;
-import static org.molgenis.vcf.report.mapper.PhenopacketMapper.checkPhenotype;
 import static org.molgenis.vcf.report.utils.PathUtils.parsePaths;
+import static org.molgenis.vcf.utils.sample.mapper.PhenopacketMapper.PHENOTYPE_SEPARATOR;
+import static org.molgenis.vcf.utils.sample.mapper.PhenopacketMapper.SAMPLE_PHENOTYPE_SEPARATOR;
+import static org.molgenis.vcf.utils.sample.mapper.PhenopacketMapper.checkPhenotype;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,7 +14,8 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.molgenis.vcf.report.generator.ReportGeneratorSettings;
 import org.molgenis.vcf.report.utils.InvalidSampleBamException;
-import org.molgenis.vcf.report.utils.InvalidSamplePhenotypesException;
+import org.molgenis.vcf.utils.InvalidSamplePhenotypesException;
+import org.molgenis.vcf.utils.MixedPhenotypesException;
 
 class AppCommandLineOptions {
 

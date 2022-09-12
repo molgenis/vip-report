@@ -6,6 +6,8 @@ import java.util.List;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.NonFinal;
+import org.molgenis.vcf.utils.sample.model.Phenopacket;
+import org.molgenis.vcf.utils.sample.model.Sample;
 
 @Value
 @NonFinal
