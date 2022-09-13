@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.NonFinal;
+import org.molgenis.vcf.utils.model.metadata.HtsFile;
 
 @Value
 @NonFinal

@@ -3,7 +3,7 @@ package org.molgenis.vcf.report;
 import static java.util.Collections.emptyList;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.molgenis.vcf.report.model.metadata.HtsFormat.VCF;
+import static org.molgenis.vcf.utils.model.metadata.HtsFormat.VCF;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -29,8 +29,8 @@ import org.molgenis.vcf.report.model.Bytes;
 import org.molgenis.vcf.report.model.Report;
 import org.molgenis.vcf.report.model.ReportData;
 import org.molgenis.vcf.report.model.metadata.AppMetadata;
-import org.molgenis.vcf.report.model.metadata.HtsFile;
 import org.molgenis.vcf.report.model.metadata.ReportMetadata;
+import org.molgenis.vcf.utils.model.metadata.HtsFile;
 
 @ExtendWith(MockitoExtension.class)
 class ReportServiceTest {

@@ -25,9 +25,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.molgenis.vcf.report.mapper.IllegalPhenotypeArgumentException;
 import org.molgenis.vcf.report.utils.InvalidSampleBamException;
-import org.molgenis.vcf.report.utils.InvalidSamplePhenotypesException;
+import org.molgenis.vcf.utils.InvalidSamplePhenotypesException;
+import org.molgenis.vcf.utils.MixedPhenotypesException;
+import org.molgenis.vcf.utils.sample.mapper.IllegalPhenotypeArgumentException;
 import org.springframework.util.ResourceUtils;
 
 @ExtendWith(MockitoExtension.class)

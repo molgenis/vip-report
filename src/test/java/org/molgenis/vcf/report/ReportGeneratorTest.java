@@ -7,7 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.molgenis.vcf.report.model.metadata.HtsFormat.VCF;
+import static org.molgenis.vcf.utils.model.metadata.HtsFormat.VCF;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import htsjdk.variant.vcf.VCFHeader;
@@ -32,28 +32,29 @@ import org.molgenis.vcf.report.generator.ReportGenerator;
 import org.molgenis.vcf.report.generator.ReportGeneratorSettings;
 import org.molgenis.vcf.report.generator.SampleSettings;
 import org.molgenis.vcf.report.genes.GenesFilterFactory;
-import org.molgenis.vcf.report.mapper.HtsFileMapper;
-import org.molgenis.vcf.report.mapper.HtsJdkToPersonsMapper;
-import org.molgenis.vcf.report.mapper.PedToSamplesMapper;
-import org.molgenis.vcf.report.mapper.PhenopacketMapper;
 import org.molgenis.vcf.report.model.Binary;
 import org.molgenis.vcf.report.model.Bytes;
-import org.molgenis.vcf.report.model.Items;
-import org.molgenis.vcf.report.model.Phenopacket;
 import org.molgenis.vcf.report.model.Report;
 import org.molgenis.vcf.report.model.ReportData;
-import org.molgenis.vcf.report.model.Sample;
 import org.molgenis.vcf.report.model.metadata.AppMetadata;
-import org.molgenis.vcf.report.model.metadata.HtsFile;
+
 import org.molgenis.vcf.report.model.metadata.ReportMetadata;
-import org.molgenis.vcf.report.utils.PersonListMerger;
+import org.molgenis.vcf.utils.PersonListMerger;
+import org.molgenis.vcf.utils.model.metadata.HtsFile;
+import org.molgenis.vcf.utils.sample.mapper.HtsFileMapper;
+import org.molgenis.vcf.utils.sample.mapper.HtsJdkToPersonsMapper;
+import org.molgenis.vcf.utils.sample.mapper.PhenopacketMapper;
+import org.molgenis.vcf.utils.sample.model.AffectedStatus;
+import org.molgenis.vcf.utils.sample.model.Person;
+import org.molgenis.vcf.utils.sample.model.Phenopacket;
+import org.molgenis.vcf.utils.sample.model.Sample;
+import org.molgenis.vcf.utils.sample.model.Sex;
 
 @ExtendWith(MockitoExtension.class)
 class ReportGeneratorTest {
 
   @Mock private HtsJdkToPersonsMapper htsJdkToPersonsMapper;
   @Mock private PhenopacketMapper phenopacketMapper;
-  @Mock private PedToSamplesMapper pedToSamplesMapper;
   @Mock private PersonListMerger personListMerger;
   @Mock private HtsFileMapper htsFileMapper;
   @Mock private VcfFastaSlicerFactory vcfFastaSlicerFactory;
@@ -67,7 +68,6 @@ class ReportGeneratorTest {
         new ReportGenerator(
             htsJdkToPersonsMapper,
             phenopacketMapper,
-            pedToSamplesMapper,
             personListMerger,
             htsFileMapper,
             vcfFastaSlicerFactory,
@@ -80,12 +80,12 @@ class ReportGeneratorTest {
     int maxNrSamples = 10;
     int maxNrRecords = 100;
 
-    Items<Sample> vcfSampleItems = new Items<>(emptyList(), 3);
+    List<Sample> vcfSampleItems = emptyList();
     when(htsJdkToPersonsMapper.map(any(VCFHeader.class), eq(maxNrSamples)))
         .thenReturn(vcfSampleItems);
 
     List<Phenopacket> phenopacketList = emptyList();
-    Items<Phenopacket> phenopacketItems = new Items<>(phenopacketList, 5);
+    List<Phenopacket> phenopacketItems = phenopacketList;
     when(phenopacketMapper.mapPhenotypes(any(), any())).thenReturn(phenopacketItems);
 
     Path inputVcfPath = Paths.get("src", "test", "resources", "example.vcf");
@@ -94,13 +94,19 @@ class ReportGeneratorTest {
         Collections.singletonList(Paths.get("src", "test", "resources", "example.ped"));
     Path referencePath = Paths.get("src", "test", "resources", "example.fasta.gz");
 
-    Map<String, Sample> pedSampleItems = emptyMap();
-    when(pedToSamplesMapper.mapPedFileToPersons(pedPath, 10)).thenReturn(pedSampleItems);
+    Map<String, Sample> pedSampleItems =
+        Map.of("John", Sample.builder().person(Person.builder().familyId("FAM001").sex(Sex.MALE).affectedStatus(
+            AffectedStatus.AFFECTED).maternalId("Jane").individualId("John").paternalId("Jimmy").build()).proband(false).index(-1).build(),
+            "James", Sample.builder().person(Person.builder().familyId("FAM002").sex(Sex.MALE).affectedStatus(
+            AffectedStatus.UNAFFECTED).maternalId("0").individualId("James").paternalId("0").build()).proband(false).index(-1).build(),
+            "Jane", Sample.builder().person(Person.builder().familyId("FAM001").sex(Sex.FEMALE).affectedStatus(
+            AffectedStatus.UNAFFECTED).maternalId("0").individualId("Jane").paternalId("0").build()).proband(false).index(-1).build(),
+            "Jimmy", Sample.builder().person(Person.builder().familyId("FAM001").sex(Sex.MALE).affectedStatus(
+            AffectedStatus.UNAFFECTED).maternalId("0").individualId("Jimmy").paternalId("0").build()).proband(false).index(-1).build());
 
     List<Sample> sampleList = emptyList();
-    Items<Sample> sampleItems = new Items<>(sampleList, 6);
-    when(personListMerger.merge(vcfSampleItems.getItems(), pedSampleItems, 10))
-        .thenReturn(sampleItems);
+    when(personListMerger.merge(vcfSampleItems, pedSampleItems, 10))
+        .thenReturn(sampleList);
 
     HtsFile htsFile = new HtsFile("test.vcf", VCF, "GRCh38");
     when(htsFileMapper.map(any(), eq(inputVcfPath.toString()))).thenReturn(htsFile);
