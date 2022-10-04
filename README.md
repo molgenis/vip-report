@@ -32,9 +32,9 @@ usage: java -jar vcf-report.jar -i <arg> [-o <arg>] [-f] [-t <arg>] [-pb
  -g,--genes <arg>            Genes file to be used as reference track in
                              the genome browser, UCSC NCBI RefSeq format
                              (.txt.gz).
- -b,--bam <arg>              Comma-separated list of sample-bam files
+ -c,--cram <arg>              Comma-separated list of sample-bam files
                              (e.g.
-                             sample0=/path/to/0.bam,sample1=/path/to/1.bam
+                             sample0=/path/to/0.cram,sample1=/path/to/1.cram
                              ).
  -dt,--decision_tree <arg>   Decision tree file as used in
                              vip-decision-tree (.json).

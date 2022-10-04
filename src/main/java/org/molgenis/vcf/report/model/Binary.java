@@ -20,6 +20,15 @@ public class Binary {
   @JsonProperty("genesGz")
   Bytes genesGz;
 
-  @JsonProperty("bam")
-  Map<String, Bytes> bam;
+  @JsonProperty("cram")
+  Map<String, Cram> cram;
+
+  @Value
+  @NonFinal
+  public static class Cram {
+    @JsonProperty("cram")
+    Bytes cram;
+    @JsonProperty("crai")
+    Bytes crai;
+  }
 }

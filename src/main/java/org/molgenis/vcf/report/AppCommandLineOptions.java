@@ -13,7 +13,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.molgenis.vcf.report.generator.ReportGeneratorSettings;
-import org.molgenis.vcf.report.utils.InvalidSampleBamException;
+import org.molgenis.vcf.report.utils.InvalidSampleCramException;
 import org.molgenis.vcf.utils.InvalidSamplePhenotypesException;
 import org.molgenis.vcf.utils.MixedPhenotypesException;
 
@@ -47,8 +47,8 @@ class AppCommandLineOptions {
   static final String OPT_GENES_LONG = "genes";
   static final String OPT_TREE = "dt";
   static final String OPT_TREE_LONG = "decision_tree";
-  static final String OPT_BAM = "b";
-  static final String OPT_BAM_LONG = "bam";
+  static final String OPT_CRAM = "c";
+  static final String OPT_CRAM_LONG = "cram";
   private static final Options APP_OPTIONS;
   private static final Options APP_VERSION_OPTIONS;
 
@@ -130,11 +130,11 @@ class AppCommandLineOptions {
                 "Genes file to be used as reference track in the genome browser, UCSC NCBI RefSeq format (.txt.gz).")
             .build());
     appOptions.addOption(
-        Option.builder(OPT_BAM)
+        Option.builder(OPT_CRAM)
             .hasArg(true)
-            .longOpt(OPT_BAM_LONG)
+            .longOpt(OPT_CRAM_LONG)
             .desc(
-                "Comma-separated list of sample-bam files (e.g. sample0=/path/to/0.bam,sample1=/path/to/1.bam).")
+                "Comma-separated list of sample-cram files (e.g. sample0=/path/to/0.cram,sample1=/path/to/1.cram).")
             .build());
     appOptions.addOption(
         Option.builder(OPT_TREE)
@@ -179,7 +179,7 @@ class AppCommandLineOptions {
     validateMaxSamples(commandLine);
     validateReference(commandLine);
     validateGenes(commandLine);
-    validateBam(commandLine);
+    validateCram(commandLine);
     validateTree(commandLine);
   }
 
@@ -227,28 +227,28 @@ class AppCommandLineOptions {
     }
   }
 
-  private static void validateBam(CommandLine commandLine) {
-    if (!commandLine.hasOption(OPT_BAM)) {
+  private static void validateCram(CommandLine commandLine) {
+    if (!commandLine.hasOption(OPT_CRAM)) {
       return;
     }
 
-    String bamString = commandLine.getOptionValue(OPT_BAM);
-    for (String sampleBamString : bamString.split(",")) {
-      String[] tokens = sampleBamString.split("=");
+    String cramString = commandLine.getOptionValue(OPT_CRAM);
+    for (String sampleCramString : cramString.split(",")) {
+      String[] tokens = sampleCramString.split("=");
       if (tokens.length != 2) {
-        throw new InvalidSampleBamException(sampleBamString);
+        throw new InvalidSampleCramException(sampleCramString);
       }
 
-      String bamPathStr = tokens[1];
-      if (!bamPathStr.endsWith(".bam")) {
+      String cramPathStr = tokens[1];
+      if (!cramPathStr.endsWith(".cram")) {
         throw new IllegalArgumentException(
-            format("Input file '%s' is not a .bam file.", bamPathStr));
+            format("Input file '%s' is not a .cram file.", cramPathStr));
       }
 
-      validateFilePath(Path.of(bamPathStr), "bam");
+      validateFilePath(Path.of(cramPathStr), "cram");
 
-      Path bamIndexPath = Path.of(bamPathStr + ".bai");
-      validateFilePath(bamIndexPath, "Bam .bai");
+      Path cramIndexPath = Path.of(cramPathStr + ".crai");
+      validateFilePath(cramIndexPath, "cram .crai");
     }
   }
 

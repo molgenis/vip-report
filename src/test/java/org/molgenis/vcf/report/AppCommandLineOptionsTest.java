@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_BAM;
+import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_CRAM;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_FORCE;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_GENES;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_INPUT;
@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.molgenis.vcf.report.utils.InvalidSampleBamException;
+import org.molgenis.vcf.report.utils.InvalidSampleCramException;
 import org.molgenis.vcf.utils.InvalidSamplePhenotypesException;
 import org.molgenis.vcf.utils.MixedPhenotypesException;
 import org.molgenis.vcf.utils.sample.mapper.IllegalPhenotypeArgumentException;
@@ -599,9 +599,9 @@ class AppCommandLineOptionsTest {
     doReturn(false).when(cmd).hasOption(OPT_PED);
     doReturn(false).when(cmd).hasOption(OPT_REFERENCE);
     doReturn(false).when(cmd).hasOption(OPT_GENES);
-    doReturn(true).when(cmd).hasOption(OPT_BAM);
+    doReturn(true).when(cmd).hasOption(OPT_CRAM);
     doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
-    doReturn(bamPathString).when(cmd).getOptionValue(OPT_BAM);
+    doReturn(bamPathString).when(cmd).getOptionValue(OPT_CRAM);
 
     return cmd;
   }
@@ -610,7 +610,7 @@ class AppCommandLineOptionsTest {
   void validateBamInvalidValue() throws FileNotFoundException {
     CommandLine cmd = validateBamInit("my.bam");
     assertThrows(
-        InvalidSampleBamException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
+        InvalidSampleCramException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
   }
 
   @Test
@@ -622,7 +622,7 @@ class AppCommandLineOptionsTest {
 
   @Test
   void validateBamInvalidFileTypeValueNoIndex() throws FileNotFoundException {
-    CommandLine cmd = validateBamInit("sample0=example_no_index.bam");
+    CommandLine cmd = validateBamInit("sample0=example_no_index.cram");
     assertThrows(
         IllegalArgumentException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
   }
@@ -646,7 +646,7 @@ class AppCommandLineOptionsTest {
     doReturn(false).when(cmd).hasOption(OPT_PED);
     doReturn(false).when(cmd).hasOption(OPT_REFERENCE);
     doReturn(false).when(cmd).hasOption(OPT_GENES);
-    doReturn(false).when(cmd).hasOption(OPT_BAM);
+    doReturn(false).when(cmd).hasOption(OPT_CRAM);
     doReturn(true).when(cmd).hasOption(OPT_TREE);
     doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
     doReturn(treePathString).when(cmd).getOptionValue(OPT_TREE);
