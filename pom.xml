@@ -46,7 +46,7 @@
     <vip.report.template.version>3.1.4</vip.report.template.version>
     <phenopackets.version>1.0.0</phenopackets.version>
     <opencsv.version>5.2</opencsv.version>
-    <vip.utils.version>1.1.1</vip.utils.version>
+    <vip.utils.version>1.1.2</vip.utils.version>
   </properties>
 
   <profiles>
