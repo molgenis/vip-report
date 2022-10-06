@@ -1,6 +1,6 @@
 package org.molgenis.vcf.report;
 
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_BAM;
+import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_CRAM;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_DEBUG;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_FORCE;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_GENES;
@@ -25,6 +25,7 @@ import org.apache.commons.cli.CommandLine;
 import org.molgenis.vcf.report.generator.ReportGeneratorSettings;
 import org.molgenis.vcf.report.generator.ReportWriterSettings;
 import org.molgenis.vcf.report.generator.SampleSettings;
+import org.molgenis.vcf.report.generator.SampleSettings.CramPath;
 import org.molgenis.vcf.report.generator.Settings;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -119,12 +120,12 @@ public class AppCommandLineToSettingsMapper {
       decisionTreePath = null;
     }
 
-    Map<String, Path> bamPaths;
-    if (commandLine.hasOption(OPT_BAM)) {
-      String bamPathValue = commandLine.getOptionValue(OPT_BAM);
-      bamPaths = toBamPaths(bamPathValue);
+    Map<String, CramPath> cramPaths;
+    if (commandLine.hasOption(OPT_CRAM)) {
+      String cramPathValue = commandLine.getOptionValue(OPT_CRAM);
+      cramPaths = toCramPaths(cramPathValue);
     } else {
-      bamPaths = Map.of();
+      cramPaths = Map.of();
     }
 
     boolean overwriteOutput = commandLine.hasOption(OPT_FORCE);
@@ -137,7 +138,7 @@ public class AppCommandLineToSettingsMapper {
             appName, appVersion, appArgs, maxSamples, maxRecords, referencePath, genesPath, decisionTreePath);
     ReportWriterSettings reportWriterSettings = new ReportWriterSettings(templatePath, debugMode);
     SampleSettings sampleSettings =
-        new SampleSettings(probandNames, pedPaths, phenotypes, bamPaths);
+        new SampleSettings(probandNames, pedPaths, phenotypes, cramPaths);
     return new Settings(
         inputPath,
         reportGeneratorSettings,
@@ -147,15 +148,17 @@ public class AppCommandLineToSettingsMapper {
         sampleSettings);
   }
 
-  private Map<String, Path> toBamPaths(String bamPathValue) {
-    Map<String, Path> bamPaths = new LinkedHashMap<>();
-    String[] tokens = bamPathValue.split(",");
+  private Map<String, CramPath> toCramPaths(String cramPathValue) {
+    Map<String, CramPath> cramPaths = new LinkedHashMap<>();
+    String[] tokens = cramPathValue.split(",");
     for (String token : tokens) {
       int idx = token.indexOf("=");
       String sampleId = token.substring(0, idx);
-      Path bamPath = Path.of(token.substring(idx + 1));
-      bamPaths.put(sampleId, bamPath);
+      String cramStr = token.substring(idx + 1);
+      Path cramPath = Path.of(cramStr);
+      Path craiPath = Path.of(cramStr + ".crai");
+      cramPaths.put(sampleId, new CramPath(cramPath, craiPath));
     }
-    return bamPaths;
+    return cramPaths;
   }
 }

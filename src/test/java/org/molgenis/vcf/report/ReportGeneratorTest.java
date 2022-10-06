@@ -1,7 +1,6 @@
 package org.molgenis.vcf.report;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -23,7 +22,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.molgenis.vcf.report.bam.VcfBamSlicerFactory;
 import org.molgenis.vcf.report.fasta.ContigInterval;
 import org.molgenis.vcf.report.fasta.FastaSlice;
 import org.molgenis.vcf.report.fasta.VcfFastaSlicer;
@@ -37,7 +35,6 @@ import org.molgenis.vcf.report.model.Bytes;
 import org.molgenis.vcf.report.model.Report;
 import org.molgenis.vcf.report.model.ReportData;
 import org.molgenis.vcf.report.model.metadata.AppMetadata;
-
 import org.molgenis.vcf.report.model.metadata.ReportMetadata;
 import org.molgenis.vcf.utils.PersonListMerger;
 import org.molgenis.vcf.utils.model.metadata.HtsFile;
@@ -59,7 +56,6 @@ class ReportGeneratorTest {
   @Mock private HtsFileMapper htsFileMapper;
   @Mock private VcfFastaSlicerFactory vcfFastaSlicerFactory;
   @Mock private GenesFilterFactory genesFilterFactory;
-  @Mock private VcfBamSlicerFactory vcfBamSlicerFactory;
   private ReportGenerator reportGenerator;
 
   @BeforeEach
@@ -71,8 +67,7 @@ class ReportGeneratorTest {
             personListMerger,
             htsFileMapper,
             vcfFastaSlicerFactory,
-            genesFilterFactory,
-            vcfBamSlicerFactory);
+            genesFilterFactory);
   }
 
   @Test

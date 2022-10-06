@@ -10,14 +10,11 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
-import org.molgenis.vcf.report.bam.BamSlice;
-import org.molgenis.vcf.report.bam.VcfBamSlicerFactory;
 import org.molgenis.vcf.report.fasta.ContigInterval;
 import org.molgenis.vcf.report.fasta.FastaSlice;
 import org.molgenis.vcf.report.fasta.VcfFastaSlicer;
@@ -25,6 +22,7 @@ import org.molgenis.vcf.report.fasta.VcfFastaSlicerFactory;
 import org.molgenis.vcf.report.genes.GenesFilter;
 import org.molgenis.vcf.report.genes.GenesFilterFactory;
 import org.molgenis.vcf.report.model.Binary;
+import org.molgenis.vcf.report.model.Binary.Cram;
 import org.molgenis.vcf.report.model.Bytes;
 import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.report.model.Report;
@@ -35,7 +33,6 @@ import org.molgenis.vcf.utils.PersonListMerger;
 import org.molgenis.vcf.utils.model.metadata.HtsFile;
 import org.molgenis.vcf.utils.sample.mapper.HtsFileMapper;
 import org.molgenis.vcf.utils.sample.mapper.HtsJdkToPersonsMapper;
-import org.molgenis.vcf.utils.sample.mapper.PedToSamplesMapper;
 import org.molgenis.vcf.utils.sample.mapper.PhenopacketMapper;
 import org.molgenis.vcf.utils.sample.model.Phenopacket;
 import org.molgenis.vcf.utils.sample.model.Sample;
@@ -50,7 +47,6 @@ public class ReportGenerator {
   private final HtsFileMapper htsFileMapper;
   private final VcfFastaSlicerFactory vcfFastaSlicerFactory;
   private final GenesFilterFactory genesFilterFactory;
-  private final VcfBamSlicerFactory vcfBamSlicerFactory;
 
   public ReportGenerator(
       HtsJdkToPersonsMapper htsJdkToPersonsMapper,
@@ -58,15 +54,13 @@ public class ReportGenerator {
       PersonListMerger personListMerger,
       HtsFileMapper htsFileMapper,
       VcfFastaSlicerFactory vcfFastaSlicerFactory,
-      GenesFilterFactory genesFilterFactory,
-      VcfBamSlicerFactory vcfBamSlicerFactory) {
+      GenesFilterFactory genesFilterFactory) {
     this.htsJdkToPersonsMapper = requireNonNull(htsJdkToPersonsMapper);
     this.phenopacketMapper = requireNonNull(phenopacketMapper);
     this.personListMerger = requireNonNull(personListMerger);
     this.htsFileMapper = requireNonNull(htsFileMapper);
     this.vcfFastaSlicerFactory = requireNonNull(vcfFastaSlicerFactory);
     this.genesFilterFactory = requireNonNull(genesFilterFactory);
-    this.vcfBamSlicerFactory = requireNonNull(vcfBamSlicerFactory);
   }
 
   public Report generateReport(
@@ -143,14 +137,20 @@ public class ReportGenerator {
       genesGz = null;
     }
 
-    Map<String, Bytes> bamMap = new LinkedHashMap<>();
+    Map<String, Cram> cramMap = new LinkedHashMap<>();
     sampleSettings
-        .getBamPaths()
+        .getCramPaths()
         .forEach(
-            (sampleId, bamPath) -> {
-              BamSlice bamSlice =
-                  vcfBamSlicerFactory.create(bamPath).generate(vcfFileReader, 250, sampleId);
-              bamMap.put(sampleId, new Bytes(bamSlice.getBam()));
+            (sampleId, cramPath) -> {
+              byte[] cram;
+              byte[] crai;
+              try {
+                cram = Files.readAllBytes(cramPath.getCram());
+                crai = Files.readAllBytes(cramPath.getCrai());
+              } catch (IOException e) {
+                throw new UncheckedIOException(e);
+              }
+              cramMap.put(sampleId, new Cram(new Bytes(cram),new Bytes(crai)));
             });
 
     Bytes vcfBytes;
@@ -175,7 +175,7 @@ public class ReportGenerator {
       decisionTree = null;
     }
 
-    Binary binary = new Binary(vcfBytes, fastaGzMap, genesGz, bamMap);
+    Binary binary = new Binary(vcfBytes, fastaGzMap, genesGz, cramMap);
     return new Report(reportMetadata, reportData, binary, decisionTree);
   }
 

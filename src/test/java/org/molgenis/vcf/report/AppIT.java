@@ -25,7 +25,7 @@ class AppIT {
     String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
     String probands = "NA00001";
     String phenotypes = "Jimmy/HP:123456,Unknown/test:Headache,Jane/OMIM:23456";
-    String bamFile = ResourceUtils.getFile("classpath:example.bam").toString();
+    String bamFile = ResourceUtils.getFile("classpath:example.cram").toString();
 
     String[] args = {
       "-i",
@@ -41,7 +41,7 @@ class AppIT {
       "-ph",
       phenotypes,
       "-d",
-      "-b",
+      "-c",
       "NA00001=" + bamFile
     };
     SpringApplication.run(App.class, args);
