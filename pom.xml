@@ -13,7 +13,7 @@
 
   <groupId>org.molgenis</groupId>
   <artifactId>vip-report</artifactId>
-  <version>4.2.0</version>
+  <version>4.3.0</version>
 
   <name>vip-report</name>
   <description>Report generator for Variant Call Format (VCF) files</description>
@@ -39,14 +39,13 @@
 
   <properties>
     <java.version>17</java.version>
-    <commons.cli.version>1.4</commons.cli.version>
+    <commons.cli.version>1.5.0</commons.cli.version>
     <samtools.htsjdk.version>2.24.1</samtools.htsjdk.version>
     <download-maven-plugin.version>1.6.7</download-maven-plugin.version>
-    <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
+    <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
     <vip.report.template.version>4.0.0</vip.report.template.version>
-    <phenopackets.version>1.0.0</phenopackets.version>
-    <opencsv.version>5.2</opencsv.version>
-    <vip.utils.version>v1.0.0</vip.utils.version>
+    <opencsv.version>5.7.0</opencsv.version>
+    <vip.utils.version>1.1.2</vip.utils.version>
   </properties>
 
   <profiles>
@@ -81,7 +80,7 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>com.github.molgenis</groupId>
+        <groupId>org.molgenis</groupId>
         <artifactId>vip-utils</artifactId>
         <version>${vip.utils.version}</version>
       </dependency>
@@ -103,16 +102,9 @@
     </dependencies>
   </dependencyManagement>
 
-  <repositories>
-    <repository>
-      <id>jitpack.io</id>
-      <url>https://jitpack.io</url>
-    </repository>
-  </repositories>
-
   <dependencies>
     <dependency>
-      <groupId>com.github.molgenis</groupId>
+      <groupId>org.molgenis</groupId>
       <artifactId>vip-utils</artifactId>
     </dependency>
     <dependency>
@@ -143,11 +135,6 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.skyscreamer</groupId>
-      <artifactId>jsonassert</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
