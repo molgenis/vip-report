@@ -491,7 +491,7 @@ class AppCommandLineOptionsTest {
   @Test
   void validateGenes() throws FileNotFoundException {
     String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
-    String genesFile = ResourceUtils.getFile("classpath:exampleGene.txt.gz").toString();
+    String genesFile = ResourceUtils.getFile("classpath:example.genes.gff.gz").toString();
 
     CommandLine cmd = mock(CommandLine.class);
     doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);

@@ -222,8 +222,8 @@ class AppCommandLineOptions {
     validateFilePath(genesPath, "Genes");
 
     String genesPathStr = genesPath.toString();
-    if (!genesPathStr.endsWith(".txt.gz")) {
-      throw new IllegalArgumentException(format("Input file '%s' is not a .txt.gz", genesPathStr));
+    if (!genesPathStr.endsWith(".gff.gz") && !genesPathStr.endsWith(".gff3.gz")) {
+      throw new IllegalArgumentException(format("Input file '%s' is not a .gff.gz or gff3.gz", genesPathStr));
     }
   }
 
