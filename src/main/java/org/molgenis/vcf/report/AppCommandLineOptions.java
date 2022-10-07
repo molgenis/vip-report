@@ -127,7 +127,7 @@ class AppCommandLineOptions {
             .hasArg(true)
             .longOpt(OPT_GENES_LONG)
             .desc(
-                "Genes file to be used as reference track in the genome browser, UCSC NCBI RefSeq format (.txt.gz).")
+                "Genes file to be used as reference track in the genome browser, UCSC NCBI RefSeq GFF file (gff.gz or gff3.gz).")
             .build());
     appOptions.addOption(
         Option.builder(OPT_CRAM)
