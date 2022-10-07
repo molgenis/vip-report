@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.zip.GZIPInputStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,7 +42,20 @@ class GenesFilterTest {
     when(contigInterval.getContig()).thenReturn("chr1");
     when(contigInterval.getStart()).thenReturn(11895);
     when(contigInterval.getStop()).thenReturn(11900);
-    when(vcfIntervalCalculator.calculate(variants, 250)).thenReturn(singletonList(contigInterval));
+    ContigInterval contigInterval2 = mock(ContigInterval.class);
+    when(contigInterval2.getContig()).thenReturn("chr1");
+    when(contigInterval2.getStart()).thenReturn(11870);
+    when(contigInterval2.getStop()).thenReturn(14400);
+    ContigInterval contigInterval3 = mock(ContigInterval.class);
+    when(contigInterval3.getContig()).thenReturn("chr1");
+    when(contigInterval3.getStart()).thenReturn(11890);
+    when(contigInterval3.getStop()).thenReturn(14410);
+    ContigInterval contigInterval4 = mock(ContigInterval.class);
+    when(contigInterval4.getContig()).thenReturn("chr1");
+    when(contigInterval4.getStart()).thenReturn(11890);
+    when(contigInterval4.getStop()).thenReturn(14408);
+    when(vcfIntervalCalculator.calculate(variants, 250)).thenReturn(
+        List.of(contigInterval, contigInterval2, contigInterval3, contigInterval4));
 
     assertEquals(
         "##gff-version 3.1.25\n"
