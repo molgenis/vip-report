@@ -127,7 +127,7 @@ class AppCommandLineOptions {
             .hasArg(true)
             .longOpt(OPT_GENES_LONG)
             .desc(
-                "Genes file to be used as reference track in the genome browser, UCSC NCBI RefSeq format (.txt.gz).")
+                "Genes file to be used as reference track in the genome browser, UCSC NCBI RefSeq GFF file (gff.gz or gff3.gz).")
             .build());
     appOptions.addOption(
         Option.builder(OPT_CRAM)
@@ -222,8 +222,8 @@ class AppCommandLineOptions {
     validateFilePath(genesPath, "Genes");
 
     String genesPathStr = genesPath.toString();
-    if (!genesPathStr.endsWith(".txt.gz")) {
-      throw new IllegalArgumentException(format("Input file '%s' is not a .txt.gz", genesPathStr));
+    if (!genesPathStr.endsWith(".gff.gz") && !genesPathStr.endsWith(".gff3.gz")) {
+      throw new IllegalArgumentException(format("Input file '%s' is not a .gff.gz or gff3.gz", genesPathStr));
     }
   }
 

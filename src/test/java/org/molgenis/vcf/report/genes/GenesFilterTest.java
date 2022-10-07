@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.zip.GZIPInputStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +30,7 @@ class GenesFilterTest {
 
   @BeforeEach
   void setUp() {
-    Path genesGzPath = Path.of("src", "test", "resources", "exampleGene.txt.gz");
+    Path genesGzPath = Path.of("src", "test", "resources", "example.genes.gff.gz");
     genesFilter = new GenesFilter(vcfIntervalCalculator, genesGzPath);
   }
 
@@ -38,28 +39,29 @@ class GenesFilterTest {
     VariantContext variantContext = mock(VariantContext.class);
     Iterable<VariantContext> variants = singletonList(variantContext);
     ContigInterval contigInterval = mock(ContigInterval.class);
-    when(contigInterval.getContig()).thenReturn("1");
-    when(contigInterval.getStart()).thenReturn(661200);
-    when(contigInterval.getStop()).thenReturn(661700);
-    when(vcfIntervalCalculator.calculate(variants, 250)).thenReturn(singletonList(contigInterval));
-
-    assertEquals(
-        "590\tNR_028327.1\tchr1\t-\t661138\t665731\t665731\t665731\t3\t661138,665277,665562,\t665184,665335,665731,\t0\tLOC100133331\tnone\tnone\t-1,-1,-1,\n",
-        decompress(genesFilter.filter(variants, 250)));
-  }
-
-  @Test
-  void filterPrefixedBuild() {
-    VariantContext variantContext = mock(VariantContext.class);
-    Iterable<VariantContext> variants = singletonList(variantContext);
-    ContigInterval contigInterval = mock(ContigInterval.class);
     when(contigInterval.getContig()).thenReturn("chr1");
-    when(contigInterval.getStart()).thenReturn(661200);
-    when(contigInterval.getStop()).thenReturn(661700);
-    when(vcfIntervalCalculator.calculate(variants, 250)).thenReturn(singletonList(contigInterval));
+    when(contigInterval.getStart()).thenReturn(11895);
+    when(contigInterval.getStop()).thenReturn(11900);
+    ContigInterval contigInterval2 = mock(ContigInterval.class);
+    when(contigInterval2.getContig()).thenReturn("chr1");
+    when(contigInterval2.getStart()).thenReturn(11870);
+    when(contigInterval2.getStop()).thenReturn(14400);
+    ContigInterval contigInterval3 = mock(ContigInterval.class);
+    when(contigInterval3.getContig()).thenReturn("chr1");
+    when(contigInterval3.getStart()).thenReturn(11890);
+    when(contigInterval3.getStop()).thenReturn(14410);
+    ContigInterval contigInterval4 = mock(ContigInterval.class);
+    when(contigInterval4.getContig()).thenReturn("chr1");
+    when(contigInterval4.getStart()).thenReturn(11890);
+    when(contigInterval4.getStop()).thenReturn(14408);
+    when(vcfIntervalCalculator.calculate(variants, 250)).thenReturn(
+        List.of(contigInterval, contigInterval2, contigInterval3, contigInterval4));
 
     assertEquals(
-        "590\tNR_028327.1\tchr1\t-\t661138\t665731\t665731\t665731\t3\t661138,665277,665562,\t665184,665335,665731,\t0\tLOC100133331\tnone\tnone\t-1,-1,-1,\n",
+        "##gff-version 3.1.25\n"
+            + "chr1\tBestRefSeq\tpseudogene\t11874\t14409\t.\t+\t.\tID=gene-DDX11L1;Dbxref=GeneID%3A100287102,HGNC%3AHGNC%3A37102;Name=DDX11L1;description=DEAD%2FH-box helicase 11 like 1 %28pseudogene%29;gbkey=Gene;gene=DDX11L1;gene_biotype=transcribed_pseudogene;pseudo=true\n"
+            + "chr1\tBestRefSeq\ttranscript\t11874\t14409\t.\t+\t.\tID=rna-NR_046018.2;Parent=gene-DDX11L1;Dbxref=GeneID%3A100287102,Genbank%3ANR_046018.2,HGNC%3AHGNC%3A37102;Name=NR_046018.2;gbkey=misc_RNA;gene=DDX11L1;product=DEAD%2FH-box helicase 11 like 1 %28pseudogene%29;pseudo=true;transcript_id=NR_046018.2\n"
+            + "chr1\tBestRefSeq\texon\t11874\t12227\t.\t+\t.\tID=exon-NR_046018.2-1;Parent=rna-NR_046018.2;Dbxref=GeneID%3A100287102,Genbank%3ANR_046018.2,HGNC%3AHGNC%3A37102;gbkey=misc_RNA;gene=DDX11L1;product=DEAD%2FH-box helicase 11 like 1 %28pseudogene%29;pseudo=true;transcript_id=NR_046018.2\n",
         decompress(genesFilter.filter(variants, 250)));
   }
 

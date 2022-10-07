@@ -1,15 +1,17 @@
 package org.molgenis.vcf.report.genes;
 
 import static java.util.Objects.requireNonNull;
-import static org.molgenis.vcf.report.genes.GeneFileParser.readGeneFile;
 
+import htsjdk.tribble.AbstractFeatureReader;
+import htsjdk.tribble.gff.Gff3Codec;
+import htsjdk.tribble.gff.Gff3Codec.DecodeDepth;
+import htsjdk.tribble.gff.Gff3Feature;
+import htsjdk.tribble.gff.Gff3Writer;
+import htsjdk.tribble.readers.LineIterator;
 import htsjdk.variant.variantcontext.VariantContext;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.UncheckedIOException;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
 import org.molgenis.vcf.report.fasta.ContigInterval;
@@ -17,7 +19,9 @@ import org.molgenis.vcf.report.fasta.VcfIntervalCalculator;
 import org.molgenis.vcf.report.utils.BestCompressionGZIPOutputStream;
 
 public class GenesFilter {
-  private static final String CHROM_PREFIX = "chr";
+  private static final List<String> FEATURE_SOURCES = List.of("BestRefSeq", "Curated Genomic");
+  private static final List<String> FEATURE_TYPES =
+      List.of("transcript", "primary_transcript", "exon", "mRNA", "pseudogene", "gene");
 
   private final VcfIntervalCalculator vcfIntervalCalculator;
   private final Path genesFile;
@@ -29,23 +33,24 @@ public class GenesFilter {
 
   public byte[] filter(Iterable<VariantContext> variants, int flanking) {
     List<ContigInterval> contigIntervals = vcfIntervalCalculator.calculate(variants, flanking);
-    List<GeneLine> geneLines = readGeneFile(genesFile);
 
     ByteArrayOutputStream output = new ByteArrayOutputStream();
-    try (Writer writer = new OutputStreamWriter(output, StandardCharsets.UTF_8)) {
-      for (GeneLine geneLine : geneLines) {
+
+    final Gff3Codec codec = new Gff3Codec(DecodeDepth.SHALLOW);
+    try (final AbstractFeatureReader<Gff3Feature, LineIterator> reader =
+            AbstractFeatureReader.getFeatureReader(
+                genesFile.toAbsolutePath().toString(), null, codec, false);
+        Gff3Writer writer = new Gff3Writer(output)) {
+      for (final Gff3Feature feature : reader.iterator()) {
+        boolean isAdded = false;
         for (ContigInterval contigInterval : contigIntervals) {
-          if (geneLine.getChrom().equals(contigInterval.getContig().startsWith(CHROM_PREFIX)? contigInterval.getContig() : CHROM_PREFIX + contigInterval.getContig())
-              && ((geneLine.getTxStart() >= contigInterval.getStart()
-                      && geneLine.getTxStart()
-                          <= contigInterval.getStop()) // feature start in region
-                  || (geneLine.getTxEnd() >= contigInterval.getStart()
-                      && geneLine.getTxEnd() <= contigInterval.getStop()) // feature end in region
-                  || (geneLine.getTxStart() <= contigInterval.getStart()
-                      && geneLine.getTxEnd()
-                          >= contigInterval.getStop()))) { // feature overlaps entire contig
-            writer.write(geneLine.toGeneLineString());
-            writer.write("\n");
+          if (!isAdded
+              && feature.getContig().equals(contigInterval.getContig())
+              && isOverlappingFeature(feature, contigInterval)
+              && FEATURE_TYPES.contains(feature.getType())
+              && FEATURE_SOURCES.contains(feature.getSource())) {
+            writer.addFeature(feature);
+            isAdded = true;
           }
         }
       }
@@ -53,5 +58,14 @@ public class GenesFilter {
       throw new UncheckedIOException(e);
     }
     return BestCompressionGZIPOutputStream.compress(output.toByteArray());
+  }
+
+  private boolean isOverlappingFeature(Gff3Feature feature, ContigInterval contigInterval) {
+    return (feature.getStart() >= contigInterval.getStart()
+            && feature.getStart() <= contigInterval.getStop()) // feature start in region
+        || (feature.getEnd() >= contigInterval.getStart()
+            && feature.getEnd() <= contigInterval.getStop()) // feature end in region
+        || (feature.getStart() <= contigInterval.getStart()
+            && feature.getEnd() >= contigInterval.getStop());
   }
 }
