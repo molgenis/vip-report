@@ -40,11 +40,11 @@
   <properties>
     <java.version>17</java.version>
     <commons.cli.version>1.5.0</commons.cli.version>
-    <samtools.htsjdk.version>2.24.1</samtools.htsjdk.version>
+    <samtools.htsjdk.version>3.0.4</samtools.htsjdk.version>
     <download-maven-plugin.version>1.6.8</download-maven-plugin.version>
     <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
     <vip.report.template.version>5.1.5</vip.report.template.version>
-    <opencsv.version>5.7.0</opencsv.version>
+    <opencsv.version>5.7.1</opencsv.version>
     <vip.utils.version>1.1.3</vip.utils.version>
   </properties>
 
