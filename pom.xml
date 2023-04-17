@@ -45,7 +45,7 @@
     <jacoco-maven-plugin.version>0.8.9</jacoco-maven-plugin.version>
     <vip.report.template.version>5.2.3</vip.report.template.version>
     <opencsv.version>5.7.1</opencsv.version>
-    <vip.utils.version>1.1.4</vip.utils.version>
+    <vip.utils.version>1.2.1</vip.utils.version>
   </properties>
 
   <profiles>
