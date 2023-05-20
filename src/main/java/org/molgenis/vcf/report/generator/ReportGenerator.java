@@ -117,7 +117,7 @@ public class ReportGenerator {
     Path referencePath = reportGeneratorSettings.getReferencePath();
     if (referencePath != null) {
       VcfFastaSlicer vcfFastaSlicer = vcfFastaSlicerFactory.create(referencePath);
-      List<FastaSlice> fastaGzSlices = vcfFastaSlicer.generate(vcfFileReader, 250);
+      List<FastaSlice> fastaGzSlices = vcfFastaSlicer.generate(vcfFileReader.getHeader(), vcfFileReader, 250);
       fastaGzMap = new LinkedHashMap<>();
       fastaGzSlices.forEach(
           fastaSlice -> {
@@ -132,7 +132,7 @@ public class ReportGenerator {
     Bytes genesGz;
     if (genesPath != null) {
       GenesFilter genesFilter = genesFilterFactory.create(genesPath);
-      genesGz = new Bytes(genesFilter.filter(vcfFileReader, 250));
+      genesGz = new Bytes(genesFilter.filter(vcfFileReader.getHeader(), vcfFileReader, 250));
     } else {
       genesGz = null;
     }

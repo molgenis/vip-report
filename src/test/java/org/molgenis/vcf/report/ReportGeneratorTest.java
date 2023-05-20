@@ -108,7 +108,7 @@ class ReportGeneratorTest {
 
     VcfFastaSlicer vcfFastaSlicer = mock(VcfFastaSlicer.class);
     FastaSlice fastaSlice = new FastaSlice(new ContigInterval("1", 2, 3), new byte[] {0});
-    when(vcfFastaSlicer.generate(any(), eq(250))).thenReturn(List.of(fastaSlice));
+    when(vcfFastaSlicer.generate(any(), any(), eq(250))).thenReturn(List.of(fastaSlice));
     when(vcfFastaSlicerFactory.create(referencePath)).thenReturn(vcfFastaSlicer);
 
     String phenotypes = "hpo:123456;omim3456";
