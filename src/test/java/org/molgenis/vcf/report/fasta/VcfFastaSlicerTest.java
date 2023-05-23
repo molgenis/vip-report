@@ -7,6 +7,8 @@ import static org.mockito.Mockito.when;
 
 import htsjdk.variant.variantcontext.VariantContext;
 import java.util.List;
+
+import htsjdk.variant.vcf.VCFHeader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,7 +37,9 @@ class VcfFastaSlicerTest {
     ContigInterval contigInterval0 = new ContigInterval("1", 750, 1250);
     ContigInterval contigInterval1 = new ContigInterval("2", 1750, 2250);
 
-    when(vcfIntervalCalculator.calculate(List.of(variantContext1, variantContext2), 250))
+    VCFHeader vcfHeader = mock(VCFHeader.class);
+
+    when(vcfIntervalCalculator.calculate(vcfHeader, List.of(variantContext1, variantContext2), 250))
         .thenReturn(List.of(contigInterval0, contigInterval1));
 
     FastaSlice fastaSlice0 = mock(FastaSlice.class);
@@ -45,6 +49,6 @@ class VcfFastaSlicerTest {
     doReturn(fastaSlice1).when(fastaSlicer).slice(contigInterval1);
 
     assertEquals(List.of(fastaSlice0, fastaSlice1),
-        vcfFastaSlicer.generate(List.of(variantContext1, variantContext2), 250));
+        vcfFastaSlicer.generate(vcfHeader, List.of(variantContext1, variantContext2), 250));
   }
 }

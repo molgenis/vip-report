@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.List;
+
+import htsjdk.variant.vcf.VCFHeader;
 import org.molgenis.vcf.report.fasta.ContigInterval;
 import org.molgenis.vcf.report.fasta.VcfIntervalCalculator;
 import org.molgenis.vcf.report.utils.BestCompressionGZIPOutputStream;
@@ -31,8 +33,8 @@ public class GenesFilter {
     this.genesFile = requireNonNull(genesFile);
   }
 
-  public byte[] filter(Iterable<VariantContext> variants, int flanking) {
-    List<ContigInterval> contigIntervals = vcfIntervalCalculator.calculate(variants, flanking);
+  public byte[] filter(VCFHeader vcfHeader, Iterable<VariantContext> variants, int flanking) {
+    List<ContigInterval> contigIntervals = vcfIntervalCalculator.calculate(vcfHeader, variants, flanking);
 
     ByteArrayOutputStream output = new ByteArrayOutputStream();
 
