@@ -44,7 +44,7 @@ class VcfIntervalCalculatorTest {
     when(variantContext0.getStart()).thenReturn(100);
     VCFHeader vcfHeader = mock(VCFHeader.class);
     assertEquals(
-            List.of(new ContigInterval("1", 0, 300)),
+            List.of(new ContigInterval("1", 1, 300)),
             vcfIntervalCalculator.calculate(vcfHeader, List.of(variantContext0), 200));
   }
 

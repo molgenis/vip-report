@@ -43,7 +43,7 @@ public class VcfIntervalCalculator {
       if (includeVariantContext(sampleId, variantContext)) {
         String contig = variantContext.getContig();
         int pos = variantContext.getStart();
-        int start = Math.max(pos - flanking, 0);
+        int start = Math.max(pos - flanking, 1);
         Integer contigLength = contigLengthMap.get(contig);
         int stop = contigLength != null ? Math.min(pos + flanking, contigLength) : pos + flanking;
         ContigInterval contigInterval = new ContigInterval(contig, start, stop);
