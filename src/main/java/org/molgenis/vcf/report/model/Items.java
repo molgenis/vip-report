@@ -17,6 +17,5 @@ public class Items<E> {
   List<E> items;
 
   @JsonProperty("total")
-  @NonNull
   long total;
 }
