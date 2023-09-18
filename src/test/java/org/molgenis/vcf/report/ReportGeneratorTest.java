@@ -73,7 +73,6 @@ class ReportGeneratorTest {
   @Test
   void generateReport() throws IOException {
     int maxNrSamples = 10;
-    int maxNrRecords = 100;
 
     List<Sample> vcfSampleItems = emptyList();
     when(htsJdkToPersonsMapper.map(any(VCFHeader.class), eq(maxNrSamples)))
@@ -117,7 +116,7 @@ class ReportGeneratorTest {
     String appArgs = "MyArgs";
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
-            appName, appVersion, appArgs, maxNrSamples, maxNrRecords, referencePath, null, treePath);
+            appName, appVersion, appArgs, maxNrSamples, referencePath, null, treePath);
     Report report =
         new Report(
             new ReportMetadata(new AppMetadata(appName, appVersion, appArgs), htsFile),

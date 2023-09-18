@@ -31,8 +31,6 @@ class AppCommandLineOptions {
   static final String OPT_PED_LONG = "pedigree";
   static final String OPT_PHENOTYPES = "ph";
   static final String OPT_PHENOTYPES_LONG = "phenotypes";
-  static final String OPT_MAX_RECORDS = "mr";
-  static final String OPT_MAX_RECORDS_LONG = "max_records";
   static final String OPT_MAX_SAMPLES = "ms";
   static final String OPT_MAX_SAMPLES_LONG = "max_samples";
   static final String OPT_REFERENCE = "r";
@@ -96,15 +94,6 @@ class AppCommandLineOptions {
             .longOpt(OPT_PHENOTYPES_LONG)
             .desc(
                 "Comma-separated list of sample-phenotypes (e.g. HP:123 or HP:123;HP:234 or sample0/HP:123,sample1/HP:234). Phenotypes are CURIE formatted (prefix:reference) and separated by a semicolon.")
-            .build());
-    appOptions.addOption(
-        Option.builder(OPT_MAX_RECORDS)
-            .hasArg(true)
-            .longOpt(OPT_MAX_RECORDS_LONG)
-            .desc(
-                format(
-                    "Integer stating the maximum number of records to be available in the report. Default: %s",
-                    ReportGeneratorSettings.DEFAULT_MAX_NR_RECORDS))
             .build());
     appOptions.addOption(
         Option.builder(OPT_MAX_SAMPLES)
@@ -175,7 +164,6 @@ class AppCommandLineOptions {
     validateProbands(commandLine);
     validatePed(commandLine);
     validatePhenotypes(commandLine);
-    validateMaxRecords(commandLine);
     validateMaxSamples(commandLine);
     validateReference(commandLine);
     validateGenes(commandLine);
@@ -254,10 +242,6 @@ class AppCommandLineOptions {
 
   private static void validateMaxSamples(CommandLine commandLine) {
     validateInteger(commandLine, OPT_MAX_SAMPLES);
-  }
-
-  private static void validateMaxRecords(CommandLine commandLine) {
-    validateInteger(commandLine, OPT_MAX_RECORDS);
   }
 
   private static void validateInteger(CommandLine commandLine, String option) {

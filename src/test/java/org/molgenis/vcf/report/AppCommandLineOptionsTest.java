@@ -9,7 +9,6 @@ import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_CRAM;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_FORCE;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_GENES;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_INPUT;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_MAX_RECORDS;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_MAX_SAMPLES;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_OUTPUT;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_PED;
@@ -425,7 +424,6 @@ class AppCommandLineOptionsTest {
 
     CommandLine cmd = mock(CommandLine.class);
     doReturn(true).when(cmd).hasOption(OPT_MAX_SAMPLES);
-    doReturn(false).when(cmd).hasOption(OPT_MAX_RECORDS);
     doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
     doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
     doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
@@ -442,7 +440,6 @@ class AppCommandLineOptionsTest {
 
     CommandLine cmd = mock(CommandLine.class);
     doReturn(true).when(cmd).hasOption(OPT_MAX_SAMPLES);
-    doReturn(false).when(cmd).hasOption(OPT_MAX_RECORDS);
     doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
     doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
     doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
@@ -454,48 +451,13 @@ class AppCommandLineOptionsTest {
         InvalidIntegerException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
   }
 
-  @Test
-  void validateCommandLineMaxRecordsNoInt() throws FileNotFoundException {
-    String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
-    String pheno = "sample/HP:123456,HP:234567";
-
-    CommandLine cmd = mock(CommandLine.class);
-    doReturn(true).when(cmd).hasOption(OPT_MAX_RECORDS);
-    doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
-    doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
-    doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
-    doReturn(false).when(cmd).hasOption(OPT_PED);
-    doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
-    doReturn("10").when(cmd).getOptionValue(OPT_MAX_RECORDS);
-
-    AppCommandLineOptions.validateCommandLine(cmd);
-  }
-
-  @Test
-  void validateCommandLineMaxRecords() throws FileNotFoundException {
-    String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
-
-    CommandLine cmd = mock(CommandLine.class);
-    doReturn(true).when(cmd).hasOption(OPT_MAX_RECORDS);
-    doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
-    doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
-    doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
-    doReturn(false).when(cmd).hasOption(OPT_PED);
-    doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
-    doReturn("test").when(cmd).getOptionValue(OPT_MAX_RECORDS);
-
-    assertThrows(
-        InvalidIntegerException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
-  }
-
-  @Test
+@Test
   void validateGenes() throws FileNotFoundException {
     String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
     String genesFile = ResourceUtils.getFile("classpath:example.genes.gff.gz").toString();
 
     CommandLine cmd = mock(CommandLine.class);
     doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
-    doReturn(false).when(cmd).hasOption(OPT_MAX_RECORDS);
     doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
     doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
     doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
@@ -515,7 +477,6 @@ class AppCommandLineOptionsTest {
 
     CommandLine cmd = mock(CommandLine.class);
     doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
-    doReturn(false).when(cmd).hasOption(OPT_MAX_RECORDS);
     doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
     doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
     doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
@@ -534,7 +495,6 @@ class AppCommandLineOptionsTest {
 
     CommandLine cmd = mock(CommandLine.class);
     doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
-    doReturn(false).when(cmd).hasOption(OPT_MAX_RECORDS);
     doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
     doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
     doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
@@ -554,7 +514,6 @@ class AppCommandLineOptionsTest {
 
     CommandLine cmd = mock(CommandLine.class);
     doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
-    doReturn(false).when(cmd).hasOption(OPT_MAX_RECORDS);
     doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
     doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
     doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
@@ -574,7 +533,6 @@ class AppCommandLineOptionsTest {
 
     CommandLine cmd = mock(CommandLine.class);
     doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
-    doReturn(false).when(cmd).hasOption(OPT_MAX_RECORDS);
     doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
     doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
     doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
@@ -592,7 +550,6 @@ class AppCommandLineOptionsTest {
 
     CommandLine cmd = mock(CommandLine.class);
     doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
-    doReturn(false).when(cmd).hasOption(OPT_MAX_RECORDS);
     doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
     doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
     doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
@@ -639,7 +596,6 @@ class AppCommandLineOptionsTest {
 
     CommandLine cmd = mock(CommandLine.class);
     doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
-    doReturn(false).when(cmd).hasOption(OPT_MAX_RECORDS);
     doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
     doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
     doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
