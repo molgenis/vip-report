@@ -71,7 +71,6 @@ class ReportServiceTest {
             appVersion,
             appArguments,
             ReportGeneratorSettings.DEFAULT_MAX_NR_SAMPLES,
-            ReportGeneratorSettings.DEFAULT_MAX_NR_RECORDS,
             null,
             null,
             null);

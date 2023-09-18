@@ -57,7 +57,7 @@ contain the following:
 
 ```
 usage: java -jar vcf-report.jar -i <arg> [-o <arg>] [-f] [-t <arg>] [-pb
-       <arg>] [-pd <arg>] [-ph <arg>] [-mr <arg>] [-ms <arg>] [-r <arg>]
+       <arg>] [-pd <arg>] [-ph <arg>] [-ms <arg>] [-r <arg>]
        [-g <arg>] [-b <arg>] [-dt <arg>] [-d]
  -i,--input <arg>            Input VCF file (.vcf or .vcf.gz).
  -o,--output <arg>           Output report file (.html).
@@ -72,8 +72,6 @@ usage: java -jar vcf-report.jar -i <arg> [-o <arg>] [-f] [-t <arg>] [-pb
                              sample0/HP:123,sample1/HP:234). Phenotypes
                              are CURIE formatted (prefix:reference) and
                              separated by a semicolon.
- -mr,--max_records <arg>     Integer stating the maximum number of records
-                             to be available in the report. Default: 100
  -ms,--max_samples <arg>     Integer stating the maximum number of samples
                              to be available in the report. Default: 100
  -r,--reference <arg>        Reference sequence file (.fasta.gz, .fna.gz,
@@ -106,7 +104,7 @@ java -jar vcf-report.jar -i my.vcf.gz -o my-report.html -t my-template.html -pb 
 java -jar vcf-report.jar -i my.vcf.gz -o my-report.html -t my-template.html -pb sample0,sample1 -pd my.ped,my_other.ped
 java -jar vcf-report.jar -i my.vcf.gz -o my-report.html -t my-template.html -pb sample0,sample1 -pd my.ped,my_other.ped -ph HP:0000001;HP:0000002
 java -jar vcf-report.jar -i my.vcf.gz -o my-report.html -t my-template.html -pb sample0,sample1 -pd my.ped,my_other.ped -ph sampleId1/HP:0000001;HP:0000002,sampleId2/HP:0000001
-java -jar vcf-report.jar -i my.vcf.gz -o my-report.html -t my-template.html -pb sample0,sample1 -pd my.ped,my_other.ped -ph sampleId1/HP:0000001;HP:0000002,sampleId2/HP:0000001 -mr 1000 -ms 10
+java -jar vcf-report.jar -i my.vcf.gz -o my-report.html -t my-template.html -pb sample0,sample1 -pd my.ped,my_other.ped -ph sampleId1/HP:0000001;HP:0000002,sampleId2/HP:0000001 -ms 10
 java -jar vcf-report.jar -v
 ```
 
