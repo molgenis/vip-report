@@ -62,8 +62,9 @@ java -jar vcf-report.jar -v
 ```
 
 ## Frequently asked questions
-### Why doesn't my report open in my web browser?
-You report might contain more data than your web browser can handle. Try reducing the number of VCF records, setting a lower value for --max_samples and disabling or reducing alignment data in .cram files.
+### Why doesn't my report load in the web browser?
+You report might contain more data than your web browser can handle. Try reducing the number of VCF records, setting a lower value for `--max_samples` and reducing alignment data in .cram files.
+In case of long-read alignment sequences try removing `--cram` from the argument list.
 
 ## Development
 
