@@ -22,10 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.molgenis.vcf.report.fasta.ContigInterval;
-import org.molgenis.vcf.report.fasta.FastaSlice;
-import org.molgenis.vcf.report.fasta.VcfFastaSlicer;
-import org.molgenis.vcf.report.fasta.VcfFastaSlicerFactory;
+import org.molgenis.vcf.report.fasta.*;
 import org.molgenis.vcf.report.generator.ReportGenerator;
 import org.molgenis.vcf.report.generator.ReportGeneratorSettings;
 import org.molgenis.vcf.report.generator.SampleSettings;
@@ -54,6 +51,7 @@ class ReportGeneratorTest {
   @Mock private PhenopacketMapper phenopacketMapper;
   @Mock private PersonListMerger personListMerger;
   @Mock private HtsFileMapper htsFileMapper;
+  @Mock private CramFastaSlicerFactory cramFastaSlicerFactory;
   @Mock private VcfFastaSlicerFactory vcfFastaSlicerFactory;
   @Mock private GenesFilterFactory genesFilterFactory;
   private ReportGenerator reportGenerator;
@@ -66,6 +64,7 @@ class ReportGeneratorTest {
             phenopacketMapper,
             personListMerger,
             htsFileMapper,
+            cramFastaSlicerFactory,
             vcfFastaSlicerFactory,
             genesFilterFactory);
   }

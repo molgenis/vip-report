@@ -21,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.molgenis.vcf.report.fasta.ContigInterval;
+import org.molgenis.vcf.report.fasta.CramIntervalCalculator;
 import org.molgenis.vcf.report.fasta.VcfIntervalCalculator;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,11 +30,13 @@ class GenesFilterTest {
   private GenesFilter genesFilter;
   @Mock
   private VcfIntervalCalculator vcfIntervalCalculator;
+  @Mock
+  private CramIntervalCalculator cramIntervalCalculator;
 
   @BeforeEach
   void setUp() {
     Path genesGzPath = Path.of("src", "test", "resources", "example.genes.gff.gz");
-    genesFilter = new GenesFilter(vcfIntervalCalculator, genesGzPath);
+    genesFilter = new GenesFilter(vcfIntervalCalculator, cramIntervalCalculator, genesGzPath);
   }
 
   @Test
