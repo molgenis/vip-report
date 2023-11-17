@@ -7,14 +7,19 @@ import java.util.*;
 
 import htsjdk.samtools.SAMRecord;
 import htsjdk.samtools.SAMRecordIterator;
-import htsjdk.samtools.cram.ref.ReferenceSource;
 import org.molgenis.vcf.report.generator.SampleSettings;
 import org.springframework.stereotype.Component;
 
+import static java.util.Objects.requireNonNull;
 import static org.molgenis.vcf.report.utils.IntervalUtils.mergeIntervals;
 
 @Component
 public class CramIntervalCalculator {
+    private final CramReaderFactory cramReaderFactory;
+
+    public CramIntervalCalculator(CramReaderFactory cramReaderFactory) {
+        this.cramReaderFactory = requireNonNull(cramReaderFactory);
+    }
 
     public List<ContigInterval> calculate(
             Map<String, SampleSettings.CramPath> crampaths, Path reference) {
@@ -25,17 +30,17 @@ public class CramIntervalCalculator {
         return intervals;
     }
 
-    private static Map<String, List<ContigInterval>> computeIntervalMap(Map<String, SampleSettings.CramPath> crampaths, Path reference) {
+    private Map<String, List<ContigInterval>> computeIntervalMap(Map<String, SampleSettings.CramPath> crampaths, Path reference) {
         Map<String, List<ContigInterval>> intervalMap = new LinkedHashMap<>();
         for (SampleSettings.CramPath cramPath : crampaths.values()) {
-            try (CRAMFileReader reader = new CRAMFileReader(cramPath.getCram().toFile(), cramPath.getCrai().toFile(), new ReferenceSource(reference))) {
-                SAMRecordIterator it = reader.getIterator();
-                while (it.hasNext()) {
-                    SAMRecord record = it.next();
+            try (CRAMFileReader reader = cramReaderFactory.create(cramPath, reference)) {
+                SAMRecordIterator iterator = reader.getIterator();
+                iterator.stream().forEach(record -> {
                     ContigInterval contigInterval = new ContigInterval(record.getContig(), record.getStart(), record.getEnd());
                     intervalMap.computeIfAbsent(record.getContig(), k -> new ArrayList<>()).add(contigInterval);
-                }
+                });
             }
+
         }
         return intervalMap;
     }
