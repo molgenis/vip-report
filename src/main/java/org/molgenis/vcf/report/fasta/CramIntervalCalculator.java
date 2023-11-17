@@ -35,9 +35,9 @@ public class CramIntervalCalculator {
         for (SampleSettings.CramPath cramPath : crampaths.values()) {
             try (CRAMFileReader reader = cramReaderFactory.create(cramPath, reference)) {
                 SAMRecordIterator iterator = reader.getIterator();
-                iterator.stream().forEach(record -> {
-                    ContigInterval contigInterval = new ContigInterval(record.getContig(), record.getStart(), record.getEnd());
-                    intervalMap.computeIfAbsent(record.getContig(), k -> new ArrayList<>()).add(contigInterval);
+                iterator.stream().forEach(cramRecord -> {
+                    ContigInterval contigInterval = new ContigInterval(cramRecord.getContig(), cramRecord.getStart(), cramRecord.getEnd());
+                    intervalMap.computeIfAbsent(cramRecord.getContig(), k -> new ArrayList<>()).add(contigInterval);
                 });
             }
 

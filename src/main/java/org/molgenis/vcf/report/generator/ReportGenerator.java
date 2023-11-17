@@ -117,8 +117,62 @@ public class ReportGenerator {
     Map<String, Bytes> fastaGzMap;
     Path referencePath = reportGeneratorSettings.getReferencePath();
     Map<String, SampleSettings.CramPath> cramPaths = sampleSettings.getCramPaths();
-    if (referencePath != null) {
+    fastaGzMap = getReferenceTrackData(vcfFileReader, referencePath, cramPaths);
+    Bytes genesGz = getGenesTrackData(vcfFileReader, reportGeneratorSettings, referencePath, cramPaths);
+    Map<String, Cram> cramMap = getAlignmentTrackData(sampleSettings);
+    Bytes vcfBytes = getVariantTrackData(vcfPath);
 
+    Path decisionTreePath = reportGeneratorSettings.getDecisionTreePath();
+    Map<?,?> decisionTree;
+    if (decisionTreePath != null) {
+      try {
+        ObjectMapper mapper = new ObjectMapper();
+        decisionTree = mapper.readValue(decisionTreePath.toFile(), Map.class);
+      } catch (IOException e) {
+        throw new UncheckedIOException(e);
+      }
+    } else {
+      decisionTree = null;
+    }
+
+    Binary binary = new Binary(vcfBytes, fastaGzMap, genesGz, cramMap);
+    return new Report(reportMetadata, reportData, binary, decisionTree);
+  }
+
+  private static Bytes getVariantTrackData(Path vcfPath) throws IOException {
+    Bytes vcfBytes;
+    if (vcfPath.toString().endsWith(".gz")) {
+      try (GZIPInputStream inputStream = new GZIPInputStream(Files.newInputStream(vcfPath))) {
+        vcfBytes = new Bytes(inputStream.readAllBytes());
+      }
+    } else {
+      vcfBytes = new Bytes(Files.readAllBytes(vcfPath));
+    }
+    return vcfBytes;
+  }
+
+  private static Map<String, Cram> getAlignmentTrackData(SampleSettings sampleSettings) {
+    Map<String, Cram> cramMap = new LinkedHashMap<>();
+    sampleSettings
+        .getCramPaths()
+        .forEach(
+            (sampleId, cramPath) -> {
+              byte[] cram;
+              byte[] crai;
+              try {
+                cram = Files.readAllBytes(cramPath.getCram());
+                crai = Files.readAllBytes(cramPath.getCrai());
+              } catch (IOException e) {
+                throw new UncheckedIOException(e);
+              }
+              cramMap.put(sampleId, new Cram(new Bytes(cram),new Bytes(crai)));
+            });
+    return cramMap;
+  }
+
+  private Map<String, Bytes> getReferenceTrackData(VCFFileReader vcfFileReader, Path referencePath, Map<String, SampleSettings.CramPath> cramPaths) {
+    Map<String, Bytes> fastaGzMap;
+    if (referencePath != null) {
       List<FastaSlice> fastaGzSlices;
       if(cramPaths != null && !cramPaths.isEmpty()) {
         CramFastaSlicer cramFastaSlicer = cramFastaSlicerFactory.create(referencePath);
@@ -137,7 +191,10 @@ public class ReportGenerator {
     } else {
       fastaGzMap = null;
     }
+    return fastaGzMap;
+  }
 
+  private Bytes getGenesTrackData(VCFFileReader vcfFileReader, ReportGeneratorSettings reportGeneratorSettings, Path referencePath, Map<String, SampleSettings.CramPath> cramPaths) {
     Path genesPath = reportGeneratorSettings.getGenesPath();
     Bytes genesGz;
     if (genesPath != null) {
@@ -150,47 +207,7 @@ public class ReportGenerator {
     } else {
       genesGz = null;
     }
-
-    Map<String, Cram> cramMap = new LinkedHashMap<>();
-    sampleSettings
-        .getCramPaths()
-        .forEach(
-            (sampleId, cramPath) -> {
-              byte[] cram;
-              byte[] crai;
-              try {
-                cram = Files.readAllBytes(cramPath.getCram());
-                crai = Files.readAllBytes(cramPath.getCrai());
-              } catch (IOException e) {
-                throw new UncheckedIOException(e);
-              }
-              cramMap.put(sampleId, new Cram(new Bytes(cram),new Bytes(crai)));
-            });
-
-    Bytes vcfBytes;
-    if (vcfPath.toString().endsWith(".gz")) {
-      try (GZIPInputStream inputStream = new GZIPInputStream(Files.newInputStream(vcfPath))) {
-        vcfBytes = new Bytes(inputStream.readAllBytes());
-      }
-    } else {
-      vcfBytes = new Bytes(Files.readAllBytes(vcfPath));
-    }
-
-    Path decisionTreePath = reportGeneratorSettings.getDecisionTreePath();
-    Map<?,?> decisionTree;
-    if (decisionTreePath != null) {
-      try {
-        ObjectMapper mapper = new ObjectMapper();
-        decisionTree = mapper.readValue(decisionTreePath.toFile(), Map.class);
-      } catch (IOException e) {
-        throw new UncheckedIOException(e);
-      }
-    } else {
-      decisionTree = null;
-    }
-
-    Binary binary = new Binary(vcfBytes, fastaGzMap, genesGz, cramMap);
-    return new Report(reportMetadata, reportData, binary, decisionTree);
+    return genesGz;
   }
 
   private static String getFastaSliceIdentifier(FastaSlice fastaSlice) {
