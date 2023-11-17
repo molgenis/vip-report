@@ -8,6 +8,8 @@ import htsjdk.variant.vcf.VCFContigHeaderLine;
 import htsjdk.variant.vcf.VCFHeader;
 import org.springframework.stereotype.Component;
 
+import static org.molgenis.vcf.report.utils.IntervalUtils.mergeIntervals;
+
 @Component
 public class VcfIntervalCalculator {
 
@@ -57,27 +59,5 @@ public class VcfIntervalCalculator {
     return sampleId == null
         || (variantContext.hasGenotype(sampleId)
             && variantContext.getGenotype(sampleId).isCalled());
-  }
-
-  /** package-private for testability */
-  static List<ContigInterval> mergeIntervals(List<ContigInterval> intervals) {
-    List<ContigInterval> mergedIntervals = new ArrayList<>();
-    if (intervals.size() < 2) {
-      mergedIntervals = intervals;
-    } else {
-      ContigInterval interval = intervals.get(0);
-      for (int i = 1; i < intervals.size(); ++i) {
-        ContigInterval nextInterval = intervals.get(i);
-        if (nextInterval.getStart() <= interval.getStop() + 1) {
-          interval =
-              new ContigInterval(interval.getContig(), interval.getStart(), nextInterval.getStop());
-        } else {
-          mergedIntervals.add(interval);
-          interval = nextInterval;
-        }
-      }
-      mergedIntervals.add(interval);
-    }
-    return mergedIntervals;
   }
 }
