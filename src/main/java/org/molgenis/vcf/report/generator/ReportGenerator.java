@@ -15,10 +15,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
-import org.molgenis.vcf.report.fasta.ContigInterval;
-import org.molgenis.vcf.report.fasta.FastaSlice;
-import org.molgenis.vcf.report.fasta.VcfFastaSlicer;
-import org.molgenis.vcf.report.fasta.VcfFastaSlicerFactory;
+
+import org.molgenis.vcf.report.fasta.*;
 import org.molgenis.vcf.report.genes.GenesFilter;
 import org.molgenis.vcf.report.genes.GenesFilterFactory;
 import org.molgenis.vcf.report.model.Binary;
@@ -46,6 +44,7 @@ public class ReportGenerator {
   private final PersonListMerger personListMerger;
   private final HtsFileMapper htsFileMapper;
   private final VcfFastaSlicerFactory vcfFastaSlicerFactory;
+  private final CramFastaSlicerFactory cramFastaSlicerFactory;
   private final GenesFilterFactory genesFilterFactory;
 
   public ReportGenerator(
@@ -53,12 +52,14 @@ public class ReportGenerator {
       PhenopacketMapper phenopacketMapper,
       PersonListMerger personListMerger,
       HtsFileMapper htsFileMapper,
+      CramFastaSlicerFactory cramFastaSlicerFactory,
       VcfFastaSlicerFactory vcfFastaSlicerFactory,
       GenesFilterFactory genesFilterFactory) {
     this.htsJdkToPersonsMapper = requireNonNull(htsJdkToPersonsMapper);
     this.phenopacketMapper = requireNonNull(phenopacketMapper);
     this.personListMerger = requireNonNull(personListMerger);
     this.htsFileMapper = requireNonNull(htsFileMapper);
+    this.cramFastaSlicerFactory = requireNonNull(cramFastaSlicerFactory);
     this.vcfFastaSlicerFactory = requireNonNull(vcfFastaSlicerFactory);
     this.genesFilterFactory = requireNonNull(genesFilterFactory);
   }
@@ -115,52 +116,11 @@ public class ReportGenerator {
 
     Map<String, Bytes> fastaGzMap;
     Path referencePath = reportGeneratorSettings.getReferencePath();
-    if (referencePath != null) {
-      VcfFastaSlicer vcfFastaSlicer = vcfFastaSlicerFactory.create(referencePath);
-      List<FastaSlice> fastaGzSlices = vcfFastaSlicer.generate(vcfFileReader.getHeader(), vcfFileReader, 250);
-      fastaGzMap = new LinkedHashMap<>();
-      fastaGzSlices.forEach(
-          fastaSlice -> {
-            String key = getFastaSliceIdentifier(fastaSlice);
-            fastaGzMap.put(key, new Bytes(fastaSlice.getFastaGz()));
-          });
-    } else {
-      fastaGzMap = null;
-    }
-
-    Path genesPath = reportGeneratorSettings.getGenesPath();
-    Bytes genesGz;
-    if (genesPath != null) {
-      GenesFilter genesFilter = genesFilterFactory.create(genesPath);
-      genesGz = new Bytes(genesFilter.filter(vcfFileReader.getHeader(), vcfFileReader, 250));
-    } else {
-      genesGz = null;
-    }
-
-    Map<String, Cram> cramMap = new LinkedHashMap<>();
-    sampleSettings
-        .getCramPaths()
-        .forEach(
-            (sampleId, cramPath) -> {
-              byte[] cram;
-              byte[] crai;
-              try {
-                cram = Files.readAllBytes(cramPath.getCram());
-                crai = Files.readAllBytes(cramPath.getCrai());
-              } catch (IOException e) {
-                throw new UncheckedIOException(e);
-              }
-              cramMap.put(sampleId, new Cram(new Bytes(cram),new Bytes(crai)));
-            });
-
-    Bytes vcfBytes;
-    if (vcfPath.toString().endsWith(".gz")) {
-      try (GZIPInputStream inputStream = new GZIPInputStream(Files.newInputStream(vcfPath))) {
-        vcfBytes = new Bytes(inputStream.readAllBytes());
-      }
-    } else {
-      vcfBytes = new Bytes(Files.readAllBytes(vcfPath));
-    }
+    Map<String, SampleSettings.CramPath> cramPaths = sampleSettings.getCramPaths();
+    fastaGzMap = getReferenceTrackData(vcfFileReader, referencePath, cramPaths);
+    Bytes genesGz = getGenesTrackData(vcfFileReader, reportGeneratorSettings, referencePath, cramPaths);
+    Map<String, Cram> cramMap = getAlignmentTrackData(sampleSettings);
+    Bytes vcfBytes = getVariantTrackData(vcfPath);
 
     Path decisionTreePath = reportGeneratorSettings.getDecisionTreePath();
     Map<?,?> decisionTree;
@@ -177,6 +137,77 @@ public class ReportGenerator {
 
     Binary binary = new Binary(vcfBytes, fastaGzMap, genesGz, cramMap);
     return new Report(reportMetadata, reportData, binary, decisionTree);
+  }
+
+  private static Bytes getVariantTrackData(Path vcfPath) throws IOException {
+    Bytes vcfBytes;
+    if (vcfPath.toString().endsWith(".gz")) {
+      try (GZIPInputStream inputStream = new GZIPInputStream(Files.newInputStream(vcfPath))) {
+        vcfBytes = new Bytes(inputStream.readAllBytes());
+      }
+    } else {
+      vcfBytes = new Bytes(Files.readAllBytes(vcfPath));
+    }
+    return vcfBytes;
+  }
+
+  private static Map<String, Cram> getAlignmentTrackData(SampleSettings sampleSettings) {
+    Map<String, Cram> cramMap = new LinkedHashMap<>();
+    sampleSettings
+        .getCramPaths()
+        .forEach(
+            (sampleId, cramPath) -> {
+              byte[] cram;
+              byte[] crai;
+              try {
+                cram = Files.readAllBytes(cramPath.getCram());
+                crai = Files.readAllBytes(cramPath.getCrai());
+              } catch (IOException e) {
+                throw new UncheckedIOException(e);
+              }
+              cramMap.put(sampleId, new Cram(new Bytes(cram),new Bytes(crai)));
+            });
+    return cramMap;
+  }
+
+  private Map<String, Bytes> getReferenceTrackData(VCFFileReader vcfFileReader, Path referencePath, Map<String, SampleSettings.CramPath> cramPaths) {
+    Map<String, Bytes> fastaGzMap;
+    if (referencePath != null) {
+      List<FastaSlice> fastaGzSlices;
+      if(cramPaths != null && !cramPaths.isEmpty()) {
+        CramFastaSlicer cramFastaSlicer = cramFastaSlicerFactory.create(referencePath);
+        fastaGzSlices = cramFastaSlicer.generate(cramPaths, referencePath);
+      }
+      else{
+        VcfFastaSlicer vcfFastaSlicer = vcfFastaSlicerFactory.create(referencePath);
+        fastaGzSlices = vcfFastaSlicer.generate(vcfFileReader.getHeader(), vcfFileReader, 250);
+      }
+      fastaGzMap = new LinkedHashMap<>();
+      fastaGzSlices.forEach(
+          fastaSlice -> {
+            String key = getFastaSliceIdentifier(fastaSlice);
+            fastaGzMap.put(key, new Bytes(fastaSlice.getFastaGz()));
+          });
+    } else {
+      fastaGzMap = null;
+    }
+    return fastaGzMap;
+  }
+
+  private Bytes getGenesTrackData(VCFFileReader vcfFileReader, ReportGeneratorSettings reportGeneratorSettings, Path referencePath, Map<String, SampleSettings.CramPath> cramPaths) {
+    Path genesPath = reportGeneratorSettings.getGenesPath();
+    Bytes genesGz;
+    if (genesPath != null) {
+      GenesFilter genesFilter = genesFilterFactory.create(genesPath);
+      if(cramPaths != null && !cramPaths.isEmpty()) {
+        genesGz = new Bytes(genesFilter.filter(cramPaths, referencePath));
+      } else {
+        genesGz = new Bytes(genesFilter.filter(vcfFileReader.getHeader(), vcfFileReader, 250));
+      }
+    } else {
+      genesGz = null;
+    }
+    return genesGz;
   }
 
   private static String getFastaSliceIdentifier(FastaSlice fastaSlice) {

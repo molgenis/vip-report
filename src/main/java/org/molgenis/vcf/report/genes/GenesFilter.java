@@ -14,10 +14,13 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 
 import htsjdk.variant.vcf.VCFHeader;
 import org.molgenis.vcf.report.fasta.ContigInterval;
+import org.molgenis.vcf.report.fasta.CramIntervalCalculator;
 import org.molgenis.vcf.report.fasta.VcfIntervalCalculator;
+import org.molgenis.vcf.report.generator.SampleSettings;
 import org.molgenis.vcf.report.utils.BestCompressionGZIPOutputStream;
 
 public class GenesFilter {
@@ -26,16 +29,26 @@ public class GenesFilter {
       List.of("transcript", "primary_transcript", "exon", "mRNA", "pseudogene", "gene");
 
   private final VcfIntervalCalculator vcfIntervalCalculator;
+  private final CramIntervalCalculator cramIntervalCalculator;
   private final Path genesFile;
 
-  public GenesFilter(VcfIntervalCalculator vcfIntervalCalculator, Path genesFile) {
+  public GenesFilter(VcfIntervalCalculator vcfIntervalCalculator, CramIntervalCalculator cramIntervalCalculator, Path genesFile) {
+    this.cramIntervalCalculator = requireNonNull(cramIntervalCalculator);
     this.vcfIntervalCalculator = requireNonNull(vcfIntervalCalculator);
     this.genesFile = requireNonNull(genesFile);
+
+  }
+
+  public byte[] filter(Map<String, SampleSettings.CramPath> crampaths, Path reference) {
+    List<ContigInterval> contigIntervals = cramIntervalCalculator.calculate(crampaths, reference);
+    return filter(contigIntervals);
   }
 
   public byte[] filter(VCFHeader vcfHeader, Iterable<VariantContext> variants, int flanking) {
     List<ContigInterval> contigIntervals = vcfIntervalCalculator.calculate(vcfHeader, variants, flanking);
-
+    return filter(contigIntervals);
+  }
+  private byte[] filter(List<ContigInterval> contigIntervals){
     ByteArrayOutputStream output = new ByteArrayOutputStream();
 
     final Gff3Codec codec = new Gff3Codec(DecodeDepth.SHALLOW);
