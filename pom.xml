@@ -7,13 +7,13 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.1.3</version>
+    <version>3.2.0</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
 
   <groupId>org.molgenis</groupId>
   <artifactId>vip-report</artifactId>
-  <version>5.7.0</version>
+  <version>5.8.0</version>
 
   <name>vip-report</name>
   <description>Report generator for Variant Call Format (VCF) files</description>
@@ -39,13 +39,13 @@
 
   <properties>
     <java.version>17</java.version>
-    <commons.cli.version>1.5.0</commons.cli.version>
-    <samtools.htsjdk.version>4.0.1</samtools.htsjdk.version>
+    <commons.cli.version>1.6.0</commons.cli.version>
+    <samtools.htsjdk.version>4.0.2</samtools.htsjdk.version>
     <download-maven-plugin.version>1.7.1</download-maven-plugin.version>
-    <jacoco-maven-plugin.version>0.8.10</jacoco-maven-plugin.version>
-    <vip.report.template.version>5.6.0</vip.report.template.version>
-    <opencsv.version>5.8</opencsv.version>
-    <vip.utils.version>1.4.1</vip.utils.version>
+    <jacoco-maven-plugin.version>0.8.11</jacoco-maven-plugin.version>
+    <vip.report.template.version>5.7.0</vip.report.template.version>
+    <opencsv.version>5.9</opencsv.version>
+    <vip.utils.version>1.4.5</vip.utils.version>
   </properties>
 
   <profiles>
@@ -150,6 +150,7 @@
           <configuration>
             <compilerArgs>
               <arg>-Xlint</arg>
+              <arg>-Xlint:-processing</arg><!-- disable: perfectly normal for annotations to not have a processor -->
             </compilerArgs>
           </configuration>
         </plugin>
