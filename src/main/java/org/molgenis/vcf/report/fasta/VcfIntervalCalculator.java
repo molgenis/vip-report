@@ -19,9 +19,8 @@ public class VcfIntervalCalculator {
 
   public List<ContigInterval> calculate(
       VCFHeader vcfHeader, Iterable<VariantContext> variantContexts, int flanking, String sampleId) {
-    Map<String, Integer> contigLengthMap = createContigLengthMap(vcfHeader.getContigLines());
     Map<String, List<ContigInterval>> intervalMap =
-        computeIntervalMap(variantContexts, flanking, contigLengthMap, sampleId);
+        computeIntervalMap(vcfHeader, variantContexts, flanking, sampleId);
     List<ContigInterval> intervals = new ArrayList<>();
     intervalMap.forEach((key, value) -> intervals.addAll(mergeIntervals(value)));
     return intervals;
@@ -39,8 +38,10 @@ public class VcfIntervalCalculator {
     return contigLengthMap;
   }
 
-  private static Map<String, List<ContigInterval>> computeIntervalMap(Iterable<VariantContext> variantContexts, int flanking, Map<String, Integer> contigLengthMap, String sampleId) {
+  public Map<String, List<ContigInterval>> computeIntervalMap(
+          VCFHeader vcfHeader, Iterable<VariantContext> variantContexts, int flanking, String sampleId) {
     Map<String, List<ContigInterval>> intervalMap = new LinkedHashMap<>();
+    Map<String, Integer> contigLengthMap = createContigLengthMap(vcfHeader.getContigLines());
     for (VariantContext variantContext : variantContexts) {
       if (includeVariantContext(sampleId, variantContext)) {
         String contig = variantContext.getContig();

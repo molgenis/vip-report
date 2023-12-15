@@ -20,11 +20,13 @@ class VcfFastaSlicerFactoryTest {
   private FastaSlicerFactory fastaSlicerFactory;
   @Mock
   private VcfIntervalCalculator vcfIntervalCalculator;
+  @Mock
+  private CramIntervalCalculator cramIntervalCalculator;
   private VcfFastaSlicerFactory vcfFastaSlicerFactory;
 
   @BeforeEach
   void setUpBeforeEach() {
-    vcfFastaSlicerFactory = new VcfFastaSlicerFactory(fastaSlicerFactory, vcfIntervalCalculator);
+    vcfFastaSlicerFactory = new VcfFastaSlicerFactory(fastaSlicerFactory, vcfIntervalCalculator, cramIntervalCalculator);
   }
 
   @Test

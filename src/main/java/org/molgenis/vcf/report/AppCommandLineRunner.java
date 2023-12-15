@@ -7,6 +7,8 @@ import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_FORCE;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_FORCE_LONG;
 
 import ch.qos.logback.classic.Level;
+
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import lombok.NonNull;
@@ -51,7 +53,7 @@ public class AppCommandLineRunner implements CommandLineRunner {
   }
 
   @Override
-  public void run(String... args) {
+  public void run(String... args) throws IOException {
     if (args.length == 1
         && (args[0].equals("-" + AppCommandLineOptions.OPT_VERSION)
             || args[0].equals("--" + AppCommandLineOptions.OPT_VERSION_LONG))) {
@@ -70,7 +72,7 @@ public class AppCommandLineRunner implements CommandLineRunner {
       }
     }
 
-    try {
+
       Settings settings = createSettings(args);
 
       @NonNull Path outputReportPath = settings.getOutputReportPath();
@@ -86,10 +88,7 @@ public class AppCommandLineRunner implements CommandLineRunner {
       LOGGER.info("creating report for '{}' ...", settings.getInputVcfPath());
       reportService.createReport(settings);
       LOGGER.info("created report '{}'", outputReportPath);
-    } catch (Exception e) {
-      LOGGER.error(e.getLocalizedMessage());
-      System.exit(STATUS_MISC_ERROR);
-    }
+
   }
 
   private Settings createSettings(String... args) {
