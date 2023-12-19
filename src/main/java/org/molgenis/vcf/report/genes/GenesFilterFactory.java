@@ -3,23 +3,19 @@ package org.molgenis.vcf.report.genes;
 import static java.util.Objects.requireNonNull;
 
 import java.nio.file.Path;
-
-import org.molgenis.vcf.report.fasta.CramIntervalCalculator;
-import org.molgenis.vcf.report.fasta.VcfIntervalCalculator;
+import org.molgenis.vcf.report.fasta.VariantIntervalCalculator;
 import org.springframework.stereotype.Component;
 
 @Component
 public class GenesFilterFactory {
 
-  private final CramIntervalCalculator cramIntervalCalculator;
-  private final VcfIntervalCalculator vcfIntervalCalculator;
+  private final VariantIntervalCalculator variantIntervalCalculator;
 
-  GenesFilterFactory(VcfIntervalCalculator vcfIntervalCalculator, CramIntervalCalculator cramIntervalCalculator) {
-    this.cramIntervalCalculator = requireNonNull(cramIntervalCalculator);
-    this.vcfIntervalCalculator = requireNonNull(vcfIntervalCalculator);
+  GenesFilterFactory(VariantIntervalCalculator variantIntervalCalculator) {
+    this.variantIntervalCalculator = requireNonNull(variantIntervalCalculator);
   }
 
   public GenesFilter create(Path genesFile) {
-    return new GenesFilter(vcfIntervalCalculator, cramIntervalCalculator, genesFile);
+    return new GenesFilter(variantIntervalCalculator, genesFile);
   }
 }

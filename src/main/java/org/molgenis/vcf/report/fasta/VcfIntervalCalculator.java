@@ -8,37 +8,15 @@ import htsjdk.variant.vcf.VCFContigHeaderLine;
 import htsjdk.variant.vcf.VCFHeader;
 import org.springframework.stereotype.Component;
 
-import static org.molgenis.vcf.report.utils.IntervalUtils.mergeIntervals;
-
 @Component
 public class VcfIntervalCalculator {
 
-  public List<ContigInterval> calculate(VCFHeader vcfHeader, Iterable<VariantContext> variantContexts, int flanking) {
+  public Map<String, List<ContigInterval>> calculate(
+          VCFHeader vcfHeader, Iterable<VariantContext> variantContexts, int flanking) {
     return calculate(vcfHeader, variantContexts, flanking, null);
   }
 
-  public List<ContigInterval> calculate(
-      VCFHeader vcfHeader, Iterable<VariantContext> variantContexts, int flanking, String sampleId) {
-    Map<String, List<ContigInterval>> intervalMap =
-        computeIntervalMap(vcfHeader, variantContexts, flanking, sampleId);
-    List<ContigInterval> intervals = new ArrayList<>();
-    intervalMap.forEach((key, value) -> intervals.addAll(mergeIntervals(value)));
-    return intervals;
-  }
-
-  private Map<String, Integer> createContigLengthMap(List<VCFContigHeaderLine> contigLines) {
-    Map<String, Integer> contigLengthMap = new HashMap<>();
-    contigLines.forEach(contigLine -> {
-      String lengthStr = contigLine.getGenericFields().get("length");
-      if(lengthStr != null) {
-        int length = Integer.parseInt(lengthStr);
-        contigLengthMap.put(contigLine.getID(), length);
-      }
-    });
-    return contigLengthMap;
-  }
-
-  public Map<String, List<ContigInterval>> computeIntervalMap(
+  public Map<String, List<ContigInterval>> calculate(
           VCFHeader vcfHeader, Iterable<VariantContext> variantContexts, int flanking, String sampleId) {
     Map<String, List<ContigInterval>> intervalMap = new LinkedHashMap<>();
     Map<String, Integer> contigLengthMap = createContigLengthMap(vcfHeader.getContigLines());
@@ -54,6 +32,17 @@ public class VcfIntervalCalculator {
       }
     }
     return intervalMap;
+  }
+  private Map<String, Integer> createContigLengthMap(List<VCFContigHeaderLine> contigLines) {
+    Map<String, Integer> contigLengthMap = new HashMap<>();
+    contigLines.forEach(contigLine -> {
+      String lengthStr = contigLine.getGenericFields().get("length");
+      if(lengthStr != null) {
+        int length = Integer.parseInt(lengthStr);
+        contigLengthMap.put(contigLine.getID(), length);
+      }
+    });
+    return contigLengthMap;
   }
 
   private static boolean includeVariantContext(String sampleId, VariantContext variantContext) {

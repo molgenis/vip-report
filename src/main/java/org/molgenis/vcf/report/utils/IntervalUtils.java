@@ -3,6 +3,8 @@ package org.molgenis.vcf.report.utils;
 import org.molgenis.vcf.report.fasta.ContigInterval;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class IntervalUtils {
@@ -13,6 +15,7 @@ public class IntervalUtils {
         if (intervals.size() < 2) {
             mergedIntervals = intervals;
         } else {
+            Collections.sort(intervals, Comparator.comparingInt(ContigInterval::getStart));
             ContigInterval interval = intervals.get(0);
             for (int i = 1; i < intervals.size(); ++i) {
                 ContigInterval nextInterval = intervals.get(i);

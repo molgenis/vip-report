@@ -8,7 +8,7 @@ import htsjdk.tribble.gff.Gff3Codec.DecodeDepth;
 import htsjdk.tribble.gff.Gff3Feature;
 import htsjdk.tribble.gff.Gff3Writer;
 import htsjdk.tribble.readers.LineIterator;
-import htsjdk.variant.variantcontext.VariantContext;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -16,38 +16,31 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
-import htsjdk.variant.vcf.VCFHeader;
+import htsjdk.variant.vcf.VCFFileReader;
 import org.molgenis.vcf.report.fasta.ContigInterval;
-import org.molgenis.vcf.report.fasta.CramIntervalCalculator;
-import org.molgenis.vcf.report.fasta.VcfIntervalCalculator;
 import org.molgenis.vcf.report.generator.SampleSettings;
 import org.molgenis.vcf.report.utils.BestCompressionGZIPOutputStream;
+import org.molgenis.vcf.report.fasta.VariantIntervalCalculator;
 
 public class GenesFilter {
   private static final List<String> FEATURE_SOURCES = List.of("BestRefSeq", "Curated Genomic");
   private static final List<String> FEATURE_TYPES =
       List.of("transcript", "primary_transcript", "exon", "mRNA", "pseudogene", "gene");
 
-  private final VcfIntervalCalculator vcfIntervalCalculator;
-  private final CramIntervalCalculator cramIntervalCalculator;
+  private final VariantIntervalCalculator variantIntervalCalculator;
   private final Path genesFile;
 
-  public GenesFilter(VcfIntervalCalculator vcfIntervalCalculator, CramIntervalCalculator cramIntervalCalculator, Path genesFile) {
-    this.cramIntervalCalculator = requireNonNull(cramIntervalCalculator);
-    this.vcfIntervalCalculator = requireNonNull(vcfIntervalCalculator);
+  public GenesFilter(VariantIntervalCalculator variantIntervalCalculator, Path genesFile) {
+    this.variantIntervalCalculator = requireNonNull(variantIntervalCalculator);
     this.genesFile = requireNonNull(genesFile);
 
   }
 
-  public byte[] filter(Map<String, SampleSettings.CramPath> crampaths, Path reference) {
-    List<ContigInterval> contigIntervals = cramIntervalCalculator.calculate(crampaths, reference);
+  public byte[] filter(VCFFileReader variants, Map<String, SampleSettings.CramPath> cramPaths, Path reference) {
+    List<ContigInterval> contigIntervals = variantIntervalCalculator.calculate(variants, cramPaths, reference);
     return filter(contigIntervals);
   }
 
-  public byte[] filter(VCFHeader vcfHeader, Iterable<VariantContext> variants, int flanking) {
-    List<ContigInterval> contigIntervals = vcfIntervalCalculator.calculate(vcfHeader, variants, flanking);
-    return filter(contigIntervals);
-  }
   private byte[] filter(List<ContigInterval> contigIntervals){
     ByteArrayOutputStream output = new ByteArrayOutputStream();
 

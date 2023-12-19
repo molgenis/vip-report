@@ -166,8 +166,8 @@ public class ReportGenerator {
   private Map<String, Bytes> getReferenceTrackData(VCFFileReader vcfFileReader, Path referencePath, Map<String, SampleSettings.CramPath> cramPaths) {
     Map<String, Bytes> fastaGzMap;
     if (referencePath != null) {
-      VcfFastaSlicer vcfFastaSlicer = vcfFastaSlicerFactory.create(referencePath);
-      fastaGzMap = vcfFastaSlicer.generate(vcfFileReader, cramPaths, referencePath);
+      VariantFastaSlicer variantFastaSlicer = vcfFastaSlicerFactory.create(referencePath);
+      fastaGzMap = variantFastaSlicer.generate(vcfFileReader, cramPaths, referencePath);
     } else {
       fastaGzMap = null;
     }
@@ -179,11 +179,7 @@ public class ReportGenerator {
     Bytes genesGz;
     if (genesPath != null) {
       GenesFilter genesFilter = genesFilterFactory.create(genesPath);
-      if(cramPaths != null && !cramPaths.isEmpty()) {
-        genesGz = new Bytes(genesFilter.filter(cramPaths, referencePath));
-      } else {
-        genesGz = new Bytes(genesFilter.filter(vcfFileReader.getHeader(), vcfFileReader, 250));
-      }
+      genesGz = new Bytes(genesFilter.filter(vcfFileReader, cramPaths, referencePath));
     } else {
       genesGz = null;
     }

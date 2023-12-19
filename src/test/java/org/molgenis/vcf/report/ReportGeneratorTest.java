@@ -102,10 +102,10 @@ class ReportGeneratorTest {
     HtsFile htsFile = new HtsFile("test.vcf", VCF, "GRCh38");
     when(htsFileMapper.map(any(), eq(inputVcfPath.toString()))).thenReturn(htsFile);
 
-    VcfFastaSlicer vcfFastaSlicer = mock(VcfFastaSlicer.class);
+    VariantFastaSlicer variantFastaSlicer = mock(VariantFastaSlicer.class);
     Map<String, Bytes> fastaMap = Map.of("1:2-3", new Bytes(new byte[] {0}));
-    when(vcfFastaSlicer.generate(any(), any(), any())).thenReturn(fastaMap);
-    when(vcfFastaSlicerFactory.create(referencePath)).thenReturn(vcfFastaSlicer);
+    when(variantFastaSlicer.generate(any(), any(), any())).thenReturn(fastaMap);
+    when(vcfFastaSlicerFactory.create(referencePath)).thenReturn(variantFastaSlicer);
 
     String phenotypes = "hpo:123456;omim3456";
     String appName = "MyApp";
