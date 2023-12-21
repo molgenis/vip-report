@@ -3,10 +3,6 @@ package org.molgenis.vcf.report.fasta;
 import htsjdk.samtools.CRAMFileReader;
 import htsjdk.samtools.SAMRecord;
 import htsjdk.samtools.SAMRecordIterator;
-import htsjdk.variant.variantcontext.Genotype;
-import htsjdk.variant.variantcontext.VariantContext;
-import htsjdk.variant.vcf.VCFContigHeaderLine;
-import htsjdk.variant.vcf.VCFHeader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,13 +26,17 @@ class CramIntervalCalculatorTest {
 
     private CramIntervalCalculator cramIntervalCalculator;
 
-    @Mock CramReaderFactory cramReaderFactory;
-    @Mock CRAMFileReader cramFileReader;
-    @Mock SAMRecordIterator samRecordIterator;
+    @Mock
+    CramReaderFactory cramReaderFactory;
+    @Mock
+    CRAMFileReader cramFileReader;
+    @Mock
+    SAMRecordIterator samRecordIterator;
 
     @BeforeEach
     void setUp() {
     }
+
     @BeforeEach
     void setUpBeforeEach() {
         cramIntervalCalculator = new CramIntervalCalculator(cramReaderFactory);
@@ -59,12 +59,12 @@ class CramIntervalCalculatorTest {
         when(samRecord2.getEnd()).thenReturn(19999);
         when(samRecord2.getContig()).thenReturn("chrX");
 
-        when(cramReaderFactory.create(cramPath,reference)).thenReturn(cramFileReader);
+        when(cramReaderFactory.create(cramPath, reference)).thenReturn(cramFileReader);
         when(cramFileReader.getIterator()).thenReturn(samRecordIterator);
         when(samRecordIterator.stream()).thenReturn(List.of(samRecord1, samRecord2).stream());
 
         assertEquals(
-                List.of(new ContigInterval("chr2", 123, 1234), new ContigInterval("chrX", 999, 19999)),
+                Map.of("chr2", List.of(new ContigInterval("chr2", 123, 1234)), "chrX", List.of(new ContigInterval("chrX", 999, 19999))),
                 cramIntervalCalculator.calculate(Map.of("TEST", cramPath), reference));
     }
 }

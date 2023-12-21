@@ -3,22 +3,23 @@ package org.molgenis.vcf.report.fasta;
 import static java.util.Objects.requireNonNull;
 
 import java.nio.file.Path;
+
 import org.springframework.stereotype.Component;
 
 @Component
 public class VcfFastaSlicerFactory {
 
   private final FastaSlicerFactory fastaSlicerFactory;
-  private final VcfIntervalCalculator vcfIntervalCalculator;
+  private final VariantIntervalCalculator variantIntervalCalculator;
 
   VcfFastaSlicerFactory(FastaSlicerFactory fastaSlicerFactory,
-      VcfIntervalCalculator vcfIntervalCalculator) {
+                        VariantIntervalCalculator variantIntervalCalculator) {
     this.fastaSlicerFactory = requireNonNull(fastaSlicerFactory);
-    this.vcfIntervalCalculator = requireNonNull(vcfIntervalCalculator);
+    this.variantIntervalCalculator = requireNonNull(variantIntervalCalculator);
   }
 
-  public VcfFastaSlicer create(Path fastaGzPath) {
+  public VariantFastaSlicer create(Path fastaGzPath) {
     FastaSlicer fastaSlicer = fastaSlicerFactory.create(fastaGzPath);
-    return new VcfFastaSlicer(fastaSlicer, vcfIntervalCalculator);
+    return new VariantFastaSlicer(fastaSlicer, variantIntervalCalculator);
   }
 }
