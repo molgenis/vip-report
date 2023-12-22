@@ -12,7 +12,7 @@ report template.
 ```
 usage: java -jar vcf-report.jar -i <arg> [-o <arg>] [-f] [-t <arg>] [-pb
        <arg>] [-pd <arg>] [-ph <arg>] [-ms <arg>] [-r <arg>]
-       [-g <arg>] [-c <arg>] [-dt <arg>] [-d]
+       [-g <arg>] [-c <arg>] [-b <args>] [-dt <arg>] [-d]
  -i,--input <arg>            Input VCF file (.vcf or .vcf.gz).
  -o,--output <arg>           Output report file (.html).
  -f,--force                  Override the output file if it already
@@ -33,9 +33,13 @@ usage: java -jar vcf-report.jar -i <arg> [-o <arg>] [-f] [-t <arg>] [-pb
  -g,--genes <arg>            Genes file to be used as reference track in the 
                              genome browser, UCSC NCBI RefSeq GFF file 
                              (gff.gz or gff3.gz).
- -c,--cram <arg>             Comma-separated list of sample-bam files
+ -c,--cram <arg>             Comma-separated list of sample-cram files
                              (e.g.
                              sample0=/path/to/0.cram,sample1=/path/to/1.cram
+                             ).
+ -b, --bedmethyl <arg>       Comma-separated list of sample-bedmethyl files 
+                             (e.g. 
+                             sample0=/path/0.bedmethyl,sample1=/path/1.bedmethyl
                              ).
  -dt,--decision_tree <arg>   Decision tree file as used in
                              vip-decision-tree (.json).
