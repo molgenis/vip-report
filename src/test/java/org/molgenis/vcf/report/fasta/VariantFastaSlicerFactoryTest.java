@@ -14,17 +14,18 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class VcfFastaSlicerFactoryTest {
+class VariantFastaSlicerFactoryTest {
 
   @Mock
   private FastaSlicerFactory fastaSlicerFactory;
   @Mock
-  private VcfIntervalCalculator vcfIntervalCalculator;
+  private VariantIntervalCalculator variantIntervalCalculator;
+
   private VcfFastaSlicerFactory vcfFastaSlicerFactory;
 
   @BeforeEach
   void setUpBeforeEach() {
-    vcfFastaSlicerFactory = new VcfFastaSlicerFactory(fastaSlicerFactory, vcfIntervalCalculator);
+    vcfFastaSlicerFactory = new VcfFastaSlicerFactory(fastaSlicerFactory, variantIntervalCalculator);
   }
 
   @Test

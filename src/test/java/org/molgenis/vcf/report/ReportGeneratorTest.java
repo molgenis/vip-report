@@ -51,7 +51,6 @@ class ReportGeneratorTest {
   @Mock private PhenopacketMapper phenopacketMapper;
   @Mock private PersonListMerger personListMerger;
   @Mock private HtsFileMapper htsFileMapper;
-  @Mock private CramFastaSlicerFactory cramFastaSlicerFactory;
   @Mock private VcfFastaSlicerFactory vcfFastaSlicerFactory;
   @Mock private GenesFilterFactory genesFilterFactory;
   private ReportGenerator reportGenerator;
@@ -64,7 +63,6 @@ class ReportGeneratorTest {
             phenopacketMapper,
             personListMerger,
             htsFileMapper,
-            cramFastaSlicerFactory,
             vcfFastaSlicerFactory,
             genesFilterFactory);
   }
@@ -104,10 +102,10 @@ class ReportGeneratorTest {
     HtsFile htsFile = new HtsFile("test.vcf", VCF, "GRCh38");
     when(htsFileMapper.map(any(), eq(inputVcfPath.toString()))).thenReturn(htsFile);
 
-    VcfFastaSlicer vcfFastaSlicer = mock(VcfFastaSlicer.class);
-    FastaSlice fastaSlice = new FastaSlice(new ContigInterval("1", 2, 3), new byte[] {0});
-    when(vcfFastaSlicer.generate(any(), any(), eq(250))).thenReturn(List.of(fastaSlice));
-    when(vcfFastaSlicerFactory.create(referencePath)).thenReturn(vcfFastaSlicer);
+    VariantFastaSlicer variantFastaSlicer = mock(VariantFastaSlicer.class);
+    Map<String, Bytes> fastaMap = Map.of("1:2-3", new Bytes(new byte[] {0}));
+    when(variantFastaSlicer.generate(any(), any(), any())).thenReturn(fastaMap);
+    when(vcfFastaSlicerFactory.create(referencePath)).thenReturn(variantFastaSlicer);
 
     String phenotypes = "hpo:123456;omim3456";
     String appName = "MyApp";
