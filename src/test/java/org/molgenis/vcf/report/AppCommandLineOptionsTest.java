@@ -5,17 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_CRAM;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_FORCE;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_GENES;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_INPUT;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_MAX_SAMPLES;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_OUTPUT;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_PED;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_PHENOTYPES;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_REFERENCE;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_TEMPLATE;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_TREE;
+import static org.molgenis.vcf.report.AppCommandLineOptions.*;
 
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
@@ -24,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.molgenis.vcf.report.utils.InvalidSampleBedmethylException;
 import org.molgenis.vcf.report.utils.InvalidSampleCramException;
 import org.molgenis.vcf.utils.InvalidSamplePhenotypesException;
 import org.molgenis.vcf.utils.MixedPhenotypesException;
@@ -562,7 +553,6 @@ class AppCommandLineOptionsTest {
 
     return cmd;
   }
-
   @Test
   void validateBamInvalidValue() throws FileNotFoundException {
     CommandLine cmd = validateBamInit("my.bam");
@@ -591,6 +581,37 @@ class AppCommandLineOptionsTest {
         IllegalArgumentException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
   }
 
+  private CommandLine validateBedmethylInit(String bedmethylPathString) throws FileNotFoundException {
+    String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+
+    CommandLine cmd = mock(CommandLine.class);
+    doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
+    doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
+    doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
+    doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
+    doReturn(false).when(cmd).hasOption(OPT_PED);
+    doReturn(false).when(cmd).hasOption(OPT_REFERENCE);
+    doReturn(false).when(cmd).hasOption(OPT_GENES);
+    doReturn(false).when(cmd).hasOption(OPT_CRAM);
+    doReturn(true).when(cmd).hasOption(OPT_BEDMETHYL);
+    doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
+    doReturn(bedmethylPathString).when(cmd).getOptionValue(OPT_BEDMETHYL);
+
+    return cmd;
+  }
+  @Test
+  void validateBedmethylInvalidValue() throws FileNotFoundException {
+    CommandLine cmd = validateBedmethylInit("my.bedmethyl");
+    assertThrows(
+            InvalidSampleBedmethylException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
+  }
+
+  @Test
+  void validateBedmethylNotExists() throws FileNotFoundException {
+    CommandLine cmd = validateBedmethylInit("sample0=invalid.bedmethyl");
+    assertThrows(
+            IllegalArgumentException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
+  }
   private CommandLine validateTreeInit(String treePathString) throws FileNotFoundException {
     String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
 
@@ -603,6 +624,7 @@ class AppCommandLineOptionsTest {
     doReturn(false).when(cmd).hasOption(OPT_REFERENCE);
     doReturn(false).when(cmd).hasOption(OPT_GENES);
     doReturn(false).when(cmd).hasOption(OPT_CRAM);
+    doReturn(false).when(cmd).hasOption(OPT_BEDMETHYL);
     doReturn(true).when(cmd).hasOption(OPT_TREE);
     doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
     doReturn(treePathString).when(cmd).getOptionValue(OPT_TREE);

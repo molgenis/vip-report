@@ -124,6 +124,7 @@ class ReportGeneratorTest {
                 new Bytes(Files.readAllBytes(inputVcfPath)),
                 Map.of("1:2-3", new Bytes(new byte[] {0})),
                 null,
+                Map.of(),
                 Map.of()),
             new ObjectMapper()
                 .readValue(
@@ -134,7 +135,7 @@ class ReportGeneratorTest {
         report,
         reportGenerator.generateReport(
             inputVcfPath,
-            new SampleSettings(emptyList(), pedPath, phenotypes, Map.of()),
+            new SampleSettings(emptyList(), pedPath, phenotypes, Map.of(), Map.of()),
             reportGeneratorSettings));
   }
 }

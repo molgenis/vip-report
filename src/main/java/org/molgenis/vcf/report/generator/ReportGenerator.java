@@ -120,6 +120,7 @@ public class ReportGenerator {
     fastaGzMap = getReferenceTrackData(vcfFileReader, referencePath, cramPaths);
     Bytes genesGz = getGenesTrackData(vcfFileReader, reportGeneratorSettings, referencePath, cramPaths);
     Map<String, Cram> cramMap = getAlignmentTrackData(sampleSettings);
+    Map<String, Bytes> bedmethylMap = getBedmethylTrackData(sampleSettings);
     Bytes vcfBytes = getVariantTrackData(vcfPath);
 
     Path decisionTreePath = reportGeneratorSettings.getDecisionTreePath();
@@ -135,7 +136,7 @@ public class ReportGenerator {
       decisionTree = null;
     }
 
-    Binary binary = new Binary(vcfBytes, fastaGzMap, genesGz, cramMap);
+    Binary binary = new Binary(vcfBytes, fastaGzMap, genesGz, cramMap, bedmethylMap);
     return new Report(reportMetadata, reportData, binary, decisionTree);
   }
 
@@ -168,6 +169,23 @@ public class ReportGenerator {
               cramMap.put(sampleId, new Cram(new Bytes(cram),new Bytes(crai)));
             });
     return cramMap;
+  }
+
+  private static Map<String, Bytes> getBedmethylTrackData(SampleSettings sampleSettings) {
+    Map<String, Bytes> bedmethylMap = new LinkedHashMap<>();
+    sampleSettings
+            .getBedmethylPaths()
+            .forEach(
+                    (sampleId, BedmethylPath) -> {
+                      byte[] bedmethyl;
+                      try {
+                        bedmethyl = Files.readAllBytes(BedmethylPath.getBedmethyl());
+                      } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                      }
+                      bedmethylMap.put(sampleId, new Bytes(bedmethyl));
+                    });
+    return bedmethylMap;
   }
 
   private Map<String, Bytes> getReferenceTrackData(VCFFileReader vcfFileReader, Path referencePath, Map<String, SampleSettings.CramPath> cramPaths) {
