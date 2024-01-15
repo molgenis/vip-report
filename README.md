@@ -12,7 +12,7 @@ report template.
 ```
 usage: java -jar vcf-report.jar -i <arg> [-o <arg>] [-f] [-t <arg>] [-pb
        <arg>] [-pd <arg>] [-ph <arg>] [-ms <arg>] [-r <arg>]
-       [-g <arg>] [-b <arg>] [-dt <arg>] [-d]
+       [-g <arg>] [-c <arg>] [-dt <arg>] [-d]
  -i,--input <arg>            Input VCF file (.vcf or .vcf.gz).
  -o,--output <arg>           Output report file (.html).
  -f,--force                  Override the output file if it already
