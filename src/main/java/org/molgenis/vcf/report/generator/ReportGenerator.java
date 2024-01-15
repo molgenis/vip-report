@@ -6,6 +6,7 @@ import static org.molgenis.vcf.utils.sample.mapper.PedToSamplesMapper.mapPedFile
 import com.fasterxml.jackson.databind.ObjectMapper;
 import htsjdk.variant.vcf.VCFFileReader;
 import htsjdk.variant.vcf.VCFHeader;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
@@ -13,6 +14,8 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 
+import org.molgenis.vcf.report.bedmethyl.BedmethylFilter;
+import org.molgenis.vcf.report.bedmethyl.BedmethylFilterFactory;
 import org.molgenis.vcf.report.fasta.*;
 import org.molgenis.vcf.report.genes.GenesFilter;
 import org.molgenis.vcf.report.genes.GenesFilterFactory;
@@ -40,6 +43,7 @@ public class ReportGenerator {
   private final PersonListMerger personListMerger;
   private final HtsFileMapper htsFileMapper;
   private final GenesFilterFactory genesFilterFactory;
+  private final BedmethylFilterFactory bedmethylFilterFactory;
   private final VcfFastaSlicerFactory vcfFastaSlicerFactory;
 
   public ReportGenerator(
@@ -48,12 +52,14 @@ public class ReportGenerator {
       PersonListMerger personListMerger,
       HtsFileMapper htsFileMapper,
       VcfFastaSlicerFactory vcfFastaSlicerFactory,
-      GenesFilterFactory genesFilterFactory) {
+      GenesFilterFactory genesFilterFactory,
+      BedmethylFilterFactory bedmethtylFilterFactory) {
     this.htsJdkToPersonsMapper = requireNonNull(htsJdkToPersonsMapper);
     this.phenopacketMapper = requireNonNull(phenopacketMapper);
     this.personListMerger = requireNonNull(personListMerger);
     this.htsFileMapper = requireNonNull(htsFileMapper);
     this.genesFilterFactory = requireNonNull(genesFilterFactory);
+    this.bedmethylFilterFactory = requireNonNull(bedmethtylFilterFactory);
     this.vcfFastaSlicerFactory = requireNonNull(vcfFastaSlicerFactory);
   }
 
@@ -113,7 +119,7 @@ public class ReportGenerator {
     fastaGzMap = getReferenceTrackData(vcfFileReader, referencePath, cramPaths);
     Bytes genesGz = getGenesTrackData(vcfFileReader, reportGeneratorSettings, referencePath, cramPaths);
     Map<String, Cram> cramMap = getAlignmentTrackData(sampleSettings);
-    Map<String, Bytes> bedmethylMap = getBedmethylTrackData(sampleSettings);
+    Map<String, Bytes> bedmethylMap = getBedmethylTrackData(sampleSettings, vcfFileReader, referencePath, cramPaths);
     Bytes vcfBytes = getVariantTrackData(vcfPath);
 
     Path decisionTreePath = reportGeneratorSettings.getDecisionTreePath();
@@ -164,19 +170,16 @@ public class ReportGenerator {
     return cramMap;
   }
 
-  private static Map<String, Bytes> getBedmethylTrackData(SampleSettings sampleSettings) {
+  private Map<String, Bytes> getBedmethylTrackData(SampleSettings sampleSettings, VCFFileReader vcfFileReader, Path referencePath, Map<String, SampleSettings.CramPath> cramPaths) {
     Map<String, Bytes> bedmethylMap = new LinkedHashMap<>();
     sampleSettings
             .getBedmethylPaths()
             .forEach(
                     (sampleId, BedmethylPath) -> {
-                      byte[] bedmethyl;
-                      try {
-                        bedmethyl = Files.readAllBytes(BedmethylPath.getBedmethyl());
-                      } catch (IOException e) {
-                        throw new UncheckedIOException(e);
-                      }
-                      bedmethylMap.put(sampleId, new Bytes(bedmethyl));
+                      byte [] bedmethyl;
+                        BedmethylFilter bedmethylFilter = bedmethylFilterFactory.create(BedmethylPath.getBedmethyl());
+                        bedmethyl = bedmethylFilter.filter(vcfFileReader, cramPaths, referencePath);
+                        bedmethylMap.put(sampleId, new Bytes(bedmethyl));
                     });
     return bedmethylMap;
   }

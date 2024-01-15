@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.molgenis.vcf.report.bedmethyl.BedmethylFilterFactory;
 import org.molgenis.vcf.report.fasta.*;
 import org.molgenis.vcf.report.generator.ReportGenerator;
 import org.molgenis.vcf.report.generator.ReportGeneratorSettings;
@@ -53,6 +54,7 @@ class ReportGeneratorTest {
   @Mock private HtsFileMapper htsFileMapper;
   @Mock private VcfFastaSlicerFactory vcfFastaSlicerFactory;
   @Mock private GenesFilterFactory genesFilterFactory;
+  @Mock private BedmethylFilterFactory bedmethylFilterFactory;
   private ReportGenerator reportGenerator;
 
   @BeforeEach
@@ -64,7 +66,8 @@ class ReportGeneratorTest {
             personListMerger,
             htsFileMapper,
             vcfFastaSlicerFactory,
-            genesFilterFactory);
+            genesFilterFactory,
+            bedmethylFilterFactory);
   }
 
   @Test
