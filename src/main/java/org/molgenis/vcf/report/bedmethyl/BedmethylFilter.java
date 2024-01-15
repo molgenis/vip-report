@@ -1,6 +1,7 @@
 package org.molgenis.vcf.report.bedmethyl;
 
 
+import com.opencsv.ICSVWriter;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 import com.opencsv.bean.StatefulBeanToCsv;
@@ -13,14 +14,12 @@ import org.molgenis.vcf.report.fasta.ContigInterval;
 import org.molgenis.vcf.report.fasta.VariantIntervalCalculator;
 import org.molgenis.vcf.report.generator.SampleSettings;
 import org.molgenis.vcf.report.model.BedmethylLine;
-import org.molgenis.vcf.report.utils.BestCompressionGZIPOutputStream;
 
 import java.io.*;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.zip.GZIPInputStream;
 
 import static java.util.Objects.requireNonNull;
 
@@ -53,7 +52,10 @@ public class BedmethylFilter {
         try (
                 StringWriter stringWriter = new StringWriter()
                 ) {
-            StatefulBeanToCsv<BedmethylLine> beanToCsv = new StatefulBeanToCsvBuilder<BedmethylLine>(stringWriter).withSeparator('\t').build();
+            StatefulBeanToCsv<BedmethylLine> beanToCsv = new StatefulBeanToCsvBuilder<BedmethylLine>(stringWriter)
+                    .withSeparator('\t')
+                    .withQuotechar(ICSVWriter.NO_QUOTE_CHARACTER)
+                    .build();
 
                 for (BedmethylLine bedmethylLine : bedmethylLines) {
                     boolean isAdded = false;
@@ -80,8 +82,7 @@ public class BedmethylFilter {
     private static List<BedmethylLine> readBedmethylFile(Path bedmethylFile) {
         List<BedmethylLine> bedmethylLines;
         try (InputStream fileStream = new FileInputStream(bedmethylFile.toFile());
-             InputStream gzipStream = new GZIPInputStream(fileStream);
-             Reader reader = new BufferedReader(new InputStreamReader(gzipStream))) {
+             Reader reader = new BufferedReader(new InputStreamReader(fileStream))) {
             CsvToBean<BedmethylLine> csvToBean =
                     new CsvToBeanBuilder<BedmethylLine>(reader)
                             .withSeparator('\t')
