@@ -75,7 +75,7 @@ public class BedmethylFilter {
             throw new  UncheckedIOException(e);
         }
 
-        return BestCompressionGZIPOutputStream.compress(outputStream.toByteArray());
+        return outputStream.toByteArray();
     }
     private static List<BedmethylLine> readBedmethylFile(Path bedmethylFile) {
         List<BedmethylLine> bedmethylLines;
