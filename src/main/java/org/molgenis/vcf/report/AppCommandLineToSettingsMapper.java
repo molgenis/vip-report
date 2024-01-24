@@ -1,18 +1,6 @@
 package org.molgenis.vcf.report;
 
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_CRAM;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_DEBUG;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_FORCE;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_GENES;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_INPUT;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_MAX_SAMPLES;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_OUTPUT;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_PED;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_PHENOTYPES;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_PROBANDS;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_REFERENCE;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_TEMPLATE;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_TREE;
+import static org.molgenis.vcf.report.AppCommandLineOptions.*;
 import static org.molgenis.vcf.report.utils.PathUtils.parsePaths;
 
 import java.nio.file.Path;
@@ -25,6 +13,7 @@ import org.molgenis.vcf.report.generator.ReportGeneratorSettings;
 import org.molgenis.vcf.report.generator.ReportWriterSettings;
 import org.molgenis.vcf.report.generator.SampleSettings;
 import org.molgenis.vcf.report.generator.SampleSettings.CramPath;
+import org.molgenis.vcf.report.generator.SampleSettings.BedmethylPath;
 import org.molgenis.vcf.report.generator.Settings;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -120,6 +109,14 @@ public class AppCommandLineToSettingsMapper {
       cramPaths = Map.of();
     }
 
+    Map<String, BedmethylPath> bedmethylPaths;
+    if (commandLine.hasOption(OPT_BEDMETHYL)) {
+      String bedmethylPathValue = commandLine.getOptionValue(OPT_BEDMETHYL);
+      bedmethylPaths = toBedmethylPaths(bedmethylPathValue);
+    } else {
+      bedmethylPaths = Map.of();
+    }
+
     boolean overwriteOutput = commandLine.hasOption(OPT_FORCE);
 
     boolean debugMode = commandLine.hasOption(OPT_DEBUG);
@@ -130,7 +127,7 @@ public class AppCommandLineToSettingsMapper {
             appName, appVersion, appArgs, maxSamples, referencePath, genesPath, decisionTreePath);
     ReportWriterSettings reportWriterSettings = new ReportWriterSettings(templatePath, debugMode);
     SampleSettings sampleSettings =
-        new SampleSettings(probandNames, pedPaths, phenotypes, cramPaths);
+        new SampleSettings(probandNames, pedPaths, phenotypes, cramPaths, bedmethylPaths);
     return new Settings(
         inputPath,
         reportGeneratorSettings,
@@ -152,5 +149,18 @@ public class AppCommandLineToSettingsMapper {
       cramPaths.put(sampleId, new CramPath(cramPath, craiPath));
     }
     return cramPaths;
+  }
+
+  private Map<String, BedmethylPath> toBedmethylPaths(String bedmethylPathValue) {
+    Map<String, BedmethylPath> bedmethylPaths = new LinkedHashMap<>();
+    String[] tokens = bedmethylPathValue.split(",");
+    for (String token : tokens) {
+      int idx = token.indexOf("=");
+      String sampleId = token.substring(0, idx);
+      String bedmethylStr = token.substring(idx + 1);
+      Path bedmethylPath = Path.of(bedmethylStr);
+      bedmethylPaths.put(sampleId, new BedmethylPath(bedmethylPath));
+    }
+    return bedmethylPaths;
   }
 }

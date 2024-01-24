@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.molgenis.vcf.report.bedmethyl.BedmethylFilterFactory;
 import org.molgenis.vcf.report.fasta.*;
 import org.molgenis.vcf.report.generator.ReportGenerator;
 import org.molgenis.vcf.report.generator.ReportGeneratorSettings;
@@ -53,6 +54,7 @@ class ReportGeneratorTest {
   @Mock private HtsFileMapper htsFileMapper;
   @Mock private VcfFastaSlicerFactory vcfFastaSlicerFactory;
   @Mock private GenesFilterFactory genesFilterFactory;
+  @Mock private BedmethylFilterFactory bedmethylFilterFactory;
   private ReportGenerator reportGenerator;
 
   @BeforeEach
@@ -64,7 +66,8 @@ class ReportGeneratorTest {
             personListMerger,
             htsFileMapper,
             vcfFastaSlicerFactory,
-            genesFilterFactory);
+            genesFilterFactory,
+            bedmethylFilterFactory);
   }
 
   @Test
@@ -122,6 +125,7 @@ class ReportGeneratorTest {
                 new Bytes(Files.readAllBytes(inputVcfPath)),
                 Map.of("1:2-3", new Bytes(new byte[] {0})),
                 null,
+                Map.of(),
                 Map.of()),
             new ObjectMapper()
                 .readValue(
@@ -132,7 +136,7 @@ class ReportGeneratorTest {
         report,
         reportGenerator.generateReport(
             inputVcfPath,
-            new SampleSettings(emptyList(), pedPath, phenotypes, Map.of()),
+            new SampleSettings(emptyList(), pedPath, phenotypes, Map.of(), Map.of()),
             reportGeneratorSettings));
   }
 }

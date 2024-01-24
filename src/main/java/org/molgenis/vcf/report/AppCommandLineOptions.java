@@ -14,6 +14,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.molgenis.vcf.report.generator.ReportGeneratorSettings;
 import org.molgenis.vcf.report.utils.InvalidSampleCramException;
+import org.molgenis.vcf.report.utils.InvalidSampleBedmethylException;
 import org.molgenis.vcf.utils.InvalidSamplePhenotypesException;
 import org.molgenis.vcf.utils.MixedPhenotypesException;
 
@@ -47,6 +48,8 @@ class AppCommandLineOptions {
   static final String OPT_TREE_LONG = "decision_tree";
   static final String OPT_CRAM = "c";
   static final String OPT_CRAM_LONG = "cram";
+  static final String OPT_BEDMETHYL = "b";
+  static final String OPT_BEDMETHYL_LONG = "bedmethyl";
   private static final Options APP_OPTIONS;
   private static final Options APP_VERSION_OPTIONS;
 
@@ -126,6 +129,13 @@ class AppCommandLineOptions {
                 "Comma-separated list of sample-cram files (e.g. sample0=/path/to/0.cram,sample1=/path/to/1.cram).")
             .build());
     appOptions.addOption(
+        Option.builder(OPT_BEDMETHYL)
+            .hasArg(true)
+            .longOpt(OPT_BEDMETHYL_LONG)
+            .desc(
+                 "Comma-separated list of sample-bedmethyl files (e.g. sample0=/path/to/0.bedmethyl,sample1=/path/to/1.bedmethyl).")
+            .build());
+    appOptions.addOption(
         Option.builder(OPT_TREE)
             .hasArg(true)
             .longOpt(OPT_TREE_LONG)
@@ -168,6 +178,7 @@ class AppCommandLineOptions {
     validateReference(commandLine);
     validateGenes(commandLine);
     validateCram(commandLine);
+    validateBedmethyl(commandLine);
     validateTree(commandLine);
   }
 
@@ -239,6 +250,28 @@ class AppCommandLineOptions {
       validateFilePath(cramIndexPath, "cram .crai");
     }
   }
+
+  private static void validateBedmethyl(CommandLine commandLine) {
+    if (!commandLine.hasOption(OPT_BEDMETHYL)) {
+      return;
+    }
+  String bedmethylString = commandLine.getOptionValue(OPT_BEDMETHYL);
+    for (String sampleBedmethylString : bedmethylString.split(",")) {
+    String[] tokens = sampleBedmethylString.split("=");
+    if (tokens.length != 2) {
+      throw new InvalidSampleBedmethylException(sampleBedmethylString);
+    }
+
+    String bedmethylPathStr = tokens[1];
+    if (!bedmethylPathStr.endsWith(".bedmethyl")) {
+      throw new IllegalArgumentException(
+              format("Input file '%s' is not a .bedmethyl file.", bedmethylPathStr));
+    }
+
+    validateFilePath(Path.of(bedmethylPathStr), "bedmethyl");
+
+  }
+}
 
   private static void validateMaxSamples(CommandLine commandLine) {
     validateInteger(commandLine, OPT_MAX_SAMPLES);

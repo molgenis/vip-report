@@ -60,7 +60,7 @@ class ReportServiceTest {
                 new AppMetadata(appName, appVersion, appArguments),
                 new HtsFile(inputVcfPath.toString(), VCF, "UNKNOWN")),
             new ReportData(emptyList(), emptyList()),
-            new Binary(new Bytes(Files.readAllBytes(inputVcfPath)), null, null, Map.of()),
+            new Binary(new Bytes(Files.readAllBytes(inputVcfPath)), null, null, Map.of(), Map.of()),
             new ObjectMapper()
                 .readValue(
                     "{\"name\":\"testtree\", \"description\":\"no need for a valid tree\"}",
@@ -75,7 +75,7 @@ class ReportServiceTest {
             null,
             null);
     ReportWriterSettings reportWriterSettings = new ReportWriterSettings(null, true);
-    SampleSettings sampleSettings = new SampleSettings(null, null, null, Map.of());
+    SampleSettings sampleSettings = new SampleSettings(null, null, null, Map.of(), Map.of());
     Settings settings =
         new Settings(
             inputVcfPath,
