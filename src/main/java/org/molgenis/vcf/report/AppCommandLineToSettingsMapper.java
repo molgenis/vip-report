@@ -1,18 +1,6 @@
 package org.molgenis.vcf.report;
 
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_CRAM;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_DEBUG;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_FORCE;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_GENES;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_INPUT;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_MAX_SAMPLES;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_OUTPUT;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_PED;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_PHENOTYPES;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_PROBANDS;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_REFERENCE;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_TEMPLATE;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_TREE;
+import static org.molgenis.vcf.report.AppCommandLineOptions.*;
 import static org.molgenis.vcf.report.utils.PathUtils.parsePaths;
 
 import java.nio.file.Path;
@@ -51,6 +39,14 @@ public class AppCommandLineToSettingsMapper {
       templatePath = Path.of(templateValue);
     } else {
       templatePath = null;
+    }
+
+    Path metadataPath;
+    if (commandLine.hasOption(OPT_METADATA)) {
+      String metadataPathValue = commandLine.getOptionValue(OPT_METADATA);
+      metadataPath = Path.of(metadataPathValue);
+    } else {
+      metadataPath = null;
     }
 
     Path outputPath;
@@ -127,7 +123,7 @@ public class AppCommandLineToSettingsMapper {
     String appArgs = String.join(" ", args);
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
-            appName, appVersion, appArgs, maxSamples, referencePath, genesPath, decisionTreePath);
+            appName, appVersion, appArgs, maxSamples, metadataPath, referencePath, genesPath, decisionTreePath);
     ReportWriterSettings reportWriterSettings = new ReportWriterSettings(templatePath, debugMode);
     SampleSettings sampleSettings =
         new SampleSettings(probandNames, pedPaths, phenotypes, cramPaths);

@@ -10,10 +10,11 @@ report template.
 
 ## Usage
 ```
-usage: java -jar vcf-report.jar -i <arg> [-o <arg>] [-f] [-t <arg>] [-pb
+usage: java -jar vcf-report.jar -i <arg> [-m <arg>] [-o <arg>] [-f] [-t <arg>] [-pb
        <arg>] [-pd <arg>] [-ph <arg>] [-ms <arg>] [-r <arg>]
        [-g <arg>] [-c <arg>] [-dt <arg>] [-d]
  -i,--input <arg>            Input VCF file (.vcf or .vcf.gz).
+ -m,--metadata <arg>      VCF metadata file (.json).
  -o,--output <arg>           Output report file (.html).
  -f,--force                  Override the output file if it already
                              exists.
