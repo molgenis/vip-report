@@ -41,9 +41,9 @@
     <java.version>17</java.version>
     <commons.cli.version>1.6.0</commons.cli.version>
     <samtools.htsjdk.version>4.1.0</samtools.htsjdk.version>
-    <download-maven-plugin.version>1.7.1</download-maven-plugin.version>
+    <download-maven-plugin.version>1.8.0</download-maven-plugin.version>
     <jacoco-maven-plugin.version>0.8.11</jacoco-maven-plugin.version>
-    <vip.report.template.version>5.8.0</vip.report.template.version>
+    <vip.report.template.version>6.0.0</vip.report.template.version>
     <opencsv.version>5.9</opencsv.version>
     <vip.utils.version>1.4.6</vip.utils.version>
   </properties>

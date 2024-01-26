@@ -18,18 +18,21 @@ class AppIT {
   void test() throws IOException {
     String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
     String pedFiles =
-        ResourceUtils.getFile("classpath:example.ped").toString()
+        ResourceUtils.getFile("classpath:example.ped")
             + ","
-            + ResourceUtils.getFile("classpath:example2.ped").toString();
+            + ResourceUtils.getFile("classpath:example2.ped");
     String outputFile = sharedTempDir.resolve("example.vcf.html").toString();
     String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
     String probands = "NA00001";
     String phenotypes = "Jimmy/HP:123456,Unknown/test:Headache,Jane/OMIM:23456";
     String bamFile = ResourceUtils.getFile("classpath:example.cram").toString();
+    String metadataFile = ResourceUtils.getFile("classpath:field_metadata.json").toString();
 
     String[] args = {
       "-i",
       inputFile,
+      "-m",
+      metadataFile,
       "-o",
       outputFile,
       "-t",
