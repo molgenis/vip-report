@@ -128,8 +128,21 @@ public class ReportGenerator {
       decisionTree = null;
     }
 
+    Path vcfMetaPath = reportGeneratorSettings.getMetadataPath();
+    Map<?,?> vcfMeta;
+    if (vcfMetaPath != null) {
+      try {
+        ObjectMapper mapper = new ObjectMapper();
+        vcfMeta = mapper.readValue(vcfMetaPath.toFile(), Map.class);
+      } catch (IOException e) {
+        throw new UncheckedIOException(e);
+      }
+    } else {
+      vcfMeta = null;
+    }
+
     Binary binary = new Binary(vcfBytes, fastaGzMap, genesGz, cramMap);
-    return new Report(reportMetadata, reportData, binary, decisionTree);
+    return new Report(reportMetadata, reportData, binary, decisionTree, vcfMeta);
   }
 
   private static Bytes getVariantTrackData(Path vcfPath) throws IOException {

@@ -21,6 +21,8 @@ class AppCommandLineOptions {
 
   static final String OPT_INPUT = "i";
   static final String OPT_INPUT_LONG = "input";
+  static final String OPT_METADATA = "m";
+  static final String OPT_METADATA_LONG = "metadata";
   static final String OPT_OUTPUT = "o";
   static final String OPT_OUTPUT_LONG = "output";
   static final String OPT_TEMPLATE = "t";
@@ -58,6 +60,12 @@ class AppCommandLineOptions {
             .required()
             .longOpt(OPT_INPUT_LONG)
             .desc("Input VCF file (.vcf or .vcf.gz).")
+            .build());
+    appOptions.addOption(
+          Option.builder(OPT_METADATA)
+            .hasArg(true)
+            .longOpt(OPT_METADATA_LONG)
+            .desc("VCF metadata file (.json).")
             .build());
     appOptions.addOption(
         Option.builder(OPT_OUTPUT)
