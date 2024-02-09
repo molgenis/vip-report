@@ -13,7 +13,7 @@
 
   <groupId>org.molgenis</groupId>
   <artifactId>vip-report</artifactId>
-  <version>6.0.0</version>
+  <version>6.0.1</version>
 
   <name>vip-report</name>
   <description>Report generator for Variant Call Format (VCF) files</description>
@@ -43,7 +43,7 @@
     <samtools.htsjdk.version>4.1.0</samtools.htsjdk.version>
     <download-maven-plugin.version>1.8.0</download-maven-plugin.version>
     <jacoco-maven-plugin.version>0.8.11</jacoco-maven-plugin.version>
-    <vip.report.template.version>6.0.0</vip.report.template.version>
+    <vip.report.template.version>6.0.1</vip.report.template.version>
     <opencsv.version>5.9</opencsv.version>
     <vip.utils.version>1.4.6</vip.utils.version>
   </properties>
