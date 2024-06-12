@@ -26,7 +26,8 @@ deploy:
   prerelease: true
   on:
     tags: true
-  edge: true # opt in to dpl v2
+  edge:
+    branch: v2.0.3-beta.4 # workaround for https://travis-ci.community/t/builds-suddenly-fail-with-error-installing-dpl/14270/3
 env:
   global:
     secure: ZodsIq8/BMfhTT0rB1lZkCpBxzPzqUnK3Czyq39jMhT8J6trDPjd7w6YNF2wDdbAmIugsnnrWOs5GtFgFqUNiRDIOQpzc5ncsu3lsGEG7NaqGPdY0kMlf+ihUKsESNglUXOR8BctOdUO7vC/p8VHw8o43n+VRZsfSvzDdHF57KE23NvfY+q/yt5vggYc8BiRJOU6BOOk3VpwI6D/hc1Qt5ZWOv+Y2K5MkH+boAdkmg5t3BdFwJOaG85MxqSlWkcY8irjtgx8oNYayV+cneXnaFUS4wtK/kMQ6ftDhmh5fAveJQdXcbbVVRFPUUYnrf0Grxt+74gXvFNw0BLnIcDjArChqhypyB1EPT4a1cpf9tQyhZ7ZNXwBfDaibSbMUY+ethDCpAdDUCQUHea96gdzbs2enhGQ3nXajgXacdKS+lpn1TJhNWr0gkHXb3PiAHF3EH3JwRuF6NwwEYvlRpZ2gdYUK8IFA59na/CZ21QzrHBuqk5v8PJaQRAdGZhUgXh1GOiPLT8vDhIKq6qUNGUPOmUyIzyKxLJfFdws+c4i1II7r5CqdjlshIcBOnENpZbyRlFZm0hfoJ3oieCSNpnvLmzEdzBrK9hlu1dkZIIX/pSKNFl+cBb4IJnQEpC/SiKmpwG5Z11hP+nHQm3s9NzD/zek3F8djKIkCe+u08D9EMU=
