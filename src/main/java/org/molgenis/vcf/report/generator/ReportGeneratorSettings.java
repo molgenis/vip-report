@@ -17,4 +17,5 @@ public class ReportGeneratorSettings {
   Path referencePath;
   Path genesPath;
   Path decisionTreePath;
+  Path sampleTreePath;
 }

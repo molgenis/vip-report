@@ -113,7 +113,7 @@ class ReportGeneratorTest {
     String appArgs = "MyArgs";
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
-            appName, appVersion, appArgs, maxNrSamples, null, referencePath, null, treePath);
+            appName, appVersion, appArgs, maxNrSamples, null, referencePath, null, treePath, treePath);
     Report report =
         new Report(
             new ReportMetadata(new AppMetadata(appName, appVersion, appArgs), htsFile),
@@ -126,7 +126,11 @@ class ReportGeneratorTest {
             new ObjectMapper()
                 .readValue(
                     "{\"name\":\"testtree\", \"description\":\"no need for a valid tree\"}",
-                    Map.class), null);
+                    Map.class),
+            new ObjectMapper()
+                    .readValue(
+                    "{\"name\":\"testtree\", \"description\":\"no need for a valid tree\"}",
+                    Map.class),null);
 
     assertEquals(
         report,

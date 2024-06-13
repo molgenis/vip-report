@@ -64,7 +64,11 @@ class ReportServiceTest {
             new ObjectMapper()
                 .readValue(
                     "{\"name\":\"testtree\", \"description\":\"no need for a valid tree\"}",
-                    Map.class), null);
+                    Map.class),
+            new ObjectMapper()
+                .readValue(
+                        "{\"name\":\"sampletree\", \"description\":\"no need for a valid tree\"}",
+                        Map.class), null);
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
             appName,
@@ -74,7 +78,8 @@ class ReportServiceTest {
             null,
             null,
             null,
-            null);
+            null,
+                null);
     ReportWriterSettings reportWriterSettings = new ReportWriterSettings(null, true);
     SampleSettings sampleSettings = new SampleSettings(null, null, null, Map.of());
     Settings settings =
