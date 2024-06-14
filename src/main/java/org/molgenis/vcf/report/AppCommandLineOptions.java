@@ -362,7 +362,7 @@ class AppCommandLineOptions {
     String treePathStr = treePath.toString();
     if (!treePathStr.endsWith(".json")) {
       throw new IllegalArgumentException(
-          format("Template file '%s' is not a .json file.", treePathStr));
+          format("Decision tree file '%s' is not a .json file.", treePathStr));
     }
   }
 
