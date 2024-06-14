@@ -1,6 +1,7 @@
 package org.molgenis.vcf.report;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.molgenis.vcf.utils.model.metadata.HtsFormat.VCF;
@@ -53,6 +54,7 @@ class ReportServiceTest {
     String appArguments = "MyArguments";
     Path inputVcfPath = Paths.get("src", "test", "resources", "example.vcf");
     Path outputReportPath = sharedTempDir.resolve("example.vcf.html");
+    Path metadataPath = sharedTempDir.resolve("field_metadata.json");
 
     Report report =
         new Report(
@@ -64,14 +66,14 @@ class ReportServiceTest {
             new ObjectMapper()
                 .readValue(
                     "{\"name\":\"testtree\", \"description\":\"no need for a valid tree\"}",
-                    Map.class), null);
+                    Map.class), emptyMap());
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
             appName,
             appVersion,
             appArguments,
             ReportGeneratorSettings.DEFAULT_MAX_NR_SAMPLES,
-            null,
+            metadataPath,
             null,
             null,
             null);

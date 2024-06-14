@@ -27,5 +27,6 @@ public class Report {
   Map<?,?> decisionTree;
 
   @JsonProperty("vcfMeta")
+  @NonNull
   Map<?,?> vcfMeta;
 }

@@ -66,6 +66,7 @@ class AppCommandLineOptions {
             .hasArg(true)
             .longOpt(OPT_METADATA_LONG)
             .desc("VCF metadata file (.json).")
+            .required()
             .build());
     appOptions.addOption(
         Option.builder(OPT_OUTPUT)

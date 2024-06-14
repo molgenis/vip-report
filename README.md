@@ -51,14 +51,14 @@ usage: java -jar vcf-report.jar -v
 
 ## Examples
 ```
-java -jar vcf-report.jar -i my.vcf.gz
-java -jar vcf-report.jar -i my.vcf.gz -o my-report.html
-java -jar vcf-report.jar -i my.vcf.gz -o my-report.html -t my-template.html
-java -jar vcf-report.jar -i my.vcf.gz -o my-report.html -t my-template.html -pb sample0,sample1 -pd my.ped,my_other.ped
-java -jar vcf-report.jar -i my.vcf.gz -o my-report.html -t my-template.html -pb sample0,sample1 -pd my.ped,my_other.ped
-java -jar vcf-report.jar -i my.vcf.gz -o my-report.html -t my-template.html -pb sample0,sample1 -pd my.ped,my_other.ped -ph HP:0000001;HP:0000002
-java -jar vcf-report.jar -i my.vcf.gz -o my-report.html -t my-template.html -pb sample0,sample1 -pd my.ped,my_other.ped -ph sampleId1/HP:0000001;HP:0000002,sampleId2/HP:0000001
-java -jar vcf-report.jar -i my.vcf.gz -o my-report.html -t my-template.html -pb sample0,sample1 -pd my.ped,my_other.ped -ph sampleId1/HP:0000001;HP:0000002,sampleId2/HP:0000001 -ms 10
+java -jar vcf-report.jar -i my.vcf.gz -m metadata.json
+java -jar vcf-report.jar -i my.vcf.gz -m metadata.json -o my-report.html
+java -jar vcf-report.jar -i my.vcf.gz -m metadata.json -o my-report.html -t my-template.html
+java -jar vcf-report.jar -i my.vcf.gz -m metadata.json -o my-report.html -t my-template.html -pb sample0,sample1 -pd my.ped,my_other.ped
+java -jar vcf-report.jar -i my.vcf.gz -m metadata.json -o my-report.html -t my-template.html -pb sample0,sample1 -pd my.ped,my_other.ped
+java -jar vcf-report.jar -i my.vcf.gz -m metadata.json -o my-report.html -t my-template.html -pb sample0,sample1 -pd my.ped,my_other.ped -ph HP:0000001;HP:0000002
+java -jar vcf-report.jar -i my.vcf.gz -m metadata.json -o my-report.html -t my-template.html -pb sample0,sample1 -pd my.ped,my_other.ped -ph sampleId1/HP:0000001;HP:0000002,sampleId2/HP:0000001
+java -jar vcf-report.jar -i my.vcf.gz -m metadata.json -o my-report.html -t my-template.html -pb sample0,sample1 -pd my.ped,my_other.ped -ph sampleId1/HP:0000001;HP:0000002,sampleId2/HP:0000001 -ms 10
 java -jar vcf-report.jar -v
 ```
 
