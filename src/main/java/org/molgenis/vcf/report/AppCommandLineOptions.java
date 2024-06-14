@@ -84,6 +84,7 @@ class AppCommandLineOptions {
             .hasArg(true)
             .longOpt(OPT_TEMPLATE_LONG)
             .desc("Report template file (.html).")
+            .required()
             .build());
     appOptions.addOption(
         Option.builder(OPT_PROBANDS)
@@ -322,10 +323,6 @@ class AppCommandLineOptions {
   }
 
   private static void validateTemplate(CommandLine commandLine) {
-    if (!commandLine.hasOption(OPT_TEMPLATE)) {
-      return;
-    }
-
     Path templatePath = Path.of(commandLine.getOptionValue(OPT_TEMPLATE));
     validateFilePath(templatePath, "Template");
 

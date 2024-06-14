@@ -51,8 +51,8 @@ usage: java -jar vcf-report.jar -v
 
 ## Examples
 ```
-java -jar vcf-report.jar -i my.vcf.gz -m metadata.json
-java -jar vcf-report.jar -i my.vcf.gz -m metadata.json -o my-report.html
+java -jar vcf-report.jar -i my.vcf.gz -m metadata.json -t my-template.html
+java -jar vcf-report.jar -i my.vcf.gz -m metadata.json -o my-report.html -t my-template.html
 java -jar vcf-report.jar -i my.vcf.gz -m metadata.json -o my-report.html -t my-template.html
 java -jar vcf-report.jar -i my.vcf.gz -m metadata.json -o my-report.html -t my-template.html -pb sample0,sample1 -pd my.ped,my_other.ped
 java -jar vcf-report.jar -i my.vcf.gz -m metadata.json -o my-report.html -t my-template.html -pb sample0,sample1 -pd my.ped,my_other.ped

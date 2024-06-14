@@ -7,6 +7,6 @@ import org.springframework.lang.Nullable;
 @Value
 public class ReportWriterSettings {
 
-  @Nullable Path templatePath;
+  Path templatePath;
   boolean prettyPrint;
 }
