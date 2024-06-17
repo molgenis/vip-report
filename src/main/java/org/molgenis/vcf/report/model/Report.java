@@ -26,6 +26,9 @@ public class Report {
   @JsonProperty("decisionTree")
   Map<?,?> decisionTree;
 
+  @JsonProperty("sampleTree")
+  Map<?,?> sampleTree;
+
   @JsonProperty("vcfMeta")
   Map<?,?> vcfMeta;
 }

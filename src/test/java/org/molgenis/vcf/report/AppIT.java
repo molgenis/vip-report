@@ -23,6 +23,8 @@ class AppIT {
             + ResourceUtils.getFile("classpath:example2.ped");
     String outputFile = sharedTempDir.resolve("example.vcf.html").toString();
     String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
+    String treePath = ResourceUtils.getFile("classpath:tree.json").toString();
+    String sampleTreePath = ResourceUtils.getFile("classpath:tree.json").toString();
     String probands = "NA00001";
     String phenotypes = "Jimmy/HP:123456,Unknown/test:Headache,Jane/OMIM:23456";
     String bamFile = ResourceUtils.getFile("classpath:example.cram").toString();
@@ -43,9 +45,54 @@ class AppIT {
       pedFiles,
       "-ph",
       phenotypes,
+      "-dt",
+      treePath,
+      "-st",
+      sampleTreePath,
       "-d",
       "-c",
       "NA00001=" + bamFile
+    };
+    SpringApplication.run(App.class, args);
+
+    String report = Files.readString(Path.of(outputFile));
+    // due to report content encoding we only check whether the application ran without error and a
+    // report was created
+    assertNotNull(report);
+  }
+
+  @Test
+  void testTreeLess() throws IOException {
+    String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+    String pedFiles =
+            ResourceUtils.getFile("classpath:example.ped")
+                    + ","
+                    + ResourceUtils.getFile("classpath:example2.ped");
+    String outputFile = sharedTempDir.resolve("example.vcf.html").toString();
+    String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
+    String probands = "NA00001";
+    String phenotypes = "Jimmy/HP:123456,Unknown/test:Headache,Jane/OMIM:23456";
+    String bamFile = ResourceUtils.getFile("classpath:example.cram").toString();
+    String metadataFile = ResourceUtils.getFile("classpath:field_metadata.json").toString();
+
+    String[] args = {
+            "-i",
+            inputFile,
+            "-m",
+            metadataFile,
+            "-o",
+            outputFile,
+            "-t",
+            templateFile,
+            "-pb",
+            probands,
+            "-pd",
+            pedFiles,
+            "-ph",
+            phenotypes,
+            "-d",
+            "-c",
+            "NA00001=" + bamFile
     };
     SpringApplication.run(App.class, args);
 

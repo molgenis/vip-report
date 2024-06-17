@@ -128,6 +128,19 @@ public class ReportGenerator {
       decisionTree = null;
     }
 
+    Path sampleTreePath = reportGeneratorSettings.getSampleTreePath();
+    Map<?,?> sampleTree;
+    if (sampleTreePath != null) {
+      try {
+        ObjectMapper mapper = new ObjectMapper();
+        sampleTree = mapper.readValue(sampleTreePath.toFile(), Map.class);
+      } catch (IOException e) {
+        throw new UncheckedIOException(e);
+      }
+    } else {
+      sampleTree = null;
+    }
+
     Path vcfMetaPath = reportGeneratorSettings.getMetadataPath();
     Map<?,?> vcfMeta;
     if (vcfMetaPath != null) {
@@ -142,7 +155,7 @@ public class ReportGenerator {
     }
 
     Binary binary = new Binary(vcfBytes, fastaGzMap, genesGz, cramMap);
-    return new Report(reportMetadata, reportData, binary, decisionTree, vcfMeta);
+    return new Report(reportMetadata, reportData, binary, decisionTree, sampleTree, vcfMeta);
   }
 
   private static Bytes getVariantTrackData(Path vcfPath) throws IOException {

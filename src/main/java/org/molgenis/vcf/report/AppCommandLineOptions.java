@@ -47,6 +47,8 @@ class AppCommandLineOptions {
   static final String OPT_GENES_LONG = "genes";
   static final String OPT_TREE = "dt";
   static final String OPT_TREE_LONG = "decision_tree";
+  static final String OPT_SAMPLE_TREE = "st";
+  static final String OPT_SAMPLE_TREE_LONG = "sample_tree";
   static final String OPT_CRAM = "c";
   static final String OPT_CRAM_LONG = "cram";
   private static final Options APP_OPTIONS;
@@ -138,6 +140,12 @@ class AppCommandLineOptions {
             .hasArg(true)
             .longOpt(OPT_TREE_LONG)
             .desc("Decision tree file as used in vip-decision-tree (.json).")
+            .build());
+    appOptions.addOption(
+        Option.builder(OPT_SAMPLE_TREE)
+            .hasArg(true)
+            .longOpt(OPT_SAMPLE_TREE_LONG)
+            .desc("Sample decision tree file as used in vip-decision-tree (.json).")
             .build());
     appOptions.addOption(
         Option.builder(OPT_DEBUG)
