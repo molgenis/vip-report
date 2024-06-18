@@ -30,5 +30,6 @@ public class Report {
   Map<?,?> sampleTree;
 
   @JsonProperty("vcfMeta")
+  @NonNull
   Map<?,?> vcfMeta;
 }

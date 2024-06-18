@@ -49,7 +49,6 @@ class AppCommandLineOptionsTest {
     doReturn(true).when(cmd).hasOption(OPT_FORCE);
     doReturn(true).when(cmd).hasOption(OPT_PED);
     doReturn(true).when(cmd).hasOption(OPT_OUTPUT);
-    doReturn(true).when(cmd).hasOption(OPT_TEMPLATE);
 
     doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
     doReturn(pedFiles).when(cmd).getOptionValue(OPT_PED);
@@ -63,15 +62,16 @@ class AppCommandLineOptionsTest {
   void validateCommandLineNoTemplateNoPed() throws FileNotFoundException {
     String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
     String outputFile = sharedTempDir.resolve("example.vcf.html").toString();
+    String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
     CommandLine cmd = mock(CommandLine.class);
     doReturn(true).when(cmd).hasOption(OPT_FORCE);
     doReturn(false).when(cmd).hasOption(OPT_PED);
     doReturn(true).when(cmd).hasOption(OPT_OUTPUT);
-    doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
 
     doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
     doReturn(outputFile).when(cmd).getOptionValue(OPT_OUTPUT);
+    doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
 
     AppCommandLineOptions.validateCommandLine(cmd);
   }
@@ -90,7 +90,6 @@ class AppCommandLineOptionsTest {
     doReturn(true).when(cmd).hasOption(OPT_FORCE);
     doReturn(true).when(cmd).hasOption(OPT_PED);
     doReturn(true).when(cmd).hasOption(OPT_OUTPUT);
-    doReturn(true).when(cmd).hasOption(OPT_TEMPLATE);
 
     doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
     doReturn(pedFiles).when(cmd).getOptionValue(OPT_PED);
@@ -199,7 +198,6 @@ class AppCommandLineOptionsTest {
     doReturn(true).when(cmd).hasOption(OPT_FORCE);
     doReturn(true).when(cmd).hasOption(OPT_PED);
     doReturn(true).when(cmd).hasOption(OPT_OUTPUT);
-    doReturn(true).when(cmd).hasOption(OPT_TEMPLATE);
 
     doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
     doReturn(pedFiles).when(cmd).getOptionValue(OPT_PED);
@@ -225,7 +223,6 @@ class AppCommandLineOptionsTest {
     doReturn(true).when(cmd).hasOption(OPT_FORCE);
     doReturn(true).when(cmd).hasOption(OPT_PED);
     doReturn(true).when(cmd).hasOption(OPT_OUTPUT);
-    doReturn(true).when(cmd).hasOption(OPT_TEMPLATE);
 
     doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
     doReturn(pedFiles).when(cmd).getOptionValue(OPT_PED);
@@ -253,7 +250,6 @@ class AppCommandLineOptionsTest {
     doReturn(true).when(cmd).hasOption(OPT_FORCE);
     doReturn(true).when(cmd).hasOption(OPT_PED);
     doReturn(true).when(cmd).hasOption(OPT_OUTPUT);
-    doReturn(true).when(cmd).hasOption(OPT_TEMPLATE);
 
     doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
     doReturn(pedFiles).when(cmd).getOptionValue(OPT_PED);
@@ -280,7 +276,6 @@ class AppCommandLineOptionsTest {
     doReturn(true).when(cmd).hasOption(OPT_FORCE);
     doReturn(true).when(cmd).hasOption(OPT_PED);
     doReturn(true).when(cmd).hasOption(OPT_OUTPUT);
-    doReturn(true).when(cmd).hasOption(OPT_TEMPLATE);
 
     doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
     doReturn(pedFiles).when(cmd).getOptionValue(OPT_PED);
@@ -299,7 +294,6 @@ class AppCommandLineOptionsTest {
     CommandLine cmd = mock(CommandLine.class);
     doReturn(true).when(cmd).hasOption(OPT_FORCE);
     doReturn(true).when(cmd).hasOption(OPT_OUTPUT);
-    doReturn(true).when(cmd).hasOption(OPT_TEMPLATE);
 
     doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
     doReturn(outputFile).when(cmd).getOptionValue(OPT_OUTPUT);
@@ -320,8 +314,6 @@ class AppCommandLineOptionsTest {
     CommandLine cmd = mock(CommandLine.class);
     doReturn(true).when(cmd).hasOption(OPT_FORCE);
     doReturn(true).when(cmd).hasOption(OPT_OUTPUT);
-    doReturn(true).when(cmd).hasOption(OPT_TEMPLATE);
-
     doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
     doReturn(outputFile).when(cmd).getOptionValue(OPT_OUTPUT);
     doReturn(inputFile).when(cmd).getOptionValue(OPT_TEMPLATE);
@@ -336,14 +328,15 @@ class AppCommandLineOptionsTest {
   void validateCommandLinePheno() throws FileNotFoundException {
     String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
     String pheno = "HP:123456,HP:23456";
+    String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
     CommandLine cmd = mock(CommandLine.class);
     doReturn(true).when(cmd).hasOption(OPT_PHENOTYPES);
     doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
-    doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
     doReturn(false).when(cmd).hasOption(OPT_PED);
     doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
     doReturn(pheno).when(cmd).getOptionValue(OPT_PHENOTYPES);
+    doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
 
     AppCommandLineOptions.validateCommandLine(cmd);
   }
@@ -352,14 +345,15 @@ class AppCommandLineOptionsTest {
   void validateCommandLinePhenoSample() throws FileNotFoundException {
     String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
     String pheno = "sample1/HP:123456;HP:234567,sample2/HP:23456";
+    String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
     CommandLine cmd = mock(CommandLine.class);
     doReturn(true).when(cmd).hasOption(OPT_PHENOTYPES);
     doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
-    doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
     doReturn(false).when(cmd).hasOption(OPT_PED);
     doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
     doReturn(pheno).when(cmd).getOptionValue(OPT_PHENOTYPES);
+    doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
 
     AppCommandLineOptions.validateCommandLine(cmd);
   }
@@ -368,14 +362,15 @@ class AppCommandLineOptionsTest {
   void validateCommandLinePhenoSampleInvalid() throws FileNotFoundException {
     String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
     String pheno = "sample1/HP:123456/HP:234567";
+    String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
     CommandLine cmd = mock(CommandLine.class);
     doReturn(true).when(cmd).hasOption(OPT_PHENOTYPES);
     doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
-    doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
     doReturn(false).when(cmd).hasOption(OPT_PED);
     doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
     doReturn(pheno).when(cmd).getOptionValue(OPT_PHENOTYPES);
+    doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
 
     assertThrows(
         InvalidSamplePhenotypesException.class,
@@ -386,14 +381,15 @@ class AppCommandLineOptionsTest {
   void validateCommandLinePhenoNoCurie() throws FileNotFoundException {
     String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
     String pheno = "HP123456";
+    String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
     CommandLine cmd = mock(CommandLine.class);
     doReturn(true).when(cmd).hasOption(OPT_PHENOTYPES);
     doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
-    doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
     doReturn(false).when(cmd).hasOption(OPT_PED);
     doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
     doReturn(pheno).when(cmd).getOptionValue(OPT_PHENOTYPES);
+    doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
 
     assertThrows(
         IllegalPhenotypeArgumentException.class,
@@ -404,14 +400,15 @@ class AppCommandLineOptionsTest {
   void validateCommandLinePhenoMixed() throws FileNotFoundException {
     String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
     String pheno = "sample/HP:123456,HP:234567";
+    String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
     CommandLine cmd = mock(CommandLine.class);
     doReturn(true).when(cmd).hasOption(OPT_PHENOTYPES);
     doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
-    doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
     doReturn(false).when(cmd).hasOption(OPT_PED);
     doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
     doReturn(pheno).when(cmd).getOptionValue(OPT_PHENOTYPES);
+    doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
 
     assertThrows(
         MixedPhenotypesException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
@@ -421,15 +418,16 @@ class AppCommandLineOptionsTest {
   void validateCommandLineMaxSamples() throws FileNotFoundException {
     String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
     String pheno = "sample/HP:123456,HP:234567";
+    String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
     CommandLine cmd = mock(CommandLine.class);
     doReturn(true).when(cmd).hasOption(OPT_MAX_SAMPLES);
     doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
     doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
-    doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
     doReturn(false).when(cmd).hasOption(OPT_PED);
     doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
     doReturn("10").when(cmd).getOptionValue(OPT_MAX_SAMPLES);
+    doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
 
     AppCommandLineOptions.validateCommandLine(cmd);
   }
@@ -437,15 +435,16 @@ class AppCommandLineOptionsTest {
   @Test
   void validateCommandLineMaxSamplesNoInt() throws FileNotFoundException {
     String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+    String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
     CommandLine cmd = mock(CommandLine.class);
     doReturn(true).when(cmd).hasOption(OPT_MAX_SAMPLES);
     doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
     doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
-    doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
     doReturn(false).when(cmd).hasOption(OPT_PED);
     doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
     doReturn("test").when(cmd).getOptionValue(OPT_MAX_SAMPLES);
+    doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
 
     assertThrows(
         InvalidIntegerException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
@@ -455,17 +454,18 @@ class AppCommandLineOptionsTest {
   void validateGenes() throws FileNotFoundException {
     String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
     String genesFile = ResourceUtils.getFile("classpath:example.genes.gff.gz").toString();
+  String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
     CommandLine cmd = mock(CommandLine.class);
     doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
     doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
     doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
-    doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
     doReturn(false).when(cmd).hasOption(OPT_PED);
     doReturn(false).when(cmd).hasOption(OPT_REFERENCE);
     doReturn(true).when(cmd).hasOption(OPT_GENES);
     doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
     doReturn(genesFile).when(cmd).getOptionValue(OPT_GENES);
+  doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
 
     AppCommandLineOptions.validateCommandLine(cmd);
   }
@@ -474,16 +474,17 @@ class AppCommandLineOptionsTest {
   void validateReference() throws FileNotFoundException {
     String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
     String referenceFile = ResourceUtils.getFile("classpath:example.fasta.gz").toString();
+    String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
     CommandLine cmd = mock(CommandLine.class);
     doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
     doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
     doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
-    doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
     doReturn(false).when(cmd).hasOption(OPT_PED);
     doReturn(true).when(cmd).hasOption(OPT_REFERENCE);
     doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
     doReturn(referenceFile).when(cmd).getOptionValue(OPT_REFERENCE);
+    doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
 
     AppCommandLineOptions.validateCommandLine(cmd);
   }
@@ -492,16 +493,17 @@ class AppCommandLineOptionsTest {
   void validateReferenceNotExists() throws FileNotFoundException {
     String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
     String referenceFile = "invalid.fasta.gz";
+    String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
     CommandLine cmd = mock(CommandLine.class);
     doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
     doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
     doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
-    doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
     doReturn(false).when(cmd).hasOption(OPT_PED);
     doReturn(true).when(cmd).hasOption(OPT_REFERENCE);
     doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
     doReturn(referenceFile).when(cmd).getOptionValue(OPT_REFERENCE);
+    doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
 
     assertThrows(
         IllegalArgumentException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
@@ -511,16 +513,17 @@ class AppCommandLineOptionsTest {
   void validateReferenceInvalidFileType() throws FileNotFoundException {
     String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
     String referenceFile = "invalid.fasta";
+    String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
     CommandLine cmd = mock(CommandLine.class);
     doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
     doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
     doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
-    doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
     doReturn(false).when(cmd).hasOption(OPT_PED);
     doReturn(true).when(cmd).hasOption(OPT_REFERENCE);
     doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
     doReturn(referenceFile).when(cmd).getOptionValue(OPT_REFERENCE);
+    doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
 
     assertThrows(
         IllegalArgumentException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
@@ -530,16 +533,17 @@ class AppCommandLineOptionsTest {
   void validateReferenceNoIndex() throws FileNotFoundException {
     String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
     String referenceFile = ResourceUtils.getFile("classpath:example_no_index.fasta.gz").toString();
+    String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
     CommandLine cmd = mock(CommandLine.class);
     doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
     doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
     doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
-    doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
     doReturn(false).when(cmd).hasOption(OPT_PED);
     doReturn(true).when(cmd).hasOption(OPT_REFERENCE);
     doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
     doReturn(referenceFile).when(cmd).getOptionValue(OPT_REFERENCE);
+    doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
 
     assertThrows(
         IllegalArgumentException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
@@ -547,18 +551,19 @@ class AppCommandLineOptionsTest {
 
   private CommandLine validateBamInit(String bamPathString) throws FileNotFoundException {
     String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+    String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
     CommandLine cmd = mock(CommandLine.class);
     doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
     doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
     doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
-    doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
     doReturn(false).when(cmd).hasOption(OPT_PED);
     doReturn(false).when(cmd).hasOption(OPT_REFERENCE);
     doReturn(false).when(cmd).hasOption(OPT_GENES);
     doReturn(true).when(cmd).hasOption(OPT_CRAM);
     doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
     doReturn(bamPathString).when(cmd).getOptionValue(OPT_CRAM);
+    doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
 
     return cmd;
   }
@@ -593,12 +598,12 @@ class AppCommandLineOptionsTest {
 
   private CommandLine validateTreeInit(String treePathString) throws FileNotFoundException {
     String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+    String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
     CommandLine cmd = mock(CommandLine.class);
     doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
     doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
     doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
-    doReturn(false).when(cmd).hasOption(OPT_TEMPLATE);
     doReturn(false).when(cmd).hasOption(OPT_PED);
     doReturn(false).when(cmd).hasOption(OPT_REFERENCE);
     doReturn(false).when(cmd).hasOption(OPT_GENES);
@@ -606,6 +611,7 @@ class AppCommandLineOptionsTest {
     doReturn(true).when(cmd).hasOption(OPT_TREE);
     doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
     doReturn(treePathString).when(cmd).getOptionValue(OPT_TREE);
+    doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
 
     return cmd;
   }

@@ -13,7 +13,7 @@ public class ReportGeneratorSettings {
   @NonNull String appVersion;
   @NonNull String appArguments;
   int maxNrSamples;
-  Path metadataPath;
+  @NonNull Path metadataPath;
   Path referencePath;
   Path genesPath;
   Path decisionTreePath;

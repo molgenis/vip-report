@@ -1,0 +1,13 @@
+{
+  "info": {
+    "TEST": {
+        "ALLELE_NUM": {
+          "label": "test.",
+          "description": "test.",
+          "numberType": "NUMBER",
+          "numberCount": 1,
+          "type": "STRING"
+        }
+      }
+    }
+}

@@ -41,16 +41,9 @@ public class ReportWriter {
       throws IOException {
     String templateHtml;
     Path templatePath = reportWriterSettings.getTemplatePath();
-    if (templatePath != null) {
-      LOGGER.info("creating report using template {}", templatePath);
-      templateHtml = Files.readString(templatePath, UTF_8);
-    } else {
-      LOGGER.info("creating report using default template");
-      try (InputStream inputStream =
-          new ClassPathResource("vip-report-template.html").getInputStream()) {
-        templateHtml = new String(inputStream.readAllBytes(), UTF_8);
-      }
-    }
+
+    LOGGER.info("creating report using template {}", templatePath);
+    templateHtml = Files.readString(templatePath, UTF_8);
 
     String scriptTag = createScriptTag(report, reportWriterSettings.isPrettyPrint());
 

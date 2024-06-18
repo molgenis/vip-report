@@ -34,12 +34,8 @@ public class AppCommandLineToSettingsMapper {
     Path inputPath = Path.of(inputPathValue);
 
     Path templatePath;
-    if (commandLine.hasOption(OPT_TEMPLATE)) {
-      String templateValue = commandLine.getOptionValue(OPT_TEMPLATE);
-      templatePath = Path.of(templateValue);
-    } else {
-      templatePath = null;
-    }
+    String templateValue = commandLine.getOptionValue(OPT_TEMPLATE);
+    templatePath = Path.of(templateValue);
 
     Path metadataPath;
     if (commandLine.hasOption(OPT_METADATA)) {

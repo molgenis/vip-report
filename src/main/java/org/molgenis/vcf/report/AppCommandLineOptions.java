@@ -68,6 +68,7 @@ class AppCommandLineOptions {
             .hasArg(true)
             .longOpt(OPT_METADATA_LONG)
             .desc("VCF metadata file (.json).")
+            .required()
             .build());
     appOptions.addOption(
         Option.builder(OPT_OUTPUT)
@@ -85,6 +86,7 @@ class AppCommandLineOptions {
             .hasArg(true)
             .longOpt(OPT_TEMPLATE_LONG)
             .desc("Report template file (.html).")
+            .required()
             .build());
     appOptions.addOption(
         Option.builder(OPT_PROBANDS)
@@ -329,10 +331,6 @@ class AppCommandLineOptions {
   }
 
   private static void validateTemplate(CommandLine commandLine) {
-    if (!commandLine.hasOption(OPT_TEMPLATE)) {
-      return;
-    }
-
     Path templatePath = Path.of(commandLine.getOptionValue(OPT_TEMPLATE));
     validateFilePath(templatePath, "Template");
 
@@ -372,7 +370,7 @@ class AppCommandLineOptions {
     String treePathStr = treePath.toString();
     if (!treePathStr.endsWith(".json")) {
       throw new IllegalArgumentException(
-          format("Template file '%s' is not a .json file.", treePathStr));
+          format("Decision tree file '%s' is not a .json file.", treePathStr));
     }
   }
 

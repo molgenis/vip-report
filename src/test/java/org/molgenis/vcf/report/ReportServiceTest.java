@@ -53,6 +53,7 @@ class ReportServiceTest {
     String appArguments = "MyArguments";
     Path inputVcfPath = Paths.get("src", "test", "resources", "example.vcf");
     Path outputReportPath = sharedTempDir.resolve("example.vcf.html");
+    Path metadataPath = sharedTempDir.resolve("field_metadata.json");
 
     Report report =
         new Report(
@@ -68,18 +69,21 @@ class ReportServiceTest {
             new ObjectMapper()
                 .readValue(
                         "{\"name\":\"sampletree\", \"description\":\"no need for a valid tree\"}",
-                        Map.class), null);
+                        Map.class),
+            new ObjectMapper()
+                .readValue("{\"info\":{\"TEST\":{\"ALLELE_NUM\":{\"label\":\"test.\", \"description\":\"test.\", \"numberType\":\"NUMBER\", \"numberCount\":1, \"type\":\"STRING\"}}}}", Map.class));
+
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
             appName,
             appVersion,
             appArguments,
             ReportGeneratorSettings.DEFAULT_MAX_NR_SAMPLES,
+            metadataPath,
             null,
             null,
             null,
-            null,
-                null);
+            null);
     ReportWriterSettings reportWriterSettings = new ReportWriterSettings(null, true);
     SampleSettings sampleSettings = new SampleSettings(null, null, null, Map.of());
     Settings settings =

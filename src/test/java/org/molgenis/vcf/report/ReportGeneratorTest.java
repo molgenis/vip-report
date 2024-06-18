@@ -84,6 +84,7 @@ class ReportGeneratorTest {
     List<Path> pedPath =
         Collections.singletonList(Paths.get("src", "test", "resources", "example.ped"));
     Path referencePath = Paths.get("src", "test", "resources", "example.fasta.gz");
+    Path metadataPath = Paths.get("src", "test", "resources", "minimal_field_metadata.json");
 
     Map<String, Sample> pedSampleItems =
         Map.of("John", Sample.builder().person(Person.builder().familyId("FAM001").sex(Sex.MALE).affectedStatus(
@@ -113,7 +114,7 @@ class ReportGeneratorTest {
     String appArgs = "MyArgs";
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
-            appName, appVersion, appArgs, maxNrSamples, null, referencePath, null, treePath, treePath);
+            appName, appVersion, appArgs, maxNrSamples, metadataPath, referencePath, null, treePath, treePath);
     Report report =
         new Report(
             new ReportMetadata(new AppMetadata(appName, appVersion, appArgs), htsFile),
@@ -128,9 +129,10 @@ class ReportGeneratorTest {
                     "{\"name\":\"testtree\", \"description\":\"no need for a valid tree\"}",
                     Map.class),
             new ObjectMapper()
-                    .readValue(
+                .readValue(
                     "{\"name\":\"testtree\", \"description\":\"no need for a valid tree\"}",
-                    Map.class),null);
+                    Map.class), new ObjectMapper()
+                .readValue("{\"info\":{\"TEST\":{\"ALLELE_NUM\":{\"label\":\"test.\", \"description\":\"test.\", \"numberType\":\"NUMBER\", \"numberCount\":1, \"type\":\"STRING\"}}}}", Map.class));
 
     assertEquals(
         report,
