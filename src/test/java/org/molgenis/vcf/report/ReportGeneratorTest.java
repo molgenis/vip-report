@@ -1,7 +1,6 @@
 package org.molgenis.vcf.report;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -115,7 +114,7 @@ class ReportGeneratorTest {
     String appArgs = "MyArgs";
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
-            appName, appVersion, appArgs, maxNrSamples, metadataPath, referencePath, null, treePath);
+            appName, appVersion, appArgs, maxNrSamples, metadataPath, referencePath, null, treePath, treePath);
     Report report =
         new Report(
             new ReportMetadata(new AppMetadata(appName, appVersion, appArgs), htsFile),
@@ -125,6 +124,10 @@ class ReportGeneratorTest {
                 Map.of("1:2-3", new Bytes(new byte[] {0})),
                 null,
                 Map.of()),
+            new ObjectMapper()
+                .readValue(
+                    "{\"name\":\"testtree\", \"description\":\"no need for a valid tree\"}",
+                    Map.class),
             new ObjectMapper()
                 .readValue(
                     "{\"name\":\"testtree\", \"description\":\"no need for a valid tree\"}",

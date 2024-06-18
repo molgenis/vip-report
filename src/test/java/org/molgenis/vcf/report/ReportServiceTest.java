@@ -1,7 +1,6 @@
 package org.molgenis.vcf.report;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.molgenis.vcf.utils.model.metadata.HtsFormat.VCF;
@@ -66,7 +65,14 @@ class ReportServiceTest {
             new ObjectMapper()
                 .readValue(
                     "{\"name\":\"testtree\", \"description\":\"no need for a valid tree\"}",
-                    Map.class), emptyMap());
+                    Map.class),
+            new ObjectMapper()
+                .readValue(
+                        "{\"name\":\"sampletree\", \"description\":\"no need for a valid tree\"}",
+                        Map.class),
+            new ObjectMapper()
+                .readValue("{\"info\":{\"TEST\":{\"ALLELE_NUM\":{\"label\":\"test.\", \"description\":\"test.\", \"numberType\":\"NUMBER\", \"numberCount\":1, \"type\":\"STRING\"}}}}", Map.class));
+
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
             appName,
@@ -74,6 +80,7 @@ class ReportServiceTest {
             appArguments,
             ReportGeneratorSettings.DEFAULT_MAX_NR_SAMPLES,
             metadataPath,
+            null,
             null,
             null,
             null);
