@@ -13,7 +13,7 @@
 
   <groupId>org.molgenis</groupId>
   <artifactId>vip-report</artifactId>
-  <version>6.2.0</version>
+  <version>7.0.0</version>
 
   <name>vip-report</name>
   <description>Report generator for Variant Call Format (VCF) files</description>
