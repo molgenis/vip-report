@@ -5,6 +5,7 @@ jdk: openjdk17
 cache:
   directories:
     - "$HOME/.m2"
+    - "$HOME/graalvm"
 branches:
   only:
     - main
@@ -15,6 +16,18 @@ addons:
     token:
       secure: jLuVPAB7cIfVQfISdPSRfZ0PDTAdpSk5ziqfcfpqSHvI4sczDF9V8nZiSBCIRoL42Kvy1DZHS81qQHyvhleduihfn1cjYQ80QHDFiX6lIQbb/P4b5CZpCVhGTLUYPrG1buI/nSEIrj3c4I4dgfwpv0+OUKKV1OttmE3dH0pxKqcjWpaRvPZqd/zZJsPPkVkQtuUWkdHbppjjWt2r7YuPtudjAQ5tABgexzKMHgfVCuxGdY10YUVI2pYyWtUdpyGWykYmZayyJllsG4apZhlvqDVMG8vuLnmo7NuixVLXYDXu9YFGob6+rAk5OlXep2JtCZBXLPDK3FMjrhM2EA1MQYoQHIDlI+CxcG+udyY5XJ8ETMIr/U032Oq60kIns1CTs85mddlMGsoBNbVpNMtuxzay/OSq+b+KiRP792/R5DW+fD3VsWhNMX9GY4kKUdsgaHiObbnc6784uPzHBtDFC+8cktAvYfyw2ADvO4lLQXqxvE4IO6xLVbyWxplRzs7gBLmbmQ3S8fm7shUP7b401d5sHyzfhCFn+VlHafBKuDj3qACNSZj8ueH/0mcyWzM/e2LP9yeukUSxMpQhhvOlzf64fiH0POoCfqKE1VHowMtiIvt1++CvS86G/swcSfKIxvRKc8/gVQC5eawg4jugZqPges8oX8JAIqbs5zZAEWM=
 before_install:
+  # Check if GraalVM is already cached, if not download and install it
+  - if [ ! -d "$HOME/graalvm/graalvm-community-openjdk-21.0.2+13.1" ]; then
+    echo "GraalVM is not cached, installing...";
+    wget https://github.com/graalvm/graalvm-ce-builds/releases/download/jdk-21.0.2/graalvm-community-jdk-21.0.2_linux-x64_bin.tar.gz;
+    mkdir -p $HOME/graalvm;
+    tar -xzf graalvm-community-jdk-21.0.2_linux-x64_bin.tar.gz -C $HOME/graalvm;
+    else
+    echo "Using cached GraalVM";
+    fi
+
+  - export JAVA_HOME=$HOME/graalvm/graalvm-community-openjdk-21.0.2+13.1
+  - export PATH=JAVA_HOME/bin:$PATH
   - cp travis.settings.xml $HOME/.m2/settings.xml
 script:
   - mvn clean install sonar:sonar -Pcoverage -Dsonar.projectKey=molgenis_vip-report
