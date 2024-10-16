@@ -6,7 +6,7 @@ Command-line application to generate a report for any VCF (Variant Call Format) 
 report template.
 
 ## Requirements
-- Java 17
+- Java 21
 
 ## Usage
 ```
