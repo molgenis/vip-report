@@ -1,7 +1,7 @@
 package org.molgenis.vcf.report.fasta;
 
-import htsjdk.variant.vcf.VCFFileReader;
 import htsjdk.variant.vcf.VCFHeader;
+import htsjdk.variant.vcf.VCFIterator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,7 +32,7 @@ class VariantIntervalCalculatorTest {
     }
     @Test
     void calculate() {
-        VCFFileReader vcfFileReader = mock(VCFFileReader.class);
+        VCFIterator vcfFileReader = mock(VCFIterator.class);
         VCFHeader vcfHeader = mock(VCFHeader.class);
         when(vcfFileReader.getHeader()).thenReturn(vcfHeader);
         SampleSettings.CramPath cramPath = mock(SampleSettings.CramPath.class);
