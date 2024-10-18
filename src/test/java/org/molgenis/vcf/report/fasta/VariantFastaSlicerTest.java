@@ -12,6 +12,7 @@ import java.util.Map;
 
 import htsjdk.variant.vcf.VCFFileReader;
 import htsjdk.variant.vcf.VCFHeader;
+import htsjdk.variant.vcf.VCFIterator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,7 +43,7 @@ class VariantFastaSlicerTest {
         ContigInterval contigInterval3 = new ContigInterval("4", 3750, 4250);
 
         VCFHeader vcfHeader = mock(VCFHeader.class);
-        VCFFileReader vcfFileReader = mock(VCFFileReader.class);
+        VCFIterator vcfFileReader = mock(VCFIterator.class);
 
         SampleSettings.CramPath cramPath = mock(SampleSettings.CramPath.class);
         Map<String, SampleSettings.CramPath> cramPaths = Map.of("TEST", cramPath);
@@ -74,7 +75,7 @@ class VariantFastaSlicerTest {
         ContigInterval contigInterval1 = new ContigInterval("2", 1750, 2250);
 
         VCFHeader vcfHeader = mock(VCFHeader.class);
-        VCFFileReader vcfFileReader = mock(VCFFileReader.class);
+        VCFIterator vcfFileReader = mock(VCFIterator.class);
 
         Path referencePath = Path.of("fake/reference/path");
         when(variantIntervalCalculator.calculate(vcfFileReader, null, referencePath))

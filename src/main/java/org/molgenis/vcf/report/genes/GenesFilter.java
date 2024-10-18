@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import htsjdk.variant.vcf.VCFFileReader;
+import htsjdk.variant.vcf.VCFIterator;
 import org.molgenis.vcf.report.fasta.ContigInterval;
 import org.molgenis.vcf.report.generator.SampleSettings;
 import org.molgenis.vcf.report.utils.BestCompressionGZIPOutputStream;
@@ -36,8 +37,8 @@ public class GenesFilter {
 
   }
 
-  public byte[] filter(VCFFileReader variants, Map<String, SampleSettings.CramPath> cramPaths, Path reference) {
-    List<ContigInterval> contigIntervals = variantIntervalCalculator.calculate(variants, cramPaths, reference);
+  public byte[] filter(VCFIterator vcfIterator, Map<String, SampleSettings.CramPath> cramPaths, Path reference) {
+    List<ContigInterval> contigIntervals = variantIntervalCalculator.calculate(vcfIterator, cramPaths, reference);
     return filter(contigIntervals);
   }
 

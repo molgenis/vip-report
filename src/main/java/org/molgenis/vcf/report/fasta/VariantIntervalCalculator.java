@@ -1,6 +1,6 @@
 package org.molgenis.vcf.report.fasta;
 
-import htsjdk.variant.vcf.VCFFileReader;
+import htsjdk.variant.vcf.VCFIterator;
 import org.molgenis.vcf.report.generator.SampleSettings;
 import org.springframework.stereotype.Component;
 
@@ -21,16 +21,16 @@ public class VariantIntervalCalculator {
         this.cramIntervalCalculator = requireNonNull(cramIntervalCalculator);
     }
 
-    public List<ContigInterval> calculate(VCFFileReader vcfFileReader, Map<String, SampleSettings.CramPath> cramPaths, Path referencePath) {
+    public List<ContigInterval> calculate(VCFIterator vcfIterator, Map<String, SampleSettings.CramPath> cramPaths, Path referencePath) {
         Map<String, List<ContigInterval>> cramIntervals;
         List<ContigInterval> intervals = new ArrayList<>();
         if(cramPaths != null && !cramPaths.isEmpty()) {
-            Map<String, List<ContigInterval>> vcfIntervals = vcfIntervalCalculator.calculate(vcfFileReader.getHeader(), vcfFileReader, FLANKING, null);
+            Map<String, List<ContigInterval>> vcfIntervals = vcfIntervalCalculator.calculate(vcfIterator.getHeader(), vcfIterator, FLANKING, null);
             cramIntervals = cramIntervalCalculator.calculate(cramPaths, referencePath);
             intervals = mergeIntervalLists(cramIntervals, vcfIntervals);
         }else{
             Map<String, List<ContigInterval>> intervalMap =
-                    vcfIntervalCalculator.calculate(vcfFileReader.getHeader(), vcfFileReader, FLANKING, null);
+                    vcfIntervalCalculator.calculate(vcfIterator.getHeader(), vcfIterator, FLANKING, null);
             for(Map.Entry<String, List<ContigInterval>> entry : intervalMap.entrySet()){
                 intervals.addAll(mergeIntervals(entry.getValue()));
             }

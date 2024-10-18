@@ -18,6 +18,7 @@ import java.util.zip.GZIPInputStream;
 
 import htsjdk.variant.vcf.VCFFileReader;
 import htsjdk.variant.vcf.VCFHeader;
+import htsjdk.variant.vcf.VCFIterator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,8 +42,6 @@ class GenesFilterTest {
 
   @Test
   void filter() {
-    VariantContext variantContext = mock(VariantContext.class);
-    Iterable<VariantContext> variants = singletonList(variantContext);
     ContigInterval contigInterval = mock(ContigInterval.class);
     when(contigInterval.getContig()).thenReturn("chr1");
     when(contigInterval.getStart()).thenReturn(11895);
@@ -59,9 +58,8 @@ class GenesFilterTest {
     when(contigInterval4.getContig()).thenReturn("chr1");
     when(contigInterval4.getStart()).thenReturn(11890);
     when(contigInterval4.getStop()).thenReturn(14408);
-    VCFHeader vcfHeader = mock(VCFHeader.class);
 
-    VCFFileReader vcfFileReader = mock(VCFFileReader.class);
+    VCFIterator vcfFileReader = mock(VCFIterator.class);
 
     when(variantIntervalCalculator.calculate(vcfFileReader, null, Path.of("fake"))).thenReturn(
         List.of(contigInterval, contigInterval2, contigInterval3, contigInterval4));

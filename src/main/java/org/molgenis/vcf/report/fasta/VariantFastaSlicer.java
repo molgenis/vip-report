@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
 import htsjdk.variant.vcf.VCFFileReader;
+import htsjdk.variant.vcf.VCFIterator;
 import org.molgenis.vcf.report.generator.SampleSettings;
 import org.molgenis.vcf.report.model.Bytes;
 
@@ -19,11 +20,11 @@ public class VariantFastaSlicer {
     this.variantIntervalCalculator = variantIntervalCalculator;
   }
 
-  public Map<String, Bytes> generate(VCFFileReader vcfFileReader, Map<String, SampleSettings.CramPath> cramPaths, Path referencePath) {
+  public Map<String, Bytes> generate(VCFIterator vcfIterator, Map<String, SampleSettings.CramPath> cramPaths, Path referencePath) {
     Map<String, Bytes> fastaGzMap;
     if (referencePath != null) {
       List<FastaSlice> fastaGzSlices;
-      List<ContigInterval> intervals = variantIntervalCalculator.calculate(vcfFileReader, cramPaths, referencePath);
+      List<ContigInterval> intervals = variantIntervalCalculator.calculate(vcfIterator, cramPaths, referencePath);
       fastaGzSlices = intervals.stream().map(fastaSlicer::slice).collect(toList());
       fastaGzMap = new LinkedHashMap<>();
       fastaGzSlices.forEach(

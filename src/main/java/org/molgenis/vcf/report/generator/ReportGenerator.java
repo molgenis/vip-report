@@ -4,7 +4,6 @@ import static java.util.Objects.requireNonNull;
 import static org.molgenis.vcf.utils.sample.mapper.PedToSamplesMapper.mapPedFileToPersons;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import htsjdk.variant.vcf.VCFFileReader;
 import htsjdk.variant.vcf.VCFHeader;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -13,6 +12,8 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 
+import htsjdk.variant.vcf.VCFIterator;
+import htsjdk.variant.vcf.VCFIteratorBuilder;
 import org.molgenis.vcf.report.fasta.*;
 import org.molgenis.vcf.report.genes.GenesFilter;
 import org.molgenis.vcf.report.genes.GenesFilterFactory;
@@ -24,6 +25,7 @@ import org.molgenis.vcf.report.model.Report;
 import org.molgenis.vcf.report.model.ReportData;
 import org.molgenis.vcf.report.model.metadata.AppMetadata;
 import org.molgenis.vcf.report.model.metadata.ReportMetadata;
+import org.molgenis.vcf.report.utils.VcfInputStreamDecorator;
 import org.molgenis.vcf.utils.PersonListMerger;
 import org.molgenis.vcf.utils.model.metadata.HtsFile;
 import org.molgenis.vcf.utils.sample.mapper.HtsFileMapper;
@@ -62,25 +64,25 @@ public class ReportGenerator {
       SampleSettings sampleSettings,
       ReportGeneratorSettings reportGeneratorSettings) {
     Report report;
-    try (VCFFileReader vcfFileReader = createReader(inputVcfPath)) {
-      report = createReport(vcfFileReader, inputVcfPath, sampleSettings, reportGeneratorSettings);
+    try (VCFIterator vcfIterator = createReader(inputVcfPath)) {
+      report = createReport(vcfIterator, inputVcfPath, sampleSettings, reportGeneratorSettings);
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }
     return report;
   }
 
-  private VCFFileReader createReader(Path vcfPath) {
-    return new VCFFileReader(vcfPath, false);
+  private VCFIterator createReader(Path vcfPath) throws IOException {
+    return new VCFIteratorBuilder().open(VcfInputStreamDecorator.preprocessVCF(vcfPath.toFile()));
   }
 
   private Report createReport(
-      VCFFileReader vcfFileReader,
+          VCFIterator vcfFileReader,
       Path vcfPath,
       SampleSettings sampleSettings,
       ReportGeneratorSettings reportGeneratorSettings)
       throws IOException {
-    HtsFile htsFile = htsFileMapper.map(vcfFileReader.getFileHeader(), vcfPath.toString());
+    HtsFile htsFile = htsFileMapper.map(vcfFileReader.getHeader(), vcfPath.toString());
 
     Items<Sample> samples =
         createPersons(
@@ -189,7 +191,7 @@ public class ReportGenerator {
     return cramMap;
   }
 
-  private Map<String, Bytes> getReferenceTrackData(VCFFileReader vcfFileReader, Path referencePath, Map<String, SampleSettings.CramPath> cramPaths) {
+  private Map<String, Bytes> getReferenceTrackData(VCFIterator vcfFileReader, Path referencePath, Map<String, SampleSettings.CramPath> cramPaths) {
     Map<String, Bytes> fastaGzMap;
     if (referencePath != null) {
       VariantFastaSlicer variantFastaSlicer = vcfFastaSlicerFactory.create(referencePath);
@@ -200,12 +202,12 @@ public class ReportGenerator {
     return fastaGzMap;
   }
 
-  private Bytes getGenesTrackData(VCFFileReader vcfFileReader, ReportGeneratorSettings reportGeneratorSettings, Path referencePath, Map<String, SampleSettings.CramPath> cramPaths) {
+  private Bytes getGenesTrackData(VCFIterator vcfIterator, ReportGeneratorSettings reportGeneratorSettings, Path referencePath, Map<String, SampleSettings.CramPath> cramPaths) {
     Path genesPath = reportGeneratorSettings.getGenesPath();
     Bytes genesGz;
     if (genesPath != null) {
       GenesFilter genesFilter = genesFilterFactory.create(genesPath);
-      genesGz = new Bytes(genesFilter.filter(vcfFileReader, cramPaths, referencePath));
+      genesGz = new Bytes(genesFilter.filter(vcfIterator, cramPaths, referencePath));
     } else {
       genesGz = null;
     }
@@ -213,11 +215,11 @@ public class ReportGenerator {
   }
 
   private Items<Sample> createPersons(
-      VCFFileReader vcfFileReader,
+          VCFIterator vcfFileReader,
       List<String> probandNames,
       List<Path> pedigreePaths,
       ReportGeneratorSettings settings) {
-    VCFHeader fileHeader = vcfFileReader.getFileHeader();
+    VCFHeader fileHeader = vcfFileReader.getHeader();
     int maxNrSamples = settings.getMaxNrSamples();
     List<Sample> samplesList = htsJdkToPersonsMapper.map(fileHeader, maxNrSamples);
     Items<Sample> sampleItems = new Items<>(samplesList, samplesList.size());
