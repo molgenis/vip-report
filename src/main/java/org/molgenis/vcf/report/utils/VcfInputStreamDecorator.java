@@ -3,6 +3,7 @@ package org.molgenis.vcf.report.utils;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.GZIPInputStream;
 
 public class VcfInputStreamDecorator {
     public static final String TR_ALLELE = "<CNV:TR>";
@@ -11,9 +12,13 @@ public class VcfInputStreamDecorator {
     private VcfInputStreamDecorator(){}
 
     public static InputStream preprocessVCF(File inputVCF) throws IOException {
-        try(ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(byteArrayOutputStream));
-            BufferedReader reader = new BufferedReader(new FileReader(inputVCF))) {
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(byteArrayOutputStream));
+             InputStream inputStream = new FileInputStream(inputVCF);
+             BufferedReader reader = inputVCF.toPath().toString().endsWith(".vcf.gz") ?
+                     new BufferedReader(new InputStreamReader(new GZIPInputStream(inputStream))) :
+                     new BufferedReader(new InputStreamReader(inputStream));
+        ) {
             String line;
             while ((line = reader.readLine()) != null) {
                 line = processLine(line);
@@ -26,7 +31,7 @@ public class VcfInputStreamDecorator {
     }
 
     private static String processLine(String line) {
-        if(line.startsWith("#") || line.isEmpty()){
+        if (line.startsWith("#") || line.isEmpty()) {
             return line;
         }
         String[] parts = line.split("\t");
@@ -41,7 +46,6 @@ public class VcfInputStreamDecorator {
         } else {
             throw new InvalidVcfLineException(line);
         }
-        // Rejoin the parts with tabs and return the modified line
         return String.join("\t", parts);
     }
 
