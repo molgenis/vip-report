@@ -26,7 +26,7 @@ public class VcfInputStreamDecorator {
     }
 
     private static String processLine(String line) {
-        if(line.startsWith("#")){
+        if(line.startsWith("#") || line.isEmpty()){
             return line;
         }
         String[] parts = line.split("\t");

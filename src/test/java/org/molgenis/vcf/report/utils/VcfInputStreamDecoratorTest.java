@@ -41,6 +41,8 @@ class VcfInputStreamDecoratorTest {
                 ##fileformat=VCFv4.2
                 #CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO
                 1\t123456\t.\tA\tT\t.\tPASS\t.
+                1\t123456\t.\tA\tC,T\t.\tPASS\t.
+                
                 """;
 
         File mockFile = tmpFileFromString(vcfContent);
