@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
+//Workaround for https://github.com/samtools/htsjdk/issues/1718
 public class VcfInputStreamDecorator {
     public static final String TR_ALLELE = "<CNV:TR>";
     public static final String FORMAT = "<CNV:TR%d>";
