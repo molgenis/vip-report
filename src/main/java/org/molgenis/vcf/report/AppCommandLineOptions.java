@@ -27,6 +27,8 @@ class AppCommandLineOptions {
   static final String OPT_OUTPUT_LONG = "output";
   static final String OPT_TEMPLATE = "t";
   static final String OPT_TEMPLATE_LONG = "template";
+  static final String OPT_TEMPLATE_CONFIG = "tc";
+  static final String OPT_TEMPLATE_CONFIG_LONG = "template_config";
   static final String OPT_PROBANDS = "pb";
   static final String OPT_PROBANDS_LONG = "probands";
   static final String OPT_PED = "pd";
@@ -88,6 +90,12 @@ class AppCommandLineOptions {
             .desc("Report template file (.html).")
             .required()
             .build());
+    appOptions.addOption(
+            Option.builder(OPT_TEMPLATE_CONFIG)
+                    .hasArg(true)
+                    .longOpt(OPT_TEMPLATE_CONFIG_LONG)
+                    .desc("Report template config file (.json).")
+                    .build());
     appOptions.addOption(
         Option.builder(OPT_PROBANDS)
             .hasArg(true)
@@ -187,6 +195,7 @@ class AppCommandLineOptions {
     validateGenes(commandLine);
     validateCram(commandLine);
     validateTree(commandLine);
+    validateTemplateConfig(commandLine);
   }
 
   static void validateReference(CommandLine commandLine) {
@@ -338,6 +347,20 @@ class AppCommandLineOptions {
     if (!templatePathStr.endsWith(".html")) {
       throw new IllegalArgumentException(
           format("Template file '%s' is not a .html file.", templatePathStr));
+    }
+  }
+
+  private static void validateTemplateConfig(CommandLine commandLine) {
+    if (!commandLine.hasOption(OPT_TEMPLATE_CONFIG)) {
+      return;
+    }
+    Path templateConfigPath = Path.of(commandLine.getOptionValue(OPT_TEMPLATE_CONFIG));
+    validateFilePath(templateConfigPath, "Template config");
+
+    String templateConfigPathStr = templateConfigPath.toString();
+    if (!templateConfigPathStr.endsWith(".json")) {
+      throw new IllegalArgumentException(
+              format("Template config file '%s' is not a .json file.", templateConfigPathStr));
     }
   }
 

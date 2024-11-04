@@ -14,11 +14,12 @@ usage: java -jar vcf-report.jar -i <arg> [-m <arg>] [-o <arg>] [-f] [-t <arg>] [
        <arg>] [-pd <arg>] [-ph <arg>] [-ms <arg>] [-r <arg>]
        [-g <arg>] [-c <arg>] [-dt <arg>] [-d]
  -i,--input <arg>            Input VCF file (.vcf or .vcf.gz).
- -m,--metadata <arg>      VCF metadata file (.json).
+ -m,--metadata <arg>         VCF metadata file (.json).
  -o,--output <arg>           Output report file (.html).
  -f,--force                  Override the output file if it already
                              exists.
  -t,--template <arg>         Report template file (.html).
+ -tc,--template_config <arg> Report template configuration file (.json).
  -pb,--probands <arg>        Comma-separated list of proband names.
  -pd,--pedigree <arg>        Comma-separated list of pedigree files
                              (.ped).
@@ -59,6 +60,7 @@ java -jar vcf-report.jar -i my.vcf.gz -m metadata.json -o my-report.html -t my-t
 java -jar vcf-report.jar -i my.vcf.gz -m metadata.json -o my-report.html -t my-template.html -pb sample0,sample1 -pd my.ped,my_other.ped -ph HP:0000001;HP:0000002
 java -jar vcf-report.jar -i my.vcf.gz -m metadata.json -o my-report.html -t my-template.html -pb sample0,sample1 -pd my.ped,my_other.ped -ph sampleId1/HP:0000001;HP:0000002,sampleId2/HP:0000001
 java -jar vcf-report.jar -i my.vcf.gz -m metadata.json -o my-report.html -t my-template.html -pb sample0,sample1 -pd my.ped,my_other.ped -ph sampleId1/HP:0000001;HP:0000002,sampleId2/HP:0000001 -ms 10
+java -jar vcf-report.jar -i my.vcf.gz -m metadata.json -o my-report.html -t my-template.html -pb sample0,sample1 -pd my.ped,my_other.ped -ph sampleId1/HP:0000001;HP:0000002,sampleId2/HP:0000001 -ms 10 -tc template_config.json
 java -jar vcf-report.jar -v
 ```
 

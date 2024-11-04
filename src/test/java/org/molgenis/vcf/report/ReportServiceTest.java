@@ -71,7 +71,7 @@ class ReportServiceTest {
                         "{\"name\":\"sampletree\", \"description\":\"no need for a valid tree\"}",
                         Map.class),
             new ObjectMapper()
-                .readValue("{\"info\":{\"TEST\":{\"ALLELE_NUM\":{\"label\":\"test.\", \"description\":\"test.\", \"numberType\":\"NUMBER\", \"numberCount\":1, \"type\":\"STRING\"}}}}", Map.class));
+                .readValue("{\"info\":{\"TEST\":{\"ALLELE_NUM\":{\"label\":\"test.\", \"description\":\"test.\", \"numberType\":\"NUMBER\", \"numberCount\":1, \"type\":\"STRING\"}}}}", Map.class),null);
 
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
@@ -82,7 +82,7 @@ class ReportServiceTest {
             metadataPath,
             null,
             null,
-            null,
+            null,null,
             null);
     ReportWriterSettings reportWriterSettings = new ReportWriterSettings(null, true);
     SampleSettings sampleSettings = new SampleSettings(null, null, null, Map.of());
