@@ -37,14 +37,6 @@ public class AppCommandLineToSettingsMapper {
     String templateValue = commandLine.getOptionValue(OPT_TEMPLATE);
     templatePath = Path.of(templateValue);
 
-    Path templateConfigPath;
-    if (commandLine.hasOption(OPT_TEMPLATE_CONFIG)) {
-      String templateConfigValue = commandLine.getOptionValue(OPT_TEMPLATE_CONFIG);
-      templateConfigPath = Path.of(templateConfigValue);
-    } else {
-      templateConfigPath = null;
-    }
-
     Path metadataPath;
     if (commandLine.hasOption(OPT_METADATA)) {
       String metadataPathValue = commandLine.getOptionValue(OPT_METADATA);
@@ -118,6 +110,14 @@ public class AppCommandLineToSettingsMapper {
       sampleTreePath = Path.of(sampleTreePathValue);
     } else {
       sampleTreePath = null;
+    }
+
+    Path templateConfigPath;
+    if (commandLine.hasOption(OPT_TEMPLATE_CONFIG)) {
+      String templateConfigValue = commandLine.getOptionValue(OPT_TEMPLATE_CONFIG);
+      templateConfigPath = Path.of(templateConfigValue);
+    } else {
+      templateConfigPath = null;
     }
 
     Map<String, CramPath> cramPaths;
