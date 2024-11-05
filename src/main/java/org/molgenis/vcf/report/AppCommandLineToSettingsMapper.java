@@ -112,6 +112,14 @@ public class AppCommandLineToSettingsMapper {
       sampleTreePath = null;
     }
 
+    Path templateConfigPath;
+    if (commandLine.hasOption(OPT_TEMPLATE_CONFIG)) {
+      String templateConfigValue = commandLine.getOptionValue(OPT_TEMPLATE_CONFIG);
+      templateConfigPath = Path.of(templateConfigValue);
+    } else {
+      templateConfigPath = null;
+    }
+
     Map<String, CramPath> cramPaths;
     if (commandLine.hasOption(OPT_CRAM)) {
       String cramPathValue = commandLine.getOptionValue(OPT_CRAM);
@@ -127,7 +135,7 @@ public class AppCommandLineToSettingsMapper {
     String appArgs = String.join(" ", args);
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
-            appName, appVersion, appArgs, maxSamples, metadataPath, referencePath, genesPath, decisionTreePath, sampleTreePath);
+            appName, appVersion, appArgs, maxSamples, metadataPath, referencePath, genesPath, decisionTreePath, sampleTreePath, templateConfigPath);
     ReportWriterSettings reportWriterSettings = new ReportWriterSettings(templatePath, debugMode);
     SampleSettings sampleSettings =
         new SampleSettings(probandNames, pedPaths, phenotypes, cramPaths);

@@ -29,6 +29,7 @@ class AppIT {
     String phenotypes = "Jimmy/HP:123456,Unknown/test:Headache,Jane/OMIM:23456";
     String bamFile = ResourceUtils.getFile("classpath:example.cram").toString();
     String metadataFile = ResourceUtils.getFile("classpath:field_metadata.json").toString();
+    String templateConfigPath = ResourceUtils.getFile("classpath:template_config.json").toString();
 
     String[] args = {
       "-i",
@@ -39,6 +40,8 @@ class AppIT {
       outputFile,
       "-t",
       templateFile,
+      "-tc",
+      templateConfigPath,
       "-pb",
       probands,
       "-pd",

@@ -32,4 +32,7 @@ public class Report {
   @JsonProperty("vcfMeta")
   @NonNull
   Map<?,?> vcfMeta;
+
+  @JsonProperty("config")
+  Map<?,?> templateConfig;
 }
