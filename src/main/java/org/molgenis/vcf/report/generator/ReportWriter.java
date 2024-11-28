@@ -8,7 +8,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,7 +15,6 @@ import org.molgenis.vcf.report.model.Report;
 import org.molgenis.vcf.report.utils.BestCompressionGZIPOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -58,8 +56,7 @@ public class ReportWriter {
   private String createScriptTag(Report report, boolean prettyPrint)
       throws JsonProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();
-    objectMapper.setSerializationInclusion(Include.NON_NULL);
-    objectMapper.setSerializationInclusion(Include.NON_EMPTY);
+    objectMapper.setSerializationInclusion(Include.ALWAYS);
     String json;
     if (prettyPrint) {
       json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(report);
