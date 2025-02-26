@@ -547,11 +547,36 @@ class AppCommandLineOptionsTest {
         return cmd;
     }
 
+    private CommandLine validateBamInitMissingReference(String bamPathString) throws FileNotFoundException {
+        String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+        String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
+
+        CommandLine cmd = mock(CommandLine.class);
+        doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
+        doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
+        doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
+        doReturn(false).when(cmd).hasOption(OPT_PED);
+        doReturn(false).when(cmd).hasOption(OPT_REFERENCE);
+        doReturn(false).when(cmd).hasOption(OPT_GENES);
+        doReturn(true).when(cmd).hasOption(OPT_CRAM);
+        doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
+        doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
+
+        return cmd;
+    }
+
     @Test
     void validateBamInvalidValue() throws FileNotFoundException {
         CommandLine cmd = validateBamInit("my.bam");
         assertThrows(
                 InvalidSampleCramException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
+    }
+
+    @Test
+    void validateBamInvalidValueMissingReference() throws FileNotFoundException {
+        CommandLine cmd = validateBamInitMissingReference("my.bam");
+        assertThrows(
+                IllegalArgumentException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
     }
 
     @Test
