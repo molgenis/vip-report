@@ -247,6 +247,11 @@ class AppCommandLineOptions {
       return;
     }
 
+    if (!commandLine.hasOption(OPT_REFERENCE)) {
+      throw new IllegalArgumentException(
+              format("Cram files cannot be used without providing the reference Fasta file. (-%s, --%s).", OPT_REFERENCE, OPT_REFERENCE_LONG));
+    }
+
     String cramString = commandLine.getOptionValue(OPT_CRAM);
     for (String sampleCramString : cramString.split(",")) {
       String[] tokens = sampleCramString.split("=");

@@ -53,6 +53,7 @@ class ReportGeneratorTest {
   @Mock private HtsFileMapper htsFileMapper;
   @Mock private VcfFastaSlicerFactory vcfFastaSlicerFactory;
   @Mock private GenesFilterFactory genesFilterFactory;
+  @Mock private VariantIntervalCalculator variantIntervalCalculator;
   private ReportGenerator reportGenerator;
 
   @BeforeEach
@@ -64,7 +65,8 @@ class ReportGeneratorTest {
             personListMerger,
             htsFileMapper,
             vcfFastaSlicerFactory,
-            genesFilterFactory);
+            genesFilterFactory,
+            variantIntervalCalculator);
   }
 
   @Test
@@ -106,7 +108,7 @@ class ReportGeneratorTest {
 
     VariantFastaSlicer variantFastaSlicer = mock(VariantFastaSlicer.class);
     Map<String, Bytes> fastaMap = Map.of("1:2-3", new Bytes(new byte[] {0}));
-    when(variantFastaSlicer.generate(any(), any(), any())).thenReturn(fastaMap);
+    when(variantFastaSlicer.generate(any(), any())).thenReturn(fastaMap);
     when(vcfFastaSlicerFactory.create(referencePath)).thenReturn(variantFastaSlicer);
 
     String phenotypes = "hpo:123456;omim3456";

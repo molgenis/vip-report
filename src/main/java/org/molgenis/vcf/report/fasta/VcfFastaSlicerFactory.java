@@ -10,16 +10,13 @@ import org.springframework.stereotype.Component;
 public class VcfFastaSlicerFactory {
 
   private final FastaSlicerFactory fastaSlicerFactory;
-  private final VariantIntervalCalculator variantIntervalCalculator;
 
-  VcfFastaSlicerFactory(FastaSlicerFactory fastaSlicerFactory,
-                        VariantIntervalCalculator variantIntervalCalculator) {
+  VcfFastaSlicerFactory(FastaSlicerFactory fastaSlicerFactory) {
     this.fastaSlicerFactory = requireNonNull(fastaSlicerFactory);
-    this.variantIntervalCalculator = requireNonNull(variantIntervalCalculator);
   }
 
   public VariantFastaSlicer create(Path fastaGzPath) {
     FastaSlicer fastaSlicer = fastaSlicerFactory.create(fastaGzPath);
-    return new VariantFastaSlicer(fastaSlicer, variantIntervalCalculator);
+    return new VariantFastaSlicer(fastaSlicer);
   }
 }

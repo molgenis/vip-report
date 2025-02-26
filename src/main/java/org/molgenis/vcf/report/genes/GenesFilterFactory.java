@@ -9,13 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class GenesFilterFactory {
 
-  private final VariantIntervalCalculator variantIntervalCalculator;
-
-  GenesFilterFactory(VariantIntervalCalculator variantIntervalCalculator) {
-    this.variantIntervalCalculator = requireNonNull(variantIntervalCalculator);
-  }
-
   public GenesFilter create(Path genesFile) {
-    return new GenesFilter(variantIntervalCalculator, genesFile);
+    return new GenesFilter(genesFile);
   }
 }

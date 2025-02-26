@@ -13,19 +13,16 @@ import java.util.*;
 
 public class VariantFastaSlicer {
   private final FastaSlicer fastaSlicer;
-  private final VariantIntervalCalculator variantIntervalCalculator;
 
-  public VariantFastaSlicer(FastaSlicer fastaSlicer, VariantIntervalCalculator variantIntervalCalculator) {
+  public VariantFastaSlicer(FastaSlicer fastaSlicer) {
     this.fastaSlicer = requireNonNull(fastaSlicer);
-    this.variantIntervalCalculator = variantIntervalCalculator;
   }
 
-  public Map<String, Bytes> generate(VCFIterator vcfIterator, Map<String, SampleSettings.CramPath> cramPaths, Path referencePath) {
+  public Map<String, Bytes> generate(List<ContigInterval> contigIntervals, Path referencePath) {
     Map<String, Bytes> fastaGzMap;
     if (referencePath != null) {
       List<FastaSlice> fastaGzSlices;
-      List<ContigInterval> intervals = variantIntervalCalculator.calculate(vcfIterator, cramPaths, referencePath);
-      fastaGzSlices = intervals.stream().map(fastaSlicer::slice).collect(toList());
+      fastaGzSlices = contigIntervals.stream().map(fastaSlicer::slice).toList();
       fastaGzMap = new LinkedHashMap<>();
       fastaGzSlices.forEach(
               fastaSlice -> {
