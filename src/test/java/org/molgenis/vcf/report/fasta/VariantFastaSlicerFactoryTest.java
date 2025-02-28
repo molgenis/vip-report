@@ -18,14 +18,12 @@ class VariantFastaSlicerFactoryTest {
 
   @Mock
   private FastaSlicerFactory fastaSlicerFactory;
-  @Mock
-  private VariantIntervalCalculator variantIntervalCalculator;
 
   private VcfFastaSlicerFactory vcfFastaSlicerFactory;
 
   @BeforeEach
   void setUpBeforeEach() {
-    vcfFastaSlicerFactory = new VcfFastaSlicerFactory(fastaSlicerFactory, variantIntervalCalculator);
+    vcfFastaSlicerFactory = new VcfFastaSlicerFactory(fastaSlicerFactory);
   }
 
   @Test

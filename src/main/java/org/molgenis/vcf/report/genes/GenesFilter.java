@@ -14,35 +14,23 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
 
-import htsjdk.variant.vcf.VCFFileReader;
-import htsjdk.variant.vcf.VCFIterator;
 import org.molgenis.vcf.report.fasta.ContigInterval;
-import org.molgenis.vcf.report.generator.SampleSettings;
 import org.molgenis.vcf.report.utils.BestCompressionGZIPOutputStream;
-import org.molgenis.vcf.report.fasta.VariantIntervalCalculator;
 
 public class GenesFilter {
   private static final List<String> FEATURE_SOURCES = List.of("BestRefSeq", "Curated Genomic");
   private static final List<String> FEATURE_TYPES =
       List.of("transcript", "primary_transcript", "exon", "mRNA", "pseudogene", "gene");
 
-  private final VariantIntervalCalculator variantIntervalCalculator;
   private final Path genesFile;
 
-  public GenesFilter(VariantIntervalCalculator variantIntervalCalculator, Path genesFile) {
-    this.variantIntervalCalculator = requireNonNull(variantIntervalCalculator);
+  public GenesFilter(Path genesFile) {
     this.genesFile = requireNonNull(genesFile);
 
   }
 
-  public byte[] filter(VCFIterator vcfIterator, Map<String, SampleSettings.CramPath> cramPaths, Path reference) {
-    List<ContigInterval> contigIntervals = variantIntervalCalculator.calculate(vcfIterator, cramPaths, reference);
-    return filter(contigIntervals);
-  }
-
-  private byte[] filter(List<ContigInterval> contigIntervals){
+  public byte[] filter(List<ContigInterval> contigIntervals){
     ByteArrayOutputStream output = new ByteArrayOutputStream();
 
     final Gff3Codec codec = new Gff3Codec(DecodeDepth.SHALLOW);

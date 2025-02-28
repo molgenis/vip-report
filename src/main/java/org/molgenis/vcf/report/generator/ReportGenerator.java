@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import htsjdk.variant.vcf.VCFHeader;
 import htsjdk.variant.vcf.VCFIterator;
 import htsjdk.variant.vcf.VCFIteratorBuilder;
+import org.molgenis.vcf.report.fasta.ContigInterval;
 import org.molgenis.vcf.report.fasta.VariantFastaSlicer;
+import org.molgenis.vcf.report.fasta.VariantIntervalCalculator;
 import org.molgenis.vcf.report.fasta.VcfFastaSlicerFactory;
 import org.molgenis.vcf.report.genes.GenesFilter;
 import org.molgenis.vcf.report.genes.GenesFilterFactory;
@@ -43,6 +45,7 @@ public class ReportGenerator {
     private final HtsFileMapper htsFileMapper;
     private final GenesFilterFactory genesFilterFactory;
     private final VcfFastaSlicerFactory vcfFastaSlicerFactory;
+    private final VariantIntervalCalculator variantIntervalCalculator;
 
     public ReportGenerator(
             HtsJdkToPersonsMapper htsJdkToPersonsMapper,
@@ -50,13 +53,15 @@ public class ReportGenerator {
             PersonListMerger personListMerger,
             HtsFileMapper htsFileMapper,
             VcfFastaSlicerFactory vcfFastaSlicerFactory,
-            GenesFilterFactory genesFilterFactory) {
+            GenesFilterFactory genesFilterFactory,
+            VariantIntervalCalculator variantIntervalCalculator) {
         this.htsJdkToPersonsMapper = requireNonNull(htsJdkToPersonsMapper);
         this.phenopacketMapper = requireNonNull(phenopacketMapper);
         this.personListMerger = requireNonNull(personListMerger);
         this.htsFileMapper = requireNonNull(htsFileMapper);
         this.genesFilterFactory = requireNonNull(genesFilterFactory);
         this.vcfFastaSlicerFactory = requireNonNull(vcfFastaSlicerFactory);
+        this.variantIntervalCalculator = requireNonNull(variantIntervalCalculator);
     }
 
     public Report generateReport(
@@ -104,8 +109,9 @@ public class ReportGenerator {
         Map<String, Bytes> fastaGzMap;
         Path referencePath = reportGeneratorSettings.getReferencePath();
         Map<String, SampleSettings.CramPath> cramPaths = sampleSettings.getCramPaths();
-        fastaGzMap = getReferenceTrackData(vcfFileReader, referencePath, cramPaths);
-        Bytes genesGz = getGenesTrackData(vcfFileReader, reportGeneratorSettings, referencePath, cramPaths);
+        List<ContigInterval> contigIntervals = variantIntervalCalculator.calculate(vcfFileReader, cramPaths, referencePath);
+        fastaGzMap = getReferenceTrackData(contigIntervals, referencePath);
+        Bytes genesGz = getGenesTrackData(contigIntervals, reportGeneratorSettings);
         Map<String, Cram> cramMap = getAlignmentTrackData(sampleSettings);
         Bytes vcfBytes = getVariantTrackData(vcfPath);
 
@@ -177,23 +183,23 @@ public class ReportGenerator {
         return cramMap;
     }
 
-    private Map<String, Bytes> getReferenceTrackData(VCFIterator vcfFileReader, Path referencePath, Map<String, SampleSettings.CramPath> cramPaths) {
+    private Map<String, Bytes> getReferenceTrackData(List<ContigInterval> contigIntervals, Path referencePath) {
         Map<String, Bytes> fastaGzMap;
         if (referencePath != null) {
             VariantFastaSlicer variantFastaSlicer = vcfFastaSlicerFactory.create(referencePath);
-            fastaGzMap = variantFastaSlicer.generate(vcfFileReader, cramPaths, referencePath);
+            fastaGzMap = variantFastaSlicer.generate(contigIntervals, referencePath);
         } else {
             fastaGzMap = null;
         }
         return fastaGzMap;
     }
 
-    private Bytes getGenesTrackData(VCFIterator vcfIterator, ReportGeneratorSettings reportGeneratorSettings, Path referencePath, Map<String, SampleSettings.CramPath> cramPaths) {
+    private Bytes getGenesTrackData(List<ContigInterval> contigIntervals, ReportGeneratorSettings reportGeneratorSettings) {
         Path genesPath = reportGeneratorSettings.getGenesPath();
         Bytes genesGz;
         if (genesPath != null) {
             GenesFilter genesFilter = genesFilterFactory.create(genesPath);
-            genesGz = new Bytes(genesFilter.filter(vcfIterator, cramPaths, referencePath));
+            genesGz = new Bytes(genesFilter.filter(contigIntervals));
         } else {
             genesGz = null;
         }

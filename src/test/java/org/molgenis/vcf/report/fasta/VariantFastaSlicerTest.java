@@ -32,7 +32,7 @@ class VariantFastaSlicerTest {
 
     @BeforeEach
     void setUpBeforeEach() {
-        variantFastaSlicer = new VariantFastaSlicer(fastaSlicer, variantIntervalCalculator);
+        variantFastaSlicer = new VariantFastaSlicer(fastaSlicer);
     }
 
     @Test
@@ -42,14 +42,7 @@ class VariantFastaSlicerTest {
         ContigInterval contigInterval2 = new ContigInterval("3", 2750, 3250);
         ContigInterval contigInterval3 = new ContigInterval("4", 3750, 4250);
 
-        VCFHeader vcfHeader = mock(VCFHeader.class);
-        VCFIterator vcfFileReader = mock(VCFIterator.class);
-
-        SampleSettings.CramPath cramPath = mock(SampleSettings.CramPath.class);
-        Map<String, SampleSettings.CramPath> cramPaths = Map.of("TEST", cramPath);
         Path referencePath = Path.of("fake/reference/path");
-        when(variantIntervalCalculator.calculate(vcfFileReader, cramPaths, referencePath))
-                .thenReturn(List.of(contigInterval0,contigInterval1,contigInterval2,contigInterval3));
 
         FastaSlice fastaSlice0 = new FastaSlice(contigInterval0, "ACTG".getBytes(StandardCharsets.UTF_8));
         FastaSlice fastaSlice1 = new FastaSlice(contigInterval1, "ACTG".getBytes(StandardCharsets.UTF_8));
@@ -66,20 +59,13 @@ class VariantFastaSlicerTest {
                 "2:1750-2250", new Bytes("ACTG".getBytes(StandardCharsets.UTF_8)),
                 "3:2750-3250", new Bytes("ACTG".getBytes(StandardCharsets.UTF_8)),
                 "4:3750-4250", new Bytes("ACTG".getBytes(StandardCharsets.UTF_8))),
-                variantFastaSlicer.generate(vcfFileReader, cramPaths, referencePath));
+                variantFastaSlicer.generate(List.of(contigInterval0,contigInterval1,contigInterval2,contigInterval3), referencePath));
     }
 
     @Test
     void generateWithoutCram() {
         ContigInterval contigInterval0 = new ContigInterval("1", 750, 1250);
         ContigInterval contigInterval1 = new ContigInterval("2", 1750, 2250);
-
-        VCFHeader vcfHeader = mock(VCFHeader.class);
-        VCFIterator vcfFileReader = mock(VCFIterator.class);
-
-        Path referencePath = Path.of("fake/reference/path");
-        when(variantIntervalCalculator.calculate(vcfFileReader, null, referencePath))
-                .thenReturn(List.of(contigInterval0,contigInterval1));
 
         FastaSlice fastaSlice0 = new FastaSlice(contigInterval0, "ACTG".getBytes(StandardCharsets.UTF_8));
         FastaSlice fastaSlice1 = new FastaSlice(contigInterval1, "ACTG".getBytes(StandardCharsets.UTF_8));
@@ -88,6 +74,6 @@ class VariantFastaSlicerTest {
         doReturn(fastaSlice1).when(fastaSlicer).slice(contigInterval1);
 
         assertEquals(Map.of("1:750-1250", new Bytes("ACTG".getBytes(StandardCharsets.UTF_8)), "2:1750-2250", new Bytes("ACTG".getBytes(StandardCharsets.UTF_8))),
-                variantFastaSlicer.generate(vcfFileReader, null, Path.of("fake/reference/path")));
+                variantFastaSlicer.generate(List.of(contigInterval0,contigInterval1), Path.of("fake/reference/path")));
     }
 }
