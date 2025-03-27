@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.5</version>
+        <version>3.4.4</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -38,12 +38,14 @@
     </issueManagement>
 
     <properties>
+        <!-- suppress Java 21 dynamic agent loading warning, since there is no suitable fix yet -->
+        <argLine>-XX:+EnableDynamicAgentLoading</argLine>
         <java.version>21</java.version>
         <commons.cli.version>1.9.0</commons.cli.version>
         <samtools.htsjdk.version>4.1.3</samtools.htsjdk.version>
         <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
-        <opencsv.version>5.9</opencsv.version>
-        <vip.utils.version>2.0.2</vip.utils.version>
+        <opencsv.version>5.10</opencsv.version>
+        <vip.utils.version>3.1.0</vip.utils.version>
     </properties>
 
     <profiles>
@@ -194,11 +196,10 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
             </plugin>
             <plugin>
-                <!-- suppress Java 21 dynamic agent loading warning, since there is no suitable fix yet -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <argLine>-XX:+EnableDynamicAgentLoading</argLine>
+                    <!-- no argLine here -->
                 </configuration>
             </plugin>
         </plugins>
