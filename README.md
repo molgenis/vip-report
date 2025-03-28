@@ -2,13 +2,16 @@
 [![Quality Status](https://sonarcloud.io/api/project_badges/measure?project=molgenis_vip-report&metric=alert_status)](https://sonarcloud.io/dashboard?id=molgenis_vip-report)
 
 # Variant Interpretation Pipeline - VCF Report Generator
+
 Command-line application to generate a report for any VCF (Variant Call Format) file based on a
 report template.
 
 ## Requirements
+
 - Java 21
 
 ## Usage
+
 ```
 usage: java -jar vcf-report.jar -i <arg> [-m <arg>] [-o <arg>] [-f] [-t <arg>] [-pb
        <arg>] [-pd <arg>] [-ph <arg>] [-ms <arg>] [-r <arg>]
@@ -51,6 +54,7 @@ usage: java -jar vcf-report.jar -v
 *: [CURIE](https://phenopackets-schema.readthedocs.io/en/latest/resource.html#rstcurie)
 
 ## Examples
+
 ```
 java -jar vcf-report.jar -i my.vcf.gz -m metadata.json -t my-template.html
 java -jar vcf-report.jar -i my.vcf.gz -m metadata.json -o my-report.html -t my-template.html
@@ -65,13 +69,17 @@ java -jar vcf-report.jar -v
 ```
 
 ## Frequently asked questions
+
 ### Why doesn't my report load in the web browser?
-You report might contain more data than your web browser can handle. Try reducing the number of VCF records, setting a lower value for `--max_samples` and reducing alignment data in .cram files.
+
+You report might contain more data than your web browser can handle. Try reducing the number of VCF records, setting a
+lower value for `--max_samples` and reducing alignment data in .cram files.
 In case of long-read alignment sequences try removing `--cram` from the argument list.
 
 ## Development
 
 ### Installation
+
 Generate a personal access token in GitHub with at least the scope "read:packages".
 
 Then add a settings.xml to your Maven .m2 folder, or edit it if you already have one. It should
@@ -114,23 +122,25 @@ contain the following:
 ```
 
 ### Template
+
 The report generator transforms the input data to a JavaScript object (window.api) that is injected
 into the report template at the end of the head tag.
 
 #### Example
+
 Consider the following template:
 
 ```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Report</title>
+    <meta charset="UTF-8">
+    <title>Report</title>
 </head>
 <body>
 <div id="report"></div>
 <script>
-  document.getElementById("report").innerHTML = JSON.stringify(api.data)
+    document.getElementById("report").innerHTML = JSON.stringify(api.data)
 </script>
 </body>
 </html>
@@ -142,30 +152,31 @@ The resulting report after rendering the template using input data will look lik
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Report</title>
-  <script>
-    window.api = {...}
-  </script>
+    <meta charset="UTF-8">
+    <title>Report</title>
+    <script>
+        window.api = {...}
+    </script>
 </head>
 <body>
 <div id="report"></div>
 <script>
-  document.getElementById("report").innerHTML = JSON.stringify(api)
+    document.getElementById("report").innerHTML = JSON.stringify(api)
 </script>
 </body>
 </html>
 ```
 
 ### API
+
 The format of the variant report data is described in the ```org.molgenis.vcf.report.model``` Java
 classes.
 
 The format of the phenotype data is described
-here: [Phenopackets_Person](https://phenopackets-schema.readthedocs.io/en/latest/pedigree.html#person)
+here: [Phenopackets_Person](https://phenopacket-schema.readthedocs.io/en/latest/pedigree.html#person)
 
 The format of the sample data is described
-here: [Phenopacket](https://phenopackets-schema.readthedocs.io/en/latest/phenopacket.html)
+here: [Phenopacket](https://phenopacket-schema.readthedocs.io/en/latest/phenopacket.html)
 Please note that only a subset of PhenotypicFeature fields is returned.
 
 #### Example
