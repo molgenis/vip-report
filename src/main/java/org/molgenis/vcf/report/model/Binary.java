@@ -23,6 +23,18 @@ public class Binary {
   @JsonProperty("cram")
   Map<String, Cram> cram;
 
+  @JsonProperty("rna")
+  Map<String, Rna> rna;
+
+  @Value
+  @NonFinal
+  public static class Rna {
+    @JsonProperty("bw")
+    Bytes bw;
+    @JsonProperty("bed")
+    Bytes bed;
+  }
+
   @Value
   @NonFinal
   public static class Cram {

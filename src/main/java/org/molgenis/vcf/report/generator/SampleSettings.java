@@ -11,9 +11,15 @@ public class SampleSettings {
   List<Path> pedigreePaths;
   String phenotypeString;
   Map<String, CramPath> cramPaths;
+  Map<String, RnaPath> rnaPaths;
   @Value
   public static class CramPath {
     Path cram;
     Path crai;
+  }
+  @Value
+  public static class RnaPath {
+    Path bw;
+    Path bed;
   }
 }

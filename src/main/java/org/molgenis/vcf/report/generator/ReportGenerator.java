@@ -113,6 +113,7 @@ public class ReportGenerator {
         fastaGzMap = getReferenceTrackData(contigIntervals, referencePath);
         Bytes genesGz = getGenesTrackData(contigIntervals, reportGeneratorSettings);
         Map<String, Cram> cramMap = getAlignmentTrackData(sampleSettings);
+        Map<String, Binary.Rna> rnaMap= getRnaTrackData(sampleSettings);
         Bytes vcfBytes = getVariantTrackData(vcfPath);
 
         Map<?, ?> decisionTree = parseJsonObject(reportGeneratorSettings.getDecisionTreePath());
@@ -120,7 +121,7 @@ public class ReportGenerator {
         Map<?, ?> vcfMeta = parseJsonObject(reportGeneratorSettings.getMetadataPath());
         Map<?, ?> templateConfig = parseJsonObject(reportGeneratorSettings.getTemplateConfigPath());
 
-        Binary binary = new Binary(vcfBytes, fastaGzMap, genesGz, cramMap);
+        Binary binary = new Binary(vcfBytes, fastaGzMap, genesGz, cramMap, rnaMap);
         return new Report(reportMetadata, reportData, binary, decisionTree, sampleTree, vcfMeta, templateConfig);
     }
 
@@ -163,7 +164,24 @@ public class ReportGenerator {
         }
         return vcfBytes;
     }
-
+    private static Map<String, Binary.Rna> getRnaTrackData(SampleSettings sampleSettings) {
+        Map<String, Binary.Rna> rnaMap = new LinkedHashMap<>();
+        sampleSettings
+                .getRnaPaths()
+                .forEach(
+                        (sampleId, rnaPath) -> {
+                            byte[] bw;
+                            byte[] bed;
+                            try {
+                                bw = Files.readAllBytes(rnaPath.getBw());
+                                bed = Files.readAllBytes(rnaPath.getBed());
+                            } catch (IOException e) {
+                                throw new UncheckedIOException(e);
+                            }
+                            rnaMap.put(sampleId, new Binary.Rna(new Bytes(bw), new Bytes(bed)));
+                        });
+        return rnaMap;
+    }
     private static Map<String, Cram> getAlignmentTrackData(SampleSettings sampleSettings) {
         Map<String, Cram> cramMap = new LinkedHashMap<>();
         sampleSettings

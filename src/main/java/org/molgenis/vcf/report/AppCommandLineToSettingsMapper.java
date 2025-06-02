@@ -128,6 +128,14 @@ public class AppCommandLineToSettingsMapper {
       cramPaths = Map.of();
     }
 
+    Map<String, SampleSettings.RnaPath> rnaPaths;
+    if (commandLine.hasOption(OPT_RNA)) {
+      String rnaPathValue = commandLine.getOptionValue(OPT_RNA);
+      rnaPaths = toRnaPaths(rnaPathValue);
+    } else {
+      rnaPaths = Map.of();
+    }
+
     boolean overwriteOutput = commandLine.hasOption(OPT_FORCE);
 
     boolean debugMode = commandLine.hasOption(OPT_DEBUG);
@@ -138,7 +146,7 @@ public class AppCommandLineToSettingsMapper {
             appName, appVersion, appArgs, maxSamples, metadataPath, referencePath, genesPath, decisionTreePath, sampleTreePath, templateConfigPath);
     ReportWriterSettings reportWriterSettings = new ReportWriterSettings(templatePath, debugMode);
     SampleSettings sampleSettings =
-        new SampleSettings(probandNames, pedPaths, phenotypes, cramPaths);
+        new SampleSettings(probandNames, pedPaths, phenotypes, cramPaths, rnaPaths);
     return new Settings(
         inputPath,
         reportGeneratorSettings,
@@ -160,5 +168,19 @@ public class AppCommandLineToSettingsMapper {
       cramPaths.put(sampleId, new CramPath(cramPath, craiPath));
     }
     return cramPaths;
+  }
+
+  private Map<String, SampleSettings.RnaPath> toRnaPaths(String cramPathValue) {
+    Map<String, SampleSettings.RnaPath> rnaPaths = new LinkedHashMap<>();
+    String[] tokens = cramPathValue.split(",");
+    for (String token : tokens) {
+      int idx = token.indexOf("=");
+      String sampleId = token.substring(0, idx);
+      String files[] = token.substring(idx + 1).split(";"); //FIXME: more robust
+      Path bwPath = Path.of(files[0]);
+      Path bedPath = Path.of(files[1]);
+      rnaPaths.put(sampleId, new SampleSettings.RnaPath(bwPath, bedPath));
+    }
+    return rnaPaths;
   }
 }

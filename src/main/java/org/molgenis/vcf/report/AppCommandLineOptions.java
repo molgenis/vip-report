@@ -53,6 +53,8 @@ class AppCommandLineOptions {
   static final String OPT_SAMPLE_TREE_LONG = "sample_tree";
   static final String OPT_CRAM = "c";
   static final String OPT_CRAM_LONG = "cram";
+  static final String OPT_RNA = "rn";
+  static final String OPT_RNA_LONG = "rna";
   private static final Options APP_OPTIONS;
   private static final Options APP_VERSION_OPTIONS;
 
@@ -145,6 +147,12 @@ class AppCommandLineOptions {
             .desc(
                 "Comma-separated list of sample-cram files (e.g. sample0=/path/to/0.cram,sample1=/path/to/1.cram).")
             .build());
+    appOptions.addOption(
+            Option.builder(OPT_RNA)
+                    .hasArg(true)
+                    .longOpt(OPT_RNA_LONG)
+                    .desc("Comma-separated list of sample rna bgwig and bed file pairs files (e.g. sample0=/path/to/0.bbw;/path/to/0.bed,sample1==/path/to/1.bbw;/path/to/1.bed).")
+                    .build());
     appOptions.addOption(
         Option.builder(OPT_TREE)
             .hasArg(true)
