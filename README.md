@@ -1,5 +1,4 @@
 [![Build Status](https://app.travis-ci.com/molgenis/vip-report.svg?branch=main)](https://app.travis-ci.com/molgenis/vip-report)
-[![Quality Status](https://sonarcloud.io/api/project_badges/measure?project=molgenis_vip-report&metric=alert_status)](https://sonarcloud.io/dashboard?id=molgenis_vip-report)
 
 # Variant Interpretation Pipeline - VCF Report Generator
 
