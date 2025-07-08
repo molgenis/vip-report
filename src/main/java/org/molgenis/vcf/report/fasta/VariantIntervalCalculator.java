@@ -12,7 +12,7 @@ import static org.molgenis.vcf.report.utils.IntervalUtils.mergeIntervals;
 
 @Component
 public class VariantIntervalCalculator {
-    public static final int FLANKING = 250;
+    public static final int FLANKING = 10000;
     private final VcfIntervalCalculator vcfIntervalCalculator;
     private final CramIntervalCalculator cramIntervalCalculator;
 
