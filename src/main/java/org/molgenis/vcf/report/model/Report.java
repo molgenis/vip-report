@@ -35,4 +35,8 @@ public class Report {
 
   @JsonProperty("config")
   Map<?,?> templateConfig;
+
+  @JsonProperty("database")
+  @NonNull
+  Bytes database;
 }

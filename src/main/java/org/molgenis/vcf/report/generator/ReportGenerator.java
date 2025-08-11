@@ -1,9 +1,9 @@
 package org.molgenis.vcf.report.generator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import htsjdk.variant.vcf.VCFHeader;
-import htsjdk.variant.vcf.VCFIterator;
-import htsjdk.variant.vcf.VCFIteratorBuilder;
+import htsjdk.beta.codecs.hapref.fasta.FASTADecoderV1_0;
+import htsjdk.variant.vcf.*;
+import lombok.NonNull;
 import org.molgenis.vcf.report.fasta.ContigInterval;
 import org.molgenis.vcf.report.fasta.VariantFastaSlicer;
 import org.molgenis.vcf.report.fasta.VariantIntervalCalculator;
@@ -14,24 +14,32 @@ import org.molgenis.vcf.report.model.*;
 import org.molgenis.vcf.report.model.Binary.Cram;
 import org.molgenis.vcf.report.model.metadata.AppMetadata;
 import org.molgenis.vcf.report.model.metadata.ReportMetadata;
+import org.molgenis.vcf.report.repository.DatabaseManager;
+import org.molgenis.vcf.report.repository.DatabaseSchemaManager;
 import org.molgenis.vcf.report.utils.VcfInputStreamDecorator;
 import org.molgenis.vcf.utils.PersonListMerger;
+import org.molgenis.vcf.utils.UnexpectedEnumException;
+import org.molgenis.vcf.utils.metadata.*;
+import org.molgenis.vcf.utils.model.metadata.FieldMetadata;
+import org.molgenis.vcf.utils.model.metadata.FieldMetadatas;
 import org.molgenis.vcf.utils.model.metadata.HtsFile;
+import org.molgenis.vcf.utils.model.metadata.NestedFieldMetadata;
 import org.molgenis.vcf.utils.sample.mapper.HtsFileMapper;
 import org.molgenis.vcf.utils.sample.mapper.HtsJdkToPersonsMapper;
 import org.molgenis.vcf.utils.sample.mapper.PhenopacketMapper;
+import org.molgenis.vcf.utils.sample.model.AffectedStatus;
 import org.molgenis.vcf.utils.sample.model.Phenopacket;
 import org.molgenis.vcf.utils.sample.model.Sample;
+import org.molgenis.vcf.utils.sample.model.Sex;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 import static java.util.Objects.requireNonNull;
@@ -46,6 +54,7 @@ public class ReportGenerator {
     private final GenesFilterFactory genesFilterFactory;
     private final VcfFastaSlicerFactory vcfFastaSlicerFactory;
     private final VariantIntervalCalculator variantIntervalCalculator;
+    public static final String INFO_DESCRIPTION_PREFIX = "Consequence annotations from Ensembl VEP. Format: ";
 
     public ReportGenerator(
             HtsJdkToPersonsMapper htsJdkToPersonsMapper,
@@ -120,9 +129,28 @@ public class ReportGenerator {
         Map<?, ?> vcfMeta = parseJsonObject(reportGeneratorSettings.getMetadataPath());
         Map<?, ?> templateConfig = parseJsonObject(reportGeneratorSettings.getTemplateConfigPath());
 
+        DatabaseManager databaseManager = new DatabaseManager();
+        DatabaseSchemaManager databaseSchemaManager = new DatabaseSchemaManager(reportGeneratorSettings, vcfFileReader.getHeader(), databaseManager);
+        databaseSchemaManager.createDatabase();
+
+        FieldMetadataService fieldMetadataService = new FieldMetadataServiceImpl(reportGeneratorSettings.getMetadataPath().toFile());
+        FieldMetadatas fieldMetadatas = fieldMetadataService.load(vcfFileReader.getHeader(), Map.of(FieldIdentifier.builder().type(FieldType.INFO).name("CSQ").build(), NestedAttributes.builder().prefix(INFO_DESCRIPTION_PREFIX).seperator("|").build()));
+
+        try {
+            databaseManager.populateDb(fieldMetadatas, samples, vcfPath.toFile(),
+                    reportGeneratorSettings.getDecisionTreePath(), reportGeneratorSettings.getSampleTreePath(),
+                    vcfMeta, reportData, reportMetadata, templateConfig);
+        } catch (Exception e) {
+            throw new RuntimeException(e); //FIXME
+        }
+
+        byte[] fileContent = Files.readAllBytes(Path.of("vip-report.db"));
+        Bytes database = new Bytes(fileContent);
+
         Binary binary = new Binary(vcfBytes, fastaGzMap, genesGz, cramMap);
-        return new Report(reportMetadata, reportData, binary, decisionTree, sampleTree, vcfMeta, templateConfig);
+        return new Report(reportMetadata, reportData, binary, decisionTree, sampleTree, vcfMeta, templateConfig, database);
     }
+
 
     private static Map<?, ?> parseJsonObject(Path jsonPath) {
         Map<?, ?> jsonObject;
