@@ -17,7 +17,7 @@ public class ConfigRepository {
     }
 
     public void insertConfigData(Map<?, ?> templateConfig) {
-        String sql = "INSERT INTO reportdata (key, value) VALUES (?, ?)";
+        String sql = "INSERT INTO reportdata (id, value) VALUES (?, ?)";
 
         try (PreparedStatement insertStmt = conn.prepareStatement(sql)) {
 
@@ -40,7 +40,7 @@ public class ConfigRepository {
             insertStmt.executeBatch();
 
         } catch (SQLException | JsonProcessingException e) {
-            throw new RuntimeException("Error inserting config data", e);
+            throw new RuntimeException("Error inserting config data", e); // FIXME
         }
     }
 }

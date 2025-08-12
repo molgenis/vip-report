@@ -51,6 +51,7 @@ public class DatabaseSchemaManager {
         sqlStatements.add(getSamplePhenotypeTableSql());
         sqlStatements.add(getDecisionTreeTableSql());
         sqlStatements.add(getMetadataTableSql());
+        sqlStatements.add(getReportMetadataTableSql());
 
         sqlStatements.add(getInfoTableSql());
         sqlStatements.add(getFormatTableSql());
@@ -78,7 +79,7 @@ public class DatabaseSchemaManager {
     private String getReportDataTableSql() {
         return """
             CREATE TABLE reportdata (
-                key TEXT PRIMARY KEY,
+                id TEXT PRIMARY KEY,
                 value TEXT
             );
             """;
@@ -127,6 +128,15 @@ public class DatabaseSchemaManager {
             CREATE TABLE decisiontree (
                 id TEXT PRIMARY KEY,
                 tree TEXT NOT NULL
+            );
+            """;
+    }
+
+    private String getReportMetadataTableSql() {
+        return """
+            CREATE TABLE reportMetadata (
+                id TEXT PRIMARY KEY,
+                value TEXT NOT NULL
             );
             """;
     }

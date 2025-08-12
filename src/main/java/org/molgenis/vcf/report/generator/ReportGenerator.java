@@ -139,7 +139,7 @@ public class ReportGenerator {
         try {
             databaseManager.populateDb(fieldMetadatas, samples, vcfPath.toFile(),
                     reportGeneratorSettings.getDecisionTreePath(), reportGeneratorSettings.getSampleTreePath(),
-                    vcfMeta, reportData, reportMetadata, templateConfig);
+                    reportData, reportMetadata, templateConfig);
         } catch (Exception e) {
             throw new RuntimeException(e); //FIXME
         }

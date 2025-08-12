@@ -57,7 +57,7 @@ public class DatabaseManager {
         }
     }
 
-    public void populateDb(FieldMetadatas fieldMetadatas, Items<Sample> samples, File vcfFile, Path decisionTreePath, Path sampleTreePath, Map<?, ?> vcfMeta, ReportData reportData, ReportMetadata reportMetadata, Map<?, ?> templateConfig) throws Exception {
+    public void populateDb(FieldMetadatas fieldMetadatas, Items<Sample> samples, File vcfFile, Path decisionTreePath, Path sampleTreePath, ReportData reportData, ReportMetadata reportMetadata, Map<?, ?> templateConfig) throws Exception {
         try (
                 VCFFileReader reader = new VCFFileReader(vcfFile, false);
         ) {
@@ -69,6 +69,7 @@ public class DatabaseManager {
             ConfigRepository configRepo = new ConfigRepository(conn);
             DecisionTreeRepository decisionTreeRepo = new DecisionTreeRepository(conn);
             SampleRepository sampleRepo = new SampleRepository(conn);
+            ReportMetadataRepository reportMetadataRepo = new ReportMetadataRepository(conn);
             VCFHeader header = reader.getFileHeader();
 
             // Extract CSQ field names from VCF header
@@ -99,6 +100,7 @@ public class DatabaseManager {
             phenotypeRepo.insertPhenotypeData(reportData);
             configRepo.insertConfigData(templateConfig);
             decisionTreeRepo.insertDecisionTreeData(decisionTreePath, sampleTreePath);
+            reportMetadataRepo.insertReportMetadata(reportMetadata);
 
             conn.commit();
         }
