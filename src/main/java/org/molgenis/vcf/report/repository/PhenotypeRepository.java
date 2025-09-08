@@ -3,6 +3,7 @@ package org.molgenis.vcf.report.repository;
 import org.molgenis.vcf.report.model.ReportData;
 import org.molgenis.vcf.utils.sample.model.PhenotypicFeature;
 import org.molgenis.vcf.utils.sample.model.Phenopacket;
+import org.molgenis.vcf.utils.sample.model.Sample;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,18 +18,17 @@ public class PhenotypeRepository {
         this.conn = conn;
     }
 
-    public void insertPhenotypeData(ReportData reportData) {
+    public void insertPhenotypeData(List<Phenopacket> packets, List<Sample> samples) {
         String phenotypeSql = "INSERT OR IGNORE INTO phenotype (id, label) VALUES (?, ?)";
         String samplePhenoSql = "INSERT OR IGNORE INTO samplePhenotype (sample_id, phenotype_id) VALUES (?, ?)";
 
         try (PreparedStatement phenotypeStmt = conn.prepareStatement(phenotypeSql);
              PreparedStatement samplePhenoStmt = conn.prepareStatement(samplePhenoSql)) {
 
-            List<?> packets = reportData.getPhenopackets();
-
             for (Object o : packets) {
                 Phenopacket packet = (Phenopacket) o;
-                String sampleId = packet.getSubject().getId();
+                Sample sample = samples.stream().filter(s -> s.getPerson().getIndividualId()
+                        .equals(packet.getSubject().getId())).toList().get(0);
 
                 for (PhenotypicFeature feature : packet.getPhenotypicFeaturesList()) {
                     String phenotypeId = feature.getOntologyClass().getId();
@@ -38,7 +38,7 @@ public class PhenotypeRepository {
                     phenotypeStmt.setString(2, phenotypeLabel);
                     phenotypeStmt.addBatch();
 
-                    samplePhenoStmt.setString(1, sampleId);
+                    samplePhenoStmt.setInt(1, sample.getIndex());
                     samplePhenoStmt.setString(2, phenotypeId);
                     samplePhenoStmt.addBatch();
                 }

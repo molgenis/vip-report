@@ -52,7 +52,7 @@ public class DatabaseSchemaManager {
         sqlStatements.add(getDecisionTreeTableSql());
         sqlStatements.add(getMetadataTableSql());
         sqlStatements.add(getReportMetadataTableSql());
-
+        sqlStatements.add(getHeaderSql());
         sqlStatements.add(getInfoTableSql());
         sqlStatements.add(getFormatTableSql());
 
@@ -76,11 +76,11 @@ public class DatabaseSchemaManager {
             """;
     }
 
-    private String getReportDataTableSql() {
+    private String getHeaderSql() {
         return """
-            CREATE TABLE reportdata (
-                id TEXT PRIMARY KEY,
-                value TEXT
+            CREATE TABLE header (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                line TEXT
             );
             """;
     }
@@ -88,7 +88,7 @@ public class DatabaseSchemaManager {
     private String getSampleTableSql() {
         return String.format("""
             CREATE TABLE sample (
-                id TEXT PRIMARY KEY,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 familyId TEXT,
                 individualId TEXT,
                 paternalId TEXT,
@@ -105,6 +105,15 @@ public class DatabaseSchemaManager {
             """, getSexTypes(), getAffectedStatuses());
     }
 
+    private String getReportDataTableSql() {
+        return """
+            CREATE TABLE reportdata (
+                id TEXT PRIMARY KEY,
+                value TEXT
+            );
+            """;
+    }
+
     private String getPhenotypeTableSql() {
         return """
             CREATE TABLE phenotype (
@@ -117,7 +126,7 @@ public class DatabaseSchemaManager {
     private String getSamplePhenotypeTableSql() {
         return """
             CREATE TABLE samplePhenotype (
-                sample_id TEXT PRIMARY KEY,
+                sample_id INTEGER PRIMARY KEY,
                 phenotype_id TEXT NOT NULL
             );
             """;
@@ -222,7 +231,7 @@ public class DatabaseSchemaManager {
                 }
             } else {
                 // Build nested table SQL here; e.g. variant_<field>
-                String nestedTableSql = buildNestedTable("variant_" + entry.getKey(), meta.getNestedFields());
+                String nestedTableSql = buildNestedTable("variant", entry.getKey(), meta.getNestedFields());
                 nestedTables.add(nestedTableSql);
 
                 // Normally no direct column added to this table for nested fields,
@@ -241,7 +250,7 @@ public class DatabaseSchemaManager {
         List<String> columns = new ArrayList<>();
         columns.add("id INTEGER PRIMARY KEY AUTOINCREMENT");
         columns.add("sample_id INTEGER REFERENCES sample(id)");
-        columns.add("variant_id INTEGER REFERENCES variant(id)");
+        columns.add("variant_id INTEGER REFERENCES vcf(id)");
 
         for (var entry : formatFields.entrySet()) {
             FieldMetadata meta = entry.getValue();
@@ -253,7 +262,7 @@ public class DatabaseSchemaManager {
                 }
             } else {
                 // Build nested table SQL here; e.g. format_<field>
-                String nestedTableSql = buildNestedTable("format_" + entry.getKey(), meta.getNestedFields());
+                String nestedTableSql = buildNestedTable("format", entry.getKey(), meta.getNestedFields());
                 nestedTables.add(nestedTableSql);
 
                 // No direct column added here for nested fields
@@ -266,21 +275,15 @@ public class DatabaseSchemaManager {
         return formatBuilder.toString();
     }
 
-    /**
-     * Builds nested table SQL strings from nested fields
-     *
-     * @param tableName       Name of nested table, e.g. "variant_X" or "format_X"
-     * @param nestedFieldMap  Nested fields map from metadata
-     * @return SQL CREATE TABLE string
-     */
-    private String buildNestedTable(String tableName, Map<String, NestedFieldMetadata> nestedFieldMap) {
+    private String buildNestedTable(String prefix, String postfix, Map<String, NestedFieldMetadata> nestedFieldMap) {
+        String tableName = String.format("%s_%s", prefix, postfix);
         StringBuilder nestedBuilder = new StringBuilder("CREATE TABLE ").append(tableName).append(" (");
         List<String> nestedColumns = new ArrayList<>();
 
         nestedColumns.add("id INTEGER PRIMARY KEY AUTOINCREMENT");
         // Determine foreign key column based on prefix
         if (tableName.startsWith("variant_")) {
-            nestedColumns.add("variant_id INTEGER REFERENCES variant(id)");
+            nestedColumns.add("variant_id INTEGER REFERENCES vcf(id)");
         } else if (tableName.startsWith("format_")) {
             nestedColumns.add("format_id INTEGER REFERENCES format(id)");
         } else {

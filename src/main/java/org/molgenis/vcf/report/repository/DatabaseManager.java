@@ -3,6 +3,7 @@ package org.molgenis.vcf.report.repository;
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.vcf.VCFFileReader;
 import htsjdk.variant.vcf.VCFHeader;
+import htsjdk.variant.vcf.VCFHeaderLine;
 import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.report.model.ReportData;
 import org.molgenis.vcf.report.model.metadata.ReportMetadata;
@@ -32,6 +33,7 @@ public class DatabaseManager {
         // Delete the existing file
         try {
             Files.deleteIfExists(Path.of(FILE));
+            Files.deleteIfExists(Path.of(FILE + ".blob"));//FIXME
             initConnection();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -48,7 +50,7 @@ public class DatabaseManager {
     }
 
     private void initConnection() {
-        if(conn == null){
+        if (conn == null) {
             try {
                 this.conn = DriverManager.getConnection(DB_URL);
             } catch (SQLException e) {
@@ -57,53 +59,76 @@ public class DatabaseManager {
         }
     }
 
-    public void populateDb(FieldMetadatas fieldMetadatas, Items<Sample> samples, File vcfFile, Path decisionTreePath, Path sampleTreePath, ReportData reportData, ReportMetadata reportMetadata, Map<?, ?> templateConfig) throws Exception {
+    public void populateDb(FieldMetadatas fieldMetadatas, Items<Sample> samples, File vcfFile, Path decisionTreePath, Path sampleTreePath, ReportData reportData, ReportMetadata reportMetadata, Map<?, ?> templateConfig) {
         try (
                 VCFFileReader reader = new VCFFileReader(vcfFile, false);
         ) {
-            conn.setAutoCommit(false);
+            try {
+                conn.setAutoCommit(false);
 
-            VcfRepository vcfRepo = new VcfRepository(conn);
-            PhenotypeRepository phenotypeRepo = new PhenotypeRepository(conn);
-            MetadataRepository metadataRepo = new MetadataRepository(conn);
-            ConfigRepository configRepo = new ConfigRepository(conn);
-            DecisionTreeRepository decisionTreeRepo = new DecisionTreeRepository(conn);
-            SampleRepository sampleRepo = new SampleRepository(conn);
-            ReportMetadataRepository reportMetadataRepo = new ReportMetadataRepository(conn);
-            VCFHeader header = reader.getFileHeader();
 
-            // Extract CSQ field names from VCF header
-            String csqDesc = header.getInfoHeaderLine("CSQ").getDescription();
-            List<String> csqFields = extractCSQFields(csqDesc);
+                VcfRepository vcfRepo = new VcfRepository(conn);
+                PhenotypeRepository phenotypeRepo = new PhenotypeRepository(conn);
+                MetadataRepository metadataRepo = new MetadataRepository(conn);
+                ConfigRepository configRepo = new ConfigRepository(conn);
+                DecisionTreeRepository decisionTreeRepo = new DecisionTreeRepository(conn);
+                SampleRepository sampleRepo = new SampleRepository(conn);
+                ReportMetadataRepository reportMetadataRepo = new ReportMetadataRepository(conn);
+                VCFHeader header = reader.getFileHeader();
 
-            // Filter CSQ fields that match your database schema
-            List<String> dbCsqColumns = getDatabaseCSQColumns();
-            List<String> matchingCsqFields = new ArrayList<>();
-            for (String field : csqFields) {
-                if (dbCsqColumns.contains(field)) {
-                    matchingCsqFields.add(field);
-                } else {
-                    throw new IllegalArgumentException(field);
+                // Extract CSQ field names from VCF header
+                String csqDesc = header.getInfoHeaderLine("CSQ").getDescription();
+                List<String> csqFields = extractCSQFields(csqDesc);
+
+                List<String> dbCsqColumns = getDatabaseCSQColumns();
+                List<String> matchingCsqFields = new ArrayList<>();
+                for (String field : csqFields) {
+                    if (dbCsqColumns.contains(String.format("%s", field))) {
+                        matchingCsqFields.add(String.format("%s", field));
+                    } else {
+                        throw new IllegalArgumentException(field);
+                    }
                 }
-            }
-            List<String> formatColumns = getDatabaseFormatColumns();
-            List<String> infoColumns = getDatabaseInfoColumns();
+                List<String> formatColumns = getDatabaseFormatColumns();
+                List<String> infoColumns = getDatabaseInfoColumns();
 
-            for (VariantContext vc : reader) {
-                int variantId = vcfRepo.insertVariant(vc);
-                vcfRepo.insertCsqData(vc, matchingCsqFields, dbCsqColumns, variantId);
-                vcfRepo.insertFormatData(vc, formatColumns, variantId);
-                vcfRepo.insertInfoData(vc, infoColumns, variantId);
-            }
-            metadataRepo.insertMetadata(fieldMetadatas);
-            sampleRepo.insertSamples(samples);
-            phenotypeRepo.insertPhenotypeData(reportData);
-            configRepo.insertConfigData(templateConfig);
-            decisionTreeRepo.insertDecisionTreeData(decisionTreePath, sampleTreePath);
-            reportMetadataRepo.insertReportMetadata(reportMetadata);
+                List<String> lines = new ArrayList<>(header.getMetaDataInInputOrder().stream().map(VCFHeaderLine::toString).toList());
+                metadataRepo.insertHeaderLine(lines, getHeaderLine(samples));
 
-            conn.commit();
+                for (VariantContext vc : reader) {
+                    int variantId = vcfRepo.insertVariant(vc);
+                    vcfRepo.insertCsqData(vc, matchingCsqFields, fieldMetadatas, variantId);
+                    vcfRepo.insertFormatData(vc, formatColumns, variantId, fieldMetadatas, samples.getItems());
+                    vcfRepo.insertInfoData(vc, infoColumns, fieldMetadatas, variantId);
+                }
+                metadataRepo.insertMetadata(fieldMetadatas);
+                sampleRepo.insertSamples(samples);
+                phenotypeRepo.insertPhenotypeData(reportData.getPhenopackets(), samples.getItems());
+                configRepo.insertConfigData(templateConfig);
+                decisionTreeRepo.insertDecisionTreeData(decisionTreePath, sampleTreePath);
+                reportMetadataRepo.insertReportMetadata(reportMetadata);
+
+                conn.commit();
+                Files.copy(Path.of(FILE), Path.of(FILE + ".blob")); //FIXME
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
+    }
+
+    private static String getHeaderLine(Items<Sample> samples) {
+        String fixedCols = "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT";
+        String headerLine;
+        if (samples.getItems().isEmpty()) {
+            headerLine = fixedCols;
+        } else {
+            headerLine = fixedCols + "\t" +
+                    String.join("\t", samples.getItems().stream()
+                            .map(sample -> sample.getPerson().getIndividualId()).toList());
+        }
+        return headerLine;
     }
 
     private List<String> getDatabaseInfoColumns() throws SQLException {
@@ -127,8 +152,9 @@ public class DatabaseManager {
             ResultSet rs = stmt.executeQuery("PRAGMA table_info(variant_CSQ)");
             while (rs.next()) {
                 String column = rs.getString("name");
-                if (!column.equalsIgnoreCase("id") && !column.equalsIgnoreCase(VARIANT_ID)) {
-                    columns.add(column);
+                if (!column.equalsIgnoreCase("id") &&
+                        !column.equalsIgnoreCase(String.format("%s", VARIANT_ID))) {
+                    columns.add(String.format("%s", column));
                 }
             }
         }

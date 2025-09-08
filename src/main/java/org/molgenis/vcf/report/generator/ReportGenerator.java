@@ -124,9 +124,6 @@ public class ReportGenerator {
         Map<String, Cram> cramMap = getAlignmentTrackData(sampleSettings);
         Bytes vcfBytes = getVariantTrackData(vcfPath);
 
-        Map<?, ?> decisionTree = parseJsonObject(reportGeneratorSettings.getDecisionTreePath());
-        Map<?, ?> sampleTree = parseJsonObject(reportGeneratorSettings.getSampleTreePath());
-        Map<?, ?> vcfMeta = parseJsonObject(reportGeneratorSettings.getMetadataPath());
         Map<?, ?> templateConfig = parseJsonObject(reportGeneratorSettings.getTemplateConfigPath());
 
         DatabaseManager databaseManager = new DatabaseManager();
@@ -136,19 +133,19 @@ public class ReportGenerator {
         FieldMetadataService fieldMetadataService = new FieldMetadataServiceImpl(reportGeneratorSettings.getMetadataPath().toFile());
         FieldMetadatas fieldMetadatas = fieldMetadataService.load(vcfFileReader.getHeader(), Map.of(FieldIdentifier.builder().type(FieldType.INFO).name("CSQ").build(), NestedAttributes.builder().prefix(INFO_DESCRIPTION_PREFIX).seperator("|").build()));
 
-        try {
+ //       try {
             databaseManager.populateDb(fieldMetadatas, samples, vcfPath.toFile(),
                     reportGeneratorSettings.getDecisionTreePath(), reportGeneratorSettings.getSampleTreePath(),
                     reportData, reportMetadata, templateConfig);
-        } catch (Exception e) {
-            throw new RuntimeException(e); //FIXME
-        }
+//        } catch (Exception e) {
+//            throw new RuntimeException(e); //FIXME
+//        }
 
         byte[] fileContent = Files.readAllBytes(Path.of("vip-report.db"));
         Bytes database = new Bytes(fileContent);
 
         Binary binary = new Binary(vcfBytes, fastaGzMap, genesGz, cramMap);
-        return new Report(reportMetadata, reportData, binary, decisionTree, sampleTree, vcfMeta, templateConfig, database);
+        return new Report(binary, database);
     }
 
 

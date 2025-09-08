@@ -39,7 +39,7 @@ public class SampleRepository {
             for (Object sampleObject : samples) {
                 Sample sample = (Sample) sampleObject;
                 Person p = sample.getPerson();
-                pstmt.setString(1, String.format("%s_%s", p.getFamilyId(), p.getIndividualId()));
+                pstmt.setInt(1, sample.getIndex());
                 pstmt.setString(2, p.getFamilyId());
                 pstmt.setString(3, p.getIndividualId());
                 pstmt.setString(4, p.getPaternalId());

@@ -1,17 +1,11 @@
 package org.molgenis.vcf.report.generator;
 
 
-//Tuesday:
-//TODO: Uren
-//TODO: other VCF
-//TODO: size difference check
-
-//Wednesday
-//TODO: query test
-//Thursday/Friday
-//TODO: report API
-//TODO: indices
+//Monday/Thusrday
 //TODO: working filter in report
+
+//TODO: remove HTS file -> create vcf for genome browser and download in report-vcf code
+//TODO: indices
 
 public class SQL {
 
