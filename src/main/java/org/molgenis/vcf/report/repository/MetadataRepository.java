@@ -64,15 +64,38 @@ public class MetadataRepository {
         }
     }
 
-    private void addMetadata(Map.Entry<String, ? extends FieldMetadata> entry,
+    private void addMetadata(Map.Entry<String, ? extends FieldMetadata> metadataEntry,
                              PreparedStatement ps,
                              FieldType type,
                              String parent, Map<String, Map<String, ValueDescription>> customCategories) throws SQLException, JsonProcessingException {
 
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-        FieldMetadata meta = entry.getValue();
-        String fieldName = entry.getKey();
+        FieldMetadata meta = metadataEntry.getValue();
+        String fieldName = metadataEntry.getKey();
         Map<String, ValueDescription> categories = getCategories(fieldName, meta, customCategories);
+
+        if(categories != null && !categories.isEmpty()){
+            String sql = """
+                INSERT INTO categories (
+                    field,
+                    value,
+                    label,
+                    description
+                ) VALUES (?, ?, ?, ?)
+                """;
+
+            try (PreparedStatement categoryPs = conn.prepareStatement(sql)) {
+                for(Map.Entry<String, ValueDescription> entry : categories.entrySet()){
+                    categoryPs.setString(1, fieldName);
+                    categoryPs.setString(2, entry.getKey());
+                    categoryPs.setString(3, entry.getValue().getLabel());
+                    categoryPs.setString(4, entry.getValue().getDescription());
+                    categoryPs.addBatch();
+                }
+                categoryPs.executeBatch();
+            }
+
+        }
 
         ps.setString(1, fieldName);
         ps.setString(2, type.name());

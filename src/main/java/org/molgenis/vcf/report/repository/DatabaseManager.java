@@ -19,7 +19,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.molgenis.vcf.report.generator.SqlUtils.extractCSQFields;
 
@@ -94,14 +93,13 @@ public class DatabaseManager {
 
                 List<String> lines = new ArrayList<>(header.getMetaDataInInputOrder().stream().map(VCFHeaderLine::toString).toList());
                 metadataRepo.insertHeaderLine(lines, getHeaderLine(samples));
-
+                metadataRepo.insertMetadata(fieldMetadatas);
                 for (VariantContext vc : reader) {
                     int variantId = vcfRepo.insertVariant(vc);
                     vcfRepo.insertCsqData(vc, matchingCsqFields, fieldMetadatas, variantId);
                     vcfRepo.insertFormatData(vc, formatColumns, variantId, fieldMetadatas, samples.getItems());
                     vcfRepo.insertInfoData(vc, infoColumns, fieldMetadatas, variantId);
                 }
-                metadataRepo.insertMetadata(fieldMetadatas);
                 sampleRepo.insertSamples(samples);
                 phenotypeRepo.insertPhenotypeData(reportData.getPhenopackets(), samples.getItems());
                 configRepo.insertConfigData(templateConfig);

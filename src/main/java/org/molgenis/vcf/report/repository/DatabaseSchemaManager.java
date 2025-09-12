@@ -55,6 +55,7 @@ public class DatabaseSchemaManager {
         sqlStatements.add(getHeaderSql());
         sqlStatements.add(getInfoTableSql());
         sqlStatements.add(getFormatTableSql());
+        sqlStatements.add(getCategoricalTableSql());
 
         sqlStatements.addAll(nestedTables); // nested tables accumulated during info/format generation
 
@@ -81,6 +82,18 @@ public class DatabaseSchemaManager {
             CREATE TABLE header (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 line TEXT
+            );
+            """;
+    }
+
+    private String getCategoricalTableSql() {
+        return """
+            CREATE TABLE categories (
+                id integer PRIMARY KEY AUTOINCREMENT,
+                field TEXT,
+                value TEXT,
+                label TEXT,
+                description TEXT
             );
             """;
     }
@@ -229,7 +242,7 @@ public class DatabaseSchemaManager {
                     columns.add(String.format("%s INTEGER", entry.getKey()));
                 }
                 else if (meta.getNumberType() == ValueCount.Type.FIXED && meta.getNumberCount() == 1) {
-                    columns.add(String.format("%s %s", entry.getKey(), toSqlType(meta.getType())));
+                    columns.add(String.format("%s %s", entry.getKey(), toSqlType(meta.getType(), meta.getNumberCount())));
                 } else {
                     columns.add(String.format("%s TEXT", entry.getKey()));
                 }
@@ -260,7 +273,7 @@ public class DatabaseSchemaManager {
             FieldMetadata meta = entry.getValue();
             if (meta.getNestedFields() == null || meta.getNestedFields().isEmpty()) {
                 if (meta.getNumberType() == ValueCount.Type.FIXED && meta.getNumberCount() == 1) {
-                    columns.add(String.format("%s %s", entry.getKey(), toSqlType(meta.getType())));
+                    columns.add(String.format("%s %s", entry.getKey(), toSqlType(meta.getType(), meta.getNumberCount())));
                 } else {
                     columns.add(String.format("%s TEXT", entry.getKey()));
                 }
@@ -304,7 +317,7 @@ public class DatabaseSchemaManager {
             }
 
             if (nestedField.getNumberType() == ValueCount.Type.FIXED && nestedField.getNumberCount() == 1) {
-                nestedColumns.add(String.format("%s %s", columnName, toSqlType(nestedField.getType())));
+                nestedColumns.add(String.format("%s %s", columnName, toSqlType(nestedField.getType(), nestedField.getNumberCount())));
             } else {
                 nestedColumns.add(String.format("%s TEXT", columnName));
             }
@@ -348,19 +361,14 @@ public class DatabaseSchemaManager {
                 .collect(Collectors.joining(", "));
     }
 
-    private String toSqlType(ValueType type) {
-        switch (type) {
-            case INTEGER:
-                return "INTEGER";
-            case FLOAT:
-                return "REAL";
-            case FLAG:
-            case CHARACTER:
-            case STRING:
-            case CATEGORICAL:
-                return "TEXT";
-            default:
-                throw new IllegalArgumentException("Unexpected ValueType: " + type);
+    public static String toSqlType(ValueType type, Integer count) {
+        if(count != null &&  count != 1){
+            return "TEXT";
         }
+        return switch (type) {
+            case INTEGER, CATEGORICAL -> "INTEGER";
+            case FLOAT -> "REAL";
+            case FLAG, CHARACTER, STRING -> "TEXT";
+        };
     }
 }

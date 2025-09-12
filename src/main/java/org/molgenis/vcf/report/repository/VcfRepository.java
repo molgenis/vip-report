@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import htsjdk.variant.variantcontext.Allele;
 import htsjdk.variant.variantcontext.Genotype;
 import htsjdk.variant.variantcontext.VariantContext;
-import org.molgenis.vcf.utils.metadata.ValueCount;
-import org.molgenis.vcf.utils.model.ValueDescription;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadata;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadatas;
 import org.molgenis.vcf.utils.model.metadata.NestedFieldMetadata;
@@ -16,7 +14,9 @@ import java.sql.*;
 import java.util.*;
 
 import static org.molgenis.vcf.report.repository.DatabaseManager.VARIANT_ID;
+import static org.molgenis.vcf.report.repository.DatabaseSchemaManager.toSqlType;
 import static org.molgenis.vcf.utils.metadata.ValueCount.Type.FIXED;
+import static org.molgenis.vcf.utils.metadata.ValueType.CATEGORICAL;
 import static org.molgenis.vcf.utils.metadata.ValueType.FLAG;
 
 public class VcfRepository {
@@ -25,6 +25,22 @@ public class VcfRepository {
 
     public VcfRepository(Connection conn) {
         this.conn = conn;
+    }
+
+    public Map<FieldValueKey, Integer> loadCategoriesMap() throws SQLException {
+        Map<FieldValueKey, Integer> idLookupMap = new HashMap<>();
+        String sql = "SELECT id, field, value FROM categories"; // replace "your_table" with actual table
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                String field = rs.getString("field");
+                String value = rs.getString("value");
+                int id = rs.getInt("id");
+                FieldValueKey key = new FieldValueKey(field, value);
+                idLookupMap.put(key, id);
+            }
+        }
+        return idLookupMap;
     }
 
     public int insertVariant(VariantContext vc) throws SQLException {
@@ -58,35 +74,63 @@ public class VcfRepository {
     public void insertCsqData(VariantContext vc, List<String> matchingCsqFields,
                               FieldMetadatas fieldMetadatas, int variantId) throws SQLException {
         Map<String, NestedFieldMetadata> metas = new HashMap();
+        Map<FieldValueKey, Integer> categoryLookup = loadCategoriesMap();
+        ObjectMapper objectMapper = new ObjectMapper();
         for (Map.Entry<String, NestedFieldMetadata> entry : fieldMetadatas.getInfo().get("CSQ").getNestedFields().entrySet()) {
             metas.put(entry.getKey(), entry.getValue());
         }
         if (vc.hasAttribute("CSQ")) {
             try (PreparedStatement insertCSQ = prepareInsertSQL("variant_CSQ", matchingCsqFields)) {
                 List<String> csqEntries = vc.getAttributeAsStringList("CSQ", "");
+                insertCSQ.setInt(1, variantId);
                 for (String csq : csqEntries) {
                     String[] values = csq.split("\\|", -1);
-                    insertCSQ.setInt(1, variantId);
+
                     for (int i = 0; i < matchingCsqFields.size(); i++) {
                         String csqField = matchingCsqFields.get(i);
                         NestedFieldMetadata meta = metas.get(csqField);
                         int csqIndex = meta.getIndex();
                         String val = (csqIndex >= 0 && csqIndex < values.length) ? values[csqIndex] : null;
-                        if (meta.getSeparator() != null) {
-                            String[] split = val.split(meta.getSeparator().toString());
-                            ObjectMapper objectMapper = new ObjectMapper();
-                            val = objectMapper.writeValueAsString(split);
-                        }
+
                         if (val != null && val.isEmpty()) {
-                            val = null;
+                            insertCSQ.setString(i + 2, null);
                         }
-                        insertCSQ.setString(i + 2, val);
+                        else if (meta.getType() == CATEGORICAL) {
+                            addCategorical(meta, categoryLookup, csqField, val, insertCSQ, i + 2);
+                        } else {
+                            if (meta.getSeparator() != null) {
+                                String[] split = val.split(meta.getSeparator().toString());
+                                val = objectMapper.writeValueAsString(split);
+                            }
+                            insertCSQ.setString(i + 2, val);
+                        }
                     }
                     insertCSQ.addBatch();
                 }
                 insertCSQ.executeBatch();
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);//FIXME
+            }
+        }
+    }
+
+    private static void addCategorical(FieldMetadata meta, Map<FieldValueKey, Integer> categoryLookup, String csqField, Object val, PreparedStatement insertCSQ, int index) throws SQLException, JsonProcessingException {
+        if(val == null) {
+            insertCSQ.setString(index, null);
+        }
+        else {
+            String stringValue = val.toString();
+            ObjectMapper objectMapper = new ObjectMapper();
+            if (meta.getNumberCount() != null && meta.getNumberCount() == 1) {
+                Integer category = categoryLookup.get(new FieldValueKey(csqField, stringValue));
+                insertCSQ.setInt(index, category);
+            } else {
+                List<Integer> categories = new ArrayList<>();
+                for (String singleValue : stringValue.split(meta.getSeparator().toString())) {
+                    categories.add(categoryLookup.get(new FieldValueKey(csqField, singleValue)));
+                }
+                stringValue = objectMapper.writeValueAsString(categories);
+                insertCSQ.setString(index, stringValue);
             }
         }
     }
@@ -105,6 +149,7 @@ public class VcfRepository {
     }
 
     public void insertFormatData(VariantContext vc, List<String> formatColumns, int variantId, FieldMetadatas fieldMetadatas, List<Sample> samples) throws SQLException {
+        Map<FieldValueKey, Integer> categoryLookup = loadCategoriesMap();
         try (PreparedStatement insertFormat = prepareInsertFormat(formatColumns)) {
             insertFormat.setInt(1, variantId);
             for (Genotype genotype : vc.getGenotypes()) {
@@ -114,11 +159,15 @@ public class VcfRepository {
                 insertFormat.setInt(2, sampleId);
                 for (int i = 0; i < formatColumns.size(); i++) {
                     String key = formatColumns.get(i);
-                    FieldMetadata fieldMetadata = fieldMetadatas.getFormat().get(key);
+                    FieldMetadata meta = fieldMetadatas.getFormat().get(key);
                     Object value = genotype.hasAnyAttribute(key) ? genotype.getAnyAttribute(key) : null;
-                    if (fieldMetadata.getNumberType() != FIXED || fieldMetadata.getNumberCount() != 1) {
+                    if (meta.getType() == CATEGORICAL) {
+                        addCategorical(meta, categoryLookup, key, value, insertFormat, i + 3);
+                    }
+                    else{
+                        if (meta.getNumberType() != FIXED || meta.getNumberCount() != 1) {
                         if (value != null && !(value instanceof Iterable<?>)) {
-                            String separator = fieldMetadata.getSeparator() != null ? fieldMetadata.getSeparator().toString() : ",";
+                            String separator = meta.getSeparator() != null ? meta.getSeparator().toString() : ",";
                             value = List.of(value.toString().split(separator));
                         }
                     }
@@ -132,6 +181,7 @@ public class VcfRepository {
                         insertFormat.setString(i + 3, value != null ? value.toString() : null);
                     }
                 }
+                }
                 insertFormat.addBatch();
             }
             insertFormat.executeBatch();
@@ -142,6 +192,7 @@ public class VcfRepository {
 
     public void insertInfoData(VariantContext vc, List<String> infoColumns,
                                FieldMetadatas fieldMetadatas, int variantId) throws SQLException {
+        Map<FieldValueKey, Integer> categoryLookup = loadCategoriesMap();
         try (PreparedStatement insertInfo = prepareInsertInfo(infoColumns)) {
             insertInfo.setInt(1, variantId);
             for (int i = 0; i < infoColumns.size(); i++) {
@@ -154,13 +205,18 @@ public class VcfRepository {
                     } else {
                         value = "1";
                     }
+                    insertInfo.setString(i + 2, value != null ? value.toString() : null);
+                } else if (meta.getType() == CATEGORICAL) {
+                    addCategorical(meta, categoryLookup, key, value, insertInfo, i + 2);
                 } else if (!(meta.getNumberType() == FIXED && meta.getNumberCount() == 1) && value != null) {
                     String separator = meta.getSeparator() == null ? "," : meta.getSeparator().toString();
                     value = (value instanceof ArrayList) ? value : value.toString().split(separator);
                     ObjectMapper objectMapper = new ObjectMapper();
                     value = objectMapper.writeValueAsString(value);
+                    insertInfo.setString(i + 2, value != null ? value.toString() : null);
+                }else{
+                    insertInfo.setString(i + 2, value != null ? value.toString() : null);
                 }
-                insertInfo.setString(i + 2, value != null ? value.toString() : null);
             }
             insertInfo.executeUpdate();
         } catch (JsonProcessingException e) {
@@ -170,15 +226,6 @@ public class VcfRepository {
 
     private PreparedStatement prepareInsertSQL(String table, List<String> columns) throws SQLException {
         StringBuilder sql = new StringBuilder("INSERT INTO ").append(table).append(" (").append(VARIANT_ID);
-        for (String col : columns) {
-            sql.append(", ").append(col);
-        }
-        sql.append(") VALUES (?").append(", ?".repeat(columns.size())).append(")");
-        return conn.prepareStatement(sql.toString());
-    }
-
-    private PreparedStatement prepareInsertVippSQL(String table, List<String> columns) throws SQLException {
-        StringBuilder sql = new StringBuilder("INSERT INTO ").append(table).append(" (").append("value");
         for (String col : columns) {
             sql.append(", ").append(col);
         }
@@ -204,38 +251,5 @@ public class VcfRepository {
         }
         sql.append(") VALUES (?").append(", ?".repeat(columns.size())).append(")");
         return conn.prepareStatement(sql.toString());
-    }
-
-    public List<String> getDatabaseCSQColumns() throws SQLException {
-        return getTableColumnsExcluding("variant_CSQ", "id", VARIANT_ID);
-    }
-
-    public List<String> getDatabaseFormatColumns() throws SQLException {
-        return getTableColumnsExcluding("format", "id", "sample_id", VARIANT_ID);
-    }
-
-    public List<String> getDatabaseInfoColumns() throws SQLException {
-        return getTableColumnsExcluding("info", "id", VARIANT_ID);
-    }
-
-    private List<String> getTableColumnsExcluding(String table, String... excludeColumns) throws SQLException {
-        List<String> columns = new ArrayList<>();
-        try (Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery("PRAGMA table_info(" + table + ")")) {
-            while (rs.next()) {
-                String col = rs.getString("name");
-                boolean excluded = false;
-                for (String exc : excludeColumns) {
-                    if (col.equalsIgnoreCase(exc)) {
-                        excluded = true;
-                        break;
-                    }
-                }
-                if (!excluded) {
-                    columns.add(col);
-                }
-            }
-        }
-        return columns;
     }
 }
