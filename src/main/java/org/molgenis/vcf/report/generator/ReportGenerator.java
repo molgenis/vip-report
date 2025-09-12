@@ -122,7 +122,6 @@ public class ReportGenerator {
         fastaGzMap = getReferenceTrackData(contigIntervals, referencePath);
         Bytes genesGz = getGenesTrackData(contigIntervals, reportGeneratorSettings);
         Map<String, Cram> cramMap = getAlignmentTrackData(sampleSettings);
-        Bytes vcfBytes = getVariantTrackData(vcfPath);
 
         Map<?, ?> templateConfig = parseJsonObject(reportGeneratorSettings.getTemplateConfigPath());
 
@@ -144,7 +143,7 @@ public class ReportGenerator {
         byte[] fileContent = Files.readAllBytes(Path.of("vip-report.db"));
         Bytes database = new Bytes(fileContent);
 
-        Binary binary = new Binary(vcfBytes, fastaGzMap, genesGz, cramMap);
+        Binary binary = new Binary(fastaGzMap, genesGz, cramMap);
         return new Report(binary, database);
     }
 

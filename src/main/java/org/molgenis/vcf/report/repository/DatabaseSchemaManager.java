@@ -224,7 +224,11 @@ public class DatabaseSchemaManager {
         for (var entry : infoFields.entrySet()) {
             FieldMetadata meta = entry.getValue();
             if (meta.getNestedFields() == null || meta.getNestedFields().isEmpty()) {
-                if (meta.getNumberType() == ValueCount.Type.FIXED && meta.getNumberCount() == 1) {
+                List<String> categoricals = List.of("Gene","Existing_variation","SYMBOL","CLIN_SIG","Feature","Consequence", "SpliceAI_pred_SYMBOL", "BIOTYPE", "clinVar_CLNSIGINCL", "VIPP", "Feature_type", "clinVar_CLNREVSTAT", "VIPC_S", "clinVar_CLNSIG", "IMPACT", "VKGL_CL", "InheritanceModesGene", "IncompletePenetrance", "gnomAD_SRC", "SYMBOL_SOURCE", "CAPICE_CL");
+                if(categoricals.contains(entry.getKey()) && meta.getSeparator()==null){
+                    columns.add(String.format("%s INTEGER", entry.getKey()));
+                }
+                else if (meta.getNumberType() == ValueCount.Type.FIXED && meta.getNumberCount() == 1) {
                     columns.add(String.format("%s %s", entry.getKey(), toSqlType(meta.getType())));
                 } else {
                     columns.add(String.format("%s TEXT", entry.getKey()));

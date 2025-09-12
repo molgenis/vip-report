@@ -38,7 +38,7 @@ public class VcfRepository {
             insertVCF.setString(4, vc.getReference().getDisplayString());
             insertVCF.setString(5, objectMapper.writeValueAsString(vc.getAlternateAlleles().stream().map(Allele::getDisplayString).toList()));
             insertVCF.setDouble(6, vc.hasLog10PError() ? vc.getPhredScaledQual() : 0.0);
-            insertVCF.setString(7, vc.isFiltered() ?objectMapper.writeValueAsString(vc.getFilters()) : objectMapper.writeValueAsString(Set.of("PASS")));
+            insertVCF.setString(7, vc.isFiltered() ? objectMapper.writeValueAsString(vc.getFilters()) : objectMapper.writeValueAsString(Set.of("PASS")));
 
             insertVCF.executeUpdate();
 
@@ -58,12 +58,12 @@ public class VcfRepository {
     public void insertCsqData(VariantContext vc, List<String> matchingCsqFields,
                               FieldMetadatas fieldMetadatas, int variantId) throws SQLException {
         Map<String, NestedFieldMetadata> metas = new HashMap();
-        for(Map.Entry<String, NestedFieldMetadata> entry : fieldMetadatas.getInfo().get("CSQ").getNestedFields().entrySet()){
+        for (Map.Entry<String, NestedFieldMetadata> entry : fieldMetadatas.getInfo().get("CSQ").getNestedFields().entrySet()) {
             metas.put(entry.getKey(), entry.getValue());
         }
         if (vc.hasAttribute("CSQ")) {
             try (PreparedStatement insertCSQ = prepareInsertSQL("variant_CSQ", matchingCsqFields)) {
-                String[] csqEntries = vc.getAttributeAsString("CSQ", "").split(",");
+                List<String> csqEntries = vc.getAttributeAsStringList("CSQ", "");
                 for (String csq : csqEntries) {
                     String[] values = csq.split("\\|", -1);
                     insertCSQ.setInt(1, variantId);
@@ -72,10 +72,13 @@ public class VcfRepository {
                         NestedFieldMetadata meta = metas.get(csqField);
                         int csqIndex = meta.getIndex();
                         String val = (csqIndex >= 0 && csqIndex < values.length) ? values[csqIndex] : null;
-                        if(meta.getSeparator() != null){
+                        if (meta.getSeparator() != null) {
                             String[] split = val.split(meta.getSeparator().toString());
                             ObjectMapper objectMapper = new ObjectMapper();
                             val = objectMapper.writeValueAsString(split);
+                        }
+                        if (val != null && val.isEmpty()) {
+                            val = null;
                         }
                         insertCSQ.setString(i + 2, val);
                     }
@@ -113,19 +116,19 @@ public class VcfRepository {
                     String key = formatColumns.get(i);
                     FieldMetadata fieldMetadata = fieldMetadatas.getFormat().get(key);
                     Object value = genotype.hasAnyAttribute(key) ? genotype.getAnyAttribute(key) : null;
-                    if(fieldMetadata.getNumberType() != FIXED || fieldMetadata.getNumberCount() != 1) {
-                        if(value != null &&!(value instanceof Iterable<?>)){
-                            String separator = fieldMetadata.getSeparator() != null ?  fieldMetadata.getSeparator().toString() : ",";
+                    if (fieldMetadata.getNumberType() != FIXED || fieldMetadata.getNumberCount() != 1) {
+                        if (value != null && !(value instanceof Iterable<?>)) {
+                            String separator = fieldMetadata.getSeparator() != null ? fieldMetadata.getSeparator().toString() : ",";
                             value = List.of(value.toString().split(separator));
                         }
                     }
                     if (value != null && "GT".equals(key)) {
                         value = getOriginalGTString(genotype, vc);
                     }
-                    if(value instanceof Iterable<?>){
+                    if (value instanceof Iterable<?>) {
                         ObjectMapper mapper = new ObjectMapper();
                         insertFormat.setString(i + 3, value != null ? mapper.writeValueAsString(value) : null);
-                    }else {
+                    } else {
                         insertFormat.setString(i + 3, value != null ? value.toString() : null);
                     }
                 }
@@ -144,19 +147,18 @@ public class VcfRepository {
             for (int i = 0; i < infoColumns.size(); i++) {
                 String key = infoColumns.get(i);
                 FieldMetadata meta = fieldMetadatas.getInfo().get(key);
-                String value = vc.getAttributeAsString(key, "");
-                if(meta.getType() == FLAG){
-                    if(value == null){
+                Object value = vc.getAttribute(key, null);
+                if (meta.getType() == FLAG) {
+                    if (value == null) {
                         value = "0";
-                    }else{
+                    } else {
                         value = "1";
                     }
-                }
-                else if(!(meta.getNumberType() == FIXED && meta.getNumberCount() == 1)){
-                    String separator = meta.getSeparator() == null ? ",":meta.getSeparator().toString();
-                    String[] split = value.split(separator);
+                } else if (!(meta.getNumberType() == FIXED && meta.getNumberCount() == 1) && value != null) {
+                    String separator = meta.getSeparator() == null ? "," : meta.getSeparator().toString();
+                    value = (value instanceof ArrayList) ? value : value.toString().split(separator);
                     ObjectMapper objectMapper = new ObjectMapper();
-                    value = objectMapper.writeValueAsString(split);
+                    value = objectMapper.writeValueAsString(value);
                 }
                 insertInfo.setString(i + 2, value != null ? value.toString() : null);
             }
@@ -168,6 +170,15 @@ public class VcfRepository {
 
     private PreparedStatement prepareInsertSQL(String table, List<String> columns) throws SQLException {
         StringBuilder sql = new StringBuilder("INSERT INTO ").append(table).append(" (").append(VARIANT_ID);
+        for (String col : columns) {
+            sql.append(", ").append(col);
+        }
+        sql.append(") VALUES (?").append(", ?".repeat(columns.size())).append(")");
+        return conn.prepareStatement(sql.toString());
+    }
+
+    private PreparedStatement prepareInsertVippSQL(String table, List<String> columns) throws SQLException {
+        StringBuilder sql = new StringBuilder("INSERT INTO ").append(table).append(" (").append("value");
         for (String col : columns) {
             sql.append(", ").append(col);
         }
