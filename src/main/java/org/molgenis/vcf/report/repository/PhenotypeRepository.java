@@ -1,6 +1,5 @@
 package org.molgenis.vcf.report.repository;
 
-import org.molgenis.vcf.report.model.ReportData;
 import org.molgenis.vcf.utils.sample.model.PhenotypicFeature;
 import org.molgenis.vcf.utils.sample.model.Phenopacket;
 import org.molgenis.vcf.utils.sample.model.Sample;
@@ -25,10 +24,9 @@ public class PhenotypeRepository {
         try (PreparedStatement phenotypeStmt = conn.prepareStatement(phenotypeSql);
              PreparedStatement samplePhenoStmt = conn.prepareStatement(samplePhenoSql)) {
 
-            for (Object o : packets) {
-                Phenopacket packet = (Phenopacket) o;
+            for (Phenopacket packet : packets) {
                 Sample sample = samples.stream().filter(s -> s.getPerson().getIndividualId()
-                        .equals(packet.getSubject().getId())).toList().get(0);
+                        .equals(packet.getSubject().getId())).toList().getFirst();
 
                 for (PhenotypicFeature feature : packet.getPhenotypicFeaturesList()) {
                     String phenotypeId = feature.getOntologyClass().getId();

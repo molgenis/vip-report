@@ -7,6 +7,8 @@ import htsjdk.variant.vcf.VCFHeaderLine;
 import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.report.model.ReportData;
 import org.molgenis.vcf.report.model.metadata.ReportMetadata;
+import org.molgenis.vcf.utils.metadata.FieldType;
+import org.molgenis.vcf.utils.model.metadata.FieldMetadata;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadatas;
 import org.molgenis.vcf.utils.sample.model.Sample;
 
@@ -16,11 +18,10 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
-import static org.molgenis.vcf.report.generator.SqlUtils.extractCSQFields;
+import static org.molgenis.vcf.utils.metadata.FieldType.INFO;
 
 public class DatabaseManager {
     private Connection conn;
@@ -65,7 +66,6 @@ public class DatabaseManager {
             try {
                 conn.setAutoCommit(false);
 
-
                 VcfRepository vcfRepo = new VcfRepository(conn);
                 PhenotypeRepository phenotypeRepo = new PhenotypeRepository(conn);
                 MetadataRepository metadataRepo = new MetadataRepository(conn);
@@ -75,18 +75,11 @@ public class DatabaseManager {
                 ReportMetadataRepository reportMetadataRepo = new ReportMetadataRepository(conn);
                 VCFHeader header = reader.getFileHeader();
 
-                // Extract CSQ field names from VCF header
-                String csqDesc = header.getInfoHeaderLine("CSQ").getDescription();
-                List<String> csqFields = extractCSQFields(csqDesc);
 
-                List<String> dbCsqColumns = getDatabaseCSQColumns();
-                List<String> matchingCsqFields = new ArrayList<>();
-                for (String field : csqFields) {
-                    if (dbCsqColumns.contains(String.format("%s", field))) {
-                        matchingCsqFields.add(String.format("%s", field));
-                    } else {
-                        throw new IllegalArgumentException(field);
-                    }
+                Map<String, FieldMetadata> parentFields = getNestedFields(fieldMetadatas, INFO);
+                Map<String,List<String>> nestedFields = new HashMap<>();
+                for (String field : parentFields.keySet()) {
+                    nestedFields.put(field, getDatabaseNestedColumns(field));
                 }
                 List<String> formatColumns = getDatabaseFormatColumns();
                 List<String> infoColumns = getDatabaseInfoColumns();
@@ -96,7 +89,9 @@ public class DatabaseManager {
                 metadataRepo.insertMetadata(fieldMetadatas);
                 for (VariantContext vc : reader) {
                     int variantId = vcfRepo.insertVariant(vc);
-                    vcfRepo.insertCsqData(vc, matchingCsqFields, fieldMetadatas, variantId);
+                    for (Map.Entry<String, List<String>> entry : nestedFields.entrySet()) {
+                        vcfRepo.insertNested(entry.getKey(), vc, entry.getValue(), fieldMetadatas, variantId);
+                    }
                     vcfRepo.insertFormatData(vc, formatColumns, variantId, fieldMetadatas, samples.getItems());
                     vcfRepo.insertInfoData(vc, infoColumns, fieldMetadatas, variantId);
                 }
@@ -114,6 +109,18 @@ public class DatabaseManager {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    private Map<String, FieldMetadata> getNestedFields(FieldMetadatas fieldMetadatas, FieldType fieldType) {
+        if (fieldType != INFO) {
+            throw new UnsupportedOperationException("Nested fields are only supported for INFO fields.");
+        }
+        return fieldMetadatas.getInfo().entrySet().stream()
+                .filter(e -> e.getValue().getNestedFields() != null && !e.getValue().getNestedFields().isEmpty())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue
+                ));
     }
 
     private static String getHeaderLine(Items<Sample> samples) {
@@ -144,10 +151,10 @@ public class DatabaseManager {
         return columns;
     }
 
-    private List<String> getDatabaseCSQColumns() throws SQLException {
+    private List<String> getDatabaseNestedColumns(String field) throws SQLException {
         List<String> columns = new ArrayList<>();
         try (Statement stmt = conn.createStatement()) {
-            ResultSet rs = stmt.executeQuery("PRAGMA table_info(variant_CSQ)");
+            ResultSet rs = stmt.executeQuery(String.format("PRAGMA table_info(variant_%s)", field));
             while (rs.next()) {
                 String column = rs.getString("name");
                 if (!column.equalsIgnoreCase("id") &&

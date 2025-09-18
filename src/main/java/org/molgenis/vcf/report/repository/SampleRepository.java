@@ -18,7 +18,7 @@ public class SampleRepository {
         this.conn = conn;
     }
 
-    public void insertSamples(Items sampleItems) throws SQLException {
+    public void insertSamples(Items<Sample> sampleItems) throws SQLException {
 
         String sql = """
                 INSERT INTO sample (
@@ -35,9 +35,8 @@ public class SampleRepository {
                 """;
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            @NonNull List samples = sampleItems.getItems();
-            for (Object sampleObject : samples) {
-                Sample sample = (Sample) sampleObject;
+            @NonNull List<Sample> samples = sampleItems.getItems();
+            for (Sample sample : samples) {
                 Person p = sample.getPerson();
                 pstmt.setInt(1, sample.getIndex());
                 pstmt.setString(2, p.getFamilyId());

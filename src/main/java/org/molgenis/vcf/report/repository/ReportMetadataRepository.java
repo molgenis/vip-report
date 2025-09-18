@@ -1,5 +1,7 @@
 package org.molgenis.vcf.report.repository;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.molgenis.vcf.report.model.metadata.ReportMetadata;
 
 import java.sql.Connection;
@@ -16,7 +18,7 @@ public class ReportMetadataRepository {
 
     public void insertReportMetadata(ReportMetadata reportMetadata) {
         String sql = "INSERT INTO reportMetadata (id, value) VALUES (?, ?)";
-
+        ObjectMapper objectMapper = new ObjectMapper();
         try (PreparedStatement insertStmt = conn.prepareStatement(sql)) {
 
 
@@ -29,12 +31,17 @@ public class ReportMetadataRepository {
             insertStmt.setString(1, "version");
             insertStmt.setString(2, reportMetadata.getAppMetadata().getAppVersion());
             insertStmt.addBatch();
+            insertStmt.setString(1, "htsFile");
+            insertStmt.setString(2, objectMapper.writeValueAsString(reportMetadata.getHtsFile()));
+            insertStmt.addBatch();
 
 
             insertStmt.executeBatch();
 
         } catch (SQLException e) {
             throw new RuntimeException("Error inserting config data", e); // FIXME
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e); // FIXME
         }
     }
 }

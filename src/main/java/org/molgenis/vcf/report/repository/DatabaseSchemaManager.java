@@ -15,15 +15,20 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
+import static org.molgenis.vcf.report.generator.ReportGenerator.INFO_DESCRIPTION_PREFIX;
 
 public class DatabaseSchemaManager {
 
+    public static final String TEXT_COLUMN = "%s TEXT";
+    public static final String SQL_COLUMN = "%s %s";
+    public static final String INTEGER_COLUMN = "%s INTEGER";
+    public static final String AUTOID_COLUMN = "id INTEGER PRIMARY KEY AUTOINCREMENT";
     private final ReportGeneratorSettings settings;
 
     // Keep state of nested table creations
     private final Set<String> nestedTables = new LinkedHashSet<>();
     private final DatabaseManager databaseManager;
-    private VCFHeader vcfFileHeader;
+    private final VCFHeader vcfFileHeader;
 
     public DatabaseSchemaManager(ReportGeneratorSettings settings, VCFHeader vcfFileHeader, DatabaseManager databaseManager) {
         this.settings = requireNonNull(settings);
@@ -193,7 +198,7 @@ public class DatabaseSchemaManager {
      * Generates info table SQL plus nested variant_* tables.
      * @return SQL string for 'info' table.
      */
-    public String getInfoTableSql() throws IOException {
+    public String getInfoTableSql() {
         FieldMetadataService fieldMetadataService = new FieldMetadataServiceImpl(settings.getMetadataPath().toFile());
         FieldMetadatas fieldMetadatas = loadFieldMetadatas(fieldMetadataService);
 
@@ -204,55 +209,36 @@ public class DatabaseSchemaManager {
      * Generates format table SQL plus nested format_* tables
      * @return SQL string for 'format' table.
      */
-    public String getFormatTableSql() throws IOException {
+    public String getFormatTableSql() {
         FieldMetadataService fieldMetadataService = new FieldMetadataServiceImpl(settings.getMetadataPath().toFile());
         FieldMetadatas fieldMetadatas = loadFieldMetadatas(fieldMetadataService);
 
         return buildFormatTable(fieldMetadatas.getFormat());
     }
 
-    // Helpers for loading metadata (you can refactor this to accept param too)
-    private FieldMetadatas loadFieldMetadatas(FieldMetadataService service) throws IOException {
-        // Note: You may want to make the Map param to the load method configurable outside if needed
+    private FieldMetadatas loadFieldMetadatas(FieldMetadataService service) {
         return service.load(
                 vcfFileHeader,
-                Map.of(
-                        FieldIdentifier.builder()
-                                .type(FieldType.INFO)
-                                .name("CSQ")
-                                .build(),
-                        NestedAttributes.builder()
-                                .prefix("INFO_DESCRIPTION_PREFIX")  // use real prefix constant
-                                .seperator("|")
-                                .build()
-                ));
+                Map.of(FieldIdentifier.builder().type(FieldType.INFO).name("CSQ").build(), NestedAttributes.builder().prefix(INFO_DESCRIPTION_PREFIX).seperator("|").build()));
     }
 
     private String buildInfoTable(Map<String, FieldMetadata> infoFields) {
         StringBuilder infoBuilder = new StringBuilder("CREATE TABLE info (");
         List<String> columns = new ArrayList<>();
-        columns.add("id INTEGER PRIMARY KEY AUTOINCREMENT");
+        columns.add(AUTOID_COLUMN);
         columns.add("variant_id INTEGER REFERENCES variant(id)");
 
         for (var entry : infoFields.entrySet()) {
             FieldMetadata meta = entry.getValue();
             if (meta.getNestedFields() == null || meta.getNestedFields().isEmpty()) {
-                List<String> categoricals = List.of("Gene","Existing_variation","SYMBOL","CLIN_SIG","Feature","Consequence", "SpliceAI_pred_SYMBOL", "BIOTYPE", "clinVar_CLNSIGINCL", "VIPP", "Feature_type", "clinVar_CLNREVSTAT", "VIPC_S", "clinVar_CLNSIG", "IMPACT", "VKGL_CL", "InheritanceModesGene", "IncompletePenetrance", "gnomAD_SRC", "SYMBOL_SOURCE", "CAPICE_CL");
-                if(categoricals.contains(entry.getKey()) && meta.getSeparator()==null){
-                    columns.add(String.format("%s INTEGER", entry.getKey()));
-                }
-                else if (meta.getNumberType() == ValueCount.Type.FIXED && meta.getNumberCount() == 1) {
-                    columns.add(String.format("%s %s", entry.getKey(), toSqlType(meta.getType(), meta.getNumberCount())));
+                if (meta.getNumberType() == ValueCount.Type.FIXED && meta.getNumberCount() == 1) {
+                    columns.add(String.format(SQL_COLUMN, entry.getKey(), toSqlType(meta.getType(), meta.getNumberCount())));
                 } else {
-                    columns.add(String.format("%s TEXT", entry.getKey()));
+                    columns.add(String.format(TEXT_COLUMN, entry.getKey()));
                 }
             } else {
-                // Build nested table SQL here; e.g. variant_<field>
                 String nestedTableSql = buildNestedTable("variant", entry.getKey(), meta.getNestedFields());
                 nestedTables.add(nestedTableSql);
-
-                // Normally no direct column added to this table for nested fields,
-                // as they go to separate tables.
             }
         }
 
@@ -265,7 +251,7 @@ public class DatabaseSchemaManager {
     private String buildFormatTable(Map<String, FieldMetadata> formatFields) {
         StringBuilder formatBuilder = new StringBuilder("CREATE TABLE format (");
         List<String> columns = new ArrayList<>();
-        columns.add("id INTEGER PRIMARY KEY AUTOINCREMENT");
+        columns.add(AUTOID_COLUMN);
         columns.add("sample_id INTEGER REFERENCES sample(id)");
         columns.add("variant_id INTEGER REFERENCES vcf(id)");
 
@@ -273,16 +259,12 @@ public class DatabaseSchemaManager {
             FieldMetadata meta = entry.getValue();
             if (meta.getNestedFields() == null || meta.getNestedFields().isEmpty()) {
                 if (meta.getNumberType() == ValueCount.Type.FIXED && meta.getNumberCount() == 1) {
-                    columns.add(String.format("%s %s", entry.getKey(), toSqlType(meta.getType(), meta.getNumberCount())));
+                    columns.add(String.format(SQL_COLUMN, entry.getKey(), toSqlType(meta.getType(), meta.getNumberCount())));
                 } else {
-                    columns.add(String.format("%s TEXT", entry.getKey()));
+                    columns.add(String.format(TEXT_COLUMN, entry.getKey()));
                 }
             } else {
-                // Build nested table SQL here; e.g. format_<field>
-                String nestedTableSql = buildNestedTable("format", entry.getKey(), meta.getNestedFields());
-                nestedTables.add(nestedTableSql);
-
-                // No direct column added here for nested fields
+                throw new UnsupportedOperationException("Nested Formats are not yet supported");
             }
         }
 
@@ -297,7 +279,7 @@ public class DatabaseSchemaManager {
         StringBuilder nestedBuilder = new StringBuilder("CREATE TABLE ").append(tableName).append(" (");
         List<String> nestedColumns = new ArrayList<>();
 
-        nestedColumns.add("id INTEGER PRIMARY KEY AUTOINCREMENT");
+        nestedColumns.add(AUTOID_COLUMN);
         // Determine foreign key column based on prefix
         if (tableName.startsWith("variant_")) {
             nestedColumns.add("variant_id INTEGER REFERENCES vcf(id)");
@@ -317,9 +299,9 @@ public class DatabaseSchemaManager {
             }
 
             if (nestedField.getNumberType() == ValueCount.Type.FIXED && nestedField.getNumberCount() == 1) {
-                nestedColumns.add(String.format("%s %s", columnName, toSqlType(nestedField.getType(), nestedField.getNumberCount())));
+                nestedColumns.add(String.format(SQL_COLUMN, columnName, toSqlType(nestedField.getType(), nestedField.getNumberCount())));
             } else {
-                nestedColumns.add(String.format("%s TEXT", columnName));
+                nestedColumns.add(String.format(TEXT_COLUMN, columnName));
             }
         }
 

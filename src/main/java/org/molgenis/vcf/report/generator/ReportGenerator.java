@@ -130,7 +130,9 @@ public class ReportGenerator {
         databaseSchemaManager.createDatabase();
 
         FieldMetadataService fieldMetadataService = new FieldMetadataServiceImpl(reportGeneratorSettings.getMetadataPath().toFile());
-        FieldMetadatas fieldMetadatas = fieldMetadataService.load(vcfFileReader.getHeader(), Map.of(FieldIdentifier.builder().type(FieldType.INFO).name("CSQ").build(), NestedAttributes.builder().prefix(INFO_DESCRIPTION_PREFIX).seperator("|").build()));
+        FieldMetadatas fieldMetadatas = fieldMetadataService.load(vcfFileReader.getHeader(),
+                Map.of(FieldIdentifier.builder().type(FieldType.INFO).name("CSQ").build(),
+                        NestedAttributes.builder().prefix(INFO_DESCRIPTION_PREFIX).seperator("|").build()));
 
  //       try {
             databaseManager.populateDb(fieldMetadatas, samples, vcfPath.toFile(),

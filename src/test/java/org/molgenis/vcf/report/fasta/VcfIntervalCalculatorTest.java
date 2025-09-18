@@ -13,7 +13,6 @@ import htsjdk.variant.vcf.VCFContigHeaderLine;
 import htsjdk.variant.vcf.VCFHeader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.molgenis.vcf.report.utils.IntervalUtils;
 
 class VcfIntervalCalculatorTest {
 
