@@ -12,6 +12,7 @@ import org.molgenis.vcf.utils.sample.model.Sample;
 
 import java.sql.*;
 import java.util.*;
+import java.util.regex.Pattern;
 
 import static org.molgenis.vcf.report.repository.DatabaseManager.VARIANT_ID;
 import static org.molgenis.vcf.utils.metadata.ValueCount.Type.FIXED;
@@ -53,12 +54,11 @@ public class VcfRepository {
             insertVCF.setString(3, writeJsonListValue(vc.getID(), ","));
             insertVCF.setString(4, vc.getReference().getDisplayString());
             insertVCF.setString(5, objectMapper.writeValueAsString(vc.getAlternateAlleles().stream().map(Allele::getDisplayString).toList()));
-            insertVCF.setDouble(6, vc.hasLog10PError() ? vc.getPhredScaledQual() : 0.0);
-            if (!vc.filtersWereApplied()) {
-                insertVCF.setString(7, null);
+            if(vc.hasLog10PError()){
+                insertVCF.setDouble(6, vc.getPhredScaledQual());
             }
-            else {
-                insertVCF.setString(7, vc.isNotFiltered() ? "PASS" : String.join(",", vc.getFilters()));
+            if (vc.filtersWereApplied()) {
+                insertVCF.setString(7, objectMapper.writeValueAsString(vc.isNotFiltered() ? List.of("PASS") : String.join(",", vc.getFilters())));
             }
 
             insertVCF.executeUpdate();
@@ -98,7 +98,8 @@ public class VcfRepository {
     }
 
     private static void insertNestedValue(List<String> matchingCsqFields, String nestedStringValue, FieldMetadata parent, PreparedStatement insertNestedStmt, Map<FieldValueKey, Integer> categoryLookup) throws SQLException, JsonProcessingException {
-        String[] nestedValues = nestedStringValue.split(parent.getSeparator() != null ? parent.getSeparator().toString() : "\\|", -1);
+        String separator = parent.getSeparator() != null ? parent.getSeparator().toString() : "|";
+        String[] nestedValues = nestedStringValue.split(Pattern.quote(separator), -1);
         int i = 0;
         for (String nestedField : matchingCsqFields) {
             NestedFieldMetadata meta = parent.getNestedFields().get(nestedField);

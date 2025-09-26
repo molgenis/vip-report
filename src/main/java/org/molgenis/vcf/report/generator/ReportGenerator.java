@@ -1,9 +1,7 @@
 package org.molgenis.vcf.report.generator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import htsjdk.beta.codecs.hapref.fasta.FASTADecoderV1_0;
 import htsjdk.variant.vcf.*;
-import lombok.NonNull;
 import org.molgenis.vcf.report.fasta.ContigInterval;
 import org.molgenis.vcf.report.fasta.VariantFastaSlicer;
 import org.molgenis.vcf.report.fasta.VariantIntervalCalculator;
@@ -18,19 +16,14 @@ import org.molgenis.vcf.report.repository.DatabaseManager;
 import org.molgenis.vcf.report.repository.DatabaseSchemaManager;
 import org.molgenis.vcf.report.utils.VcfInputStreamDecorator;
 import org.molgenis.vcf.utils.PersonListMerger;
-import org.molgenis.vcf.utils.UnexpectedEnumException;
 import org.molgenis.vcf.utils.metadata.*;
-import org.molgenis.vcf.utils.model.metadata.FieldMetadata;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadatas;
 import org.molgenis.vcf.utils.model.metadata.HtsFile;
-import org.molgenis.vcf.utils.model.metadata.NestedFieldMetadata;
 import org.molgenis.vcf.utils.sample.mapper.HtsFileMapper;
 import org.molgenis.vcf.utils.sample.mapper.HtsJdkToPersonsMapper;
 import org.molgenis.vcf.utils.sample.mapper.PhenopacketMapper;
-import org.molgenis.vcf.utils.sample.model.AffectedStatus;
 import org.molgenis.vcf.utils.sample.model.Phenopacket;
 import org.molgenis.vcf.utils.sample.model.Sample;
-import org.molgenis.vcf.utils.sample.model.Sex;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -38,8 +31,6 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 import static java.util.Objects.requireNonNull;
