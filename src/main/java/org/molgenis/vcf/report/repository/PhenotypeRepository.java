@@ -3,21 +3,18 @@ package org.molgenis.vcf.report.repository;
 import org.molgenis.vcf.utils.sample.model.PhenotypicFeature;
 import org.molgenis.vcf.utils.sample.model.Phenopacket;
 import org.molgenis.vcf.utils.sample.model.Sample;
+import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
+
+@Component
 public class PhenotypeRepository {
 
-    private final Connection conn;
-
-    public PhenotypeRepository(Connection conn) {
-        this.conn = conn;
-    }
-
-    public void insertPhenotypeData(List<Phenopacket> packets, List<Sample> samples) {
+    public void insertPhenotypeData(Connection conn, List<Phenopacket> packets, List<Sample> samples) {
         String phenotypeSql = "INSERT OR IGNORE INTO phenotype (id, label) VALUES (?, ?)";
         String samplePhenoSql = "INSERT OR IGNORE INTO samplePhenotype (sample_id, phenotype_id) VALUES (?, ?)";
 
@@ -45,7 +42,7 @@ public class PhenotypeRepository {
             samplePhenoStmt.executeBatch();
 
         } catch (SQLException e) {
-            throw new RuntimeException("Error inserting phenotype data", e);
+            throw new DatabaseException(e.getMessage());
         }
     }
 }

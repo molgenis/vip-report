@@ -1,6 +1,7 @@
 {
   "info": {
     "TEST": {
+      "nestedFields": {
         "ALLELE_NUM": {
           "label": "test.",
           "description": "test.",
@@ -10,4 +11,5 @@
         }
       }
     }
+  }
 }

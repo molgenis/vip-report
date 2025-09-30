@@ -4,21 +4,18 @@ import lombok.NonNull;
 import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.utils.sample.model.Person;
 import org.molgenis.vcf.utils.sample.model.Sample;
+import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
+
+@Component
 public class SampleRepository {
 
-    private final Connection conn;
-
-    public SampleRepository(Connection conn) {
-        this.conn = conn;
-    }
-
-    public void insertSamples(Items<Sample> sampleItems) throws SQLException {
+    public void insertSamples(Connection conn, Items<Sample> sampleItems) throws SQLException {
 
         String sql = """
                 INSERT INTO sample (

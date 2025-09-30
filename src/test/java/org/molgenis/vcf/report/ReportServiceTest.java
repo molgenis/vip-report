@@ -1,13 +1,7 @@
 package org.molgenis.vcf.report;
 
-import static java.util.Collections.emptyList;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.molgenis.vcf.utils.model.metadata.HtsFormat.VCF;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -27,10 +21,6 @@ import org.molgenis.vcf.report.generator.Settings;
 import org.molgenis.vcf.report.model.Binary;
 import org.molgenis.vcf.report.model.Bytes;
 import org.molgenis.vcf.report.model.Report;
-import org.molgenis.vcf.report.model.ReportData;
-import org.molgenis.vcf.report.model.metadata.AppMetadata;
-import org.molgenis.vcf.report.model.metadata.ReportMetadata;
-import org.molgenis.vcf.utils.model.metadata.HtsFile;
 
 @ExtendWith(MockitoExtension.class)
 class ReportServiceTest {
@@ -47,7 +37,7 @@ class ReportServiceTest {
   }
 
   @Test
-  void createReport() throws IOException {
+  void createReport() {
     String appName = "MyApp";
     String appVersion = "MyVersion";
     String appArguments = "MyArguments";
@@ -57,21 +47,9 @@ class ReportServiceTest {
 
     Report report =
         new Report(
-            new ReportMetadata(
-                new AppMetadata(appName, appVersion, appArguments),
-                new HtsFile(inputVcfPath.toString(), VCF, "UNKNOWN")),
-            new ReportData(emptyList(), emptyList()),
-            new Binary(new Bytes(Files.readAllBytes(inputVcfPath)), null, null, Map.of()),
-            new ObjectMapper()
-                .readValue(
-                    "{\"name\":\"testtree\", \"description\":\"no need for a valid tree\"}",
-                    Map.class),
-            new ObjectMapper()
-                .readValue(
-                        "{\"name\":\"sampletree\", \"description\":\"no need for a valid tree\"}",
-                        Map.class),
-            new ObjectMapper()
-                .readValue("{\"info\":{\"TEST\":{\"ALLELE_NUM\":{\"label\":\"test.\", \"description\":\"test.\", \"numberType\":\"NUMBER\", \"numberCount\":1, \"type\":\"STRING\"}}}}", Map.class),null);
+            new Binary( null, null, Map.of()),
+            new Bytes("FIXME".getBytes())
+        );
 
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(

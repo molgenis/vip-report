@@ -4,13 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import htsjdk.samtools.util.CloseableIterator;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.Iterator;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
@@ -51,10 +49,12 @@ class GenesFilterTest {
     when(contigInterval4.getStop()).thenReturn(14408);
 
     assertEquals(
-        "##gff-version 3.1.25\n"
-            + "chr1\tBestRefSeq\tpseudogene\t11874\t14409\t.\t+\t.\tID=gene-DDX11L1;Dbxref=GeneID%3A100287102,HGNC%3AHGNC%3A37102;Name=DDX11L1;description=DEAD%2FH-box helicase 11 like 1 %28pseudogene%29;gbkey=Gene;gene=DDX11L1;gene_biotype=transcribed_pseudogene;pseudo=true\n"
-            + "chr1\tBestRefSeq\ttranscript\t11874\t14409\t.\t+\t.\tID=rna-NR_046018.2;Parent=gene-DDX11L1;Dbxref=GeneID%3A100287102,Genbank%3ANR_046018.2,HGNC%3AHGNC%3A37102;Name=NR_046018.2;gbkey=misc_RNA;gene=DDX11L1;product=DEAD%2FH-box helicase 11 like 1 %28pseudogene%29;pseudo=true;transcript_id=NR_046018.2\n"
-            + "chr1\tBestRefSeq\texon\t11874\t12227\t.\t+\t.\tID=exon-NR_046018.2-1;Parent=rna-NR_046018.2;Dbxref=GeneID%3A100287102,Genbank%3ANR_046018.2,HGNC%3AHGNC%3A37102;gbkey=misc_RNA;gene=DDX11L1;product=DEAD%2FH-box helicase 11 like 1 %28pseudogene%29;pseudo=true;transcript_id=NR_046018.2\n",
+        """
+            ##gff-version 3.1.25
+            chr1\tBestRefSeq\tpseudogene\t11874\t14409\t.\t+\t.\tID=gene-DDX11L1;Dbxref=GeneID%3A100287102,HGNC%3AHGNC%3A37102;Name=DDX11L1;description=DEAD%2FH-box helicase 11 like 1 %28pseudogene%29;gbkey=Gene;gene=DDX11L1;gene_biotype=transcribed_pseudogene;pseudo=true
+            chr1\tBestRefSeq\ttranscript\t11874\t14409\t.\t+\t.\tID=rna-NR_046018.2;Parent=gene-DDX11L1;Dbxref=GeneID%3A100287102,Genbank%3ANR_046018.2,HGNC%3AHGNC%3A37102;Name=NR_046018.2;gbkey=misc_RNA;gene=DDX11L1;product=DEAD%2FH-box helicase 11 like 1 %28pseudogene%29;pseudo=true;transcript_id=NR_046018.2
+            chr1\tBestRefSeq\texon\t11874\t12227\t.\t+\t.\tID=exon-NR_046018.2-1;Parent=rna-NR_046018.2;Dbxref=GeneID%3A100287102,Genbank%3ANR_046018.2,HGNC%3AHGNC%3A37102;gbkey=misc_RNA;gene=DDX11L1;product=DEAD%2FH-box helicase 11 like 1 %28pseudogene%29;pseudo=true;transcript_id=NR_046018.2
+            """,
         decompress(genesFilter.filter(List.of(contigInterval, contigInterval2, contigInterval3, contigInterval4))));
   }
 
@@ -64,24 +64,5 @@ class GenesFilterTest {
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }
-  }
-
-
-  private <T> CloseableIterator<T> createCloseableIterator(Iterator<T> iterator) {
-    return new CloseableIterator<T>() {
-      @Override
-      public void close() {
-      }
-
-      @Override
-      public boolean hasNext() {
-        return iterator.hasNext();
-      }
-
-      @Override
-      public T next() {
-        return iterator.next();
-      }
-    };
   }
 }

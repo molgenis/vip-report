@@ -1,21 +1,20 @@
 package org.molgenis.vcf.report.repository;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.springframework.stereotype.Component;
+
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+@Component
 public class DecisionTreeRepository {
 
-    private final Connection conn;
-
-    public DecisionTreeRepository(Connection conn) {
-        this.conn = conn;
-    }
-
-    public void insertDecisionTreeData(Path decisionTreePath, Path sampleTreePath) {
+    public void insertDecisionTreeData(Connection conn, Path decisionTreePath, Path sampleTreePath) {
         String sql = "INSERT INTO decisiontree (id, tree) VALUES (?, ?)";
 
         try (PreparedStatement insertStmt = conn.prepareStatement(sql)) {
@@ -31,10 +30,10 @@ public class DecisionTreeRepository {
             }
             insertStmt.executeBatch();
 
-        } catch (SQLException e) {
-            throw new RuntimeException("Error inserting decision tree data", e);
         } catch (IOException e) {
-            throw new RuntimeException("Error reading decision tree files", e);
+            throw new UncheckedIOException(e);
+        } catch (SQLException e) {
+            throw new DatabaseException(e.getMessage());
         }
     }
 }

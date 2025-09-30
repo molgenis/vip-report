@@ -1,12 +1,10 @@
 package org.molgenis.vcf.report;
 
 import static java.util.Objects.requireNonNull;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_DEBUG;
-import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_DEBUG_LONG;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_FORCE;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_FORCE_LONG;
+import static org.molgenis.vcf.report.utils.PathUtils.getDatabaseLocation;
 
-import ch.qos.logback.classic.Level;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import lombok.NonNull;
@@ -74,6 +72,7 @@ public class AppCommandLineRunner implements CommandLineRunner {
 
       LOGGER.info("creating report for '{}' ...", settings.getInputVcfPath());
       reportService.createReport(settings);
+        Files.copy(Path.of(getDatabaseLocation(settings.getInputVcfPath())), Path.of(getDatabaseLocation(settings.getInputVcfPath()) + ".blob")); // FIXME remove
       LOGGER.info("created report '{}'", outputReportPath);
     } catch (Exception e) {
       e.printStackTrace();

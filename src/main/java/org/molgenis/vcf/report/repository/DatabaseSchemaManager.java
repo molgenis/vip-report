@@ -8,218 +8,184 @@ import org.molgenis.vcf.utils.model.metadata.FieldMetadatas;
 import org.molgenis.vcf.utils.model.metadata.NestedFieldMetadata;
 import org.molgenis.vcf.utils.sample.model.AffectedStatus;
 import org.molgenis.vcf.utils.sample.model.Sex;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.util.Objects.requireNonNull;
-import static org.molgenis.vcf.report.generator.ReportGenerator.INFO_DESCRIPTION_PREFIX;
-
+@Component
 public class DatabaseSchemaManager {
-
     public static final String TEXT_COLUMN = "%s TEXT";
     public static final String SQL_COLUMN = "%s %s";
-    public static final String INTEGER_COLUMN = "%s INTEGER";
     public static final String AUTOID_COLUMN = "id INTEGER PRIMARY KEY AUTOINCREMENT";
-    private final ReportGeneratorSettings settings;
-
-    // Keep state of nested table creations
     private final Set<String> nestedTables = new LinkedHashSet<>();
-    private final DatabaseManager databaseManager;
-    private final VCFHeader vcfFileHeader;
 
-    public DatabaseSchemaManager(ReportGeneratorSettings settings, VCFHeader vcfFileHeader, DatabaseManager databaseManager) {
-        this.settings = requireNonNull(settings);
-        this.vcfFileHeader = requireNonNull(vcfFileHeader);
-        this.databaseManager = requireNonNull(databaseManager);
+    private final String VCF_TABLE_SQL = """
+                CREATE TABLE vcf (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    chrom TEXT NOT NULL,
+                    pos INTEGER NOT NULL,
+                    id_vcf TEXT,
+                    ref TEXT NOT NULL,
+                    alt TEXT,
+                    qual REAL,
+                    filter TEXT
+                );
+            """;
+
+    private final String HEADER_TABLE_SQL = """
+                CREATE TABLE header (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    line TEXT
+                );
+            """;
+
+    private final String CATEGORIES_TABLE_SQL = """
+                CREATE TABLE categories (
+                    id integer PRIMARY KEY AUTOINCREMENT,
+                    field TEXT,
+                    value TEXT,
+                    label TEXT,
+                    description TEXT
+                );
+            """;
+
+    private final String CONFIG_TABLE_SQL = """
+                CREATE TABLE config (
+                    id TEXT PRIMARY KEY,
+                    value TEXT
+                );
+            """;
+
+    private final String PHENOTYPE_TABLE_SQL = """
+                CREATE TABLE phenotype (
+                    id TEXT PRIMARY KEY,
+                    label TEXT
+                );
+            """;
+
+    private final String SAMPLE_PHENOTYPE_TABLE_SQL = """
+                CREATE TABLE samplePhenotype (
+                    sample_id INTEGER PRIMARY KEY,
+                    phenotype_id TEXT NOT NULL
+                );
+            """;
+
+    private final String DECISION_TREE_TABLE_SQL = """
+                CREATE TABLE decisiontree (
+                    id TEXT PRIMARY KEY,
+                    tree TEXT NOT NULL
+                );
+            """;
+
+    private final String APP_METADATA_TABLE_SQL = """
+                CREATE TABLE appMetadata (
+                    id TEXT PRIMARY KEY,
+                    value TEXT NOT NULL
+                );
+            """;
+
+    public void createTable(String sql, Connection connection) {
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute(sql);
+        } catch (SQLException e) {
+            e.printStackTrace(); // FIXME
+        }
     }
 
-    public void createDatabase(){
+    public void createDatabase(ReportGeneratorSettings settings, VCFHeader vcfFileHeader, Connection connection) {
         try {
-            for(String sql : generateAllTableSql()) {
-                databaseManager.createTable(sql);
+            for (String sql : generateAllTableSql(settings, vcfFileHeader)) {
+                createTable(sql, connection);
             }
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
 
-    private List<String> generateAllTableSql() throws IOException {
+    private List<String> generateAllTableSql(ReportGeneratorSettings reportGeneratorSettings, VCFHeader vcfFileHeader) throws IOException {
         List<String> sqlStatements = new ArrayList<>();
-
-        sqlStatements.add(getVcfTableSql());
-        sqlStatements.add(getReportDataTableSql());
+        sqlStatements.add(VCF_TABLE_SQL);
+        sqlStatements.add(CONFIG_TABLE_SQL);
         sqlStatements.add(getSampleTableSql());
-        sqlStatements.add(getPhenotypeTableSql());
-        sqlStatements.add(getSamplePhenotypeTableSql());
-        sqlStatements.add(getDecisionTreeTableSql());
+        sqlStatements.add(PHENOTYPE_TABLE_SQL);
+        sqlStatements.add(SAMPLE_PHENOTYPE_TABLE_SQL);
+        sqlStatements.add(DECISION_TREE_TABLE_SQL);
         sqlStatements.add(getMetadataTableSql());
-        sqlStatements.add(getReportMetadataTableSql());
-        sqlStatements.add(getHeaderSql());
-        sqlStatements.add(getInfoTableSql());
-        sqlStatements.add(getFormatTableSql());
-        sqlStatements.add(getCategoricalTableSql());
-
-        sqlStatements.addAll(nestedTables); // nested tables accumulated during info/format generation
-
+        sqlStatements.add(APP_METADATA_TABLE_SQL);
+        sqlStatements.add(HEADER_TABLE_SQL);
+        sqlStatements.add(getInfoTableSql(reportGeneratorSettings, vcfFileHeader));
+        sqlStatements.add(getFormatTableSql(reportGeneratorSettings, vcfFileHeader));
+        sqlStatements.add(CATEGORIES_TABLE_SQL);
+        sqlStatements.addAll(nestedTables);
         return sqlStatements;
-    }
-
-    private String getVcfTableSql() {
-        return """
-            CREATE TABLE vcf (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                chrom TEXT NOT NULL,
-                pos INTEGER NOT NULL,
-                id_vcf TEXT,
-                ref TEXT NOT NULL,
-                alt TEXT,
-                qual REAL,
-                filter TEXT
-            );
-            """;
-    }
-
-    private String getHeaderSql() {
-        return """
-            CREATE TABLE header (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                line TEXT
-            );
-            """;
-    }
-
-    private String getCategoricalTableSql() {
-        return """
-            CREATE TABLE categories (
-                id integer PRIMARY KEY AUTOINCREMENT,
-                field TEXT,
-                value TEXT,
-                label TEXT,
-                description TEXT
-            );
-            """;
     }
 
     private String getSampleTableSql() {
         return String.format("""
-            CREATE TABLE sample (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                familyId TEXT,
-                individualId TEXT,
-                paternalId TEXT,
-                maternalId TEXT,
-                sex TEXT NOT NULL,
-                affectedStatus TEXT NOT NULL,
-                sample_index INTEGER,
-                proband INTEGER,
-                CHECK (
-                    sex IN (%s) AND
-                    affectedStatus IN (%s)
-                )
-            );
-            """, getSexTypes(), getAffectedStatuses());
-    }
-
-    private String getReportDataTableSql() {
-        return """
-            CREATE TABLE reportdata (
-                id TEXT PRIMARY KEY,
-                value TEXT
-            );
-            """;
-    }
-
-    private String getPhenotypeTableSql() {
-        return """
-            CREATE TABLE phenotype (
-                id TEXT PRIMARY KEY,
-                label TEXT
-            );
-            """;
-    }
-
-    private String getSamplePhenotypeTableSql() {
-        return """
-            CREATE TABLE samplePhenotype (
-                sample_id INTEGER PRIMARY KEY,
-                phenotype_id TEXT NOT NULL
-            );
-            """;
-    }
-
-    private String getDecisionTreeTableSql() {
-        return """
-            CREATE TABLE decisiontree (
-                id TEXT PRIMARY KEY,
-                tree TEXT NOT NULL
-            );
-            """;
-    }
-
-    private String getReportMetadataTableSql() {
-        return """
-            CREATE TABLE reportMetadata (
-                id TEXT PRIMARY KEY,
-                value TEXT NOT NULL
-            );
-            """;
+                    CREATE TABLE sample (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        familyId TEXT,
+                        individualId TEXT,
+                        paternalId TEXT,
+                        maternalId TEXT,
+                        sex TEXT NOT NULL,
+                        affectedStatus TEXT NOT NULL,
+                        sample_index INTEGER,
+                        proband INTEGER,
+                        CHECK (
+                            sex IN (%s) AND
+                            affectedStatus IN (%s)
+                        )
+                    );
+                """, getSexTypes(), getAffectedStatuses());
     }
 
     private String getMetadataTableSql() {
         return String.format("""
-            CREATE TABLE metadata (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT,
-                fieldType TEXT NOT NULL,
-                valueType TEXT NOT NULL,
-                numberType TEXT NOT NULL,
-                numberCount INTEGER,
-                required INTEGER NOT NULL,
-                separator TEXT,
-                categories TEXT,
-                label TEXT,
-                description TEXT,
-                parent TEXT,
-                nested INTEGER,
-                nullValue TEXT,
-                CHECK (
-                    fieldType IN (%s) AND
-                    valueType IN (%s) AND
-                    numberType IN (%s)
-                )
-            );
-            """, getFieldTypes(), getValueTypes(), getNumberTypes());
+                    CREATE TABLE metadata (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        name TEXT,
+                        fieldType TEXT NOT NULL,
+                        valueType TEXT NOT NULL,
+                        numberType TEXT NOT NULL,
+                        numberCount INTEGER,
+                        required INTEGER NOT NULL,
+                        separator TEXT,
+                        categories TEXT,
+                        label TEXT,
+                        description TEXT,
+                        parent TEXT,
+                        nested INTEGER,
+                        nullValue TEXT,
+                        CHECK (
+                            fieldType IN (%s) AND
+                            valueType IN (%s) AND
+                            numberType IN (%s)
+                        )
+                    );
+                """, getFieldTypes(), getValueTypes(), getNumberTypes());
     }
 
-    /**
-     * Generates info table SQL plus nested variant_* tables.
-     * @return SQL string for 'info' table.
-     */
-    public String getInfoTableSql() {
+    public String getInfoTableSql(ReportGeneratorSettings settings, VCFHeader vcfFileHeader) {
         FieldMetadataService fieldMetadataService = new FieldMetadataServiceImpl(settings.getMetadataPath().toFile());
-        FieldMetadatas fieldMetadatas = loadFieldMetadatas(fieldMetadataService);
-
+        FieldMetadatas fieldMetadatas = loadFieldMetadatas(fieldMetadataService, vcfFileHeader);
         return buildInfoTable(fieldMetadatas.getInfo());
     }
 
-    /**
-     * Generates format table SQL plus nested format_* tables
-     * @return SQL string for 'format' table.
-     */
-    public String getFormatTableSql() {
+    public String getFormatTableSql(ReportGeneratorSettings settings, VCFHeader vcfFileHeader) {
         FieldMetadataService fieldMetadataService = new FieldMetadataServiceImpl(settings.getMetadataPath().toFile());
-        FieldMetadatas fieldMetadatas = loadFieldMetadatas(fieldMetadataService);
-
+        FieldMetadatas fieldMetadatas = loadFieldMetadatas(fieldMetadataService, vcfFileHeader);
         return buildFormatTable(fieldMetadatas.getFormat());
     }
 
-    private FieldMetadatas loadFieldMetadatas(FieldMetadataService service) {
-        return service.load(
-                vcfFileHeader,
-                Map.of(FieldIdentifier.builder().type(FieldType.INFO).name("CSQ").build(), NestedAttributes.builder().prefix(INFO_DESCRIPTION_PREFIX).seperator("|").build()));
+    private FieldMetadatas loadFieldMetadatas(FieldMetadataService service, VCFHeader vcfFileHeader) {
+        return service.load(vcfFileHeader);
     }
 
     private String buildInfoTable(Map<String, FieldMetadata> infoFields) {
@@ -241,10 +207,8 @@ public class DatabaseSchemaManager {
                 nestedTables.add(nestedTableSql);
             }
         }
-
         infoBuilder.append(String.join(",", columns));
         infoBuilder.append(");");
-
         return infoBuilder.toString();
     }
 
@@ -267,10 +231,8 @@ public class DatabaseSchemaManager {
                 throw new UnsupportedOperationException("Nested Formats are not yet supported");
             }
         }
-
         formatBuilder.append(String.join(",", columns));
         formatBuilder.append(");");
-
         return formatBuilder.toString();
     }
 
@@ -278,40 +240,25 @@ public class DatabaseSchemaManager {
         String tableName = String.format("%s_%s", prefix, postfix);
         StringBuilder nestedBuilder = new StringBuilder("CREATE TABLE ").append(tableName).append(" (");
         List<String> nestedColumns = new ArrayList<>();
-
         nestedColumns.add(AUTOID_COLUMN);
-        // Determine foreign key column based on prefix
         if (tableName.startsWith("variant_")) {
             nestedColumns.add("variant_id INTEGER REFERENCES vcf(id)");
         } else if (tableName.startsWith("format_")) {
             nestedColumns.add("format_id INTEGER REFERENCES format(id)");
-        } else {
-            // add fallback or other keys if needed
         }
-
         for (var nestedEntry : nestedFieldMap.entrySet()) {
             NestedFieldMetadata nestedField = nestedEntry.getValue();
             String columnName = nestedEntry.getKey();
-
-            //FIXME: bug in utils?
-            if(columnName.equals(" from Ensembl VEP. Format: Allele")){
-                columnName = "Allele";
-            }
-
             if (nestedField.getNumberType() == ValueCount.Type.FIXED && nestedField.getNumberCount() == 1) {
                 nestedColumns.add(String.format(SQL_COLUMN, columnName, toSqlType(nestedField.getType(), nestedField.getNumberCount())));
             } else {
                 nestedColumns.add(String.format(TEXT_COLUMN, columnName));
             }
         }
-
         nestedBuilder.append(String.join(", ", nestedColumns));
         nestedBuilder.append(");");
-
         return nestedBuilder.toString();
     }
-
-    // Enum utilities methods left basically the same, but public or private as needed...
 
     public String getSexTypes() {
         return Arrays.stream(Sex.values())
@@ -344,7 +291,7 @@ public class DatabaseSchemaManager {
     }
 
     public static String toSqlType(ValueType type, Integer count) {
-        if(count != null &&  count != 1){
+        if (count != null && count != 1) {
             return "TEXT";
         }
         return switch (type) {

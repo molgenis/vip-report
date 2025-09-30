@@ -311,6 +311,7 @@ class AppCommandLineOptionsTest {
         CommandLine cmd = mock(CommandLine.class);
         doReturn(true).when(cmd).hasOption(OPT_PHENOTYPES);
         doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
+        doReturn(false).when(cmd).hasOption(OPT_FORCE);
         doReturn(false).when(cmd).hasOption(OPT_PED);
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(pheno).when(cmd).getOptionValue(OPT_PHENOTYPES);
@@ -329,6 +330,7 @@ class AppCommandLineOptionsTest {
         doReturn(true).when(cmd).hasOption(OPT_PHENOTYPES);
         doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
         doReturn(false).when(cmd).hasOption(OPT_PED);
+        doReturn(false).when(cmd).hasOption(OPT_FORCE);
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(pheno).when(cmd).getOptionValue(OPT_PHENOTYPES);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
@@ -345,6 +347,7 @@ class AppCommandLineOptionsTest {
         CommandLine cmd = mock(CommandLine.class);
         doReturn(true).when(cmd).hasOption(OPT_PHENOTYPES);
         doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
+        doReturn(false).when(cmd).hasOption(OPT_FORCE);
         doReturn(false).when(cmd).hasOption(OPT_PED);
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(pheno).when(cmd).getOptionValue(OPT_PHENOTYPES);
@@ -364,6 +367,7 @@ class AppCommandLineOptionsTest {
         CommandLine cmd = mock(CommandLine.class);
         doReturn(true).when(cmd).hasOption(OPT_PHENOTYPES);
         doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
+        doReturn(false).when(cmd).hasOption(OPT_FORCE);
         doReturn(false).when(cmd).hasOption(OPT_PED);
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(pheno).when(cmd).getOptionValue(OPT_PHENOTYPES);
@@ -383,6 +387,7 @@ class AppCommandLineOptionsTest {
         CommandLine cmd = mock(CommandLine.class);
         doReturn(true).when(cmd).hasOption(OPT_PHENOTYPES);
         doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
+        doReturn(false).when(cmd).hasOption(OPT_FORCE);
         doReturn(false).when(cmd).hasOption(OPT_PED);
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(pheno).when(cmd).getOptionValue(OPT_PHENOTYPES);
@@ -402,6 +407,7 @@ class AppCommandLineOptionsTest {
         doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
         doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
         doReturn(false).when(cmd).hasOption(OPT_PED);
+        doReturn(false).when(cmd).hasOption(OPT_FORCE);
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn("10").when(cmd).getOptionValue(OPT_MAX_SAMPLES);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
@@ -418,6 +424,7 @@ class AppCommandLineOptionsTest {
         doReturn(true).when(cmd).hasOption(OPT_MAX_SAMPLES);
         doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
         doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
+        doReturn(false).when(cmd).hasOption(OPT_FORCE);
         doReturn(false).when(cmd).hasOption(OPT_PED);
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn("test").when(cmd).getOptionValue(OPT_MAX_SAMPLES);
@@ -437,6 +444,7 @@ class AppCommandLineOptionsTest {
         doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
         doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
         doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
+        doReturn(false).when(cmd).hasOption(OPT_FORCE);
         doReturn(false).when(cmd).hasOption(OPT_PED);
         doReturn(false).when(cmd).hasOption(OPT_REFERENCE);
         doReturn(true).when(cmd).hasOption(OPT_GENES);
@@ -457,6 +465,7 @@ class AppCommandLineOptionsTest {
         doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
         doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
         doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
+        doReturn(false).when(cmd).hasOption(OPT_FORCE);
         doReturn(false).when(cmd).hasOption(OPT_PED);
         doReturn(true).when(cmd).hasOption(OPT_REFERENCE);
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
@@ -476,6 +485,7 @@ class AppCommandLineOptionsTest {
         doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
         doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
         doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
+        doReturn(false).when(cmd).hasOption(OPT_FORCE);
         doReturn(false).when(cmd).hasOption(OPT_PED);
         doReturn(true).when(cmd).hasOption(OPT_REFERENCE);
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
@@ -498,6 +508,7 @@ class AppCommandLineOptionsTest {
         doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
         doReturn(false).when(cmd).hasOption(OPT_PED);
         doReturn(true).when(cmd).hasOption(OPT_REFERENCE);
+        doReturn(false).when(cmd).hasOption(OPT_FORCE);
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(referenceFile).when(cmd).getOptionValue(OPT_REFERENCE);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
@@ -516,6 +527,7 @@ class AppCommandLineOptionsTest {
         doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
         doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
         doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
+        doReturn(false).when(cmd).hasOption(OPT_FORCE);
         doReturn(false).when(cmd).hasOption(OPT_PED);
         doReturn(true).when(cmd).hasOption(OPT_REFERENCE);
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
@@ -535,6 +547,7 @@ class AppCommandLineOptionsTest {
         doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
         doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
         doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
+        doReturn(false).when(cmd).hasOption(OPT_FORCE);
         doReturn(false).when(cmd).hasOption(OPT_PED);
         doReturn(true).when(cmd).hasOption(OPT_REFERENCE);
         doReturn(false).when(cmd).hasOption(OPT_GENES);
@@ -555,6 +568,7 @@ class AppCommandLineOptionsTest {
         doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
         doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
         doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
+        doReturn(false).when(cmd).hasOption(OPT_FORCE);
         doReturn(false).when(cmd).hasOption(OPT_PED);
         doReturn(false).when(cmd).hasOption(OPT_REFERENCE);
         doReturn(false).when(cmd).hasOption(OPT_GENES);
@@ -608,6 +622,7 @@ class AppCommandLineOptionsTest {
         doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
         doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
         doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
+        doReturn(false).when(cmd).hasOption(OPT_FORCE);
         doReturn(false).when(cmd).hasOption(OPT_PED);
         doReturn(false).when(cmd).hasOption(OPT_REFERENCE);
         doReturn(false).when(cmd).hasOption(OPT_GENES);
@@ -650,6 +665,7 @@ class AppCommandLineOptionsTest {
         doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
         doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
         doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
+        doReturn(false).when(cmd).hasOption(OPT_FORCE);
         doReturn(false).when(cmd).hasOption(OPT_PED);
         doReturn(false).when(cmd).hasOption(OPT_REFERENCE);
         doReturn(false).when(cmd).hasOption(OPT_GENES);

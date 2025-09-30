@@ -34,6 +34,7 @@ import java.util.*;
 import java.util.zip.GZIPInputStream;
 
 import static java.util.Objects.requireNonNull;
+import static org.molgenis.vcf.report.utils.PathUtils.getDatabaseLocation;
 import static org.molgenis.vcf.utils.sample.mapper.PedToSamplesMapper.mapPedFileToPersons;
 
 @Component
@@ -45,7 +46,8 @@ public class ReportGenerator {
     private final GenesFilterFactory genesFilterFactory;
     private final VcfFastaSlicerFactory vcfFastaSlicerFactory;
     private final VariantIntervalCalculator variantIntervalCalculator;
-    public static final String INFO_DESCRIPTION_PREFIX = "Consequence annotations from Ensembl VEP. Format: ";
+    private final DatabaseSchemaManager databaseSchemaManager;
+    private final DatabaseManager databaseManager;
 
     public ReportGenerator(
             HtsJdkToPersonsMapper htsJdkToPersonsMapper,
@@ -54,7 +56,9 @@ public class ReportGenerator {
             HtsFileMapper htsFileMapper,
             VcfFastaSlicerFactory vcfFastaSlicerFactory,
             GenesFilterFactory genesFilterFactory,
-            VariantIntervalCalculator variantIntervalCalculator) {
+            VariantIntervalCalculator variantIntervalCalculator,
+            DatabaseSchemaManager databaseSchemaManager,
+            DatabaseManager databaseManager) {
         this.htsJdkToPersonsMapper = requireNonNull(htsJdkToPersonsMapper);
         this.phenopacketMapper = requireNonNull(phenopacketMapper);
         this.personListMerger = requireNonNull(personListMerger);
@@ -62,6 +66,8 @@ public class ReportGenerator {
         this.genesFilterFactory = requireNonNull(genesFilterFactory);
         this.vcfFastaSlicerFactory = requireNonNull(vcfFastaSlicerFactory);
         this.variantIntervalCalculator = requireNonNull(variantIntervalCalculator);
+        this.databaseManager = requireNonNull(databaseManager);
+        this.databaseSchemaManager = requireNonNull(databaseSchemaManager);
     }
 
     public Report generateReport(
@@ -115,31 +121,22 @@ public class ReportGenerator {
         Map<String, Cram> cramMap = getAlignmentTrackData(sampleSettings);
 
         Map<?, ?> templateConfig = parseJsonObject(reportGeneratorSettings.getTemplateConfigPath());
-
-        DatabaseManager databaseManager = new DatabaseManager();
-        DatabaseSchemaManager databaseSchemaManager = new DatabaseSchemaManager(reportGeneratorSettings, vcfFileReader.getHeader(), databaseManager);
-        databaseSchemaManager.createDatabase();
-
+        String databaseLocation = getDatabaseLocation(vcfPath);
+        databaseSchemaManager.createDatabase(reportGeneratorSettings, vcfFileReader.getHeader(), databaseManager.getConnection(databaseLocation));
         FieldMetadataService fieldMetadataService = new FieldMetadataServiceImpl(reportGeneratorSettings.getMetadataPath().toFile());
-        FieldMetadatas fieldMetadatas = fieldMetadataService.load(vcfFileReader.getHeader(),
-                Map.of(FieldIdentifier.builder().type(FieldType.INFO).name("CSQ").build(),
-                        NestedAttributes.builder().prefix(INFO_DESCRIPTION_PREFIX).seperator("|").build()));
-
- //       try {
-            databaseManager.populateDb(fieldMetadatas, samples, vcfPath.toFile(),
+        FieldMetadatas fieldMetadatas = fieldMetadataService.load(vcfFileReader.getHeader());
+        Bytes database;
+        try {
+            database = databaseManager.populateDb(databaseLocation, fieldMetadatas, samples, vcfPath.toFile(),
                     reportGeneratorSettings.getDecisionTreePath(), reportGeneratorSettings.getSampleTreePath(),
-                    reportData, reportMetadata, templateConfig);
-//        } catch (Exception e) {
-//            throw new RuntimeException(e); //FIXME
-//        }
-
-        byte[] fileContent = Files.readAllBytes(Path.of("vip-report.db"));
-        Bytes database = new Bytes(fileContent);
+                    reportMetadata, templateConfig, phenopackets.getItems());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
 
         Binary binary = new Binary(fastaGzMap, genesGz, cramMap);
         return new Report(binary, database);
     }
-
 
     private static Map<?, ?> parseJsonObject(Path jsonPath) {
         Map<?, ?> jsonObject;
@@ -167,18 +164,6 @@ public class ReportGenerator {
             phenopackets = new Items<>(Collections.emptyList(), 0);
         }
         return phenopackets;
-    }
-
-    private static Bytes getVariantTrackData(Path vcfPath) throws IOException {
-        Bytes vcfBytes;
-        if (vcfPath.toString().endsWith(".gz")) {
-            try (GZIPInputStream inputStream = new GZIPInputStream(Files.newInputStream(vcfPath))) {
-                vcfBytes = new Bytes(inputStream.readAllBytes());
-            }
-        } else {
-            vcfBytes = new Bytes(Files.readAllBytes(vcfPath));
-        }
-        return vcfBytes;
     }
 
     private static Map<String, Cram> getAlignmentTrackData(SampleSettings sampleSettings) {

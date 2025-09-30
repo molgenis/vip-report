@@ -1,4 +1,5 @@
 {
   "name": "testtree",
-  "description": "no need for a valid tree"
+  "description": "empty tree",
+  "nodes":{}
 }
