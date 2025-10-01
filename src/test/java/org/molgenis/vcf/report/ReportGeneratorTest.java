@@ -8,7 +8,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.molgenis.vcf.utils.model.metadata.HtsFormat.VCF;
 
-import htsjdk.variant.vcf.VCFFileReader;
 import htsjdk.variant.vcf.VCFHeader;
 
 import java.io.IOException;
@@ -124,7 +123,6 @@ class ReportGeneratorTest {
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
             appName, appVersion, appArgs, maxNrSamples, metadataPath, referencePath, null, treePath, treePath, templateConfigPath);
-    //FIXME
       when(databaseManager.populateDb(any(),any(),any(),any(),any(),any(),any(),any(),any())).thenReturn(new Bytes(Files.readAllBytes(database)));
 
       Report report =

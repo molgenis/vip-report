@@ -1,13 +1,13 @@
 package org.molgenis.vcf.report.repository;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import htsjdk.variant.variantcontext.Allele;
 import htsjdk.variant.variantcontext.VariantContext;
 import org.springframework.stereotype.Component;
 
 import java.sql.*;
 import java.util.*;
+
+import static org.molgenis.vcf.report.utils.JsonUtils.toJson;
 
 @Component
 public class VcfRepository {
@@ -23,7 +23,7 @@ public class VcfRepository {
         ) {
             insertVCF.setString(1, vc.getContig());
             insertVCF.setInt(2, vc.getStart());
-            insertVCF.setString(3, writeJsonListValue(vc.getID(), ","));
+            insertVCF.setString(3, writeJsonListValue(vc.getID()));
             insertVCF.setString(4, vc.getReference().getDisplayString());
             insertVCF.setString(5, toJson(vc.getAlternateAlleles().stream().map(Allele::getDisplayString).toList()));
             if(vc.hasLog10PError()) {
@@ -44,16 +44,7 @@ public class VcfRepository {
         }
     }
 
-    private static String writeJsonListValue(String value, String separator){
-        return !value.equals(MISSING) ? toJson(value.split(separator)) : "[]";
-    }
-
-    //FIXME: move to utils
-    public static String toJson(Object arr) {
-        try {
-            return new ObjectMapper().writeValueAsString(arr);
-        } catch (JsonProcessingException e) {
-            throw new JsonException(e.getMessage());
-        }
+    private static String writeJsonListValue(String value){
+        return !value.equals(MISSING) ? toJson(value.split(",")) : "[]";
     }
 }

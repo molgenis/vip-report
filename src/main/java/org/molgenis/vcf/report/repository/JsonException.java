@@ -6,6 +6,6 @@ public class JsonException extends RuntimeException {
     public JsonException(String message) {
         super(
                 format(
-                        "Error converting data to json: %s", message));
+                        "Error converting data to json: '%s'", message));
     }
 }

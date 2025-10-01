@@ -1,6 +1,5 @@
 package org.molgenis.vcf.report.repository;
 
-import htsjdk.variant.variantcontext.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -63,7 +62,7 @@ class DatabaseManagerTest {
         List<Phenopacket> phenopackets = List.of(phenopacket);
 
         Path inputVcfPath = Paths.get("src", "test", "resources", "example_fixed.vcf");
-        Path exampleDb = Paths.get("src", "test", "resources", "example_fixed.vcf");
+        Path exampleDb = Paths.get("src", "test", "resources", "example.db");
         Path decisionTree = Paths.get("src", "test", "resources", "tree.json");
         Path sampleTree = Paths.get("src", "test", "resources", "tree.json");
 

@@ -31,7 +31,6 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.zip.GZIPInputStream;
 
 import static java.util.Objects.requireNonNull;
 import static org.molgenis.vcf.report.utils.PathUtils.getDatabaseLocation;
@@ -110,7 +109,6 @@ public class ReportGenerator {
                         reportGeneratorSettings.getAppVersion(),
                         reportGeneratorSettings.getAppArguments());
         ReportMetadata reportMetadata = new ReportMetadata(appMetadata, htsFile);
-        ReportData reportData = new ReportData(samples.getItems(), phenopackets.getItems());
 
         Map<String, Bytes> fastaGzMap;
         Path referencePath = reportGeneratorSettings.getReferencePath();

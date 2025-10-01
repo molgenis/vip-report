@@ -1,9 +1,5 @@
 package org.molgenis.vcf.report.repository;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import lombok.NonNull;
 import org.molgenis.vcf.utils.metadata.FieldType;
 import org.molgenis.vcf.utils.model.ValueDescription;
@@ -15,16 +11,14 @@ import org.molgenis.vcf.utils.sample.model.Phenopacket;
 import org.molgenis.vcf.utils.sample.model.PhenotypicFeature;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
 
-import static org.molgenis.vcf.report.repository.VcfRepository.toJson;
+import static org.molgenis.vcf.report.utils.JsonUtils.collectNodes;
+import static org.molgenis.vcf.report.utils.JsonUtils.toJson;
 import static org.molgenis.vcf.utils.metadata.ValueType.CATEGORICAL;
 
 
@@ -59,8 +53,6 @@ import static org.molgenis.vcf.utils.metadata.ValueType.CATEGORICAL;
             insertForFields(conn, fieldMetadatas.getFormat().entrySet(), ps, FieldType.FORMAT, customCategories);
             insertForFields(conn, fieldMetadatas.getInfo().entrySet(), ps, FieldType.INFO, customCategories);
             ps.executeBatch();
-        } catch (JsonProcessingException e) {
-            throw new JsonException(e.getMessage());
         }
     }
 
@@ -82,7 +74,7 @@ import static org.molgenis.vcf.utils.metadata.ValueType.CATEGORICAL;
             PreparedStatement ps,
             FieldType fieldType,
             Map<String, Map<String, ValueDescription>> customCategories
-    ) throws SQLException, JsonProcessingException {
+    ) throws SQLException {
         for (Map.Entry<String, ? extends FieldMetadata> entry : entries) {
             addMetadata(conn, entry, ps, fieldType, null, customCategories);
         }
@@ -101,33 +93,13 @@ import static org.molgenis.vcf.utils.metadata.ValueType.CATEGORICAL;
         return hpos;
     }
 
-    public static Map<String, ValueDescription> collectNodes(Path jsonPath) {
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String, ValueDescription> result = new HashMap<>();
-        try {
-            JsonNode rootObj = mapper.readTree(Files.newBufferedReader(jsonPath));
-            JsonNode nodesObj = rootObj.get("nodes");
-            for (JsonNode node : nodesObj) {
-                if ("LEAF".equals(node.path("type").asText())) {
-                    String cls = node.path("class").asText();
-                    String label = node.path("label").asText();
-                    String description = node.path("description").asText();
-                    result.put(cls, new ValueDescription(label, description));
-                }
-            }
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-        return result;
-    }
-
     private void addMetadata(
             Connection conn, Map.Entry<String, ? extends FieldMetadata> metadataEntry,
             PreparedStatement ps,
             FieldType type,
             String parent,
             Map<String, Map<String, ValueDescription>> customCategories
-    ) throws SQLException, JsonProcessingException {
+    ) throws SQLException {
         FieldMetadata meta = metadataEntry.getValue();
         String fieldName = metadataEntry.getKey();
         Map<String, ValueDescription> categories = getCategories(fieldName, meta, customCategories);

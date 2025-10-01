@@ -6,7 +6,6 @@ import static org.molgenis.vcf.utils.sample.mapper.PhenopacketMapper.PHENOTYPE_S
 import static org.molgenis.vcf.utils.sample.mapper.PhenopacketMapper.SAMPLE_PHENOTYPE_SEPARATOR;
 import static org.molgenis.vcf.utils.sample.mapper.PhenopacketMapper.checkPhenotype;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
@@ -354,12 +353,12 @@ class AppCommandLineOptions {
       if(commandLine.hasOption(OPT_FORCE)) {
           try {
               Files.deleteIfExists(Path.of(databaseLocation));
-              Files.deleteIfExists(Path.of(String.format("%s.blob", databaseLocation)));//FIXME
           } catch (IOException e) {
               throw new UncheckedIOException(e);
           }
       } else if(Files.exists(Path.of(databaseLocation))){
-          format("Database file '%s' already exists", databaseLocation);
+          throw new IllegalArgumentException(
+                  format("Database file '%s' already exists", databaseLocation));
       }
   }
 

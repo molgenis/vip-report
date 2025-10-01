@@ -10,8 +10,6 @@ import org.molgenis.vcf.utils.sample.model.AffectedStatus;
 import org.molgenis.vcf.utils.sample.model.Sex;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -25,7 +23,7 @@ public class DatabaseSchemaManager {
     public static final String AUTOID_COLUMN = "id INTEGER PRIMARY KEY AUTOINCREMENT";
     private final Set<String> nestedTables = new LinkedHashSet<>();
 
-    private final String VCF_TABLE_SQL = """
+    static final String VCF_TABLE_SQL = """
                 CREATE TABLE vcf (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     chrom TEXT NOT NULL,
@@ -38,14 +36,14 @@ public class DatabaseSchemaManager {
                 );
             """;
 
-    private final String HEADER_TABLE_SQL = """
+    static final String HEADER_TABLE_SQL = """
                 CREATE TABLE header (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     line TEXT
                 );
             """;
 
-    private final String CATEGORIES_TABLE_SQL = """
+    static final String CATEGORIES_TABLE_SQL = """
                 CREATE TABLE categories (
                     id integer PRIMARY KEY AUTOINCREMENT,
                     field TEXT,
@@ -55,35 +53,35 @@ public class DatabaseSchemaManager {
                 );
             """;
 
-    private final String CONFIG_TABLE_SQL = """
+    static final String CONFIG_TABLE_SQL = """
                 CREATE TABLE config (
                     id TEXT PRIMARY KEY,
                     value TEXT
                 );
             """;
 
-    private final String PHENOTYPE_TABLE_SQL = """
+    static final String PHENOTYPE_TABLE_SQL = """
                 CREATE TABLE phenotype (
                     id TEXT PRIMARY KEY,
                     label TEXT
                 );
             """;
 
-    private final String SAMPLE_PHENOTYPE_TABLE_SQL = """
+    static final String SAMPLE_PHENOTYPE_TABLE_SQL = """
                 CREATE TABLE samplePhenotype (
                     sample_id INTEGER PRIMARY KEY,
                     phenotype_id TEXT NOT NULL
                 );
             """;
 
-    private final String DECISION_TREE_TABLE_SQL = """
+    static final String DECISION_TREE_TABLE_SQL = """
                 CREATE TABLE decisiontree (
                     id TEXT PRIMARY KEY,
                     tree TEXT NOT NULL
                 );
             """;
 
-    private final String APP_METADATA_TABLE_SQL = """
+    static final String APP_METADATA_TABLE_SQL = """
                 CREATE TABLE appMetadata (
                     id TEXT PRIMARY KEY,
                     value TEXT NOT NULL
@@ -94,21 +92,17 @@ public class DatabaseSchemaManager {
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(sql);
         } catch (SQLException e) {
-            e.printStackTrace(); // FIXME
+            throw new DatabaseException(e.getMessage());
         }
     }
 
     public void createDatabase(ReportGeneratorSettings settings, VCFHeader vcfFileHeader, Connection connection) {
-        try {
-            for (String sql : generateAllTableSql(settings, vcfFileHeader)) {
-                createTable(sql, connection);
-            }
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
+        for (String sql : generateAllTableSql(settings, vcfFileHeader)) {
+            createTable(sql, connection);
         }
     }
 
-    private List<String> generateAllTableSql(ReportGeneratorSettings reportGeneratorSettings, VCFHeader vcfFileHeader) throws IOException {
+    private List<String> generateAllTableSql(ReportGeneratorSettings reportGeneratorSettings, VCFHeader vcfFileHeader) {
         List<String> sqlStatements = new ArrayList<>();
         sqlStatements.add(VCF_TABLE_SQL);
         sqlStatements.add(CONFIG_TABLE_SQL);
@@ -148,7 +142,7 @@ public class DatabaseSchemaManager {
 
     private String getMetadataTableSql() {
         return String.format("""
-                    CREATE TABLE metadata (
+                   CREATE TABLE metadata (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         name TEXT,
                         fieldType TEXT NOT NULL,
@@ -167,8 +161,8 @@ public class DatabaseSchemaManager {
                             fieldType IN (%s) AND
                             valueType IN (%s) AND
                             numberType IN (%s)
-                        )
-                    );
+                       )
+                   );
                 """, getFieldTypes(), getValueTypes(), getNumberTypes());
     }
 

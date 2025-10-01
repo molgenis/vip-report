@@ -6,6 +6,6 @@ public class DatabaseException extends RuntimeException {
     public DatabaseException(String message) {
         super(
                 format(
-                        "Error while inserting data into the database: %s", message));
+                        "Error while communicating with the database: '%s'", message));
     }
 }

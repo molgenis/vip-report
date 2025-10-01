@@ -1,6 +1,5 @@
 package org.molgenis.vcf.report.repository;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.vcf.VCFFileReader;
 import htsjdk.variant.vcf.VCFHeader;
@@ -8,7 +7,6 @@ import htsjdk.variant.vcf.VCFHeaderLine;
 import lombok.NonNull;
 import org.molgenis.vcf.report.model.Bytes;
 import org.molgenis.vcf.report.model.Items;
-import org.molgenis.vcf.report.model.ReportData;
 import org.molgenis.vcf.report.model.metadata.ReportMetadata;
 import org.molgenis.vcf.utils.metadata.FieldType;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadata;
@@ -112,7 +110,7 @@ public class DatabaseManager {
 
                 conn.commit();
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                throw new DatabaseException(e.getMessage());
             }
         }
         byte[] fileContent = Files.readAllBytes(Path.of(databaseLocation));

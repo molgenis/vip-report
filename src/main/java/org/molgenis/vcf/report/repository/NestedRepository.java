@@ -1,7 +1,5 @@
 package org.molgenis.vcf.report.repository;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import htsjdk.variant.variantcontext.VariantContext;
 import org.molgenis.vcf.utils.metadata.UnknownFieldException;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadata;
@@ -10,41 +8,18 @@ import org.molgenis.vcf.utils.model.metadata.NestedFieldMetadata;
 import org.springframework.stereotype.Component;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 import static org.molgenis.vcf.report.repository.DatabaseManager.VARIANT_ID;
+import static org.molgenis.vcf.report.utils.CategoryUtils.addCategorical;
+import static org.molgenis.vcf.report.utils.CategoryUtils.loadCategoriesMap;
+import static org.molgenis.vcf.report.utils.JsonUtils.writeJsonListValue;
 import static org.molgenis.vcf.utils.metadata.ValueType.CATEGORICAL;
 
 @Component
 public class NestedRepository {
-
-    public static final String MISSING = ".";
-
-    private Map<FieldValueKey, Integer> loadCategoriesMap(Connection conn) throws SQLException {
-        Map<FieldValueKey, Integer> idLookupMap = new HashMap<>();
-        String sql = "SELECT id, field, value FROM categories";
-        try (
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(sql)
-        ) {
-            while (rs.next()) {
-                String field = rs.getString("field");
-                String value = rs.getString("value");
-                int id = rs.getInt("id");
-                FieldValueKey key = new FieldValueKey(field, value);
-                idLookupMap.put(key, id);
-            }
-        }
-        return idLookupMap;
-    }
-
-    private static String writeJsonListValue(String value, String separator){
-        return !value.equals(MISSING) ? toJson(value.split(separator)) : "[]";
-    }
 
     public void insertNested(Connection conn, String fieldName, VariantContext vc, List<String> matchingNestedFields,
                              FieldMetadatas fieldMetadatas, int variantId) throws SQLException {
@@ -87,33 +62,6 @@ public class NestedRepository {
             i++;
         }
         insertNestedStmt.addBatch();
-    }
-
-    private static void addCategorical(FieldMetadata meta, Map<FieldValueKey, Integer> categoryLookup, String field, Object val, PreparedStatement insertNestedStmt, int index) throws SQLException {
-        if(val == null) {
-            insertNestedStmt.setString(index, null);
-        } else {
-            String stringValue = val.toString();
-            if(meta.getNumberCount() != null && meta.getNumberCount() == 1) {
-                Integer category = categoryLookup.get(new FieldValueKey(field, stringValue));
-                insertNestedStmt.setInt(index, category);
-            } else {
-                List<Integer> categories = new ArrayList<>();
-                for(String singleValue : stringValue.split(meta.getSeparator().toString())) {
-                    categories.add(categoryLookup.get(new FieldValueKey(field, singleValue)));
-                }
-                stringValue = toJson(categories);
-                insertNestedStmt.setString(index, stringValue);
-            }
-        }
-    }
-
-    private static String toJson(Object arr) {
-        try {
-            return new ObjectMapper().writeValueAsString(arr);
-        } catch (JsonProcessingException e) {
-            throw new JsonException(e.getMessage());
-        }
     }
 
     private PreparedStatement prepareInsertSQL(Connection conn, String table, List<String> columns) throws SQLException {
