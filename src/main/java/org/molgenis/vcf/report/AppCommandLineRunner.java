@@ -72,7 +72,6 @@ public class AppCommandLineRunner implements CommandLineRunner {
 
       LOGGER.info("creating report for '{}' ...", settings.getInputVcfPath());
       reportService.createReport(settings);
-        Files.copy(Path.of(getDatabaseLocation(settings.getInputVcfPath())), Path.of(getDatabaseLocation(settings.getInputVcfPath()) + ".blob")); // FIXME remove
       LOGGER.info("created report '{}'", outputReportPath);
     } catch (Exception e) {
       e.printStackTrace();
