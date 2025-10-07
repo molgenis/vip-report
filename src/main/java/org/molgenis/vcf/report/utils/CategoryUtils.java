@@ -40,7 +40,11 @@ public class CategoryUtils {
             String stringValue = val.toString();
             if(meta.getNumberCount() != null && meta.getNumberCount() == 1) {
                 Integer category = categoryLookup.get(new FieldValueKey(field, stringValue));
-                insertNestedStmt.setInt(index, category);
+                if(category != null) {
+                    insertNestedStmt.setInt(index, category);
+                }else{
+                    insertNestedStmt.setString(index, null);
+                }
             } else {
                 List<Integer> categories = new ArrayList<>();
                 for(String singleValue : stringValue.split(meta.getSeparator().toString())) {

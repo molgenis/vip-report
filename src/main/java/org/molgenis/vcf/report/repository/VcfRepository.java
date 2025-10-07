@@ -25,7 +25,7 @@ public class VcfRepository {
             insertVCF.setInt(2, vc.getStart());
             insertVCF.setString(3, writeJsonListValue(vc.getID()));
             insertVCF.setString(4, vc.getReference().getDisplayString());
-            insertVCF.setString(5, toJson(vc.getAlternateAlleles().stream().map(Allele::getDisplayString).toList()));
+            insertVCF.setString(5, toJson(vc.getAlternateAlleles().stream().map(this::getDisplayString).toList()));
             if(vc.hasLog10PError()) {
                 insertVCF.setDouble(6, vc.getPhredScaledQual());
             }
@@ -42,6 +42,10 @@ public class VcfRepository {
                 }
             }
         }
+    }
+
+    private String getDisplayString(Allele allele) {
+        return allele.getDisplayString().contains("<CNV:TR") ? allele.getDisplayString().replaceAll("<CNV:TR\\d+>", "<CNV:TR>") : allele.getDisplayString();
     }
 
     private static String writeJsonListValue(String value){

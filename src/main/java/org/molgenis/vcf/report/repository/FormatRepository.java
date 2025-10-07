@@ -45,7 +45,11 @@ public class FormatRepository {
                 int sampleId = sample.getIndex();
                 insertFormat.setInt(2, sampleId);
                 for (int i = 0; i < formatColumns.size(); i++) {
-                    insertFormatDataColumn(vc, formatColumns, fieldMetadatas, genotype, i, categoryLookup, insertFormat);
+                    if(formatColumns.get(i).equals("GT_type")){
+                        insertFormat.setString(i + 3, genotype.getType().toString());
+                    }else {
+                        insertFormatDataColumn(vc, formatColumns, fieldMetadatas, genotype, i, categoryLookup, insertFormat);
+                    }
                 }
                 insertFormat.addBatch();
             }

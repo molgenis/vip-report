@@ -218,6 +218,9 @@ public class DatabaseSchemaManager {
             if (meta.getNestedFields() == null || meta.getNestedFields().isEmpty()) {
                 if (meta.getNumberType() == ValueCount.Type.FIXED && meta.getNumberCount() == 1) {
                     columns.add(String.format(SQL_COLUMN, entry.getKey(), toSqlType(meta.getType(), meta.getNumberCount())));
+                    if(entry.getKey().equals("GT")){
+                        columns.add(String.format(SQL_COLUMN, "GT_type", "TEXT"));
+                    }
                 } else {
                     columns.add(String.format(TEXT_COLUMN, entry.getKey()));
                 }
