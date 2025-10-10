@@ -79,7 +79,7 @@ class DatabaseSchemaManagerTest {
     }
 
     public static final String EXPECTED_INFO_TABLE = "CREATE TABLE info (id INTEGER PRIMARY KEY AUTOINCREMENT,variant_id INTEGER REFERENCES variant(id),AA TEXT,NS INTEGER,AF TEXT,H2 TEXT,DP INTEGER,DB TEXT);";
-    public static final String EXPECTED_FORMAT_TABLE = "CREATE TABLE format (id INTEGER PRIMARY KEY AUTOINCREMENT,sample_id INTEGER REFERENCES sample(id),variant_id INTEGER REFERENCES vcf(id),HQ TEXT,GQ INTEGER,DP INTEGER,GT TEXT);";
+    public static final String EXPECTED_FORMAT_TABLE = "CREATE TABLE format (id INTEGER PRIMARY KEY AUTOINCREMENT,sample_id INTEGER REFERENCES sample(id),variant_id INTEGER REFERENCES vcf(id),HQ TEXT,GQ INTEGER,DP INTEGER,GT TEXT,GT_type TEXT);";
     public static final String EXPECTED_METADATA_TABLE = """
                CREATE TABLE metadata (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,

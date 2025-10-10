@@ -43,7 +43,7 @@ public class CategoryUtils {
                 if(category != null) {
                     insertNestedStmt.setInt(index, category);
                 }else{
-                    insertNestedStmt.setString(index, null);
+                    throw new UnexpectedCategoryException(field, stringValue);
                 }
             } else {
                 List<Integer> categories = new ArrayList<>();

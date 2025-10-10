@@ -37,7 +37,7 @@ public class NestedRepository {
     }
 
     private static void insertNestedValue(List<String> matchingCsqFields, String nestedStringValue, FieldMetadata parent, PreparedStatement insertNestedStmt, Map<FieldValueKey, Integer> categoryLookup) throws SQLException {
-        String separator = parent.getSeparator() != null ? parent.getSeparator().toString() : "|";
+        String separator = (parent.getNestedAttributes() != null ) ? parent.getNestedAttributes().getSeparator() : "|";
         String[] nestedValues = nestedStringValue.split(Pattern.quote(separator), -1);
         int i = 0;
         for (String nestedField : matchingCsqFields) {
