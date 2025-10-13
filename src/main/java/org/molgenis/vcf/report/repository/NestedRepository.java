@@ -20,23 +20,24 @@ import static org.molgenis.vcf.utils.metadata.ValueType.CATEGORICAL;
 
 @Component
 public class NestedRepository {
+    public static final String VIPC = "VIPC";
 
     public void insertNested(Connection conn, String fieldName, VariantContext vc, List<String> matchingNestedFields,
-                             FieldMetadatas fieldMetadatas, int variantId) throws SQLException {
+                             FieldMetadatas fieldMetadatas, int variantId, boolean hasDecisionTree) throws SQLException {
         Map<FieldValueKey, Integer> categoryLookup = loadCategoriesMap(conn);
         if(vc.hasAttribute(fieldName)) {
             try (PreparedStatement insertNestedStmt = prepareInsertSQL(conn, String.format("variant_%s", fieldName), matchingNestedFields)) {
                 List<String> nestedEntries = vc.getAttributeAsStringList(fieldName, "");
                 insertNestedStmt.setInt(1, variantId);
                 for (String nested : nestedEntries) {
-                    insertNestedValue(matchingNestedFields, nested, fieldMetadatas.getInfo().get(fieldName), insertNestedStmt, categoryLookup);
+                    insertNestedValue(matchingNestedFields, nested, fieldMetadatas.getInfo().get(fieldName), insertNestedStmt, categoryLookup, hasDecisionTree);
                 }
                 insertNestedStmt.executeBatch();
             }
         }
     }
 
-    private static void insertNestedValue(List<String> matchingCsqFields, String nestedStringValue, FieldMetadata parent, PreparedStatement insertNestedStmt, Map<FieldValueKey, Integer> categoryLookup) throws SQLException {
+    private static void insertNestedValue(List<String> matchingCsqFields, String nestedStringValue, FieldMetadata parent, PreparedStatement insertNestedStmt, Map<FieldValueKey, Integer> categoryLookup, boolean hasDecisionTree) throws SQLException {
         String separator = (parent.getNestedAttributes() != null ) ? parent.getNestedAttributes().getSeparator() : "|";
         String[] nestedValues = nestedStringValue.split(Pattern.quote(separator), -1);
         int i = 0;
@@ -51,7 +52,7 @@ public class NestedRepository {
 
             if(val == null || val.isEmpty()) {
                 insertNestedStmt.setString(stmtIdx, null);
-            } else if(meta.getType() == CATEGORICAL) {
+            } else if(meta.getType() == CATEGORICAL || VIPC.equals(nestedField) && hasDecisionTree) {
                 addCategorical(meta, categoryLookup, nestedField, val, insertNestedStmt, stmtIdx);
             } else if(meta.getSeparator() != null) {
                 String jsonVal = writeJsonListValue(val, meta.getSeparator().toString());

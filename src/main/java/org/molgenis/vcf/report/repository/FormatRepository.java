@@ -22,6 +22,9 @@ import static org.molgenis.vcf.utils.metadata.ValueType.CATEGORICAL;
 @Component
 public class FormatRepository {
 
+    public static final String GT_TYPE = "GT_type";
+    static final String VIPC_S = "VIPC_S";
+
     private static String getOriginalGTString(Genotype genotype, VariantContext variantContext) {
         StringBuilder gtString = new StringBuilder();
         String sep = genotype.isPhased() ? "|" : "/";
@@ -35,7 +38,8 @@ public class FormatRepository {
         return gtString.toString();
     }
 
-    public void insertFormatData(Connection conn, VariantContext vc, List<String> formatColumns, int variantId, FieldMetadatas fieldMetadatas, List<Sample> samples) throws SQLException {
+    public void insertFormatData(Connection conn, VariantContext vc, List<String> formatColumns, int variantId, FieldMetadatas fieldMetadatas, List<Sample> samples,
+                                 boolean hasSampleTree) throws SQLException {
         Map<FieldValueKey, Integer> categoryLookup = loadCategoriesMap(conn);
         try (PreparedStatement insertFormat = prepareInsertFormat(conn, formatColumns)) {
             insertFormat.setInt(1, variantId);
@@ -45,10 +49,10 @@ public class FormatRepository {
                 int sampleId = sample.getIndex();
                 insertFormat.setInt(2, sampleId);
                 for (int i = 0; i < formatColumns.size(); i++) {
-                    if(formatColumns.get(i).equals("GT_type")){
+                    if(formatColumns.get(i).equals(GT_TYPE)){
                         insertFormat.setString(i + 3, genotype.getType().toString());
                     }else {
-                        insertFormatDataColumn(vc, formatColumns, fieldMetadatas, genotype, i, categoryLookup, insertFormat);
+                        insertFormatDataColumn(vc, formatColumns, fieldMetadatas, genotype, i, categoryLookup, insertFormat, hasSampleTree);
                     }
                 }
                 insertFormat.addBatch();
@@ -58,14 +62,15 @@ public class FormatRepository {
     }
 
     private static void insertFormatDataColumn(VariantContext vc, List<String> formatColumns, FieldMetadatas fieldMetadatas,
-                                               Genotype genotype, int i, Map<FieldValueKey, Integer> categoryLookup, PreparedStatement insertFormat
+                                               Genotype genotype, int i, Map<FieldValueKey, Integer> categoryLookup, PreparedStatement insertFormat,
+                                               boolean hasSampleTree
     ) throws SQLException {
 
         final String key = formatColumns.get(i);
         final FieldMetadata meta = fieldMetadatas.getFormat().get(key);
         Object value = genotype.hasAnyAttribute(key) ? genotype.getAnyAttribute(key) : null;
 
-        if(meta.getType() == CATEGORICAL) {
+        if(meta.getType() == CATEGORICAL || (key.equals(VIPC_S) && hasSampleTree)) {
             addCategorical(meta, categoryLookup, key, value, insertFormat, i + 3);
         } else {
             value = getFormatValue(vc, genotype, meta, value, key);

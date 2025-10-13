@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static org.molgenis.vcf.report.repository.FormatRepository.VIPC_S;
 import static org.molgenis.vcf.report.utils.CategoryUtils.addCategorical;
 import static org.molgenis.vcf.report.utils.CategoryUtils.loadCategoriesMap;
 import static org.molgenis.vcf.report.utils.JsonUtils.toJson;
@@ -24,20 +25,20 @@ public class InfoRepository {
             Connection conn, VariantContext vc,
             List<String> infoColumns,
             FieldMetadatas fieldMetadatas,
-            int variantId
+            int variantId, boolean hasSampleTree
     ) throws SQLException {
         Map<FieldValueKey, Integer> categoryLookup = loadCategoriesMap(conn);
 
         try (PreparedStatement insertInfo = prepareInsertInfo(conn, infoColumns)) {
             insertInfo.setInt(1, variantId);
             for (int i = 0; i < infoColumns.size(); i++) {
-                insertInfoDataColumn(vc, infoColumns, fieldMetadatas, i, insertInfo, categoryLookup);
+                insertInfoDataColumn(vc, infoColumns, fieldMetadatas, i, insertInfo, categoryLookup, hasSampleTree);
             }
             insertInfo.executeUpdate();
         }
     }
 
-    private static void insertInfoDataColumn(VariantContext vc, List<String> infoColumns, FieldMetadatas fieldMetadatas, int i, PreparedStatement insertInfo, Map<FieldValueKey, Integer> categoryLookup) throws SQLException {
+    private static void insertInfoDataColumn(VariantContext vc, List<String> infoColumns, FieldMetadatas fieldMetadatas, int i, PreparedStatement insertInfo, Map<FieldValueKey, Integer> categoryLookup, boolean hasSampleTree) throws SQLException {
         final String key = infoColumns.get(i);
         final FieldMetadata meta = fieldMetadatas.getInfo().get(key);
         Object value = vc.getAttribute(key, null);
@@ -45,7 +46,7 @@ public class InfoRepository {
         if(meta.getType() == FLAG) {
             String flagVal = (value == null) ? "0" : "1";
             insertInfo.setString(i + 2, flagVal);
-        } else if(meta.getType() == CATEGORICAL) {
+        } else if(meta.getType() == CATEGORICAL || (VIPC_S.equals(key) && hasSampleTree)) {
             addCategorical(meta, categoryLookup, key, value, insertInfo, i + 2);
         } else if((meta.getNumberType() != FIXED || meta.getNumberCount() != 1) && value != null) {
             String separator = (meta.getSeparator() != null) ? meta.getSeparator().toString() : ",";

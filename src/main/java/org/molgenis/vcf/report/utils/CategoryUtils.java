@@ -47,7 +47,8 @@ public class CategoryUtils {
                 }
             } else {
                 List<Integer> categories = new ArrayList<>();
-                for(String singleValue : stringValue.split(meta.getSeparator().toString())) {
+                String separator = meta.getSeparator() != null ? meta.getSeparator().toString() : ",";
+                for(String singleValue : stringValue.split(separator)) {
                     categories.add(categoryLookup.get(new FieldValueKey(field, singleValue)));
                 }
                 stringValue = toJson(categories);

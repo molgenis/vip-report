@@ -97,10 +97,10 @@ public class DatabaseManager {
                 for (VariantContext vc : reader) {
                     int variantId = vcfRepo.insertVariant(conn, vc);
                     for (Map.Entry<String, List<String>> entry : nestedFields.entrySet()) {
-                        nestedRepo.insertNested(conn, entry.getKey(), vc, entry.getValue(), fieldMetadatas, variantId);
+                        nestedRepo.insertNested(conn, entry.getKey(), vc, entry.getValue(), fieldMetadatas, variantId, decisionTreePath != null);
                     }
-                    formatRepo.insertFormatData(conn, vc, formatColumns, variantId, fieldMetadatas, samples.getItems());
-                    infoRepo.insertInfoData(conn, vc, infoColumns, fieldMetadatas, variantId);
+                    formatRepo.insertFormatData(conn, vc, formatColumns, variantId, fieldMetadatas, samples.getItems(), sampleTreePath != null);
+                    infoRepo.insertInfoData(conn, vc, infoColumns, fieldMetadatas, variantId, sampleTreePath != null);
                 }
                 sampleRepo.insertSamples(conn, samples);
                 phenotypeRepo.insertPhenotypeData(conn, phenopackets, samples.getItems());

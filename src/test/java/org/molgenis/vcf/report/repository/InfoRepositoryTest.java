@@ -65,7 +65,7 @@ class InfoRepositoryTest {
         when(vc.getAttribute(eq("INT_ARRAY"), isNull())).thenReturn("1,2");
         when(vc.getAttribute(eq("SIMPLE"), isNull())).thenReturn("B");
 
-        infoRepository.insertInfoData(conn, vc, infoColumns, fieldMetadatas, 1);
+        infoRepository.insertInfoData(conn, vc, infoColumns, fieldMetadatas, 1, true);
 
         verify(conn).prepareStatement(anyString());
         verify(ps).setInt(1, 1);
