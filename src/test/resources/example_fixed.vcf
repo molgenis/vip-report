@@ -9,6 +9,7 @@
 ##INFO=<ID=AA,Number=1,Type=String,Description="Ancestral Allele">
 ##INFO=<ID=DB,Number=0,Type=Flag,Description="dbSNP membership, build 129">
 ##INFO=<ID=H2,Number=0,Type=Flag,Description="HapMap2 membership">
+##INFO=<ID=CSQ,Number=.,Type=String,Description="Consequence annotations from Ensembl VEP. Format: Allele|Consequence|IMPACT|SYMBOL|Gene|Feature_type|Feature|BIOTYPE|EXON|INTRON|HGVSc|HGVSp|cDNA_position|CDS_position|Protein_position|Amino_acids|Codons|Existing_variation|ALLELE_NUM|DISTANCE|STRAND|FLAGS|PICK|SYMBOL_SOURCE|HGNC_ID|REFSEQ_MATCH|REFSEQ_OFFSET|SOURCE|SIFT|PolyPhen|HGVS_OFFSET|CLIN_SIG|SOMATIC|PHENO|PUBMED|CHECK_REF|MOTIF_NAME|MOTIF_POS|HIGH_INF_POS|MOTIF_SCORE_CHANGE|TRANSCRIPTION_FACTORS|Grantham|SpliceAI_pred_DP_AG|SpliceAI_pred_DP_AL|SpliceAI_pred_DP_DG|SpliceAI_pred_DP_DL|SpliceAI_pred_DS_AG|SpliceAI_pred_DS_AL|SpliceAI_pred_DS_DG|SpliceAI_pred_DS_DL|SpliceAI_pred_SYMBOL|CAPICE_CL|CAPICE_SC|existing_InFrame_oORFs|existing_OutOfFrame_oORFs|existing_uORFs|five_prime_UTR_variant_annotation|five_prime_UTR_variant_consequence|HPO|IncompletePenetrance|InheritanceModesGene|VKGL|VKGL_CL|ASV_ACMG_class|ASV_AnnotSV_ranking_criteria|ASV_AnnotSV_ranking_score|phyloP|gnomAD|gnomAD_AF|gnomAD_HN|clinVar|clinVar_CLNSIG|clinVar_CLNSIGINCL|clinVar_CLNREVSTAT|VIPC|VIPP">
 ##FILTER=<ID=q10,Description="Quality below 10">
 ##FILTER=<ID=s50,Description="Less than 50% of samples have data">
 ##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">

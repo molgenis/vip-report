@@ -42,6 +42,7 @@ class DatabaseSchemaManagerTest {
         dbSchemaManager.createDatabase(settings, vcfReader.getFileHeader(), conn);
 
         verify(stmt).execute(VCF_TABLE_SQL);
+        verify(stmt).execute(NESTED_TABLE_SQL);
         verify(stmt).execute(CONFIG_TABLE_SQL);
         verify(stmt).execute(SAMPLE_PHENOTYPE_TABLE_SQL);
         verify(stmt).execute(PHENOTYPE_TABLE_SQL);
@@ -78,9 +79,10 @@ class DatabaseSchemaManagerTest {
         assertEquals("TEXT", DatabaseSchemaManager.toSqlType(ValueType.STRING, null));
     }
 
-    public static final String EXPECTED_INFO_TABLE = "CREATE TABLE info (id INTEGER PRIMARY KEY AUTOINCREMENT,variant_id INTEGER REFERENCES variant(id),AA TEXT,NS INTEGER,AF TEXT,H2 TEXT,DP INTEGER,DB TEXT);";
-    public static final String EXPECTED_FORMAT_TABLE = "CREATE TABLE format (id INTEGER PRIMARY KEY AUTOINCREMENT,sample_id INTEGER REFERENCES sample(id),variant_id INTEGER REFERENCES vcf(id),HQ TEXT,GQ INTEGER,DP INTEGER,GT TEXT,GT_type TEXT);";
-    public static final String EXPECTED_METADATA_TABLE = """
+    private static final String NESTED_TABLE_SQL = "CREATE TABLE variant_CSQ (id INTEGER PRIMARY KEY AUTOINCREMENT, variant_id INTEGER REFERENCES vcf(id), ALLELE_NUM INTEGER, SIFT TEXT, ASV_AnnotSV_ranking_criteria TEXT, PICK TEXT, SpliceAI_pred_DS_AG TEXT, CAPICE_CL TEXT, INTRON TEXT, Feature TEXT, SpliceAI_pred_DS_AL TEXT, gnomAD_AF TEXT, CLIN_SIG TEXT, Gene TEXT, HGNC_ID TEXT, FLAGS TEXT, five_prime_UTR_variant_consequence TEXT, phyloP TEXT, DISTANCE TEXT, SYMBOL_SOURCE TEXT, existing_uORFs TEXT, IncompletePenetrance TEXT, InheritanceModesGene TEXT, Consequence TEXT, MOTIF_NAME TEXT, existing_InFrame_oORFs TEXT, SOMATIC TEXT, VKGL_CL TEXT, IMPACT TEXT, MOTIF_POS TEXT, CDS_position TEXT, SYMBOL TEXT, Existing_variation TEXT, clinVar TEXT, clinVar_CLNSIG TEXT, Protein_position TEXT, SOURCE TEXT, HIGH_INF_POS TEXT, Codons TEXT, CAPICE_SC TEXT, REFSEQ_MATCH TEXT, SpliceAI_pred_DP_DG TEXT, HPO TEXT, PHENO TEXT, ASV_ACMG_class TEXT, SpliceAI_pred_DP_DL TEXT, VIPC TEXT, BIOTYPE TEXT, five_prime_UTR_variant_annotation TEXT, TRANSCRIPTION_FACTORS TEXT, clinVar_CLNSIGINCL TEXT, SpliceAI_pred_SYMBOL TEXT, ASV_AnnotSV_ranking_score TEXT, REFSEQ_OFFSET TEXT, VIPP TEXT, Grantham TEXT, Feature_type TEXT, MOTIF_SCORE_CHANGE TEXT, HGVS_OFFSET TEXT, PolyPhen TEXT, SpliceAI_pred_DP_AG TEXT, SpliceAI_pred_DS_DL TEXT, SpliceAI_pred_DS_DG TEXT, existing_OutOfFrame_oORFs TEXT, Amino_acids TEXT, HGVSp TEXT, gnomAD TEXT, STRAND TEXT, SpliceAI_pred_DP_AL TEXT, clinVar_CLNREVSTAT TEXT, gnomAD_HN TEXT, CHECK_REF TEXT, Allele TEXT, EXON TEXT, VKGL TEXT, cDNA_position TEXT, HGVSc TEXT, PUBMED TEXT);";
+    private static final String EXPECTED_INFO_TABLE = "CREATE TABLE info (id INTEGER PRIMARY KEY AUTOINCREMENT,variant_id INTEGER REFERENCES variant(id),AA TEXT,NS INTEGER,AF TEXT,H2 TEXT,DP INTEGER,DB TEXT);";
+    private static final String EXPECTED_FORMAT_TABLE = "CREATE TABLE format (id INTEGER PRIMARY KEY AUTOINCREMENT,sample_id INTEGER REFERENCES sample(id),variant_id INTEGER REFERENCES vcf(id),HQ TEXT,GQ INTEGER,DP INTEGER,GT TEXT,GT_type TEXT);";
+    private static final String EXPECTED_METADATA_TABLE = """
                CREATE TABLE metadata (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT,
@@ -103,7 +105,7 @@ class DatabaseSchemaManagerTest {
                    )
                );
             """;
-    public static final String EXPECTED_SAMPLE_TABLE = """
+    private static final String EXPECTED_SAMPLE_TABLE = """
                 CREATE TABLE sample (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     familyId TEXT,
