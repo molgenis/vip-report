@@ -665,7 +665,7 @@ class AppCommandLineOptionsTest {
         doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
         doReturn(false).when(cmd).hasOption(OPT_PHENOTYPES);
         doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
-        doReturn(false).when(cmd).hasOption(OPT_FORCE);
+        doReturn(true).when(cmd).hasOption(OPT_FORCE);
         doReturn(false).when(cmd).hasOption(OPT_PED);
         doReturn(false).when(cmd).hasOption(OPT_REFERENCE);
         doReturn(false).when(cmd).hasOption(OPT_GENES);
