@@ -27,12 +27,12 @@ class AppCommandLineOptionsTest {
 
     @Test
     void validateCommandLine() throws FileNotFoundException {
-        String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+        String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String pedFiles =
                 ResourceUtils.getFile("classpath:example.ped")
                         + ","
                         + ResourceUtils.getFile("classpath:example2.ped");
-        String outputFile = sharedTempDir.resolve("example.vcf.html").toString();
+        String outputFile = sharedTempDir.resolve("exampleCmdline.vcf.html").toString();
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
         CommandLine cmd = mock(CommandLine.class);
@@ -50,8 +50,8 @@ class AppCommandLineOptionsTest {
 
     @Test
     void validateCommandLineNoTemplateNoPed() throws FileNotFoundException {
-        String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
-        String outputFile = sharedTempDir.resolve("example.vcf.html").toString();
+        String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
+        String outputFile = sharedTempDir.resolve("exampleCmdline.vcf.html").toString();
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
         CommandLine cmd = mock(CommandLine.class);
@@ -109,7 +109,7 @@ class AppCommandLineOptionsTest {
 
     @Test
     void validateCommandLineOutputDir() throws FileNotFoundException {
-        String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+        String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String outputFile = sharedTempDir.toString();
 
         CommandLine cmd = mock(CommandLine.class);
@@ -166,10 +166,10 @@ class AppCommandLineOptionsTest {
 
     @Test
     void validateCommandLinePedNotExists() throws FileNotFoundException {
-        String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+        String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String pedFiles =
                 "notexists.ped" + "," + ResourceUtils.getFile("classpath:example2.ped");
-        String outputFile = sharedTempDir.resolve("example.vcf.html").toString();
+        String outputFile = sharedTempDir.resolve("exampleCmdline.vcf.html").toString();
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
         CommandLine cmd = mock(CommandLine.class);
@@ -191,10 +191,10 @@ class AppCommandLineOptionsTest {
 
     @Test
     void validateCommandLinePedDir() throws FileNotFoundException {
-        String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+        String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String pedFiles =
                 sharedTempDir.toString() + "," + ResourceUtils.getFile("classpath:example2.ped");
-        String outputFile = sharedTempDir.resolve("example.vcf.html").toString();
+        String outputFile = sharedTempDir.resolve("exampleCmdline.vcf.html").toString();
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
         CommandLine cmd = mock(CommandLine.class);
@@ -216,12 +216,12 @@ class AppCommandLineOptionsTest {
 
     @Test
     void validateCommandLinePedNoPed() throws FileNotFoundException {
-        String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+        String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String pedFiles =
-                ResourceUtils.getFile("classpath:example.vcf")
+                ResourceUtils.getFile("classpath:exampleCmdline.vcf")
                         + ","
                         + ResourceUtils.getFile("classpath:example2.ped");
-        String outputFile = sharedTempDir.resolve("example.vcf.html").toString();
+        String outputFile = sharedTempDir.resolve("exampleCmdline.vcf.html").toString();
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
         CommandLine cmd = mock(CommandLine.class);
@@ -242,12 +242,12 @@ class AppCommandLineOptionsTest {
 
     @Test
     void validateCommandLineTemplateNotExists() throws FileNotFoundException {
-        String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+        String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String pedFiles =
                 ResourceUtils.getFile("classpath:example.ped")
                         + ","
                         + ResourceUtils.getFile("classpath:example2.ped");
-        String outputFile = sharedTempDir.resolve("example.vcf.html").toString();
+        String outputFile = sharedTempDir.resolve("exampleCmdline.vcf.html").toString();
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
         CommandLine cmd = mock(CommandLine.class);
@@ -265,8 +265,8 @@ class AppCommandLineOptionsTest {
 
     @Test
     void validateCommandLineTemplateDir() throws FileNotFoundException {
-        String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
-        String outputFile = sharedTempDir.resolve("example.vcf.html").toString();
+        String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
+        String outputFile = sharedTempDir.resolve("exampleCmdline.vcf.html").toString();
         String templateFile = sharedTempDir.toString();
 
         CommandLine cmd = mock(CommandLine.class);
@@ -286,8 +286,8 @@ class AppCommandLineOptionsTest {
 
     @Test
     void validateCommandLineTemplateNoHtml() throws FileNotFoundException {
-        String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
-        String outputFile = sharedTempDir.resolve("example.vcf.html").toString();
+        String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
+        String outputFile = sharedTempDir.resolve("exampleCmdline.vcf.html").toString();
 
         CommandLine cmd = mock(CommandLine.class);
         doReturn(true).when(cmd).hasOption(OPT_FORCE);
@@ -304,7 +304,7 @@ class AppCommandLineOptionsTest {
 
     @Test
     void validateCommandLinePheno() throws FileNotFoundException {
-        String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+        String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String pheno = "HP:123456,HP:23456";
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
@@ -322,7 +322,7 @@ class AppCommandLineOptionsTest {
 
     @Test
     void validateCommandLinePhenoSample() throws FileNotFoundException {
-        String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+        String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String pheno = "sample1/HP:123456;HP:234567,sample2/HP:23456";
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
@@ -340,7 +340,7 @@ class AppCommandLineOptionsTest {
 
     @Test
     void validateCommandLinePhenoSampleInvalid() throws FileNotFoundException {
-        String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+        String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String pheno = "sample1/HP:123456/HP:234567";
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
@@ -360,7 +360,7 @@ class AppCommandLineOptionsTest {
 
     @Test
     void validateCommandLinePhenoNoCurie() throws FileNotFoundException {
-        String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+        String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String pheno = "HP123456";
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
@@ -380,7 +380,7 @@ class AppCommandLineOptionsTest {
 
     @Test
     void validateCommandLinePhenoMixed() throws FileNotFoundException {
-        String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+        String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String pheno = "sample/HP:123456,HP:234567";
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
@@ -399,7 +399,7 @@ class AppCommandLineOptionsTest {
 
     @Test
     void validateCommandLineMaxSamples() throws FileNotFoundException {
-        String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+        String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
         CommandLine cmd = mock(CommandLine.class);
@@ -417,7 +417,7 @@ class AppCommandLineOptionsTest {
 
     @Test
     void validateCommandLineMaxSamplesNoInt() throws FileNotFoundException {
-        String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+        String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
         CommandLine cmd = mock(CommandLine.class);
@@ -436,7 +436,7 @@ class AppCommandLineOptionsTest {
 
     @Test
     void validateGenes() throws FileNotFoundException {
-        String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+        String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String genesFile = ResourceUtils.getFile("classpath:example.genes.gff.gz").toString();
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
@@ -457,7 +457,7 @@ class AppCommandLineOptionsTest {
 
     @Test
     void validateReference() throws FileNotFoundException {
-        String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+        String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String referenceFile = ResourceUtils.getFile("classpath:example.fasta.gz").toString();
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
@@ -477,7 +477,7 @@ class AppCommandLineOptionsTest {
 
     @Test
     void validateReferenceNotExists() throws FileNotFoundException {
-        String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+        String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String referenceFile = "invalid.fasta.gz";
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
@@ -498,7 +498,7 @@ class AppCommandLineOptionsTest {
 
     @Test
     void validateReferenceInvalidFileType() throws FileNotFoundException {
-        String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+        String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String referenceFile = "invalid.fasta";
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
@@ -519,7 +519,7 @@ class AppCommandLineOptionsTest {
 
     @Test
     void validateReferenceNoIndex() throws FileNotFoundException {
-        String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+        String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String referenceFile = ResourceUtils.getFile("classpath:example_no_index.fasta.gz").toString();
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
@@ -539,7 +539,7 @@ class AppCommandLineOptionsTest {
     }
 
     private CommandLine validateBamInit(String bamPathString) throws FileNotFoundException {
-        String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+        String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
         String referenceFile = ResourceUtils.getFile("classpath:example.fasta.gz").toString();
 
@@ -561,7 +561,7 @@ class AppCommandLineOptionsTest {
     }
 
     private CommandLine validateBamInitMissingReference(String bamPathString) throws FileNotFoundException {
-        String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+        String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
         CommandLine cmd = mock(CommandLine.class);
@@ -615,7 +615,7 @@ class AppCommandLineOptionsTest {
     }
 
     private CommandLine validateTreeInit(String treePathString) throws FileNotFoundException {
-        String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+        String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
         CommandLine cmd = mock(CommandLine.class);
@@ -644,7 +644,7 @@ class AppCommandLineOptionsTest {
 
     @Test
     void validateTreeInvalidFileTypeValue() throws FileNotFoundException {
-        String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+        String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         CommandLine cmd = validateTreeInit(inputFile);
         assertThrows(
                 IllegalArgumentException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
@@ -658,7 +658,7 @@ class AppCommandLineOptionsTest {
     }
 
     private CommandLine validateTemplateConfigInit(String templateConfigPathString) throws FileNotFoundException {
-        String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+        String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
         CommandLine cmd = mock(CommandLine.class);
@@ -688,7 +688,7 @@ class AppCommandLineOptionsTest {
 
     @Test
     void validateTemplateConfigInvalidFileTypeValue() throws FileNotFoundException {
-        String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+        String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         CommandLine cmd = validateTemplateConfigInit(inputFile);
         assertThrows(
                 IllegalArgumentException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
