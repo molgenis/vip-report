@@ -32,7 +32,7 @@ class NestedRepositoryTest {
         when(conn.prepareStatement(anyString())).thenReturn(ps);
         when(conn.createStatement()).thenReturn(ps);
         ResultSet rs = mock(ResultSet.class);
-        when(rs.getString("field")).thenReturn("Consequence").thenReturn("Consequence");
+        when(rs.getString("field")).thenReturn("INFO/CSQ/Consequence").thenReturn("INFO/CSQ/Consequence");
         when(rs.getString("value")).thenReturn("synonymous_variant").thenReturn("missense_variant");
         when(rs.getInt("id")).thenReturn(1).thenReturn(2);
         when(rs.next()).thenReturn(true).thenReturn(true).thenReturn(false);
@@ -65,7 +65,7 @@ class NestedRepositoryTest {
         nestedFieldsMap.put("Consequence", consMeta);
         when(parentMeta.getNestedFields()).thenReturn(nestedFieldsMap);
 
-        nestedRepository.insertNested(conn, fieldName, vc, matchingNestedFields, fieldMetadatas, 1);
+        nestedRepository.insertNested(conn, fieldName, vc, matchingNestedFields, fieldMetadatas, 1, true);
 
         verify(conn).prepareStatement(anyString());
         verify(ps).setInt(1, 1);

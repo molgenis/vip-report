@@ -3,6 +3,7 @@ package org.molgenis.vcf.report.repository;
 import htsjdk.variant.variantcontext.Allele;
 import htsjdk.variant.variantcontext.Genotype;
 import htsjdk.variant.variantcontext.VariantContext;
+import org.molgenis.vcf.utils.metadata.FieldType;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadata;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadatas;
 import org.molgenis.vcf.utils.sample.model.Sample;
@@ -15,6 +16,7 @@ import java.util.Map;
 import static org.molgenis.vcf.report.utils.CategoryUtils.addCategorical;
 import static org.molgenis.vcf.report.utils.CategoryUtils.loadCategoriesMap;
 import static org.molgenis.vcf.report.utils.JsonUtils.toJson;
+import static org.molgenis.vcf.utils.metadata.FieldType.FORMAT;
 import static org.molgenis.vcf.utils.metadata.ValueCount.Type.FIXED;
 import static org.molgenis.vcf.utils.metadata.ValueType.CATEGORICAL;
 
@@ -71,7 +73,7 @@ public class FormatRepository {
         Object value = genotype.hasAnyAttribute(key) ? genotype.getAnyAttribute(key) : null;
 
         if(meta.getType() == CATEGORICAL || (key.equals(VIPC_S) && hasSampleTree)) {
-            addCategorical(meta, categoryLookup, key, value, insertFormat, i + 3);
+            addCategorical(FORMAT, meta, categoryLookup, key, value, insertFormat, i + 3);
         } else {
             value = getFormatValue(vc, genotype, meta, value, key);
             String dbValue;

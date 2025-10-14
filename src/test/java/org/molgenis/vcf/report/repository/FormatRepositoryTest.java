@@ -86,7 +86,7 @@ class FormatRepositoryTest {
         when(genotype1.getAnyAttribute(anyString())).thenReturn("testValue");
         when(genotype2.hasAnyAttribute(anyString())).thenReturn(false);
 
-        formatRepository.insertFormatData(conn, vc, formatColumns, 1, fieldMetadatas, samples);
+        formatRepository.insertFormatData(conn, vc, formatColumns, 1, fieldMetadatas, samples, true);
 
         verify(ps).setInt(1, 1);
         verify(ps).setInt(2, 2);

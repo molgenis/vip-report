@@ -71,8 +71,8 @@ class DatabaseManagerTest {
                 decisionTree, sampleTree, reportMetadata, config, phenopackets);
 
         verify(vcfRepo).insertVariant(eq(conn), any());
-        verify(infoRepo).insertInfoData(eq(conn), any(), eq(List.of()), eq(fieldMetadatas), eq(0), true);
-        verify(formatRepo).insertFormatData(eq(conn), any(), eq(List.of()), eq(0), eq(fieldMetadatas), eq(sampleList), true);
+        verify(infoRepo).insertInfoData(eq(conn), any(), eq(List.of()), eq(fieldMetadatas), eq(0), eq(true));
+        verify(formatRepo).insertFormatData(eq(conn), any(), eq(List.of()), eq(0), eq(fieldMetadatas), eq(sampleList), eq(true));
         verify(phenotypeRepo).insertPhenotypeData(conn, phenopackets, sampleList);
         verify(metadataRepo).insertMetadata(conn, fieldMetadatas,  decisionTree, sampleTree, phenopackets);
         verify(configRepo).insertConfigData(conn, Map.of());

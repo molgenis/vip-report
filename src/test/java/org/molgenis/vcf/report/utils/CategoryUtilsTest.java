@@ -9,6 +9,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.molgenis.vcf.utils.metadata.FieldType.INFO;
 
 class CategoryUtilsTest {
 
@@ -37,11 +38,11 @@ class CategoryUtilsTest {
         when(meta.getNumberCount()).thenReturn(1);
 
         Map<FieldValueKey, Integer> lookup = new HashMap<>();
-        lookup.put(new FieldValueKey("Gene", "TEST1"), 5);
+        lookup.put(new FieldValueKey("INFO/Gene", "TEST1"), 5);
 
         PreparedStatement ps = mock(PreparedStatement.class);
 
-        CategoryUtils.addCategorical(meta, lookup, "Gene", "TEST1", ps, 2);
+        CategoryUtils.addCategorical(INFO, meta, lookup, "Gene", "TEST1", ps, 2);
 
         verify(ps).setInt(2, 5);
     }
@@ -53,12 +54,12 @@ class CategoryUtilsTest {
         when(meta.getSeparator()).thenReturn(',');
 
         Map<FieldValueKey, Integer> lookup = new HashMap<>();
-        lookup.put(new FieldValueKey("Gene", "TEST1"), 1);
-        lookup.put(new FieldValueKey("Gene", "TEST2"), 2);
+        lookup.put(new FieldValueKey("INFO/Gene", "TEST1"), 1);
+        lookup.put(new FieldValueKey("INFO/Gene", "TEST2"), 2);
 
         PreparedStatement ps = mock(PreparedStatement.class);
 
-        CategoryUtils.addCategorical(meta, lookup, "Gene", "TEST1,TEST2", ps, 3);
+        CategoryUtils.addCategorical(INFO, meta, lookup, "Gene", "TEST1,TEST2", ps, 3);
 
         verify(ps).setString(3, "[1,2]");
     }
@@ -68,7 +69,7 @@ class CategoryUtilsTest {
         FieldMetadata meta = mock(FieldMetadata.class);
         PreparedStatement ps = mock(PreparedStatement.class);
 
-        CategoryUtils.addCategorical(meta, Collections.emptyMap(), "Gene", null, ps, 4);
+        CategoryUtils.addCategorical(INFO, meta, Collections.emptyMap(), "Gene", null, ps, 4);
 
         verify(ps).setString(4, null);
     }

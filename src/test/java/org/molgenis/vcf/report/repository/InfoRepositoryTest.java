@@ -31,7 +31,7 @@ class InfoRepositoryTest {
         when(conn.prepareStatement(anyString())).thenReturn(ps);
         when(conn.createStatement()).thenReturn(ps);
         ResultSet rs = mock(ResultSet.class);
-        when(rs.getString("field")).thenReturn("CAT");
+        when(rs.getString("field")).thenReturn("INFO/CAT");
         when(rs.getString("value")).thenReturn("A");
         when(rs.getInt("id")).thenReturn(1);
         when(rs.next()).thenReturn(true).thenReturn(false);

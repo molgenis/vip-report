@@ -17,13 +17,14 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
 
+import static org.molgenis.vcf.report.utils.CategoryUtils.getKey;
 import static org.molgenis.vcf.report.utils.JsonUtils.collectNodes;
 import static org.molgenis.vcf.report.utils.JsonUtils.toJson;
 import static org.molgenis.vcf.utils.metadata.ValueType.CATEGORICAL;
 
 
 @Component
- class MetadataRepository {
+class MetadataRepository {
 
     public void insertMetadata(
             Connection conn, FieldMetadatas fieldMetadatas,
@@ -50,8 +51,8 @@ import static org.molgenis.vcf.utils.metadata.ValueType.CATEGORICAL;
                 """;
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             Map<String, Map<String, ValueDescription>> customCategories = getCustomCategories(decisionTreePath, sampleTreePath, phenopackets);
-            insertForFields(conn, fieldMetadatas.getFormat().entrySet(), ps, FieldType.FORMAT, customCategories);
-            insertForFields(conn, fieldMetadatas.getInfo().entrySet(), ps, FieldType.INFO, customCategories);
+            insertFields(conn, fieldMetadatas.getFormat().entrySet(), ps, FieldType.FORMAT, customCategories);
+            insertFields(conn, fieldMetadatas.getInfo().entrySet(), ps, FieldType.INFO, customCategories);
             ps.executeBatch();
         }
     }
@@ -68,7 +69,7 @@ import static org.molgenis.vcf.utils.metadata.ValueType.CATEGORICAL;
         return customCategories;
     }
 
-    private void insertForFields(
+    private void insertFields(
             Connection conn,
             Set<? extends Map.Entry<String, FieldMetadata>> entries,
             PreparedStatement ps,
@@ -104,7 +105,8 @@ import static org.molgenis.vcf.utils.metadata.ValueType.CATEGORICAL;
         String fieldName = metadataEntry.getKey();
         Map<String, ValueDescription> categories = getCategories(fieldName, meta, customCategories);
 
-        insertCategoriesBatch(conn, fieldName, categories);
+        String key = getKey(type, fieldName, parent);
+        insertCategoriesBatch(conn, key, categories);
 
         ps.setString(1, fieldName);
         ps.setString(2, type.name());

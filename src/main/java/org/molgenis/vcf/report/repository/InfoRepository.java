@@ -14,6 +14,7 @@ import static org.molgenis.vcf.report.repository.FormatRepository.VIPC_S;
 import static org.molgenis.vcf.report.utils.CategoryUtils.addCategorical;
 import static org.molgenis.vcf.report.utils.CategoryUtils.loadCategoriesMap;
 import static org.molgenis.vcf.report.utils.JsonUtils.toJson;
+import static org.molgenis.vcf.utils.metadata.FieldType.INFO;
 import static org.molgenis.vcf.utils.metadata.ValueCount.Type.FIXED;
 import static org.molgenis.vcf.utils.metadata.ValueType.CATEGORICAL;
 import static org.molgenis.vcf.utils.metadata.ValueType.FLAG;
@@ -47,7 +48,7 @@ public class InfoRepository {
             String flagVal = (value == null) ? "0" : "1";
             insertInfo.setString(i + 2, flagVal);
         } else if(meta.getType() == CATEGORICAL || (VIPC_S.equals(key) && hasSampleTree)) {
-            addCategorical(meta, categoryLookup, key, value, insertInfo, i + 2);
+            addCategorical(INFO, meta, categoryLookup, key, value, insertInfo, i + 2);
         } else if((meta.getNumberType() != FIXED || meta.getNumberCount() != 1) && value != null) {
             String separator = (meta.getSeparator() != null) ? meta.getSeparator().toString() : ",";
             Object[] arr = (value instanceof ArrayList)
