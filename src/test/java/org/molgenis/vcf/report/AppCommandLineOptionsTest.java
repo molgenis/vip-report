@@ -499,7 +499,7 @@ class AppCommandLineOptionsTest {
     @Test
     void validateReferenceInvalidFileType() throws FileNotFoundException {
         String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
-        String referenceFile = "invalid.fasta";
+        String referenceFile = ResourceUtils.getFile("classpath:example.vcf").toString();
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
         CommandLine cmd = mock(CommandLine.class);
