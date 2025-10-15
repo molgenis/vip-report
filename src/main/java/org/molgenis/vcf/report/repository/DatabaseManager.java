@@ -132,9 +132,8 @@ public class DatabaseManager {
         if (samples.getItems().isEmpty()) {
             headerLine = fixedCols;
         } else {
-            headerLine = fixedCols + "\t" +
-                    String.join("\t", samples.getItems().stream()
-                            .map(sample -> sample.getPerson().getIndividualId()).toList());
+            headerLine = fixedCols + "\t" + String.join("\t", samples.getItems().stream().sorted(Comparator.comparingInt(Sample::getIndex))
+                    .map(sample -> sample.getPerson().getIndividualId()).toList());
         }
         return headerLine;
     }
