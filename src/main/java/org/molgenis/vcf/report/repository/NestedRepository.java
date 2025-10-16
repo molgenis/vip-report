@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import java.sql.*;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import static org.molgenis.vcf.report.repository.DatabaseManager.VARIANT_ID;
@@ -21,7 +22,7 @@ import static org.molgenis.vcf.utils.metadata.ValueType.CATEGORICAL;
 
 @Component
 public class NestedRepository {
-    public static final String VIPC = "VIPC";
+    public static final Set<String> CUSTOM_CATEGORICALS = Set.of("VIPC", "HPO");
 
     public void insertNested(Connection conn, String fieldName, VariantContext vc, List<String> matchingNestedFields,
                              FieldMetadatas fieldMetadatas, int variantId, boolean hasDecisionTree) throws SQLException {
@@ -53,7 +54,7 @@ public class NestedRepository {
 
             if(val == null || val.isEmpty()) {
                 insertNestedStmt.setString(stmtIdx, null);
-            } else if(meta.getType() == CATEGORICAL || VIPC.equals(nestedField) && hasDecisionTree) {
+            } else if(meta.getType() == CATEGORICAL || CUSTOM_CATEGORICALS.contains(nestedField) && hasDecisionTree) {
                 addCategorical(INFO, meta, categoryLookup, nestedField, parent, val, insertNestedStmt, stmtIdx);
             } else if(meta.getSeparator() != null) {
                 String jsonVal = writeJsonListValue(val, meta.getSeparator().toString());
