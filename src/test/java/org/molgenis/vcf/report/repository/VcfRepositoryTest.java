@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
+import java.util.Map;
 
 @ExtendWith(MockitoExtension.class)
 class VcfRepositoryTest {
@@ -47,10 +48,11 @@ class VcfRepositoryTest {
         when(vc.filtersWereApplied()).thenReturn(true);
         when(vc.isNotFiltered()).thenReturn(true);
 
-        int result = repo.insertVariant(conn, vc);
+        Map<Object, Integer> contigIds = Map.of("chr1", 0);
+        int result = repo.insertVariant(conn, vc, contigIds);
         assertEquals(42, result);
 
-        verify(stmt).setString(1, "chr1");
+        verify(stmt).setInt(1, 0);
         verify(stmt).setInt(2, 12345);
         verify(stmt).setString(3, "[\"rs1\"]");
         verify(stmt).setString(4, "A");

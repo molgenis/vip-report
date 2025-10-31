@@ -45,8 +45,8 @@ public class InfoRepository {
         Object value = vc.getAttribute(key, null);
 
         if(meta.getType() == FLAG) {
-            String flagVal = (value == null) ? "0" : "1";
-            insertInfo.setString(i + 2, flagVal);
+            int flagVal = (value == null) ? 0 : 1;
+            insertInfo.setInt(i + 2, flagVal);
         } else if(meta.getType() == CATEGORICAL || (VIPC_S.equals(key) && hasSampleTree)) {
             addCategorical(INFO, meta, categoryLookup, key, value, insertInfo, i + 2);
         } else if((meta.getNumberType() != FIXED || meta.getNumberCount() != 1) && value != null) {

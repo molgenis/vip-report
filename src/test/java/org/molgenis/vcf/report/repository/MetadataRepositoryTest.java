@@ -4,6 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.molgenis.vcf.utils.metadata.ValueCount;
+import org.molgenis.vcf.utils.metadata.ValueType;
 import org.molgenis.vcf.utils.model.ValueDescription;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadata;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadatas;
@@ -17,29 +19,34 @@ import java.sql.SQLException;
 import java.util.*;
 
 import static org.mockito.Mockito.*;
+import static org.molgenis.vcf.report.repository.MetadataRepository.INSERT_METADATA_SQL;
 
 @ExtendWith(MockitoExtension.class)
 class MetadataRepositoryTest {
-
     private Connection conn;
-    private PreparedStatement preparedMetadata;
-    private PreparedStatement preparedCategories;
     private MetadataRepository repository;
 
     @BeforeEach
-    void setUp() throws SQLException {
+    void setUp() {
         conn = mock(Connection.class);
-        preparedMetadata = mock(PreparedStatement.class);
-        preparedCategories = mock(PreparedStatement.class);
-        when(conn.prepareStatement(anyString())).thenReturn(preparedMetadata, preparedCategories);
         repository = new MetadataRepository();
     }
 
     @Test
     void testInsertMetadata() throws Exception {
+        PreparedStatement preparedMetadata = mock(PreparedStatement.class);
+        PreparedStatement preparedNumberType = mock(PreparedStatement.class);
+        PreparedStatement preparedFieldTypes = mock(PreparedStatement.class);
+        PreparedStatement preparedValueTypes = mock(PreparedStatement.class);
+
+        when(conn.prepareStatement("INSERT INTO numberType (id, value) VALUES (?, ?)")).thenReturn(preparedNumberType);
+        when(conn.prepareStatement("INSERT INTO fieldType (id, value) VALUES (?, ?)")).thenReturn(preparedFieldTypes);
+        when(conn.prepareStatement("INSERT INTO valueType (id, value) VALUES (?, ?)")).thenReturn(preparedValueTypes);
+        when(conn.prepareStatement(INSERT_METADATA_SQL)).thenReturn(preparedMetadata);
+
         FieldMetadata fieldMeta = mock(FieldMetadata.class, RETURNS_DEEP_STUBS);
-        when(fieldMeta.getType().name()).thenReturn("CATEGORICAL");
-        when(fieldMeta.getNumberType().name()).thenReturn("FIXED");
+        when(fieldMeta.getType()).thenReturn(ValueType.CATEGORICAL);
+        when(fieldMeta.getNumberType()).thenReturn(ValueCount.Type.FIXED);
         when(fieldMeta.isRequired()).thenReturn(true);
         when(fieldMeta.getSeparator()).thenReturn(null);
         when(fieldMeta.getNumberCount()).thenReturn(1);
@@ -47,7 +54,7 @@ class MetadataRepositoryTest {
         when(fieldMeta.getDescription()).thenReturn("Test Desc");
         when(fieldMeta.getCategories()).thenReturn(Map.of("U1", new ValueDescription("U1", "Desc")));
 
-        Map<String, FieldMetadata> formatFields = Map.of("U1", fieldMeta);
+        Map<String, FieldMetadata> formatFields = Map.of("VIPC_S", fieldMeta);
         Map<String, FieldMetadata> infoFields = Map.of();
 
         FieldMetadatas metadatas = mock(FieldMetadatas.class);
@@ -62,43 +69,29 @@ class MetadataRepositoryTest {
 
         doNothing().when(preparedMetadata).addBatch();
         doReturn(new int[]{1}).when(preparedMetadata).executeBatch();
-        doNothing().when(preparedCategories).addBatch();
-        doReturn(new int[]{1}).when(preparedCategories).executeBatch();
+        doReturn(new int[]{1}).when(preparedNumberType).executeBatch();
 
         repository.insertMetadata(conn, metadatas, decisionTreePath, sampleTreePath, phenopackets);
 
-        verify(conn).prepareStatement("""
-            INSERT INTO metadata (
-                name,
-                fieldType,
-                valueType,
-                numberType,
-                numberCount,
-                required,
-                separator,
-                categories,
-                label,
-                description,
-                parent,
-                nested,
-                nullValue
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """);
+        verify(conn).prepareStatement(INSERT_METADATA_SQL);
         verify(preparedMetadata).addBatch();
         verify(preparedMetadata).executeBatch();
     }
 
     @Test
     void testInsertHeaderLine() throws Exception {
+        PreparedStatement preparedStmt = mock(PreparedStatement.class);
+        when(conn.prepareStatement("INSERT INTO header (line) VALUES (?)")).thenReturn(preparedStmt);
+
         List<String> lines = List.of("FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">");
         String header = "fileformat=VCFv4.2";
-        doNothing().when(preparedMetadata).addBatch();
-        doReturn(new int[]{1}).when(preparedMetadata).executeBatch();
+        doNothing().when(preparedStmt).addBatch();
+        doReturn(new int[]{1}).when(preparedStmt).executeBatch();
 
         repository.insertHeaderLine(conn, lines, header);
 
         verify(conn).prepareStatement(anyString());
-        verify(preparedMetadata, times(2)).addBatch();
-        verify(preparedMetadata).executeBatch();
+        verify(preparedStmt, times(2)).addBatch();
+        verify(preparedStmt).executeBatch();
     }
 }

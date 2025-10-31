@@ -14,14 +14,15 @@ public class VcfRepository {
 
     public static final String MISSING = ".";
 
-    public int insertVariant(Connection conn, VariantContext vc) throws SQLException {
+    public int insertVariant(Connection conn, VariantContext vc, Map<Object, Integer> contigIds) throws SQLException {
+
         try (
                 PreparedStatement insertVCF = conn.prepareStatement(
                         "INSERT INTO vcf (chrom, pos, id_vcf, ref, alt, qual, filter) VALUES (?, ?, ?, ?, ?, ?, ?)",
                         Statement.RETURN_GENERATED_KEYS
                 )
         ) {
-            insertVCF.setString(1, vc.getContig());
+            insertVCF.setInt(1, contigIds.get(vc.getContig()));
             insertVCF.setInt(2, vc.getStart());
             insertVCF.setString(3, writeJsonListValue(vc.getID()));
             insertVCF.setString(4, vc.getReference().getDisplayString());

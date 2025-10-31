@@ -2,6 +2,8 @@ package org.molgenis.vcf.report.repository;
 
 import lombok.NonNull;
 import org.molgenis.vcf.utils.metadata.FieldType;
+import org.molgenis.vcf.utils.metadata.ValueCount;
+import org.molgenis.vcf.utils.metadata.ValueType;
 import org.molgenis.vcf.utils.model.ValueDescription;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadata;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadatas;
@@ -17,22 +19,16 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
 
+import static org.molgenis.vcf.report.repository.SqlUtils.insertLookupValues;
 import static org.molgenis.vcf.report.utils.CategoryUtils.getKey;
 import static org.molgenis.vcf.report.utils.JsonUtils.collectNodes;
 import static org.molgenis.vcf.report.utils.JsonUtils.toJson;
 import static org.molgenis.vcf.utils.metadata.ValueType.CATEGORICAL;
 
-
 @Component
 class MetadataRepository {
 
-    public void insertMetadata(
-            Connection conn, FieldMetadatas fieldMetadatas,
-            Path decisionTreePath,
-            Path sampleTreePath,
-            @NonNull List<Phenopacket> phenopackets
-    ) throws SQLException {
-        String sql = """
+    static final String INSERT_METADATA_SQL = """
                 INSERT INTO metadata (
                     name,
                     fieldType,
@@ -49,10 +45,29 @@ class MetadataRepository {
                     nullValue
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+    static final String INSERT_CATEGORIES_SQL = """
+                    INSERT INTO categories (
+                        field,
+                        value,
+                        label,
+                        description
+                    ) VALUES (?, ?, ?, ?)
+                    """;
+
+    public void insertMetadata(
+            Connection conn, FieldMetadatas fieldMetadatas,
+            Path decisionTreePath,
+            Path sampleTreePath,
+            @NonNull List<Phenopacket> phenopackets
+    ) throws SQLException {
+        Map<Object, Integer> numberTypeIds = insertLookupValues(conn, "numberType", List.of(ValueCount.Type.values()));
+        Map<Object, Integer> valueTypeIds = insertLookupValues(conn, "valueType", List.of(ValueType.values()));
+        Map<Object, Integer> fieldTypeIds = insertLookupValues(conn, "fieldType", List.of(FieldType.values()));
+
+        try (PreparedStatement ps = conn.prepareStatement(INSERT_METADATA_SQL)) {
             Map<String, Map<String, ValueDescription>> customCategories = getCustomCategories(decisionTreePath, sampleTreePath, phenopackets);
-            insertFields(conn, fieldMetadatas.getFormat().entrySet(), ps, FieldType.FORMAT, customCategories);
-            insertFields(conn, fieldMetadatas.getInfo().entrySet(), ps, FieldType.INFO, customCategories);
+            insertFields(conn, fieldMetadatas.getFormat().entrySet(), ps, FieldType.FORMAT, customCategories, numberTypeIds, valueTypeIds, fieldTypeIds);
+            insertFields(conn, fieldMetadatas.getInfo().entrySet(), ps, FieldType.INFO, customCategories, numberTypeIds, valueTypeIds, fieldTypeIds);
             ps.executeBatch();
         }
     }
@@ -74,10 +89,10 @@ class MetadataRepository {
             Set<? extends Map.Entry<String, FieldMetadata>> entries,
             PreparedStatement ps,
             FieldType fieldType,
-            Map<String, Map<String, ValueDescription>> customCategories
-    ) throws SQLException {
+            Map<String, Map<String, ValueDescription>> customCategories,
+            Map<Object, Integer> numberTypeIds, Map<Object, Integer> valueTypeIds, Map<Object, Integer> fieldTypeIds) throws SQLException {
         for (Map.Entry<String, ? extends FieldMetadata> entry : entries) {
-            addMetadata(conn, entry, ps, fieldType, null, customCategories);
+            addMetadata(conn, entry, ps, fieldType, null, customCategories, numberTypeIds, valueTypeIds, fieldTypeIds);
         }
     }
 
@@ -99,8 +114,8 @@ class MetadataRepository {
             PreparedStatement ps,
             FieldType type,
             String parent,
-            Map<String, Map<String, ValueDescription>> customCategories
-    ) throws SQLException {
+            Map<String, Map<String, ValueDescription>> customCategories,
+            Map<Object, Integer> numberTypeIds, Map<Object, Integer> valueTypeIds, Map<Object, Integer> fieldTypeIds) throws SQLException {
         FieldMetadata meta = metadataEntry.getValue();
         String fieldName = metadataEntry.getKey();
         Map<String, ValueDescription> categories = getCategories(fieldName, meta, customCategories);
@@ -109,9 +124,9 @@ class MetadataRepository {
         insertCategoriesBatch(conn, key, categories);
 
         ps.setString(1, fieldName);
-        ps.setString(2, type.name());
-        ps.setString(3, customCategories.containsKey(fieldName) ? CATEGORICAL.name() : meta.getType().name());
-        ps.setString(4, meta.getNumberType().name());
+        ps.setInt(2, fieldTypeIds.get(type));
+        ps.setInt(3, customCategories.containsKey(fieldName) ? valueTypeIds.get(CATEGORICAL) : valueTypeIds.get(meta.getType()));
+        ps.setInt(4, numberTypeIds.get(meta.getNumberType()));
         ps.setObject(5, meta.getNumberCount());
         ps.setInt(6, meta.isRequired() ? 1 : 0);
         ps.setString(7, meta.getSeparator() != null ? meta.getSeparator().toString() : null);
@@ -126,22 +141,14 @@ class MetadataRepository {
 
         if (nestedFlag) {
             for (Map.Entry<String, NestedFieldMetadata> nestedEntry : meta.getNestedFields().entrySet()) {
-                addMetadata(conn, nestedEntry, ps, type, fieldName, customCategories);
+                addMetadata(conn, nestedEntry, ps, type, fieldName, customCategories, numberTypeIds, valueTypeIds, fieldTypeIds);
             }
         }
     }
 
     private void insertCategoriesBatch(Connection conn, String fieldName, Map<String, ValueDescription> categories) throws SQLException {
         if (categories != null && !categories.isEmpty()) {
-            String sql = """
-                    INSERT INTO categories (
-                        field,
-                        value,
-                        label,
-                        description
-                    ) VALUES (?, ?, ?, ?)
-                    """;
-            try (PreparedStatement categoryPs = conn.prepareStatement(sql)) {
+            try (PreparedStatement categoryPs = conn.prepareStatement(INSERT_CATEGORIES_SQL)) {
                 categoryPs.setString(1, fieldName);
                 for (Map.Entry<String, ValueDescription> entry : categories.entrySet()) {
                     categoryPs.setString(2, entry.getKey());

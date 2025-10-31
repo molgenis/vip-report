@@ -69,8 +69,7 @@ class InfoRepositoryTest {
 
         verify(conn).prepareStatement(anyString());
         verify(ps).setInt(1, 1);
-        verify(ps).setInt(1, 1);
-        verify(ps).setString(2, "0");
+        verify(ps).setInt(2, 0);
         verify(ps).setString(3, "[1]");
         verify(ps).setString(4, "[\"1\",\"2\"]");
         verify(ps).setString(5, "[\"B\"]");

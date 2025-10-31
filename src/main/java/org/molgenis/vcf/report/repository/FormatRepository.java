@@ -3,7 +3,6 @@ package org.molgenis.vcf.report.repository;
 import htsjdk.variant.variantcontext.Allele;
 import htsjdk.variant.variantcontext.Genotype;
 import htsjdk.variant.variantcontext.VariantContext;
-import org.molgenis.vcf.utils.metadata.FieldType;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadata;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadatas;
 import org.molgenis.vcf.utils.sample.model.Sample;
@@ -19,7 +18,6 @@ import static org.molgenis.vcf.report.utils.JsonUtils.toJson;
 import static org.molgenis.vcf.utils.metadata.FieldType.FORMAT;
 import static org.molgenis.vcf.utils.metadata.ValueCount.Type.FIXED;
 import static org.molgenis.vcf.utils.metadata.ValueType.CATEGORICAL;
-
 
 @Component
 public class FormatRepository {
@@ -48,8 +46,8 @@ public class FormatRepository {
             for (Genotype genotype : vc.getGenotypes()) {
                 Sample sample = samples.stream().filter(s -> s.getPerson().getIndividualId()
                         .equals(genotype.getSampleName())).toList().getFirst();
-                int sampleId = sample.getIndex();
-                insertFormat.setInt(2, sampleId);
+                int sampleIndex = sample.getIndex();
+                insertFormat.setInt(2, sampleIndex);
                 for (int i = 0; i < formatColumns.size(); i++) {
                     if(formatColumns.get(i).equals(GT_TYPE)){
                         insertFormat.setString(i + 3, genotype.getType().toString());
@@ -99,7 +97,7 @@ public class FormatRepository {
 
 
     private PreparedStatement prepareInsertFormat(Connection conn, List<String> columns) throws SQLException {
-        StringBuilder sql = new StringBuilder("INSERT INTO format (variant_id, sample_id");
+        StringBuilder sql = new StringBuilder("INSERT INTO format (variant_id, sample_index");
         for (String column : columns) {
             sql.append(", ").append(column);
         }

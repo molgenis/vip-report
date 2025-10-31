@@ -6,15 +6,12 @@ import org.molgenis.vcf.utils.metadata.*;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadata;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadatas;
 import org.molgenis.vcf.utils.model.metadata.NestedFieldMetadata;
-import org.molgenis.vcf.utils.sample.model.AffectedStatus;
-import org.molgenis.vcf.utils.sample.model.Sex;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 public class DatabaseSchemaManager {
@@ -25,30 +22,38 @@ public class DatabaseSchemaManager {
 
     static final String VCF_TABLE_SQL = """
                 CREATE TABLE vcf (
+                  id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  chrom INTEGER NOT NULL,
+                  pos INTEGER NOT NULL,
+                  id_vcf TEXT,
+                  ref TEXT NOT NULL,
+                  alt TEXT NOT NULL,
+                  qual REAL,
+                  filter INTEGER,
+                  FOREIGN KEY (chrom) REFERENCES contig(id)
+                );
+            """;
+
+    static final String CONTIG_TABLE_SQL = """
+                CREATE TABLE contig (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    chrom TEXT NOT NULL,
-                    pos INTEGER NOT NULL,
-                    id_vcf TEXT,
-                    ref TEXT NOT NULL,
-                    alt TEXT,
-                    qual REAL,
-                    filter TEXT
+                    value TEXT NOT NULL
                 );
             """;
 
     static final String HEADER_TABLE_SQL = """
                 CREATE TABLE header (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    line TEXT
+                    line TEXT NOT NULL
                 );
             """;
 
     static final String CATEGORIES_TABLE_SQL = """
                 CREATE TABLE categories (
                     id integer PRIMARY KEY AUTOINCREMENT,
-                    field TEXT,
-                    value TEXT,
-                    label TEXT,
+                    field TEXT NOT NULL,
+                    value TEXT NOT NULL,
+                    label TEXT NOT NULL,
                     description TEXT
                 );
             """;
@@ -56,21 +61,24 @@ public class DatabaseSchemaManager {
     static final String CONFIG_TABLE_SQL = """
                 CREATE TABLE config (
                     id TEXT PRIMARY KEY,
-                    value TEXT
+                    value TEXT NOT NULL
                 );
             """;
 
     static final String PHENOTYPE_TABLE_SQL = """
                 CREATE TABLE phenotype (
                     id TEXT PRIMARY KEY,
-                    label TEXT
+                    label TEXT NOT NULL
                 );
             """;
 
     static final String SAMPLE_PHENOTYPE_TABLE_SQL = """
                 CREATE TABLE samplePhenotype (
-                    sample_id INTEGER PRIMARY KEY,
-                    phenotype_id TEXT NOT NULL
+                  sample_index INTEGER NOT NULL,
+                  phenotype_id INTEGER NOT NULL,
+                  PRIMARY KEY (sample_index),
+                  FOREIGN KEY (sample_index) REFERENCES sample(sample_index),
+                  FOREIGN KEY (phenotype_id) REFERENCES phenotype(id)
                 );
             """;
 
@@ -88,7 +96,81 @@ public class DatabaseSchemaManager {
                 );
             """;
 
-    public void createTable(String sql, Connection connection) {
+    static final String SAMPLE_TABLE_SQL = """
+                    CREATE TABLE sample (
+                      sample_index INTEGER PRIMARY KEY,
+                      familyId TEXT,
+                      individualId TEXT,
+                      paternalId INTEGER,
+                      maternalId INTEGER,
+                      sex INTEGER NOT NULL,
+                      affectedStatus INTEGER NOT NULL,
+                      proband INTEGER,
+                      FOREIGN KEY (paternalId) REFERENCES sample(sample_index),
+                      FOREIGN KEY (maternalId) REFERENCES sample(sample_index)
+                      FOREIGN KEY (sex) REFERENCES sex(id),
+                      FOREIGN KEY (affectedStatus) REFERENCES affectedStatus(id)
+                    );
+                """;
+
+    static final String AFFECTED_TABLE_SQL = """
+                CREATE TABLE affectedStatus (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    value TEXT NOT NULL
+                );
+            """;
+
+    static final String SEX_TABLE_SQL = """
+                CREATE TABLE sex (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    value TEXT NOT NULL
+                );
+            """;
+
+    static final String METADATA_TABLE_SQL = """
+                    CREATE TABLE metadata (
+                      id INTEGER PRIMARY KEY AUTOINCREMENT,
+                      name TEXT,
+                      fieldType INTEGER NOT NULL,
+                      valueType INTEGER NOT NULL,
+                      numberType INTEGER NOT NULL,
+                      numberCount INTEGER,
+                      required INTEGER NOT NULL,
+                      separator TEXT,
+                      categories TEXT,
+                      label TEXT,
+                      description TEXT,
+                      parent TEXT,
+                      nested INTEGER,
+                      nullValue TEXT,
+                      FOREIGN KEY (fieldType) REFERENCES fieldType(id),
+                      FOREIGN KEY (valueType) REFERENCES valueType(id),
+                      FOREIGN KEY (numberType) REFERENCES numberType(id)
+                    );
+                """;
+
+    static final String FIELDTYPE_TABLE_SQL = """
+                CREATE TABLE fieldType (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    value TEXT NOT NULL
+                );
+            """;
+
+    static final String VALUETYPE_TABLE_SQL = """
+                CREATE TABLE valueType (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    value TEXT NOT NULL
+                );
+            """;
+
+    static final String NUMBERTYPE_TABLE_SQL = """
+                CREATE TABLE numberType (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    value TEXT NOT NULL
+                );
+            """;
+
+    public void executeSql(String sql, Connection connection) {
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(sql);
         } catch (SQLException e) {
@@ -97,20 +179,27 @@ public class DatabaseSchemaManager {
     }
 
     public void createDatabase(ReportGeneratorSettings settings, VCFHeader vcfFileHeader, Connection connection) {
+        executeSql("PRAGMA foreign_keys = ON;", connection);
         for (String sql : generateAllTableSql(settings, vcfFileHeader)) {
-            createTable(sql, connection);
+            executeSql(sql, connection);
         }
     }
 
     private List<String> generateAllTableSql(ReportGeneratorSettings reportGeneratorSettings, VCFHeader vcfFileHeader) {
         List<String> sqlStatements = new ArrayList<>();
+        sqlStatements.add(CONTIG_TABLE_SQL);
         sqlStatements.add(VCF_TABLE_SQL);
         sqlStatements.add(CONFIG_TABLE_SQL);
-        sqlStatements.add(getSampleTableSql());
+        sqlStatements.add(AFFECTED_TABLE_SQL);
+        sqlStatements.add(SAMPLE_TABLE_SQL);
+        sqlStatements.add(SEX_TABLE_SQL);
         sqlStatements.add(PHENOTYPE_TABLE_SQL);
         sqlStatements.add(SAMPLE_PHENOTYPE_TABLE_SQL);
         sqlStatements.add(DECISION_TREE_TABLE_SQL);
-        sqlStatements.add(getMetadataTableSql());
+        sqlStatements.add(FIELDTYPE_TABLE_SQL);
+        sqlStatements.add(NUMBERTYPE_TABLE_SQL);
+        sqlStatements.add(VALUETYPE_TABLE_SQL);
+        sqlStatements.add(METADATA_TABLE_SQL);
         sqlStatements.add(APP_METADATA_TABLE_SQL);
         sqlStatements.add(HEADER_TABLE_SQL);
         sqlStatements.add(getInfoTableSql(reportGeneratorSettings, vcfFileHeader));
@@ -118,52 +207,6 @@ public class DatabaseSchemaManager {
         sqlStatements.add(CATEGORIES_TABLE_SQL);
         sqlStatements.addAll(nestedTables);
         return sqlStatements;
-    }
-
-    private String getSampleTableSql() {
-        return String.format("""
-                    CREATE TABLE sample (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        familyId TEXT,
-                        individualId TEXT,
-                        paternalId TEXT,
-                        maternalId TEXT,
-                        sex TEXT NOT NULL,
-                        affectedStatus TEXT NOT NULL,
-                        sample_index INTEGER,
-                        proband INTEGER,
-                        CHECK (
-                            sex IN (%s) AND
-                            affectedStatus IN (%s)
-                        )
-                    );
-                """, getSexTypes(), getAffectedStatuses());
-    }
-
-    private String getMetadataTableSql() {
-        return String.format("""
-                   CREATE TABLE metadata (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        name TEXT,
-                        fieldType TEXT NOT NULL,
-                        valueType TEXT NOT NULL,
-                        numberType TEXT NOT NULL,
-                        numberCount INTEGER,
-                        required INTEGER NOT NULL,
-                        separator TEXT,
-                        categories TEXT,
-                        label TEXT,
-                        description TEXT,
-                        parent TEXT,
-                        nested INTEGER,
-                        nullValue TEXT,
-                        CHECK (
-                            fieldType IN (%s) AND
-                            valueType IN (%s) AND
-                            numberType IN (%s)
-                       )
-                   );
-                """, getFieldTypes(), getValueTypes(), getNumberTypes());
     }
 
     public String getInfoTableSql(ReportGeneratorSettings settings, VCFHeader vcfFileHeader) {
@@ -186,7 +229,7 @@ public class DatabaseSchemaManager {
         StringBuilder infoBuilder = new StringBuilder("CREATE TABLE info (");
         List<String> columns = new ArrayList<>();
         columns.add(AUTOID_COLUMN);
-        columns.add("variant_id INTEGER REFERENCES variant(id)");
+        columns.add("variant_id INTEGER REFERENCES vcf(id)");
 
         for (var entry : infoFields.entrySet()) {
             FieldMetadata meta = entry.getValue();
@@ -210,7 +253,7 @@ public class DatabaseSchemaManager {
         StringBuilder formatBuilder = new StringBuilder("CREATE TABLE format (");
         List<String> columns = new ArrayList<>();
         columns.add(AUTOID_COLUMN);
-        columns.add("sample_id INTEGER REFERENCES sample(id)");
+        columns.add("sample_index INTEGER REFERENCES sample(sample_index)");
         columns.add("variant_id INTEGER REFERENCES vcf(id)");
 
         for (var entry : formatFields.entrySet()) {
@@ -257,44 +300,14 @@ public class DatabaseSchemaManager {
         return nestedBuilder.toString();
     }
 
-    public String getSexTypes() {
-        return Arrays.stream(Sex.values())
-                .map(sex -> "'" + sex.name() + "'")
-                .collect(Collectors.joining(", "));
-    }
-
-    public String getAffectedStatuses() {
-        return Arrays.stream(AffectedStatus.values())
-                .map(type -> "'" + type.name() + "'")
-                .collect(Collectors.joining(", "));
-    }
-
-    public String getValueTypes() {
-        return Arrays.stream(ValueType.values())
-                .map(t -> "'" + t.name() + "'")
-                .collect(Collectors.joining(", "));
-    }
-
-    public String getNumberTypes() {
-        return Arrays.stream(ValueCount.Type.values())
-                .map(t -> "'" + t.name() + "'")
-                .collect(Collectors.joining(", "));
-    }
-
-    public String getFieldTypes() {
-        return Arrays.stream(FieldType.values())
-                .map(t -> "'" + t.name() + "'")
-                .collect(Collectors.joining(", "));
-    }
-
     public static String toSqlType(ValueType type, Integer count) {
         if (count != null && count != 1) {
             return "TEXT";
         }
         return switch (type) {
-            case INTEGER, CATEGORICAL -> "INTEGER";
+            case FLAG, INTEGER, CATEGORICAL -> "INTEGER";
             case FLOAT -> "REAL";
-            case FLAG, CHARACTER, STRING -> "TEXT";
+            case CHARACTER, STRING -> "TEXT";
         };
     }
 }

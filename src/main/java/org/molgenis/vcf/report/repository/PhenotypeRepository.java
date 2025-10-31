@@ -16,7 +16,7 @@ public class PhenotypeRepository {
 
     public void insertPhenotypeData(Connection conn, List<Phenopacket> packets, List<Sample> samples) {
         String phenotypeSql = "INSERT OR IGNORE INTO phenotype (id, label) VALUES (?, ?)";
-        String samplePhenoSql = "INSERT OR IGNORE INTO samplePhenotype (sample_id, phenotype_id) VALUES (?, ?)";
+        String samplePhenoSql = "INSERT OR IGNORE INTO samplePhenotype (sample_index, phenotype_id) VALUES (?, ?)";
 
         try (PreparedStatement phenotypeStmt = conn.prepareStatement(phenotypeSql);
              PreparedStatement samplePhenoStmt = conn.prepareStatement(samplePhenoSql)) {

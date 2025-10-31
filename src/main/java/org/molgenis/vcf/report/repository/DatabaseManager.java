@@ -1,5 +1,6 @@
 package org.molgenis.vcf.report.repository;
 
+import htsjdk.samtools.SAMSequenceRecord;
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.vcf.VCFFileReader;
 import htsjdk.variant.vcf.VCFHeader;
@@ -24,6 +25,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
+import static org.molgenis.vcf.report.repository.SqlUtils.insertLookupValues;
 import static org.molgenis.vcf.utils.metadata.FieldType.INFO;
 
 @Component
@@ -88,21 +90,11 @@ public class DatabaseManager {
                 for (String field : parentFields.keySet()) {
                     nestedFields.put(field, getDatabaseNestedColumns(field));
                 }
-                List<String> formatColumns = getDatabaseFormatColumns();
-                List<String> infoColumns = getDatabaseInfoColumns();
-
                 List<String> lines = new ArrayList<>(header.getMetaDataInInputOrder().stream().map(VCFHeaderLine::toString).toList());
                 metadataRepo.insertHeaderLine(conn, lines, getHeaderLine(samples));
                 metadataRepo.insertMetadata(conn, fieldMetadatas, decisionTreePath, sampleTreePath, phenopackets);
-                for (VariantContext vc : reader) {
-                    int variantId = vcfRepo.insertVariant(conn, vc);
-                    for (Map.Entry<String, List<String>> entry : nestedFields.entrySet()) {
-                        nestedRepo.insertNested(conn, entry.getKey(), vc, entry.getValue(), fieldMetadatas, variantId, decisionTreePath != null);
-                    }
-                    formatRepo.insertFormatData(conn, vc, formatColumns, variantId, fieldMetadatas, samples.getItems(), sampleTreePath != null);
-                    infoRepo.insertInfoData(conn, vc, infoColumns, fieldMetadatas, variantId, sampleTreePath != null);
-                }
                 sampleRepo.insertSamples(conn, samples);
+                insertVariants(fieldMetadatas, samples, decisionTreePath, sampleTreePath, header, reader, nestedFields);
                 phenotypeRepo.insertPhenotypeData(conn, phenopackets, samples.getItems());
                 configRepo.insertConfigData(conn, templateConfig);
                 decisionTreeRepo.insertDecisionTreeData(conn, decisionTreePath, sampleTreePath);
@@ -115,6 +107,21 @@ public class DatabaseManager {
         }
         byte[] fileContent = Files.readAllBytes(Path.of(databaseLocation));
         return new Bytes(fileContent);
+    }
+
+    private void insertVariants(FieldMetadatas fieldMetadatas, Items<Sample> samples, Path decisionTreePath, Path sampleTreePath, VCFHeader header, VCFFileReader reader, Map<String, List<String>> nestedFields) throws DatabaseException, SQLException {
+        List<String> formatColumns = getDatabaseFormatColumns();
+        List<String> infoColumns = getDatabaseInfoColumns();
+
+        Map<Object, Integer> contigIds = insertLookupValues(conn,"contig", header.getSequenceDictionary().getSequences().stream().map(SAMSequenceRecord::getSequenceName).toList());
+        for (VariantContext vc : reader) {
+            int variantId = vcfRepo.insertVariant(conn, vc, contigIds);
+            for (Map.Entry<String, List<String>> entry : nestedFields.entrySet()) {
+                nestedRepo.insertNested(conn, entry.getKey(), vc, entry.getValue(), fieldMetadatas, variantId, decisionTreePath != null);
+            }
+            formatRepo.insertFormatData(conn, vc, formatColumns, variantId, fieldMetadatas, samples.getItems(), sampleTreePath != null);
+            infoRepo.insertInfoData(conn, vc, infoColumns, fieldMetadatas, variantId, sampleTreePath != null);
+        }
     }
 
     private Map<String, FieldMetadata> getNestedFields(FieldMetadatas fieldMetadatas, FieldType fieldType) {
@@ -144,7 +151,7 @@ public class DatabaseManager {
 
     private List<String> getDatabaseFormatColumns() throws SQLException {
         return getTableColumns("format", c -> !c.equalsIgnoreCase("id")
-                && !c.equalsIgnoreCase("sample_id")
+                && !c.equalsIgnoreCase("sample_index")
                 && !c.equalsIgnoreCase(VARIANT_ID));
     }
 

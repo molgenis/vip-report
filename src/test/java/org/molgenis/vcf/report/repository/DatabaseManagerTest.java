@@ -43,6 +43,10 @@ class DatabaseManagerTest {
         when(stmt.executeQuery(anyString())).thenReturn(result);
         doNothing().when(conn).setAutoCommit(false);
         doNothing().when(conn).commit();
+
+        PreparedStatement pstm = mock(PreparedStatement.class);
+        when(conn.prepareStatement(any())).thenReturn(pstm);
+
         Items samples = mock(Items.class);
         Sample sample = mock(Sample.class);
         Person person = mock(Person.class);
@@ -70,7 +74,7 @@ class DatabaseManagerTest {
         manager.populateDb(exampleDb.toString(), fieldMetadatas, samples, inputVcfPath.toFile(),
                 decisionTree, sampleTree, reportMetadata, config, phenopackets);
 
-        verify(vcfRepo).insertVariant(eq(conn), any());
+        verify(vcfRepo).insertVariant(eq(conn), any(), any());
         verify(infoRepo).insertInfoData(eq(conn), any(), eq(List.of()), eq(fieldMetadatas), eq(0), eq(true));
         verify(formatRepo).insertFormatData(eq(conn), any(), eq(List.of()), eq(0), eq(fieldMetadatas), eq(sampleList), eq(true));
         verify(phenotypeRepo).insertPhenotypeData(conn, phenopackets, sampleList);
