@@ -18,7 +18,7 @@ public class VcfRepository {
 
         try (
                 PreparedStatement insertVCF = conn.prepareStatement(
-                        "INSERT INTO vcf (chrom, pos, id_vcf, ref, alt, qual, filter) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                        "INSERT INTO vcf (chrom, pos, idVcf, ref, alt, qual, filter) VALUES (?, ?, ?, ?, ?, ?, ?)",
                         Statement.RETURN_GENERATED_KEYS
                 )
         ) {
@@ -39,7 +39,7 @@ public class VcfRepository {
                 if(rs.next()) {
                     return rs.getInt(1);
                 } else {
-                    throw new SQLException("Failed to retrieve variant_id from vcf insert.");
+                    throw new SQLException("Failed to retrieve variantId from vcf insert.");
                 }
             }
         }

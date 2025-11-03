@@ -23,7 +23,7 @@ import static org.molgenis.vcf.utils.metadata.ValueType.CATEGORICAL;
 @Component
 public class NestedRepository {
     public static final Set<String> CUSTOM_CATEGORICALS = Set.of("VIPC", "HPO");
-    public static final String CSQ_INDEX = "CSQ_index";
+    public static final String CSQ_INDEX = "CsqIndex";
 
     public void insertNested(Connection conn, String fieldName, VariantContext vc, List<String> matchingNestedFields,
                              FieldMetadatas fieldMetadatas, int variantId, boolean hasDecisionTree) throws SQLException {

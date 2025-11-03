@@ -30,6 +30,7 @@ import static org.molgenis.vcf.utils.metadata.FieldType.INFO;
 
 @Component
 public class DatabaseManager {
+    public static final String SAMPLE_INDEX = "sampleIndex";
     Connection conn;
 
     private final VcfRepository vcfRepo;
@@ -42,7 +43,7 @@ public class DatabaseManager {
     private final DecisionTreeRepository decisionTreeRepo;
     private final SampleRepository sampleRepo;
     private final ReportMetadataRepository reportMetadataRepo;
-    public static final String VARIANT_ID = "variant_id";
+    public static final String VARIANT_ID = "variantId";
 
     public DatabaseManager(VcfRepository vcfRepo, InfoRepository infoRepo, NestedRepository nestedRepo, FormatRepository formatRepo, PhenotypeRepository phenotypeRepo, MetadataRepository metadataRepo, ConfigRepository configRepo, DecisionTreeRepository decisionTreeRepo, SampleRepository sampleRepo, ReportMetadataRepository reportMetadataRepo) {
         this.vcfRepo = vcfRepo;
@@ -151,7 +152,7 @@ public class DatabaseManager {
 
     private List<String> getDatabaseFormatColumns() throws SQLException {
         return getTableColumns("format", c -> !c.equalsIgnoreCase("id")
-                && !c.equalsIgnoreCase("sample_index")
+                && !c.equalsIgnoreCase(SAMPLE_INDEX)
                 && !c.equalsIgnoreCase(VARIANT_ID));
     }
 

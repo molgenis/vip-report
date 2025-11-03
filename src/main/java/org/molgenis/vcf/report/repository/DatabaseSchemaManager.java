@@ -13,6 +13,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
 
+import static org.molgenis.vcf.report.repository.FormatRepository.GT_TYPE;
+
 @Component
 public class DatabaseSchemaManager {
     public static final String TEXT_COLUMN = "%s TEXT";
@@ -25,7 +27,7 @@ public class DatabaseSchemaManager {
                   id INTEGER PRIMARY KEY AUTOINCREMENT,
                   chrom INTEGER NOT NULL,
                   pos INTEGER NOT NULL,
-                  id_vcf TEXT,
+                  idVcf TEXT,
                   ref TEXT NOT NULL,
                   alt TEXT NOT NULL,
                   qual REAL,
@@ -74,11 +76,11 @@ public class DatabaseSchemaManager {
 
     static final String SAMPLE_PHENOTYPE_TABLE_SQL = """
                 CREATE TABLE samplePhenotype (
-                  sample_index INTEGER NOT NULL,
-                  phenotype_id INTEGER NOT NULL,
-                  PRIMARY KEY (sample_index),
-                  FOREIGN KEY (sample_index) REFERENCES sample(sample_index),
-                  FOREIGN KEY (phenotype_id) REFERENCES phenotype(id)
+                  sampleIndex INTEGER NOT NULL,
+                  phenotypeId INTEGER NOT NULL,
+                  PRIMARY KEY (sampleIndex),
+                  FOREIGN KEY (sampleIndex) REFERENCES sample(sampleIndex),
+                  FOREIGN KEY (phenotypeId) REFERENCES phenotype(id)
                 );
             """;
 
@@ -98,7 +100,7 @@ public class DatabaseSchemaManager {
 
     static final String SAMPLE_TABLE_SQL = """
                     CREATE TABLE sample (
-                      sample_index INTEGER PRIMARY KEY,
+                      sampleIndex INTEGER PRIMARY KEY,
                       familyId TEXT,
                       individualId TEXT,
                       paternalId INTEGER,
@@ -106,8 +108,8 @@ public class DatabaseSchemaManager {
                       sex INTEGER NOT NULL,
                       affectedStatus INTEGER NOT NULL,
                       proband INTEGER,
-                      FOREIGN KEY (paternalId) REFERENCES sample(sample_index),
-                      FOREIGN KEY (maternalId) REFERENCES sample(sample_index)
+                      FOREIGN KEY (paternalId) REFERENCES sample(sampleIndex),
+                      FOREIGN KEY (maternalId) REFERENCES sample(sampleIndex)
                       FOREIGN KEY (sex) REFERENCES sex(id),
                       FOREIGN KEY (affectedStatus) REFERENCES affectedStatus(id)
                     );
@@ -229,7 +231,7 @@ public class DatabaseSchemaManager {
         StringBuilder infoBuilder = new StringBuilder("CREATE TABLE info (");
         List<String> columns = new ArrayList<>();
         columns.add(AUTOID_COLUMN);
-        columns.add("variant_id INTEGER REFERENCES vcf(id)");
+        columns.add("variantId INTEGER REFERENCES vcf(id)");
 
         for (var entry : infoFields.entrySet()) {
             FieldMetadata meta = entry.getValue();
@@ -253,8 +255,8 @@ public class DatabaseSchemaManager {
         StringBuilder formatBuilder = new StringBuilder("CREATE TABLE format (");
         List<String> columns = new ArrayList<>();
         columns.add(AUTOID_COLUMN);
-        columns.add("sample_index INTEGER REFERENCES sample(sample_index)");
-        columns.add("variant_id INTEGER REFERENCES vcf(id)");
+        columns.add("sampleIndex INTEGER REFERENCES sample(sampleIndex)");
+        columns.add("variantId INTEGER REFERENCES vcf(id)");
 
         for (var entry : formatFields.entrySet()) {
             FieldMetadata meta = entry.getValue();
@@ -262,7 +264,7 @@ public class DatabaseSchemaManager {
                 if (meta.getNumberType() == ValueCount.Type.FIXED && meta.getNumberCount() == 1) {
                     columns.add(String.format(SQL_COLUMN, entry.getKey(), toSqlType(meta.getType(), meta.getNumberCount())));
                     if(entry.getKey().equals("GT")){
-                        columns.add(String.format(SQL_COLUMN, "GT_type", "TEXT"));
+                        columns.add(String.format(SQL_COLUMN, GT_TYPE, "TEXT"));
                     }
                 } else {
                     columns.add(String.format(TEXT_COLUMN, entry.getKey()));
@@ -282,13 +284,13 @@ public class DatabaseSchemaManager {
         List<String> nestedColumns = new ArrayList<>();
         nestedColumns.add(AUTOID_COLUMN);
         if (tableName.startsWith("variant_")) {
-            nestedColumns.add("variant_id INTEGER REFERENCES vcf(id)");
+            nestedColumns.add("variantId INTEGER REFERENCES vcf(id)");
             //CSQ index for postprocessing VIPC_S and VIPP_S
             if(parentField.equals("CSQ")){
-                nestedColumns.add("CSQ_index INTEGER");
+                nestedColumns.add("CsqIndex INTEGER");
             }
         } else if (tableName.startsWith("format_")) {
-            nestedColumns.add("format_id INTEGER REFERENCES format(id)");
+            nestedColumns.add("formatId INTEGER REFERENCES format(id)");
         }
         for (var nestedEntry : nestedFieldMap.entrySet()) {
             NestedFieldMetadata nestedField = nestedEntry.getValue();

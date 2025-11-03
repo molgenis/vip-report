@@ -62,7 +62,7 @@ public class InfoRepository {
     }
 
     private PreparedStatement prepareInsertInfo(Connection conn, List<String> columns) throws SQLException {
-        StringBuilder sql = new StringBuilder("INSERT INTO info (variant_id");
+        StringBuilder sql = new StringBuilder("INSERT INTO info (variantId");
         for (String col : columns) {
             sql.append(", ").append(col);
         }

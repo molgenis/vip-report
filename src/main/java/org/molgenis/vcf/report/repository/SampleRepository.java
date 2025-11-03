@@ -23,7 +23,7 @@ public class SampleRepository {
 
     static final String INSERT_SAMPLE_SQL = """
             INSERT INTO sample (
-                sample_index,
+                sampleIndex,
                 familyId,
                 individualId,
                 paternalId,

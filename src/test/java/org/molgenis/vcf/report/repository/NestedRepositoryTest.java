@@ -39,7 +39,8 @@ class NestedRepositoryTest {
         when(ps.executeQuery("SELECT id, field, value FROM categories")).thenReturn(rs);
 
         String fieldName = "CSQ";
-        List<String> matchingNestedFields = Arrays.asList("Gene", "Consequence");
+        List<String> matchingNestedFields = new ArrayList<>();
+        matchingNestedFields.addAll(List.of("Gene", "Consequence"));
         VariantContext vc = mock(VariantContext.class);
         when(vc.hasAttribute(fieldName)).thenReturn(true);
         List<String> nestedEntries = Arrays.asList("GENE1|missense_variant", "GENE2|synonymous_variant");
