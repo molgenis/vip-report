@@ -276,13 +276,17 @@ public class DatabaseSchemaManager {
         return formatBuilder.toString();
     }
 
-    private String buildNestedTable(String prefix, String postfix, Map<String, NestedFieldMetadata> nestedFieldMap) {
-        String tableName = String.format("%s_%s", prefix, postfix);
+    private String buildNestedTable(String prefix, String parentField, Map<String, NestedFieldMetadata> nestedFieldMap) {
+        String tableName = String.format("%s_%s", prefix, parentField);
         StringBuilder nestedBuilder = new StringBuilder("CREATE TABLE ").append(tableName).append(" (");
         List<String> nestedColumns = new ArrayList<>();
         nestedColumns.add(AUTOID_COLUMN);
         if (tableName.startsWith("variant_")) {
             nestedColumns.add("variant_id INTEGER REFERENCES vcf(id)");
+            //CSQ index for postprocessing VIPC_S and VIPP_S
+            if(parentField.equals("CSQ")){
+                nestedColumns.add("CSQ_index INTEGER");
+            }
         } else if (tableName.startsWith("format_")) {
             nestedColumns.add("format_id INTEGER REFERENCES format(id)");
         }
