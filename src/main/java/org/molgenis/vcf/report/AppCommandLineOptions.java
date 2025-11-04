@@ -55,6 +55,8 @@ class AppCommandLineOptions {
   static final String OPT_SAMPLE_TREE_LONG = "sample_tree";
   static final String OPT_CRAM = "c";
   static final String OPT_CRAM_LONG = "cram";
+  static final String OPT_SQL_WASM = "w";
+  static final String OPT_SQL_WASM_LONG = "wasm";
   private static final Options APP_OPTIONS;
   private static final Options APP_VERSION_OPTIONS;
 
@@ -160,6 +162,13 @@ class AppCommandLineOptions {
             .desc("Sample decision tree file as used in vip-decision-tree (.json).")
             .build());
     appOptions.addOption(
+        Option.builder(OPT_SQL_WASM)
+             .longOpt(OPT_SQL_WASM_LONG)
+             .hasArg(true)
+             .desc("SQL wasm file for embedded database.")
+             .required()
+             .build());
+    appOptions.addOption(
         Option.builder(OPT_DEBUG)
             .longOpt(OPT_DEBUG_LONG)
             .desc("Enable debug mode (additional logging and pretty printed report).")
@@ -187,7 +196,9 @@ class AppCommandLineOptions {
 
   static void validateCommandLine(CommandLine commandLine) {
     validateInput(commandLine);
+    validateWasm(commandLine);
     validateOutput(commandLine);
+    validateDatabase(commandLine);
     validateDatabase(commandLine);
     validateTemplate(commandLine);
     validateProbands(commandLine);
@@ -327,6 +338,17 @@ class AppCommandLineOptions {
           format("Input file '%s' is not a .vcf or .vcf.gz file.", inputPathStr));
     }
   }
+
+    private static void validateWasm(CommandLine commandLine) {
+        Path inputPath = Path.of(commandLine.getOptionValue(OPT_SQL_WASM));
+        validateFilePath(inputPath, "wasm");
+
+        String inputPathStr = inputPath.toString();
+        if (!inputPathStr.endsWith(".wasm")) {
+            throw new IllegalArgumentException(
+                    format("SQL wasm binary file '%s' is not a .wasm file.", inputPathStr));
+        }
+    }
 
   private static void validateOutput(CommandLine commandLine) {
     if (!commandLine.hasOption(OPT_OUTPUT)) {

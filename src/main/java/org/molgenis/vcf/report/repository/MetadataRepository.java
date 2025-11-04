@@ -37,13 +37,14 @@ class MetadataRepository {
                     numberCount,
                     required,
                     separator,
+                    nestedSeparator,
                     categories,
                     label,
                     description,
                     parent,
                     nested,
                     nullValue
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
     static final String INSERT_CATEGORIES_SQL = """
                     INSERT INTO categories (
@@ -130,13 +131,14 @@ class MetadataRepository {
         ps.setObject(5, meta.getNumberCount());
         ps.setInt(6, meta.isRequired() ? 1 : 0);
         ps.setString(7, meta.getSeparator() != null ? meta.getSeparator().toString() : null);
-        ps.setString(8, categories != null ? toJson(categories) : null);
-        ps.setString(9, meta.getLabel());
-        ps.setString(10, meta.getDescription());
-        ps.setString(11, parent);
+        ps.setString(8, meta.getNestedAttributes() != null ? meta.getNestedAttributes().getSeparator() : null);
+        ps.setString(9, categories != null ? toJson(categories) : null);
+        ps.setString(10, meta.getLabel());
+        ps.setString(11, meta.getDescription());
+        ps.setString(12, parent);
         boolean nestedFlag = meta.getNestedFields() != null && !meta.getNestedFields().isEmpty();
-        ps.setInt(12, nestedFlag ? 1 : 0);
-        ps.setString(13, meta.getNullValue() != null ? toJson(meta.getNullValue()) : null);
+        ps.setInt(13, nestedFlag ? 1 : 0);
+        ps.setString(14, meta.getNullValue() != null ? toJson(meta.getNullValue()) : null);
         ps.addBatch();
 
         if (nestedFlag) {

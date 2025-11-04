@@ -35,10 +35,11 @@ class DatabaseSchemaManagerTest {
         Path decisionTree = Paths.get("src", "test", "resources", "tree.json");
         Path sampleTree = Paths.get("src", "test", "resources", "tree.json");
         Path config = Paths.get("src", "test", "resources", "template_config.json");
+        Path wasmPath = Paths.get("src", "test", "resources", "fake.wasm");
 
         VCFFileReader vcfReader = new VCFFileReader(inputVcfPath, false);
         ReportGeneratorSettings settings = new ReportGeneratorSettings("Test", "v1.0.0", "arg",
-                10, metaJson, null, null, decisionTree, sampleTree, config);
+                10, metaJson, wasmPath,null, null, decisionTree, sampleTree, config);
         dbSchemaManager.createDatabase(settings, vcfReader.getFileHeader(), conn);
 
         verify(stmt).execute(VCF_TABLE_SQL);

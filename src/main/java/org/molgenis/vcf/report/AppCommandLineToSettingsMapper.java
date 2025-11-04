@@ -45,6 +45,14 @@ public class AppCommandLineToSettingsMapper {
       metadataPath = null;
     }
 
+      Path sqlWasmPath;
+      if (commandLine.hasOption(OPT_SQL_WASM)) {
+          String sqlWasmPathValue = commandLine.getOptionValue(OPT_SQL_WASM);
+          sqlWasmPath = Path.of(sqlWasmPathValue);
+      } else {
+          sqlWasmPath = null;
+      }
+
     Path outputPath;
     if (commandLine.hasOption(OPT_OUTPUT)) {
       outputPath = Path.of(commandLine.getOptionValue(OPT_OUTPUT));
@@ -135,7 +143,7 @@ public class AppCommandLineToSettingsMapper {
     String appArgs = String.join(" ", args);
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
-            appName, appVersion, appArgs, maxSamples, metadataPath, referencePath, genesPath, decisionTreePath, sampleTreePath, templateConfigPath);
+            appName, appVersion, appArgs, maxSamples, metadataPath, sqlWasmPath, referencePath, genesPath, decisionTreePath, sampleTreePath, templateConfigPath);
     ReportWriterSettings reportWriterSettings = new ReportWriterSettings(templatePath, debugMode);
     SampleSettings sampleSettings =
         new SampleSettings(probandNames, pedPaths, phenotypes, cramPaths);

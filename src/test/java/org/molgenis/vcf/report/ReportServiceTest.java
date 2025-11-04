@@ -1,7 +1,10 @@
 package org.molgenis.vcf.report;
 
+import static java.nio.file.Files.readAllBytes;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -18,7 +21,6 @@ import org.molgenis.vcf.report.generator.ReportWriter;
 import org.molgenis.vcf.report.generator.ReportWriterSettings;
 import org.molgenis.vcf.report.generator.SampleSettings;
 import org.molgenis.vcf.report.generator.Settings;
-import org.molgenis.vcf.report.model.Binary;
 import org.molgenis.vcf.report.model.Bytes;
 import org.molgenis.vcf.report.model.Report;
 
@@ -37,18 +39,20 @@ class ReportServiceTest {
   }
 
   @Test
-  void createReport() {
+  void createReport() throws IOException {
     String appName = "MyApp";
     String appVersion = "MyVersion";
     String appArguments = "MyArguments";
     Path inputVcfPath = Paths.get("src", "test", "resources", "example.vcf");
+    Path wasmPath = Paths.get("src", "test", "resources", "fake.wasm");
     Path outputReportPath = sharedTempDir.resolve("example.vcf.html");
     Path metadataPath = sharedTempDir.resolve("field_metadata.json");
 
     Report report =
         new Report(
-            new Binary( null, null, Map.of()),
-            new Bytes("FIXME".getBytes())
+            null, null, Map.of(),
+            new Bytes(readAllBytes(wasmPath)),
+            new Bytes("DATABASE".getBytes())
         );
 
     ReportGeneratorSettings reportGeneratorSettings =
@@ -58,9 +62,11 @@ class ReportServiceTest {
             appArguments,
             ReportGeneratorSettings.DEFAULT_MAX_NR_SAMPLES,
             metadataPath,
+            wasmPath,
             null,
             null,
-            null,null,
+            null,
+            null,
             null);
     ReportWriterSettings reportWriterSettings = new ReportWriterSettings(null, true);
     SampleSettings sampleSettings = new SampleSettings(null, null, null, Map.of());

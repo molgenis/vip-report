@@ -28,6 +28,7 @@ class AppCommandLineOptionsTest {
     @Test
     void validateCommandLine() throws FileNotFoundException {
         String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
+        String wasmFile = ResourceUtils.getFile("classpath:fake.wasm").toString();
         String pedFiles =
                 ResourceUtils.getFile("classpath:example.ped")
                         + ","
@@ -44,6 +45,7 @@ class AppCommandLineOptionsTest {
         doReturn(pedFiles).when(cmd).getOptionValue(OPT_PED);
         doReturn(outputFile).when(cmd).getOptionValue(OPT_OUTPUT);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
+        doReturn(wasmFile).when(cmd).getOptionValue(OPT_SQL_WASM);
 
         AppCommandLineOptions.validateCommandLine(cmd);
     }
@@ -51,6 +53,7 @@ class AppCommandLineOptionsTest {
     @Test
     void validateCommandLineNoTemplateNoPed() throws FileNotFoundException {
         String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
+        String wasmFile = ResourceUtils.getFile("classpath:fake.wasm").toString();
         String outputFile = sharedTempDir.resolve("exampleCmdline.vcf.html").toString();
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 
@@ -58,6 +61,7 @@ class AppCommandLineOptionsTest {
         doReturn(true).when(cmd).hasOption(OPT_FORCE);
         doReturn(false).when(cmd).hasOption(OPT_PED);
         doReturn(true).when(cmd).hasOption(OPT_OUTPUT);
+        doReturn(wasmFile).when(cmd).getOptionValue(OPT_SQL_WASM);
 
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(outputFile).when(cmd).getOptionValue(OPT_OUTPUT);
@@ -69,6 +73,7 @@ class AppCommandLineOptionsTest {
     @Test
     void validateCommandLineOutputExistsForce() throws FileNotFoundException {
         String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+        String wasmFile = ResourceUtils.getFile("classpath:fake.wasm").toString();
         String pedFiles =
                 ResourceUtils.getFile("classpath:example.ped")
                         + ","
@@ -85,6 +90,7 @@ class AppCommandLineOptionsTest {
         doReturn(pedFiles).when(cmd).getOptionValue(OPT_PED);
         doReturn(outputFile).when(cmd).getOptionValue(OPT_OUTPUT);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
+        doReturn(wasmFile).when(cmd).getOptionValue(OPT_SQL_WASM);
 
         AppCommandLineOptions.validateCommandLine(cmd);
     }
@@ -92,6 +98,7 @@ class AppCommandLineOptionsTest {
     @Test
     void validateCommandLineOutputExistsNoForce() throws FileNotFoundException {
         String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+        String wasmFile = ResourceUtils.getFile("classpath:fake.wasm").toString();
         String outputFile = ResourceUtils.getFile("classpath:example.vcf.html").toString();
 
         CommandLine cmd = mock(CommandLine.class);
@@ -100,6 +107,7 @@ class AppCommandLineOptionsTest {
 
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(outputFile).when(cmd).getOptionValue(OPT_OUTPUT);
+        doReturn(wasmFile).when(cmd).getOptionValue(OPT_SQL_WASM);
 
         IllegalArgumentException exception =
                 assertThrows(
@@ -110,6 +118,7 @@ class AppCommandLineOptionsTest {
     @Test
     void validateCommandLineOutputDir() throws FileNotFoundException {
         String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
+        String wasmFile = ResourceUtils.getFile("classpath:fake.wasm").toString();
         String outputFile = sharedTempDir.toString();
 
         CommandLine cmd = mock(CommandLine.class);
@@ -117,6 +126,7 @@ class AppCommandLineOptionsTest {
 
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(outputFile).when(cmd).getOptionValue(OPT_OUTPUT);
+        doReturn(wasmFile).when(cmd).getOptionValue(OPT_SQL_WASM);
 
         IllegalArgumentException exception =
                 assertThrows(
@@ -171,6 +181,7 @@ class AppCommandLineOptionsTest {
                 "notexists.ped" + "," + ResourceUtils.getFile("classpath:example2.ped");
         String outputFile = sharedTempDir.resolve("exampleCmdline.vcf.html").toString();
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
+        String wasmFile = ResourceUtils.getFile("classpath:fake.wasm").toString();
 
         CommandLine cmd = mock(CommandLine.class);
         doReturn(true).when(cmd).hasOption(OPT_FORCE);
@@ -181,6 +192,7 @@ class AppCommandLineOptionsTest {
         doReturn(pedFiles).when(cmd).getOptionValue(OPT_PED);
         doReturn(outputFile).when(cmd).getOptionValue(OPT_OUTPUT);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
+        doReturn(wasmFile).when(cmd).getOptionValue(OPT_SQL_WASM);
 
         IllegalArgumentException exception =
                 assertThrows(
@@ -196,6 +208,7 @@ class AppCommandLineOptionsTest {
                 sharedTempDir.toString() + "," + ResourceUtils.getFile("classpath:example2.ped");
         String outputFile = sharedTempDir.resolve("exampleCmdline.vcf.html").toString();
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
+        String wasmFile = ResourceUtils.getFile("classpath:fake.wasm").toString();
 
         CommandLine cmd = mock(CommandLine.class);
         doReturn(true).when(cmd).hasOption(OPT_FORCE);
@@ -206,6 +219,7 @@ class AppCommandLineOptionsTest {
         doReturn(pedFiles).when(cmd).getOptionValue(OPT_PED);
         doReturn(outputFile).when(cmd).getOptionValue(OPT_OUTPUT);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
+        doReturn(wasmFile).when(cmd).getOptionValue(OPT_SQL_WASM);
 
         IllegalArgumentException exception =
                 assertThrows(
@@ -223,6 +237,7 @@ class AppCommandLineOptionsTest {
                         + ResourceUtils.getFile("classpath:example2.ped");
         String outputFile = sharedTempDir.resolve("exampleCmdline.vcf.html").toString();
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
+        String wasmFile = ResourceUtils.getFile("classpath:fake.wasm").toString();
 
         CommandLine cmd = mock(CommandLine.class);
         doReturn(true).when(cmd).hasOption(OPT_FORCE);
@@ -233,6 +248,7 @@ class AppCommandLineOptionsTest {
         doReturn(pedFiles).when(cmd).getOptionValue(OPT_PED);
         doReturn(outputFile).when(cmd).getOptionValue(OPT_OUTPUT);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
+        doReturn(wasmFile).when(cmd).getOptionValue(OPT_SQL_WASM);
 
         IllegalArgumentException exception =
                 assertThrows(
@@ -249,6 +265,7 @@ class AppCommandLineOptionsTest {
                         + ResourceUtils.getFile("classpath:example2.ped");
         String outputFile = sharedTempDir.resolve("exampleCmdline.vcf.html").toString();
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
+        String wasmFile = ResourceUtils.getFile("classpath:fake.wasm").toString();
 
         CommandLine cmd = mock(CommandLine.class);
         doReturn(true).when(cmd).hasOption(OPT_FORCE);
@@ -259,6 +276,7 @@ class AppCommandLineOptionsTest {
         doReturn(pedFiles).when(cmd).getOptionValue(OPT_PED);
         doReturn(outputFile).when(cmd).getOptionValue(OPT_OUTPUT);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
+        doReturn(wasmFile).when(cmd).getOptionValue(OPT_SQL_WASM);
 
         AppCommandLineOptions.validateCommandLine(cmd);
     }
@@ -267,6 +285,7 @@ class AppCommandLineOptionsTest {
     void validateCommandLineTemplateDir() throws FileNotFoundException {
         String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String outputFile = sharedTempDir.resolve("exampleCmdline.vcf.html").toString();
+        String wasmFile = ResourceUtils.getFile("classpath:fake.wasm").toString();
         String templateFile = sharedTempDir.toString();
 
         CommandLine cmd = mock(CommandLine.class);
@@ -276,6 +295,7 @@ class AppCommandLineOptionsTest {
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(outputFile).when(cmd).getOptionValue(OPT_OUTPUT);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
+        doReturn(wasmFile).when(cmd).getOptionValue(OPT_SQL_WASM);
 
         IllegalArgumentException exception =
                 assertThrows(
@@ -288,6 +308,7 @@ class AppCommandLineOptionsTest {
     void validateCommandLineTemplateNoHtml() throws FileNotFoundException {
         String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String outputFile = sharedTempDir.resolve("exampleCmdline.vcf.html").toString();
+        String wasmFile = ResourceUtils.getFile("classpath:fake.wasm").toString();
 
         CommandLine cmd = mock(CommandLine.class);
         doReturn(true).when(cmd).hasOption(OPT_FORCE);
@@ -295,6 +316,7 @@ class AppCommandLineOptionsTest {
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(outputFile).when(cmd).getOptionValue(OPT_OUTPUT);
         doReturn(inputFile).when(cmd).getOptionValue(OPT_TEMPLATE);
+        doReturn(wasmFile).when(cmd).getOptionValue(OPT_SQL_WASM);
 
         IllegalArgumentException exception =
                 assertThrows(
@@ -307,6 +329,7 @@ class AppCommandLineOptionsTest {
         String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String pheno = "HP:123456,HP:23456";
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
+        String wasmFile = ResourceUtils.getFile("classpath:fake.wasm").toString();
 
         CommandLine cmd = mock(CommandLine.class);
         doReturn(true).when(cmd).hasOption(OPT_PHENOTYPES);
@@ -314,6 +337,7 @@ class AppCommandLineOptionsTest {
         doReturn(false).when(cmd).hasOption(OPT_FORCE);
         doReturn(false).when(cmd).hasOption(OPT_PED);
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
+        doReturn(wasmFile).when(cmd).getOptionValue(OPT_SQL_WASM);
         doReturn(pheno).when(cmd).getOptionValue(OPT_PHENOTYPES);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
 
@@ -325,6 +349,7 @@ class AppCommandLineOptionsTest {
         String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String pheno = "sample1/HP:123456;HP:234567,sample2/HP:23456";
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
+        String wasmFile = ResourceUtils.getFile("classpath:fake.wasm").toString();
 
         CommandLine cmd = mock(CommandLine.class);
         doReturn(true).when(cmd).hasOption(OPT_PHENOTYPES);
@@ -334,6 +359,7 @@ class AppCommandLineOptionsTest {
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(pheno).when(cmd).getOptionValue(OPT_PHENOTYPES);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
+        doReturn(wasmFile).when(cmd).getOptionValue(OPT_SQL_WASM);
 
         AppCommandLineOptions.validateCommandLine(cmd);
     }
@@ -343,12 +369,14 @@ class AppCommandLineOptionsTest {
         String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String pheno = "sample1/HP:123456/HP:234567";
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
+        String wasmFile = ResourceUtils.getFile("classpath:fake.wasm").toString();
 
         CommandLine cmd = mock(CommandLine.class);
         doReturn(true).when(cmd).hasOption(OPT_PHENOTYPES);
         doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
         doReturn(false).when(cmd).hasOption(OPT_FORCE);
         doReturn(false).when(cmd).hasOption(OPT_PED);
+        doReturn(wasmFile).when(cmd).getOptionValue(OPT_SQL_WASM);
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(pheno).when(cmd).getOptionValue(OPT_PHENOTYPES);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
@@ -363,6 +391,7 @@ class AppCommandLineOptionsTest {
         String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String pheno = "HP123456";
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
+        String wasmFile = ResourceUtils.getFile("classpath:fake.wasm").toString();
 
         CommandLine cmd = mock(CommandLine.class);
         doReturn(true).when(cmd).hasOption(OPT_PHENOTYPES);
@@ -372,6 +401,7 @@ class AppCommandLineOptionsTest {
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(pheno).when(cmd).getOptionValue(OPT_PHENOTYPES);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
+        doReturn(wasmFile).when(cmd).getOptionValue(OPT_SQL_WASM);
 
         assertThrows(
                 IllegalPhenotypeArgumentException.class,
@@ -383,6 +413,7 @@ class AppCommandLineOptionsTest {
         String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String pheno = "sample/HP:123456,HP:234567";
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
+        String wasmFile = ResourceUtils.getFile("classpath:fake.wasm").toString();
 
         CommandLine cmd = mock(CommandLine.class);
         doReturn(true).when(cmd).hasOption(OPT_PHENOTYPES);
@@ -392,6 +423,7 @@ class AppCommandLineOptionsTest {
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(pheno).when(cmd).getOptionValue(OPT_PHENOTYPES);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
+        doReturn(wasmFile).when(cmd).getOptionValue(OPT_SQL_WASM);
 
         assertThrows(
                 MixedPhenotypesException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
@@ -401,6 +433,7 @@ class AppCommandLineOptionsTest {
     void validateCommandLineMaxSamples() throws FileNotFoundException {
         String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
+        String wasmFile = ResourceUtils.getFile("classpath:fake.wasm").toString();
 
         CommandLine cmd = mock(CommandLine.class);
         doReturn(true).when(cmd).hasOption(OPT_MAX_SAMPLES);
@@ -411,6 +444,7 @@ class AppCommandLineOptionsTest {
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn("10").when(cmd).getOptionValue(OPT_MAX_SAMPLES);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
+        doReturn(wasmFile).when(cmd).getOptionValue(OPT_SQL_WASM);
 
         AppCommandLineOptions.validateCommandLine(cmd);
     }
@@ -419,6 +453,7 @@ class AppCommandLineOptionsTest {
     void validateCommandLineMaxSamplesNoInt() throws FileNotFoundException {
         String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
+        String wasmFile = ResourceUtils.getFile("classpath:fake.wasm").toString();
 
         CommandLine cmd = mock(CommandLine.class);
         doReturn(true).when(cmd).hasOption(OPT_MAX_SAMPLES);
@@ -429,6 +464,7 @@ class AppCommandLineOptionsTest {
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn("test").when(cmd).getOptionValue(OPT_MAX_SAMPLES);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
+        doReturn(wasmFile).when(cmd).getOptionValue(OPT_SQL_WASM);
 
         assertThrows(
                 InvalidIntegerException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
@@ -439,6 +475,7 @@ class AppCommandLineOptionsTest {
         String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String genesFile = ResourceUtils.getFile("classpath:example.genes.gff.gz").toString();
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
+        String wasmFile = ResourceUtils.getFile("classpath:fake.wasm").toString();
 
         CommandLine cmd = mock(CommandLine.class);
         doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
@@ -451,6 +488,7 @@ class AppCommandLineOptionsTest {
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(genesFile).when(cmd).getOptionValue(OPT_GENES);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
+        doReturn(wasmFile).when(cmd).getOptionValue(OPT_SQL_WASM);
 
         AppCommandLineOptions.validateCommandLine(cmd);
     }
@@ -460,6 +498,7 @@ class AppCommandLineOptionsTest {
         String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String referenceFile = ResourceUtils.getFile("classpath:example.fasta.gz").toString();
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
+        String wasmFile = ResourceUtils.getFile("classpath:fake.wasm").toString();
 
         CommandLine cmd = mock(CommandLine.class);
         doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
@@ -471,6 +510,7 @@ class AppCommandLineOptionsTest {
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(referenceFile).when(cmd).getOptionValue(OPT_REFERENCE);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
+        doReturn(wasmFile).when(cmd).getOptionValue(OPT_SQL_WASM);
 
         AppCommandLineOptions.validateCommandLine(cmd);
     }
@@ -480,6 +520,7 @@ class AppCommandLineOptionsTest {
         String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String referenceFile = "invalid.fasta.gz";
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
+        String wasmFile = ResourceUtils.getFile("classpath:fake.wasm").toString();
 
         CommandLine cmd = mock(CommandLine.class);
         doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
@@ -491,6 +532,7 @@ class AppCommandLineOptionsTest {
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(referenceFile).when(cmd).getOptionValue(OPT_REFERENCE);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
+        doReturn(wasmFile).when(cmd).getOptionValue(OPT_SQL_WASM);
 
         assertThrows(
                 IllegalArgumentException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
@@ -501,6 +543,7 @@ class AppCommandLineOptionsTest {
         String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String referenceFile = ResourceUtils.getFile("classpath:example.vcf").toString();
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
+        String wasmFile = ResourceUtils.getFile("classpath:fake.wasm").toString();
 
         CommandLine cmd = mock(CommandLine.class);
         doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
@@ -509,6 +552,7 @@ class AppCommandLineOptionsTest {
         doReturn(false).when(cmd).hasOption(OPT_PED);
         doReturn(true).when(cmd).hasOption(OPT_REFERENCE);
         doReturn(false).when(cmd).hasOption(OPT_FORCE);
+        doReturn(wasmFile).when(cmd).getOptionValue(OPT_SQL_WASM);
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(referenceFile).when(cmd).getOptionValue(OPT_REFERENCE);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
@@ -522,6 +566,7 @@ class AppCommandLineOptionsTest {
         String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String referenceFile = ResourceUtils.getFile("classpath:example_no_index.fasta.gz").toString();
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
+        String wasmFile = ResourceUtils.getFile("classpath:fake.wasm").toString();
 
         CommandLine cmd = mock(CommandLine.class);
         doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
@@ -533,6 +578,7 @@ class AppCommandLineOptionsTest {
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(referenceFile).when(cmd).getOptionValue(OPT_REFERENCE);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
+        doReturn(wasmFile).when(cmd).getOptionValue(OPT_SQL_WASM);
 
         assertThrows(
                 IllegalArgumentException.class, () -> AppCommandLineOptions.validateCommandLine(cmd));
@@ -542,6 +588,7 @@ class AppCommandLineOptionsTest {
         String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
         String referenceFile = ResourceUtils.getFile("classpath:example.fasta.gz").toString();
+        String wasmFile = ResourceUtils.getFile("classpath:fake.wasm").toString();
 
         CommandLine cmd = mock(CommandLine.class);
         doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
@@ -556,6 +603,7 @@ class AppCommandLineOptionsTest {
         doReturn(bamPathString).when(cmd).getOptionValue(OPT_CRAM);
         doReturn(referenceFile).when(cmd).getOptionValue(OPT_REFERENCE);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
+        doReturn(wasmFile).when(cmd).getOptionValue(OPT_SQL_WASM);
 
         return cmd;
     }
@@ -563,6 +611,7 @@ class AppCommandLineOptionsTest {
     private CommandLine validateBamInitMissingReference(String bamPathString) throws FileNotFoundException {
         String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
+        String wasmFile = ResourceUtils.getFile("classpath:fake.wasm").toString();
 
         CommandLine cmd = mock(CommandLine.class);
         doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
@@ -575,6 +624,7 @@ class AppCommandLineOptionsTest {
         doReturn(true).when(cmd).hasOption(OPT_CRAM);
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
+        doReturn(wasmFile).when(cmd).getOptionValue(OPT_SQL_WASM);
 
         return cmd;
     }
@@ -617,6 +667,7 @@ class AppCommandLineOptionsTest {
     private CommandLine validateTreeInit(String treePathString) throws FileNotFoundException {
         String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
+        String wasmFile = ResourceUtils.getFile("classpath:fake.wasm").toString();
 
         CommandLine cmd = mock(CommandLine.class);
         doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
@@ -631,6 +682,7 @@ class AppCommandLineOptionsTest {
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(treePathString).when(cmd).getOptionValue(OPT_TREE);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
+        doReturn(wasmFile).when(cmd).getOptionValue(OPT_SQL_WASM);
 
         return cmd;
     }
@@ -660,6 +712,7 @@ class AppCommandLineOptionsTest {
     private CommandLine validateTemplateConfigInit(String templateConfigPathString) throws FileNotFoundException {
         String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
         String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
+        String wasmFile = ResourceUtils.getFile("classpath:fake.wasm").toString();
 
         CommandLine cmd = mock(CommandLine.class);
         doReturn(false).when(cmd).hasOption(OPT_MAX_SAMPLES);
@@ -673,6 +726,7 @@ class AppCommandLineOptionsTest {
         doReturn(false).when(cmd).hasOption(OPT_TREE);
         doReturn(true).when(cmd).hasOption(OPT_TEMPLATE_CONFIG);
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
+        doReturn(wasmFile).when(cmd).getOptionValue(OPT_SQL_WASM);
         doReturn(templateConfigPathString).when(cmd).getOptionValue(OPT_TEMPLATE_CONFIG);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
 

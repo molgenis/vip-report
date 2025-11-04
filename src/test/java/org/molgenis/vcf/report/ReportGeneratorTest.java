@@ -18,7 +18,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,7 +28,6 @@ import org.molgenis.vcf.report.generator.ReportGenerator;
 import org.molgenis.vcf.report.generator.ReportGeneratorSettings;
 import org.molgenis.vcf.report.generator.SampleSettings;
 import org.molgenis.vcf.report.genes.GenesFilterFactory;
-import org.molgenis.vcf.report.model.Binary;
 import org.molgenis.vcf.report.model.Bytes;
 import org.molgenis.vcf.report.model.Report;
 import org.molgenis.vcf.report.repository.DatabaseManager;
@@ -94,6 +92,7 @@ class ReportGeneratorTest {
     Path referencePath = Paths.get("src", "test", "resources", "example.fasta.gz");
     Path metadataPath = Paths.get("src", "test", "resources", "minimal_field_metadata.json");
     Path templateConfigPath = Paths.get("src", "test", "resources", "template_config.json");
+    Path wasmPath = Paths.get("src", "test", "resources", "fake.wasm");
 
     Map<String, Sample> pedSampleItems =
         Map.of("John", Sample.builder().person(Person.builder().familyId("FAM001").sex(Sex.MALE).affectedStatus(
@@ -124,17 +123,16 @@ class ReportGeneratorTest {
 
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
-            appName, appVersion, appArgs, maxNrSamples, metadataPath, referencePath, null, treePath, treePath, templateConfigPath);
+            appName, appVersion, appArgs, maxNrSamples, metadataPath, wasmPath, referencePath, null, treePath, treePath, templateConfigPath);
       when(databaseManager.populateDb(any(),any(),any(),any(),any(),any(),any(),any(),any())).thenReturn(new Bytes(Files.readAllBytes(database)));
 
       Report report =
         new Report(
-            new Binary(
                 Map.of("1:2-3", new Bytes(new byte[] {0})),
                 null,
-                Map.of()),
-                new Bytes(Files.readAllBytes(database))
-                );
+                Map.of(),
+                new Bytes(Files.readAllBytes(wasmPath)),
+                new Bytes(Files.readAllBytes(database)));
 
     assertEquals(
         report,

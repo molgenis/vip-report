@@ -139,6 +139,7 @@ public class DatabaseSchemaManager {
                       numberCount INTEGER,
                       required INTEGER NOT NULL,
                       separator TEXT,
+                      nestedSeparator TEXT,
                       categories TEXT,
                       label TEXT,
                       description TEXT,

@@ -9,7 +9,6 @@ import org.molgenis.vcf.report.fasta.VcfFastaSlicerFactory;
 import org.molgenis.vcf.report.genes.GenesFilter;
 import org.molgenis.vcf.report.genes.GenesFilterFactory;
 import org.molgenis.vcf.report.model.*;
-import org.molgenis.vcf.report.model.Binary.Cram;
 import org.molgenis.vcf.report.model.metadata.AppMetadata;
 import org.molgenis.vcf.report.model.metadata.ReportMetadata;
 import org.molgenis.vcf.report.repository.DatabaseManager;
@@ -116,7 +115,7 @@ public class ReportGenerator {
         List<ContigInterval> contigIntervals = variantIntervalCalculator.calculate(vcfFileReader, cramPaths, referencePath);
         fastaGzMap = getReferenceTrackData(contigIntervals, referencePath);
         Bytes genesGz = getGenesTrackData(contigIntervals, reportGeneratorSettings);
-        Map<String, Cram> cramMap = getAlignmentTrackData(sampleSettings);
+        Map<String, Report.Cram> cramMap = getAlignmentTrackData(sampleSettings);
 
         Map<?, ?> templateConfig = parseJsonObject(reportGeneratorSettings.getTemplateConfigPath());
         String databaseLocation = getDatabaseLocation(vcfPath);
@@ -132,8 +131,8 @@ public class ReportGenerator {
             throw new UncheckedIOException(e);
         }
 
-        Binary binary = new Binary(fastaGzMap, genesGz, cramMap);
-        return new Report(binary, database);
+        Bytes sqlWasm = new Bytes(Files.readAllBytes(reportGeneratorSettings.getSqlWasmPath()));
+        return new Report(fastaGzMap, genesGz, cramMap, sqlWasm, database);
     }
 
     private static Map<?, ?> parseJsonObject(Path jsonPath) {
@@ -164,8 +163,8 @@ public class ReportGenerator {
         return phenopackets;
     }
 
-    private static Map<String, Cram> getAlignmentTrackData(SampleSettings sampleSettings) {
-        Map<String, Cram> cramMap = new LinkedHashMap<>();
+    private static Map<String, Report.Cram> getAlignmentTrackData(SampleSettings sampleSettings) {
+        Map<String, Report.Cram> cramMap = new LinkedHashMap<>();
         sampleSettings
                 .getCramPaths()
                 .forEach(
@@ -178,7 +177,7 @@ public class ReportGenerator {
                             } catch (IOException e) {
                                 throw new UncheckedIOException(e);
                             }
-                            cramMap.put(sampleId, new Cram(new Bytes(cram), new Bytes(crai)));
+                            cramMap.put(sampleId, new Report.Cram(new Bytes(cram), new Bytes(crai)));
                         });
         return cramMap;
     }

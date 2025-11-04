@@ -22,7 +22,6 @@ import static org.molgenis.vcf.utils.metadata.ValueType.CATEGORICAL;
 
 @Component
 public class NestedRepository {
-    public static final Set<String> CUSTOM_CATEGORICALS = Set.of("VIPC", "HPO");
     public static final String CSQ_INDEX = "CsqIndex";
 
     public void insertNested(Connection conn, String fieldName, VariantContext vc, List<String> matchingNestedFields,
@@ -64,7 +63,7 @@ public class NestedRepository {
 
                 if (val == null || val.isEmpty()) {
                     insertNestedStmt.setString(stmtIdx, null);
-                } else if (meta.getType() == CATEGORICAL || CUSTOM_CATEGORICALS.contains(nestedField) && hasDecisionTree) {
+                } else if (meta.getType() == CATEGORICAL || nestedField.equals("HPO") || (nestedField.equals("VIPC") && hasDecisionTree)) {
                     addCategorical(INFO, meta, categoryLookup, nestedField, parent, val, insertNestedStmt, stmtIdx);
                 } else if (meta.getSeparator() != null) {
                     String jsonVal = writeJsonListValue(val, meta.getSeparator().toString());

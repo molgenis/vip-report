@@ -14,6 +14,7 @@ public class ReportGeneratorSettings {
   @NonNull String appArguments;
   int maxNrSamples;
   @NonNull Path metadataPath;
+  @NonNull Path sqlWasmPath;
   Path referencePath;
   Path genesPath;
   Path decisionTreePath;
