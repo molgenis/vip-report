@@ -76,9 +76,9 @@ public class DatabaseSchemaManager {
 
     static final String SAMPLE_PHENOTYPE_TABLE_SQL = """
                 CREATE TABLE samplePhenotype (
+                  id INTEGER PRIMARY KEY AUTOINCREMENT,
                   sampleIndex INTEGER NOT NULL,
                   phenotypeId INTEGER NOT NULL,
-                  PRIMARY KEY (sampleIndex),
                   FOREIGN KEY (sampleIndex) REFERENCES sample(sampleIndex),
                   FOREIGN KEY (phenotypeId) REFERENCES phenotype(id)
                 );
