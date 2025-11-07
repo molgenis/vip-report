@@ -32,7 +32,9 @@ public class DatabaseSchemaManager {
                   alt TEXT NOT NULL,
                   qual REAL,
                   filter INTEGER,
+                  format INTEGER,
                   FOREIGN KEY (chrom) REFERENCES contig(id)
+                  FOREIGN KEY (format) REFERENCES formatLookup(id)
                 );
             """;
 
@@ -40,6 +42,13 @@ public class DatabaseSchemaManager {
                 CREATE TABLE contig (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     value TEXT NOT NULL
+                );
+            """;
+
+    static final String FORMAT_LOOKUP_TABLE_SQL = """
+                CREATE TABLE formatLookup (
+                    id INTEGER PRIMARY KEY,
+                    value TEXT UNIQUE NOT NULL
                 );
             """;
 
@@ -194,6 +203,7 @@ public class DatabaseSchemaManager {
         sqlStatements.add(CONTIG_TABLE_SQL);
         sqlStatements.add(VCF_TABLE_SQL);
         sqlStatements.add(CONFIG_TABLE_SQL);
+        sqlStatements.add(FORMAT_LOOKUP_TABLE_SQL);
         sqlStatements.add(AFFECTED_TABLE_SQL);
         sqlStatements.add(SAMPLE_TABLE_SQL);
         sqlStatements.add(SEX_TABLE_SQL);

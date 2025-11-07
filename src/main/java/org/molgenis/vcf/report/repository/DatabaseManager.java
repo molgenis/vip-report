@@ -1,8 +1,10 @@
 package org.molgenis.vcf.report.repository;
 
 import htsjdk.samtools.SAMSequenceRecord;
+import htsjdk.tribble.readers.AsciiLineReader;
+import htsjdk.tribble.readers.AsciiLineReaderIterator;
 import htsjdk.variant.variantcontext.VariantContext;
-import htsjdk.variant.vcf.VCFFileReader;
+import htsjdk.variant.vcf.VCFCodec;
 import htsjdk.variant.vcf.VCFHeader;
 import htsjdk.variant.vcf.VCFHeaderLine;
 import lombok.NonNull;
@@ -17,7 +19,9 @@ import org.molgenis.vcf.utils.sample.model.Sample;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.*;
@@ -80,11 +84,13 @@ public class DatabaseManager {
                             Path decisionTreePath, Path sampleTreePath, ReportMetadata reportMetadata, Map<?, ?> templateConfig,
                             @NonNull List<Phenopacket> phenopackets) throws IOException {
         getConnection(databaseLocation);
-        try (VCFFileReader reader = new VCFFileReader(vcfFile, false)) {
+        try (FileInputStream fis = new FileInputStream(vcfFile);
+             AsciiLineReader reader = new AsciiLineReader(fis);
+             AsciiLineReaderIterator vcfIterator = new AsciiLineReaderIterator(reader);) {
+            VCFCodec codec = new VCFCodec();
+            VCFHeader header = (VCFHeader) codec.readActualHeader(vcfIterator);
             try {
                 conn.setAutoCommit(false);
-
-                VCFHeader header = reader.getFileHeader();
 
                 Map<String, FieldMetadata> parentFields = getNestedFields(fieldMetadatas, INFO);
                 Map<String, List<String>> nestedFields = new HashMap<>();
@@ -95,7 +101,7 @@ public class DatabaseManager {
                 metadataRepo.insertHeaderLine(conn, lines, getHeaderLine(samples));
                 metadataRepo.insertMetadata(conn, fieldMetadatas, decisionTreePath, sampleTreePath, phenopackets);
                 sampleRepo.insertSamples(conn, samples);
-                insertVariants(fieldMetadatas, samples, decisionTreePath, sampleTreePath, header, reader, nestedFields);
+                insertVariants(fieldMetadatas, samples, decisionTreePath, sampleTreePath, header, vcfIterator, nestedFields, codec);
                 phenotypeRepo.insertPhenotypeData(conn, phenopackets, samples.getItems());
                 configRepo.insertConfigData(conn, templateConfig);
                 decisionTreeRepo.insertDecisionTreeData(conn, decisionTreePath, sampleTreePath);
@@ -110,18 +116,50 @@ public class DatabaseManager {
         return new Bytes(fileContent);
     }
 
-    private void insertVariants(FieldMetadatas fieldMetadatas, Items<Sample> samples, Path decisionTreePath, Path sampleTreePath, VCFHeader header, VCFFileReader reader, Map<String, List<String>> nestedFields) throws DatabaseException, SQLException {
+    private void insertVariants(FieldMetadatas fieldMetadatas, Items<Sample> samples, Path decisionTreePath,
+                                Path sampleTreePath, VCFHeader header, AsciiLineReaderIterator vcfIterator,
+                                Map<String, List<String>> nestedFields, VCFCodec vcfCodec) throws DatabaseException, SQLException {
         List<String> formatColumns = getDatabaseFormatColumns();
         List<String> infoColumns = getDatabaseInfoColumns();
 
-        Map<Object, Integer> contigIds = insertLookupValues(conn,"contig", header.getSequenceDictionary().getSequences().stream().map(SAMSequenceRecord::getSequenceName).toList());
-        for (VariantContext vc : reader) {
-            int variantId = vcfRepo.insertVariant(conn, vc, contigIds);
-            for (Map.Entry<String, List<String>> entry : nestedFields.entrySet()) {
-                nestedRepo.insertNested(conn, entry.getKey(), vc, entry.getValue(), fieldMetadatas, variantId, decisionTreePath != null);
+        Map<Object, Integer> contigIds = insertLookupValues(conn, "contig", header.getSequenceDictionary().getSequences().stream().map(SAMSequenceRecord::getSequenceName).toList());
+        Map<String, Integer> formatLookup = new HashMap<>();
+        String line;
+        int formatId = 0;
+
+        while (vcfIterator.hasNext()) {
+            line = vcfIterator.next();
+            if (!line.startsWith("#")) {
+                String[] split = line.split("\t");
+                String formatString = split.length >= 9 ? split[8] : null;
+                int formatValue;
+                if (formatLookup.containsKey(formatString)) {
+                    formatValue = formatLookup.get(formatString);
+                } else {
+                    formatLookup.put(formatString, formatId);
+                    insertFormatValue(formatId, formatString);
+                    formatValue = formatId;
+                    formatId++;
+                }
+                VariantContext vc = vcfCodec.decode(line);
+                int variantId = vcfRepo.insertVariant(conn, vc, contigIds, formatValue);
+                for (Map.Entry<String, List<String>> entry : nestedFields.entrySet()) {
+                    nestedRepo.insertNested(conn, entry.getKey(), vc, entry.getValue(), fieldMetadatas, variantId, decisionTreePath != null);
+                }
+                formatRepo.insertFormatData(conn, vc, formatColumns, variantId, fieldMetadatas, samples.getItems(), sampleTreePath != null);
+                infoRepo.insertInfoData(conn, vc, infoColumns, fieldMetadatas, variantId, sampleTreePath != null);
             }
-            formatRepo.insertFormatData(conn, vc, formatColumns, variantId, fieldMetadatas, samples.getItems(), sampleTreePath != null);
-            infoRepo.insertInfoData(conn, vc, infoColumns, fieldMetadatas, variantId, sampleTreePath != null);
+        }
+    }
+
+    private void insertFormatValue(int key, String value) {
+        String sql = "INSERT INTO formatLookup (id, value) VALUES (?, ?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, key);
+            ps.setString(2, value);
+            ps.execute();
+        } catch (SQLException e) {
+            throw new DatabaseException(e.getMessage());
         }
     }
 
