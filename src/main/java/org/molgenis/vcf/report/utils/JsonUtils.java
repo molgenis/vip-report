@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class JsonUtils {
@@ -28,7 +28,7 @@ public class JsonUtils {
 
     public static Map<String, ValueDescription> collectNodes(Path jsonPath) {
         ObjectMapper mapper = new ObjectMapper();
-        Map<String, ValueDescription> result = new HashMap<>();
+        Map<String, ValueDescription> result = new LinkedHashMap<>();
         try {
             JsonNode rootObj = mapper.readTree(Files.newBufferedReader(jsonPath));
             JsonNode nodesObj = rootObj.get("nodes");
