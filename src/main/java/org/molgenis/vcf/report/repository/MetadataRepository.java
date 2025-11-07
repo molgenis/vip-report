@@ -43,8 +43,9 @@ class MetadataRepository {
                     description,
                     parent,
                     nested,
+                    nestedIndex,
                     nullValue
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
     static final String INSERT_CATEGORIES_SQL = """
                     INSERT INTO categories (
@@ -138,7 +139,12 @@ class MetadataRepository {
         ps.setString(12, parent);
         boolean nestedFlag = meta.getNestedFields() != null && !meta.getNestedFields().isEmpty();
         ps.setInt(13, nestedFlag ? 1 : 0);
-        ps.setString(14, meta.getNullValue() != null ? toJson(meta.getNullValue()) : null);
+        if (meta instanceof NestedFieldMetadata nestedFieldMetadata) { // Compliant
+            ps.setInt(14, nestedFieldMetadata.getIndex());
+        }else{
+            ps.setString(14, null);
+        }
+        ps.setString(15, meta.getNullValue() != null ? toJson(meta.getNullValue()) : null);
         ps.addBatch();
 
         if (nestedFlag) {

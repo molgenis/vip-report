@@ -52,7 +52,7 @@ public class DatabaseSchemaManager {
 
     static final String CATEGORIES_TABLE_SQL = """
                 CREATE TABLE categories (
-                    id integer PRIMARY KEY AUTOINCREMENT,
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
                     field TEXT NOT NULL,
                     value TEXT NOT NULL,
                     label TEXT NOT NULL,
@@ -145,6 +145,7 @@ public class DatabaseSchemaManager {
                       description TEXT,
                       parent TEXT,
                       nested INTEGER,
+                      nestedIndex INTEGER,
                       nullValue TEXT,
                       FOREIGN KEY (fieldType) REFERENCES fieldType(id),
                       FOREIGN KEY (valueType) REFERENCES valueType(id),
