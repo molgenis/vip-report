@@ -14,7 +14,7 @@ public class VcfRepository {
 
     public static final String MISSING = ".";
 
-    public int insertVariant(Connection conn, VariantContext vc, Map<Object, Integer> contigIds, int format) throws SQLException {
+    public int insertVariant(Connection conn, VariantContext vc, Map<Object, Integer> contigIds, Integer format) throws SQLException {
         try (
                 PreparedStatement insertVCF = conn.prepareStatement(
                         "INSERT INTO vcf (chrom, pos, idVcf, ref, alt, qual, filter, format) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
@@ -32,7 +32,9 @@ public class VcfRepository {
             if(vc.filtersWereApplied()) {
                 insertVCF.setString(7, toJson(vc.isNotFiltered() ? List.of("PASS") : String.join(",", vc.getFilters())));
             }
-            insertVCF.setInt(8, format);
+            if(format != null) {
+                insertVCF.setInt(8, format);
+            }
             insertVCF.executeUpdate();
 
             try (ResultSet rs = insertVCF.getGeneratedKeys()) {

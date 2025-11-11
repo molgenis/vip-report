@@ -137,14 +137,16 @@ public class DatabaseManager {
             if (!line.startsWith("#")) {
                 String[] split = line.split("\t");
                 String formatString = split.length >= 9 ? split[8] : null;
-                int formatValue;
-                if (formatLookup.containsKey(formatString)) {
-                    formatValue = formatLookup.get(formatString);
-                } else {
-                    formatLookup.put(formatString, formatId);
-                    insertFormatValue(formatId, formatString);
-                    formatValue = formatId;
-                    formatId++;
+                Integer formatValue = null;
+                if(formatString != null) {
+                    if (formatLookup.containsKey(formatString)) {
+                        formatValue = formatLookup.get(formatString);
+                    } else {
+                        formatLookup.put(formatString, formatId);
+                        insertFormatValue(formatId, formatString);
+                        formatValue = formatId;
+                        formatId++;
+                    }
                 }
                 VariantContext vc = vcfCodec.decode(line);
                 int variantId = vcfRepo.insertVariant(conn, vc, contigIds, formatValue);
