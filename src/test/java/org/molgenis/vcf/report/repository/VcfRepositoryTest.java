@@ -49,7 +49,7 @@ class VcfRepositoryTest {
         when(vc.isNotFiltered()).thenReturn(true);
 
         Map<Object, Integer> contigIds = Map.of("chr1", 0);
-        int result = repo.insertVariant(conn, vc, contigIds);
+        int result = repo.insertVariant(conn, vc, contigIds, 1);
         assertEquals(42, result);
 
         verify(stmt).setInt(1, 0);

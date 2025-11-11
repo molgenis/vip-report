@@ -21,13 +21,13 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
 import static org.molgenis.vcf.report.repository.SqlUtils.insertLookupValues;
 import static org.molgenis.vcf.utils.metadata.FieldType.INFO;
@@ -99,9 +99,9 @@ public class DatabaseManager {
                 }
                 List<String> lines = new ArrayList<>(header.getMetaDataInInputOrder().stream().map(VCFHeaderLine::toString).toList());
                 metadataRepo.insertHeaderLine(conn, lines, getHeaderLine(samples));
-                metadataRepo.insertMetadata(conn, fieldMetadatas, decisionTreePath, sampleTreePath, phenopackets);
+                Map<FieldType, Map<String, Integer>> metadataKeys = metadataRepo.insertMetadata(conn, fieldMetadatas, decisionTreePath, sampleTreePath, phenopackets);
                 sampleRepo.insertSamples(conn, samples);
-                insertVariants(fieldMetadatas, samples, decisionTreePath, sampleTreePath, header, vcfIterator, nestedFields, codec);
+                insertVariants(fieldMetadatas, samples, decisionTreePath, sampleTreePath, header, vcfIterator, nestedFields, codec, metadataKeys);
                 phenotypeRepo.insertPhenotypeData(conn, phenopackets, samples.getItems());
                 configRepo.insertConfigData(conn, templateConfig);
                 decisionTreeRepo.insertDecisionTreeData(conn, decisionTreePath, sampleTreePath);
@@ -118,7 +118,7 @@ public class DatabaseManager {
 
     private void insertVariants(FieldMetadatas fieldMetadatas, Items<Sample> samples, Path decisionTreePath,
                                 Path sampleTreePath, VCFHeader header, AsciiLineReaderIterator vcfIterator,
-                                Map<String, List<String>> nestedFields, VCFCodec vcfCodec) throws DatabaseException, SQLException {
+                                Map<String, List<String>> nestedFields, VCFCodec vcfCodec, Map<FieldType, Map<String, Integer>> metadataKeys) throws DatabaseException, SQLException {
         List<String> formatColumns = getDatabaseFormatColumns();
         List<String> infoColumns = getDatabaseInfoColumns();
 
@@ -143,6 +143,11 @@ public class DatabaseManager {
                 }
                 VariantContext vc = vcfCodec.decode(line);
                 int variantId = vcfRepo.insertVariant(conn, vc, contigIds, formatValue);
+
+                String infoField = split[7];
+                String[] infoItems = infoField.split(";");
+
+                infoRepo.insertInfoFieldOrder(conn, metadataKeys, infoItems, variantId);
                 for (Map.Entry<String, List<String>> entry : nestedFields.entrySet()) {
                     nestedRepo.insertNested(conn, entry.getKey(), vc, entry.getValue(), fieldMetadatas, variantId, decisionTreePath != null);
                 }
@@ -151,6 +156,8 @@ public class DatabaseManager {
             }
         }
     }
+
+
 
     private void insertFormatValue(int key, String value) {
         String sql = "INSERT INTO formatLookup (id, value) VALUES (?, ?)";

@@ -161,6 +161,16 @@ public class DatabaseSchemaManager {
                       FOREIGN KEY (numberType) REFERENCES numberType(id)
                     );
                 """;
+    static final String INFO_ORDER_TABLE_SQL = """
+                    CREATE TABLE infoOrder (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        infoIndex INTEGER NOT NULL,
+                        variantId INTEGER NOT NULL,
+                        metadataId INTEGER NOT NULL,
+                        FOREIGN KEY (variantId) REFERENCES vcf(id),
+                        FOREIGN KEY (metadataId) REFERENCES metadata(id)
+                    );
+            """;
 
     static final String FIELDTYPE_TABLE_SQL = """
                 CREATE TABLE fieldType (
@@ -214,6 +224,7 @@ public class DatabaseSchemaManager {
         sqlStatements.add(NUMBERTYPE_TABLE_SQL);
         sqlStatements.add(VALUETYPE_TABLE_SQL);
         sqlStatements.add(METADATA_TABLE_SQL);
+        sqlStatements.add(INFO_ORDER_TABLE_SQL);
         sqlStatements.add(APP_METADATA_TABLE_SQL);
         sqlStatements.add(HEADER_TABLE_SQL);
         sqlStatements.add(getInfoTableSql(reportGeneratorSettings, vcfFileHeader));

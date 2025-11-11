@@ -13,9 +13,7 @@ import org.molgenis.vcf.utils.sample.model.Phenopacket;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
 
 import static org.mockito.Mockito.*;
@@ -42,7 +40,10 @@ class MetadataRepositoryTest {
         when(conn.prepareStatement("INSERT INTO numberType (id, value) VALUES (?, ?)")).thenReturn(preparedNumberType);
         when(conn.prepareStatement("INSERT INTO fieldType (id, value) VALUES (?, ?)")).thenReturn(preparedFieldTypes);
         when(conn.prepareStatement("INSERT INTO valueType (id, value) VALUES (?, ?)")).thenReturn(preparedValueTypes);
-        when(conn.prepareStatement(INSERT_METADATA_SQL)).thenReturn(preparedMetadata);
+        ResultSet resultSet = mock(ResultSet.class);
+        when(resultSet.next()).thenReturn(true);
+        when(preparedMetadata.getGeneratedKeys()).thenReturn(resultSet);
+        when(conn.prepareStatement(INSERT_METADATA_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(preparedMetadata);
 
         FieldMetadata fieldMeta = mock(FieldMetadata.class, RETURNS_DEEP_STUBS);
         when(fieldMeta.getType()).thenReturn(ValueType.CATEGORICAL);
@@ -67,15 +68,13 @@ class MetadataRepositoryTest {
 
         // collectNodes and collectHpos use file IO. You might want to stub them with static mocking or refactor to accept injected results for true isolation. This test expects static methods that won't actually read a file.
 
-        doNothing().when(preparedMetadata).addBatch();
         doReturn(new int[]{1}).when(preparedMetadata).executeBatch();
         doReturn(new int[]{1}).when(preparedNumberType).executeBatch();
 
         repository.insertMetadata(conn, metadatas, decisionTreePath, sampleTreePath, phenopackets);
 
-        verify(conn).prepareStatement(INSERT_METADATA_SQL);
-        verify(preparedMetadata).addBatch();
-        verify(preparedMetadata).executeBatch();
+        verify(conn).prepareStatement(INSERT_METADATA_SQL, Statement.RETURN_GENERATED_KEYS);
+        verify(preparedMetadata).executeUpdate();
     }
 
     @Test

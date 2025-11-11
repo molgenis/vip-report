@@ -14,9 +14,7 @@ import org.molgenis.vcf.utils.sample.model.PhenotypicFeature;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
 
 import static org.molgenis.vcf.report.repository.SqlUtils.insertLookupValues;
@@ -56,7 +54,7 @@ class MetadataRepository {
                     ) VALUES (?, ?, ?, ?)
                     """;
 
-    public void insertMetadata(
+    public Map<FieldType, Map<String, Integer>> insertMetadata(
             Connection conn, FieldMetadatas fieldMetadatas,
             Path decisionTreePath,
             Path sampleTreePath,
@@ -66,12 +64,15 @@ class MetadataRepository {
         Map<Object, Integer> valueTypeIds = insertLookupValues(conn, "valueType", List.of(ValueType.values()));
         Map<Object, Integer> fieldTypeIds = insertLookupValues(conn, "fieldType", List.of(FieldType.values()));
 
-        try (PreparedStatement ps = conn.prepareStatement(INSERT_METADATA_SQL)) {
+        Map<String, Integer> infoKeys;
+        Map<String, Integer> formatKeys;
+        try (PreparedStatement ps = conn.prepareStatement(INSERT_METADATA_SQL, Statement.RETURN_GENERATED_KEYS)) {
             Map<String, Map<String, ValueDescription>> customCategories = getCustomCategories(decisionTreePath, sampleTreePath, phenopackets);
-            insertFields(conn, fieldMetadatas.getFormat().entrySet(), ps, FieldType.FORMAT, customCategories, numberTypeIds, valueTypeIds, fieldTypeIds);
-            insertFields(conn, fieldMetadatas.getInfo().entrySet(), ps, FieldType.INFO, customCategories, numberTypeIds, valueTypeIds, fieldTypeIds);
+            formatKeys = insertFields(conn, fieldMetadatas.getFormat().entrySet(), ps, FieldType.FORMAT, customCategories, numberTypeIds, valueTypeIds, fieldTypeIds);
+            infoKeys = insertFields(conn, fieldMetadatas.getInfo().entrySet(), ps, FieldType.INFO, customCategories, numberTypeIds, valueTypeIds, fieldTypeIds);
             ps.executeBatch();
         }
+        return Map.of(FieldType.INFO, infoKeys, FieldType.FORMAT, formatKeys);
     }
 
     private Map<String, Map<String, ValueDescription>> getCustomCategories(Path decisionTreePath, Path sampleTreePath, List<Phenopacket> phenopackets) {
@@ -86,16 +87,19 @@ class MetadataRepository {
         return customCategories;
     }
 
-    private void insertFields(
+    private Map<String, Integer> insertFields(
             Connection conn,
             Set<? extends Map.Entry<String, FieldMetadata>> entries,
             PreparedStatement ps,
             FieldType fieldType,
             Map<String, Map<String, ValueDescription>> customCategories,
             Map<Object, Integer> numberTypeIds, Map<Object, Integer> valueTypeIds, Map<Object, Integer> fieldTypeIds) throws SQLException {
+        Map<String, Integer> result = new HashMap<>();
         for (Map.Entry<String, ? extends FieldMetadata> entry : entries) {
-            addMetadata(conn, entry, ps, fieldType, null, customCategories, numberTypeIds, valueTypeIds, fieldTypeIds);
+            int pk = addMetadata(conn, entry, ps, fieldType, null, customCategories, numberTypeIds, valueTypeIds, fieldTypeIds);
+            result.put(entry.getKey(), pk);
         }
+        return result;
     }
 
     private Map<String, ValueDescription> collectHpos(@NonNull List<Phenopacket> phenopackets) {
@@ -111,7 +115,7 @@ class MetadataRepository {
         return hpos;
     }
 
-    private void addMetadata(
+    private int addMetadata(
             Connection conn, Map.Entry<String, ? extends FieldMetadata> metadataEntry,
             PreparedStatement ps,
             FieldType type,
@@ -145,13 +149,24 @@ class MetadataRepository {
             ps.setString(14, null);
         }
         ps.setString(15, meta.getNullValue() != null ? toJson(meta.getNullValue()) : null);
-        ps.addBatch();
+        ps.executeUpdate();
+
+        int metadataId;
+        try (ResultSet rs = ps.getGeneratedKeys()) {
+            if(rs.next()) {
+                metadataId = rs.getInt(1);
+            } else {
+                throw new SQLException("Failed to retrieve metadataId from metadata insert.");
+            }
+        }
 
         if (nestedFlag) {
             for (Map.Entry<String, NestedFieldMetadata> nestedEntry : meta.getNestedFields().entrySet()) {
                 addMetadata(conn, nestedEntry, ps, type, fieldName, customCategories, numberTypeIds, valueTypeIds, fieldTypeIds);
             }
         }
+
+        return metadataId;
     }
 
     private void insertCategoriesBatch(Connection conn, String fieldName, Map<String, ValueDescription> categories) throws SQLException {

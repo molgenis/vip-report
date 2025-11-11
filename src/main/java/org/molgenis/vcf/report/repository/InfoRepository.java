@@ -1,6 +1,7 @@
 package org.molgenis.vcf.report.repository;
 
 import htsjdk.variant.variantcontext.VariantContext;
+import org.molgenis.vcf.utils.metadata.FieldType;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadata;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadatas;
 import org.springframework.stereotype.Component;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Collections.emptyMap;
 import static org.molgenis.vcf.report.repository.FormatRepository.VIPC_S;
 import static org.molgenis.vcf.report.utils.CategoryUtils.addCategorical;
 import static org.molgenis.vcf.report.utils.CategoryUtils.loadCategoriesMap;
@@ -68,5 +70,23 @@ public class InfoRepository {
         }
         sql.append(") VALUES (?").append(", ?".repeat(columns.size())).append(")");
         return conn.prepareStatement(sql.toString());
+    }
+
+    public void insertInfoFieldOrder(Connection conn, Map<FieldType, Map<String, Integer>> metadataKeys, String[] infoItems, int variantId) throws SQLException {
+        String INSERT_INFO_ORDER_SQL = "INSERT INTO infoOrder (infoIndex, variantId, metadataId) VALUES (?, ?, ?)";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(INSERT_INFO_ORDER_SQL)) {
+            for (int i = 0; i < infoItems.length; i++) {
+                String item = infoItems[i];
+                String key = item.contains("=") ? item.substring(0, item.indexOf('=')) : item;
+                Map<String, Integer> infoKeys = metadataKeys.get(INFO) != null ? metadataKeys.get(INFO) : emptyMap();
+                Integer metdataId = infoKeys.get(key) != null ?  infoKeys.get(key) : -1;
+                pstmt.setInt(1, i);
+                pstmt.setInt(2, variantId);
+                pstmt.setInt(3, metdataId);
+                pstmt.addBatch();
+            }
+            pstmt.executeBatch();
+        }
     }
 }

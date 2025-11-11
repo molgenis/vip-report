@@ -70,11 +70,13 @@ class DatabaseManagerTest {
         Path decisionTree = Paths.get("src", "test", "resources", "tree.json");
         Path sampleTree = Paths.get("src", "test", "resources", "tree.json");
 
+        when(metadataRepo.insertMetadata(any(),any(),any(),any(),any())).thenReturn(Collections.emptyMap());
+
         manager.setConnection(conn);
         manager.populateDb(exampleDb.toString(), fieldMetadatas, samples, inputVcfPath.toFile(),
                 decisionTree, sampleTree, reportMetadata, config, phenopackets);
 
-        verify(vcfRepo).insertVariant(eq(conn), any(), any());
+        verify(vcfRepo).insertVariant(eq(conn), any(), any(), anyInt());
         verify(infoRepo).insertInfoData(eq(conn), any(), eq(List.of()), eq(fieldMetadatas), eq(0), eq(true));
         verify(formatRepo).insertFormatData(eq(conn), any(), eq(List.of()), eq(0), eq(fieldMetadatas), eq(sampleList), eq(true));
         verify(phenotypeRepo).insertPhenotypeData(conn, phenopackets, sampleList);
