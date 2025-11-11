@@ -3,6 +3,7 @@ package org.molgenis.vcf.report.repository;
 import htsjdk.variant.variantcontext.VariantContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.molgenis.vcf.utils.metadata.FieldType;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadata;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadatas;
 
@@ -12,8 +13,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.molgenis.vcf.utils.metadata.FieldType.INFO;
 
 class InfoRepositoryTest {
 
@@ -74,5 +77,31 @@ class InfoRepositoryTest {
         verify(ps).setString(4, "[\"1\",\"2\"]");
         verify(ps).setString(5, "[\"B\"]");
         verify(ps).executeUpdate();
+    }
+
+    @Test
+    void testInsertInfoOrderData() throws SQLException {
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+        when(conn.createStatement()).thenReturn(ps);
+
+        Map<FieldType, Map<String, Integer>> metadataKeys = new HashMap<>();
+        Map<String, Integer> infoKeys = Map.of("TEST", 1,"TEST2", 2,"TEST3", 3);
+        metadataKeys.put(INFO, infoKeys);
+        int variantId = 1;
+        String[] infoItems = "TEST3,TEST,TEST2".split(",");
+        infoRepository.insertInfoFieldOrder(conn, metadataKeys,infoItems, variantId );
+
+        verify(conn).prepareStatement(anyString());
+        verify(ps).setInt(1, 0);
+        verify(ps, times(3)).setInt(2, 1);
+        verify(ps).setInt(3, 1);
+        verify(ps).setInt(1, 1);
+        verify(ps).setInt(3, 2);
+        verify(ps).setInt(1, 0);
+        verify(ps).setInt(3, 1);
+        verify(ps, times(3)).addBatch();
+        verify(ps).executeBatch();
     }
 }
