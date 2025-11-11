@@ -21,11 +21,13 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.*;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.zip.GZIPInputStream;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
@@ -84,7 +86,10 @@ public class DatabaseManager {
                             Path decisionTreePath, Path sampleTreePath, ReportMetadata reportMetadata, Map<?, ?> templateConfig,
                             @NonNull List<Phenopacket> phenopackets) throws IOException {
         getConnection(databaseLocation);
-        try (FileInputStream fis = new FileInputStream(vcfFile);
+        boolean isGz = vcfFile.getName().toLowerCase().endsWith(".gz");
+        try (InputStream fis = isGz ?
+                new GZIPInputStream(new FileInputStream(vcfFile)) :
+                new FileInputStream(vcfFile);
              AsciiLineReader reader = new AsciiLineReader(fis);
              AsciiLineReaderIterator vcfIterator = new AsciiLineReaderIterator(reader);) {
             VCFCodec codec = new VCFCodec();
