@@ -8,7 +8,7 @@ class DatabaseExceptionTest {
     @Test
     void getMessage() {
         assertEquals(
-                "Error while communicating with the database: 'TEST'",
-                new DatabaseException("TEST").getMessage());
+                "Error while communicating with the database: 'TEST' for operation 'OPERATION'",
+                new DatabaseException("TEST", "OPERATION").getMessage());
     }
 }
