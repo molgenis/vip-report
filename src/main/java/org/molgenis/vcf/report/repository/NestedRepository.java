@@ -25,22 +25,26 @@ public class NestedRepository {
     public static final String CSQ_INDEX = "CsqIndex";
 
     public void insertNested(Connection conn, String fieldName, VariantContext vc, List<String> matchingNestedFields,
-                             FieldMetadatas fieldMetadatas, int variantId, boolean hasDecisionTree) throws SQLException {
-        Map<FieldValueKey, Integer> categoryLookup = loadCategoriesMap(conn);
-        if(fieldName.equals("CSQ")){
-            matchingNestedFields.add(CSQ_INDEX);
-        }
-        if(vc.hasAttribute(fieldName)) {
-            try (PreparedStatement insertNestedStmt = prepareInsertSQL(conn, String.format("variant_%s", fieldName), matchingNestedFields)) {
-                List<String> nestedEntries = vc.getAttributeAsStringList(fieldName, "");
-                insertNestedStmt.setInt(1, variantId);
-                int index = 0;
-                for (String nestedField : nestedEntries) {
-                    insertNestedValue(index, matchingNestedFields, nestedField, fieldName, fieldMetadatas.getInfo().get(fieldName), insertNestedStmt, categoryLookup, hasDecisionTree);
-                    index++;
-                }
-                insertNestedStmt.executeBatch();
+                             FieldMetadatas fieldMetadatas, int variantId, boolean hasDecisionTree) {
+        try {
+            Map<FieldValueKey, Integer> categoryLookup = loadCategoriesMap(conn);
+            if (fieldName.equals("CSQ")) {
+                matchingNestedFields.add(CSQ_INDEX);
             }
+            if (vc.hasAttribute(fieldName)) {
+                try (PreparedStatement insertNestedStmt = prepareInsertSQL(conn, String.format("variant_%s", fieldName), matchingNestedFields)) {
+                    List<String> nestedEntries = vc.getAttributeAsStringList(fieldName, "");
+                    insertNestedStmt.setInt(1, variantId);
+                    int index = 0;
+                    for (String nestedField : nestedEntries) {
+                        insertNestedValue(index, matchingNestedFields, nestedField, fieldName, fieldMetadatas.getInfo().get(fieldName), insertNestedStmt, categoryLookup, hasDecisionTree);
+                        index++;
+                    }
+                    insertNestedStmt.executeBatch();
+                }
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException(e.getMessage(), "insert nested values");
         }
     }
 

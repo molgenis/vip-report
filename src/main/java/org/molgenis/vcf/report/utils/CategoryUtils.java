@@ -1,5 +1,6 @@
 package org.molgenis.vcf.report.utils;
 
+import org.molgenis.vcf.report.repository.DatabaseException;
 import org.molgenis.vcf.report.repository.FieldValueKey;
 import org.molgenis.vcf.utils.metadata.FieldType;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadata;
@@ -16,7 +17,7 @@ public class CategoryUtils {
 
     private CategoryUtils() {}
 
-    public static Map<FieldValueKey, Integer> loadCategoriesMap(Connection conn) throws SQLException {
+    public static Map<FieldValueKey, Integer> loadCategoriesMap(Connection conn) {
         Map<FieldValueKey, Integer> idLookupMap = new HashMap<>();
         String sql = "SELECT id, field, value FROM categories";
         try (
@@ -30,6 +31,9 @@ public class CategoryUtils {
                 FieldValueKey key = new FieldValueKey(field, value);
                 idLookupMap.put(key, id);
             }
+        }
+        catch (SQLException e){
+            throw new DatabaseException(e.getMessage(), "load categories");
         }
         return idLookupMap;
     }

@@ -34,7 +34,7 @@ public class SampleRepository {
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """;
 
-    public void insertSamples(Connection conn, Items<Sample> sampleItems) throws SQLException {
+    public void insertSamples(Connection conn, Items<Sample> sampleItems) {
 
         Map<Object, Integer> sexIds = insertLookupValues(conn, "sex", List.of(Sex.values()));
         Map<Object, Integer> affectedIds = insertLookupValues(conn, "affectedStatus", List.of(AffectedStatus.values()));
@@ -46,6 +46,8 @@ public class SampleRepository {
                 addedSamples = addSample(sample, samples, pstmt, affectedIds, sexIds, addedSamples);
             }
             pstmt.executeBatch();
+        }catch (SQLException e){
+            throw new DatabaseException(e.getMessage(), "insert samples");
         }
     }
 

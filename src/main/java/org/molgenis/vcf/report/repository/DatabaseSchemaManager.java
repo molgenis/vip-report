@@ -197,7 +197,7 @@ public class DatabaseSchemaManager {
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(sql);
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage());
+            throw new DatabaseException(e.getMessage(), String.format("execute: '%s'", sql));
         }
     }
 

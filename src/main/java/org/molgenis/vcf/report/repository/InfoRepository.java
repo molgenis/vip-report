@@ -15,6 +15,7 @@ import static java.util.Collections.emptyMap;
 import static org.molgenis.vcf.report.repository.FormatRepository.VIPC_S;
 import static org.molgenis.vcf.report.utils.CategoryUtils.addCategorical;
 import static org.molgenis.vcf.report.utils.CategoryUtils.loadCategoriesMap;
+import static org.molgenis.vcf.report.utils.JsonUtils.MISSING;
 import static org.molgenis.vcf.report.utils.JsonUtils.toJson;
 import static org.molgenis.vcf.utils.metadata.FieldType.INFO;
 import static org.molgenis.vcf.utils.metadata.ValueCount.Type.FIXED;
@@ -29,7 +30,7 @@ public class InfoRepository {
             List<String> infoColumns,
             FieldMetadatas fieldMetadatas,
             int variantId, boolean hasSampleTree
-    ) throws SQLException {
+    ) {
         Map<FieldValueKey, Integer> categoryLookup = loadCategoriesMap(conn);
 
         try (PreparedStatement insertInfo = prepareInsertInfo(conn, infoColumns)) {
@@ -38,6 +39,8 @@ public class InfoRepository {
                 insertInfoDataColumn(vc, infoColumns, fieldMetadatas, i, insertInfo, categoryLookup, hasSampleTree);
             }
             insertInfo.executeUpdate();
+        } catch (SQLException e) {
+            throw new DatabaseException(e.getMessage(), "insert info values");
         }
     }
 
@@ -72,10 +75,13 @@ public class InfoRepository {
         return conn.prepareStatement(sql.toString());
     }
 
-    public void insertInfoFieldOrder(Connection conn, Map<FieldType, Map<String, Integer>> metadataKeys, String[] infoItems, int variantId) throws SQLException {
+    public void insertInfoFieldOrder(Connection conn, Map<FieldType, Map<String, Integer>> metadataKeys, String[] infoItems, int variantId) {
         String INSERT_INFO_ORDER_SQL = "INSERT INTO infoOrder (infoIndex, variantId, metadataId) VALUES (?, ?, ?)";
 
         try (PreparedStatement pstmt = conn.prepareStatement(INSERT_INFO_ORDER_SQL)) {
+            if(infoItems.length == 0 || (infoItems.length == 1 && infoItems[0].equals(MISSING))) {
+                return;//No info order if INFO column is a missing value.
+            }
             for (int i = 0; i < infoItems.length; i++) {
                 String item = infoItems[i];
                 String key = item.contains("=") ? item.substring(0, item.indexOf('=')) : item;
@@ -87,6 +93,8 @@ public class InfoRepository {
                 pstmt.addBatch();
             }
             pstmt.executeBatch();
+        } catch (SQLException e) {
+            throw new DatabaseException(e.getMessage(), "insert info field order");
         }
     }
 }

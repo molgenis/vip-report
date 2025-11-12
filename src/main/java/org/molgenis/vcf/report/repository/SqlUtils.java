@@ -10,7 +10,7 @@ public class SqlUtils {
 
     private SqlUtils(){}
 
-    public static Map<Object, Integer> insertLookupValues(Connection conn, String tableName, Iterable<?> values) throws SQLException {
+    public static Map<Object, Integer> insertLookupValues(Connection conn, String tableName, Iterable<?> values) {
         Map<Object, Integer> idMap = new HashMap();
         String sql = String.format("INSERT INTO %s (id, value) VALUES (?, ?)", tableName);
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -23,6 +23,8 @@ public class SqlUtils {
                 i++;
             }
             ps.executeBatch();
+        }catch (SQLException e){
+            throw new DatabaseException(e.getMessage(), String.format("insertLookupValues for: '%s'", tableName));
         }
         return idMap;
     }

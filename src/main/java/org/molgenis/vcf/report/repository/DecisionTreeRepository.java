@@ -32,7 +32,7 @@ public class DecisionTreeRepository {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage());
+            throw new DatabaseException(e.getMessage(), "insert decision tree");
         }
     }
 }

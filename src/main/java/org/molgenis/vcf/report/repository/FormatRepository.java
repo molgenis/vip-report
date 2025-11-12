@@ -39,7 +39,7 @@ public class FormatRepository {
     }
 
     public void insertFormatData(Connection conn, VariantContext vc, List<String> formatColumns, int variantId, FieldMetadatas fieldMetadatas, List<Sample> samples,
-                                 boolean hasSampleTree) throws SQLException {
+                                 boolean hasSampleTree) {
         Map<FieldValueKey, Integer> categoryLookup = loadCategoriesMap(conn);
         try (PreparedStatement insertFormat = prepareInsertFormat(conn, formatColumns)) {
             insertFormat.setInt(1, variantId);
@@ -58,6 +58,8 @@ public class FormatRepository {
                 insertFormat.addBatch();
             }
             insertFormat.executeBatch();
+        } catch (SQLException e) {
+            throw new DatabaseException(e.getMessage(), "insert format values");
         }
     }
 

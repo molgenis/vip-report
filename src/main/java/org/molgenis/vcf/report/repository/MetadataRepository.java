@@ -207,7 +207,7 @@ class MetadataRepository {
             insertStmt.addBatch();
             insertStmt.executeBatch();
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage());
+            throw new DatabaseException(e.getMessage(), "insert header line");
         }
     }
 }

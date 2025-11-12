@@ -76,7 +76,7 @@ public class DatabaseManager {
             try {
                 this.conn = DriverManager.getConnection(databaseUrl);
             } catch (SQLException e) {
-                throw new DatabaseException(e.getMessage());
+                throw new DatabaseException(e.getMessage(), "get connection");
             }
         }
         return this.conn;
@@ -94,7 +94,6 @@ public class DatabaseManager {
              AsciiLineReaderIterator vcfIterator = new AsciiLineReaderIterator(reader);) {
             VCFCodec codec = new VCFCodec();
             VCFHeader header = (VCFHeader) codec.readActualHeader(vcfIterator);
-            try {
                 conn.setAutoCommit(false);
 
                 Map<String, FieldMetadata> parentFields = getNestedFields(fieldMetadatas, INFO);
@@ -113,9 +112,8 @@ public class DatabaseManager {
                 reportMetadataRepo.insertReportMetadata(conn, reportMetadata);
 
                 conn.commit();
-            } catch (SQLException e) {
-                throw new DatabaseException(e.getMessage());
-            }
+        }catch (SQLException e){
+            throw new DatabaseException(e.getMessage(), "populate db");
         }
         byte[] fileContent = Files.readAllBytes(Path.of(databaseLocation));
         return new Bytes(fileContent);
@@ -123,11 +121,11 @@ public class DatabaseManager {
 
     private void insertVariants(FieldMetadatas fieldMetadatas, Items<Sample> samples, Path decisionTreePath,
                                 Path sampleTreePath, VCFHeader header, AsciiLineReaderIterator vcfIterator,
-                                Map<String, List<String>> nestedFields, VCFCodec vcfCodec, Map<FieldType, Map<String, Integer>> metadataKeys) throws DatabaseException, SQLException {
+                                Map<String, List<String>> nestedFields, VCFCodec vcfCodec, Map<FieldType, Map<String, Integer>> metadataKeys) throws DatabaseException {
         List<String> formatColumns = getDatabaseFormatColumns();
         List<String> infoColumns = getDatabaseInfoColumns();
 
-        Map<Object, Integer> contigIds = insertLookupValues(conn, "contig", header.getSequenceDictionary().getSequences().stream().map(SAMSequenceRecord::getSequenceName).toList());
+        Map<Object, Integer> contigIds = SqlUtils.insertLookupValues(conn, "contig", header.getSequenceDictionary().getSequences().stream().map(SAMSequenceRecord::getSequenceName).toList());
         Map<String, Integer> formatLookup = new HashMap<>();
         String line;
         int formatId = 0;
@@ -173,7 +171,7 @@ public class DatabaseManager {
             ps.setString(2, value);
             ps.execute();
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage());
+            throw new DatabaseException(e.getMessage(), "insert lookup value");
         }
     }
 
@@ -198,19 +196,31 @@ public class DatabaseManager {
         return headerLine;
     }
 
-    private List<String> getDatabaseInfoColumns() throws SQLException {
-        return getTableColumns("info", c -> !c.equalsIgnoreCase("id") && !c.equalsIgnoreCase(VARIANT_ID));
+    private List<String> getDatabaseInfoColumns() {
+        try {
+            return getTableColumns("info", c -> !c.equalsIgnoreCase("id") && !c.equalsIgnoreCase(VARIANT_ID));
+        } catch (SQLException e) {
+            throw new DatabaseException(e.getMessage(), "get info columns");
+        }
     }
 
-    private List<String> getDatabaseFormatColumns() throws SQLException {
-        return getTableColumns("format", c -> !c.equalsIgnoreCase("id")
-                && !c.equalsIgnoreCase(SAMPLE_INDEX)
-                && !c.equalsIgnoreCase(VARIANT_ID));
+    private List<String> getDatabaseFormatColumns() {
+        try {
+            return getTableColumns("format", c -> !c.equalsIgnoreCase("id")
+                    && !c.equalsIgnoreCase(SAMPLE_INDEX)
+                    && !c.equalsIgnoreCase(VARIANT_ID));
+        } catch (SQLException e) {
+            throw new DatabaseException(e.getMessage(), "get format columns");
+        }
     }
 
-    private List<String> getDatabaseNestedColumns(String field) throws SQLException {
-        return getTableColumns(String.format("variant_%s", field),
-                c -> !c.equalsIgnoreCase("id") && !c.equalsIgnoreCase(VARIANT_ID));
+    private List<String> getDatabaseNestedColumns(String field) {
+        try {
+            return getTableColumns(String.format("variant_%s", field),
+                    c -> !c.equalsIgnoreCase("id") && !c.equalsIgnoreCase(VARIANT_ID));
+        } catch (SQLException e) {
+            throw new DatabaseException(e.getMessage(), "get nested columns");
+        }
     }
 
     private List<String> getTableColumns(String table, java.util.function.Predicate<String> include) throws SQLException {

@@ -36,7 +36,7 @@ public class ReportMetadataRepository {
             insertStmt.executeBatch();
 
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage());
+            throw new DatabaseException(e.getMessage(), "insert report metadata");
         } catch (JsonProcessingException e) {
             throw new JsonException(e.getMessage());
         }

@@ -14,7 +14,7 @@ public class VcfRepository {
 
     public static final String MISSING = ".";
 
-    public int insertVariant(Connection conn, VariantContext vc, Map<Object, Integer> contigIds, Integer format) throws SQLException {
+    public int insertVariant(Connection conn, VariantContext vc, Map<Object, Integer> contigIds, Integer format) {
         try (
                 PreparedStatement insertVCF = conn.prepareStatement(
                         "INSERT INTO vcf (chrom, pos, idVcf, ref, alt, qual, filter, format) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
@@ -44,6 +44,8 @@ public class VcfRepository {
                     throw new SQLException("Failed to retrieve variantId from vcf insert.");
                 }
             }
+        } catch (SQLException e) {
+            throw new DatabaseException(e.getMessage(), "insert variant");
         }
     }
 
