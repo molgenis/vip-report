@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import java.sql.*;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import static org.molgenis.vcf.report.repository.DatabaseManager.VARIANT_ID;

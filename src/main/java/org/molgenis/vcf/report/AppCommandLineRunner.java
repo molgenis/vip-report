@@ -3,8 +3,6 @@ package org.molgenis.vcf.report;
 import static java.util.Objects.requireNonNull;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_FORCE;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_FORCE_LONG;
-import static org.molgenis.vcf.report.utils.PathUtils.getDatabaseLocation;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import lombok.NonNull;

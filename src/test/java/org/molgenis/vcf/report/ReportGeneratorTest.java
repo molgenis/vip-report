@@ -81,8 +81,7 @@ class ReportGeneratorTest {
         .thenReturn(vcfSampleItems);
 
     List<Phenopacket> phenopacketList = emptyList();
-    List<Phenopacket> phenopacketItems = phenopacketList;
-    when(phenopacketMapper.mapPhenotypes(any(), any())).thenReturn(phenopacketItems);
+    when(phenopacketMapper.mapPhenotypes(any(), any())).thenReturn(phenopacketList);
 
     Path inputVcfPath = Paths.get("src", "test", "resources", "example.vcf");
     Path database = Paths.get("src", "test", "resources", "example.db");

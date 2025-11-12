@@ -9,7 +9,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-
 @Component
 public class ReportMetadataRepository {
 
@@ -17,8 +16,6 @@ public class ReportMetadataRepository {
         String sql = "INSERT INTO appMetadata (id, value) VALUES (?, ?)";
         ObjectMapper objectMapper = new ObjectMapper();
         try (PreparedStatement insertStmt = conn.prepareStatement(sql)) {
-
-
             insertStmt.setString(1, "appArguments");
             insertStmt.setString(2, reportMetadata.getAppMetadata().getAppArguments());
             insertStmt.addBatch();
@@ -31,10 +28,7 @@ public class ReportMetadataRepository {
             insertStmt.setString(1, "htsFile");
             insertStmt.setString(2, objectMapper.writeValueAsString(reportMetadata.getHtsFile()));
             insertStmt.addBatch();
-
-
             insertStmt.executeBatch();
-
         } catch (SQLException e) {
             throw new DatabaseException(e.getMessage(), "insert report metadata");
         } catch (JsonProcessingException e) {

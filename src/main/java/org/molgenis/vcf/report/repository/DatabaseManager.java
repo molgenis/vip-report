@@ -29,9 +29,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
-import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
-import static org.molgenis.vcf.report.repository.SqlUtils.insertLookupValues;
 import static org.molgenis.vcf.utils.metadata.FieldType.INFO;
 
 @Component

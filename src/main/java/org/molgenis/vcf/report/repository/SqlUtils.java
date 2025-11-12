@@ -11,7 +11,7 @@ public class SqlUtils {
     private SqlUtils(){}
 
     public static Map<Object, Integer> insertLookupValues(Connection conn, String tableName, Iterable<?> values) {
-        Map<Object, Integer> idMap = new HashMap();
+        Map<Object, Integer> idMap = new HashMap<>();
         String sql = String.format("INSERT INTO %s (id, value) VALUES (?, ?)", tableName);
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             int i = 0;
