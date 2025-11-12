@@ -105,7 +105,9 @@ public class DatabaseManager {
                 sampleRepo.insertSamples(conn, samples);
                 insertVariants(fieldMetadatas, samples, decisionTreePath, sampleTreePath, header, vcfIterator, nestedFields, codec, metadataKeys);
                 phenotypeRepo.insertPhenotypeData(conn, phenopackets, samples.getItems());
-                configRepo.insertConfigData(conn, templateConfig);
+                if(templateConfig != null) {
+                    configRepo.insertConfigData(conn, templateConfig);
+                }
                 decisionTreeRepo.insertDecisionTreeData(conn, decisionTreePath, sampleTreePath);
                 reportMetadataRepo.insertReportMetadata(conn, reportMetadata);
 

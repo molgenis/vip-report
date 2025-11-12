@@ -22,25 +22,27 @@ public class PhenotypeRepository {
              PreparedStatement samplePhenoStmt = conn.prepareStatement(samplePhenoSql)) {
 
             for (Phenopacket packet : packets) {
-                Sample sample = samples.stream().filter(s -> s.getPerson().getIndividualId()
-                        .equals(packet.getSubject().getId())).toList().getFirst();
+                List<Sample> matchedSamples = samples.stream().filter(s -> s.getPerson().getIndividualId()
+                        .equals(packet.getSubject().getId())).toList();
+                if (matchedSamples.size() == 1) {
+                    Sample sample = matchedSamples.getFirst();
 
-                for (PhenotypicFeature feature : packet.getPhenotypicFeaturesList()) {
-                    String phenotypeId = feature.getOntologyClass().getId();
-                    String phenotypeLabel = feature.getOntologyClass().getLabel();
+                    for (PhenotypicFeature feature : packet.getPhenotypicFeaturesList()) {
+                        String phenotypeId = feature.getOntologyClass().getId();
+                        String phenotypeLabel = feature.getOntologyClass().getLabel();
 
-                    phenotypeStmt.setString(1, phenotypeId);
-                    phenotypeStmt.setString(2, phenotypeLabel);
-                    phenotypeStmt.addBatch();
+                        phenotypeStmt.setString(1, phenotypeId);
+                        phenotypeStmt.setString(2, phenotypeLabel);
+                        phenotypeStmt.addBatch();
 
-                    samplePhenoStmt.setInt(1, sample.getIndex());
-                    samplePhenoStmt.setString(2, phenotypeId);
-                    samplePhenoStmt.addBatch();
+                        samplePhenoStmt.setInt(1, sample.getIndex());
+                        samplePhenoStmt.setString(2, phenotypeId);
+                        samplePhenoStmt.addBatch();
+                    }
                 }
+                phenotypeStmt.executeBatch();
+                samplePhenoStmt.executeBatch();
             }
-            phenotypeStmt.executeBatch();
-            samplePhenoStmt.executeBatch();
-
         } catch (SQLException e) {
             throw new DatabaseException(e.getMessage(), "insert phenotype data");
         }
