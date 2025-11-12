@@ -1,8 +1,12 @@
 package org.molgenis.vcf.report;
 
 import static java.util.Objects.requireNonNull;
+import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_DEBUG;
+import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_DEBUG_LONG;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_FORCE;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_FORCE_LONG;
+
+import ch.qos.logback.classic.Level;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import lombok.NonNull;
@@ -55,6 +59,17 @@ public class AppCommandLineRunner implements CommandLineRunner {
       return;
     }
 
+    for (String arg : args) {
+      if (arg.equals('-' + OPT_DEBUG) || arg.equals('-' + OPT_DEBUG_LONG)) {
+        Logger rootLogger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        if (!(rootLogger instanceof ch.qos.logback.classic.Logger)) {
+          throw new ClassCastException("Expected root logger to be a logback logger");
+        }
+        ((ch.qos.logback.classic.Logger) rootLogger).setLevel(Level.DEBUG);
+        break;
+      }
+    }
+
     try {
       Settings settings = createSettings(args);
 
@@ -72,7 +87,7 @@ public class AppCommandLineRunner implements CommandLineRunner {
       reportService.createReport(settings);
       LOGGER.info("created report '{}'", outputReportPath);
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.error(e.getLocalizedMessage());
       System.exit(STATUS_MISC_ERROR);
     }
   }
