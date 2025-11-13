@@ -82,14 +82,14 @@ public class InfoRepository {
             if(infoItems.length == 0 || (infoItems.length == 1 && infoItems[0].equals(MISSING))) {
                 return;//No info order if INFO column is a missing value.
             }
+            pstmt.setInt(2, variantId);
             for (int i = 0; i < infoItems.length; i++) {
                 String item = infoItems[i];
                 String key = item.contains("=") ? item.substring(0, item.indexOf('=')) : item;
                 Map<String, Integer> infoKeys = metadataKeys.get(INFO) != null ? metadataKeys.get(INFO) : emptyMap();
-                Integer metdataId = infoKeys.get(key) != null ?  infoKeys.get(key) : -1;
+                Integer metadataId = infoKeys.get(key) != null ?  infoKeys.get(key) : -1;
                 pstmt.setInt(1, i);
-                pstmt.setInt(2, variantId);
-                pstmt.setInt(3, metdataId);
+                pstmt.setInt(3, metadataId);
                 pstmt.addBatch();
             }
             pstmt.executeBatch();

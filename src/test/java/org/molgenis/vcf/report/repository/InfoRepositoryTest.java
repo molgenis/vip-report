@@ -93,7 +93,7 @@ class InfoRepositoryTest {
 
         verify(conn).prepareStatement(anyString());
         verify(ps).setInt(1, 0);
-        verify(ps, times(3)).setInt(2, 1);
+        verify(ps).setInt(2, 1);
         verify(ps).setInt(3, 1);
         verify(ps).setInt(1, 1);
         verify(ps).setInt(3, 2);
