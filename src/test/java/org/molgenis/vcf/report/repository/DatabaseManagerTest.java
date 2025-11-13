@@ -16,6 +16,7 @@ import java.nio.file.Paths;
 import java.sql.*;
 import java.util.*;
 
+import static htsjdk.variant.variantcontext.GenotypeType.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -78,7 +79,7 @@ class DatabaseManagerTest {
 
         verify(vcfRepo).insertVariant(eq(conn), any(), any(), anyInt());
         verify(infoRepo).insertInfoData(eq(conn), any(), eq(List.of()), eq(fieldMetadatas), eq(0), eq(true));
-        verify(formatRepo).insertFormatData(eq(conn), any(), eq(List.of()), eq(0), eq(fieldMetadatas), eq(sampleList), eq(true));
+        verify(formatRepo).insertFormatData(eq(conn), any(), eq(List.of()), eq(0), eq(fieldMetadatas), eq(sampleList), eq(true), eq(Map.of(UNAVAILABLE,4, HOM_REF,1, HET,2, HOM_VAR,3, MIXED,5, NO_CALL,0)));
         verify(phenotypeRepo).insertPhenotypeData(conn, phenopackets, sampleList);
         verify(metadataRepo).insertMetadata(conn, fieldMetadatas,  decisionTree, sampleTree, phenopackets);
         verify(configRepo).insertConfigData(conn, Map.of());

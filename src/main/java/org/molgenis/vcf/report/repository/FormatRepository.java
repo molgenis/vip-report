@@ -39,7 +39,7 @@ public class FormatRepository {
     }
 
     public void insertFormatData(Connection conn, VariantContext vc, List<String> formatColumns, int variantId, FieldMetadatas fieldMetadatas, List<Sample> samples,
-                                 boolean hasSampleTree) {
+                                 boolean hasSampleTree, Map<Object, Integer> gtIds) {
         Map<FieldValueKey, Integer> categoryLookup = loadCategoriesMap(conn);
         try (PreparedStatement insertFormat = prepareInsertFormat(conn, formatColumns)) {
             insertFormat.setInt(1, variantId);
@@ -50,7 +50,7 @@ public class FormatRepository {
                 insertFormat.setInt(2, sampleIndex);
                 for (int i = 0; i < formatColumns.size(); i++) {
                     if(formatColumns.get(i).equals(GT_TYPE)){
-                        insertFormat.setString(i + 3, genotype.getType().toString());
+                        insertFormat.setInt(i + 3, gtIds.get(genotype.getType()));
                     }else {
                         insertFormatDataColumn(vc, formatColumns, fieldMetadatas, genotype, i, categoryLookup, insertFormat, hasSampleTree);
                     }

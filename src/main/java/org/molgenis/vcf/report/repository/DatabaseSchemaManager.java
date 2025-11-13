@@ -175,23 +175,31 @@ public class DatabaseSchemaManager {
     static final String FIELDTYPE_TABLE_SQL = """
                 CREATE TABLE fieldType (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    value TEXT NOT NULL
+                    value TEXT UNIQUE NOT NULL
                 );
             """;
 
     static final String VALUETYPE_TABLE_SQL = """
                 CREATE TABLE valueType (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    value TEXT NOT NULL
+                    value TEXT UNIQUE NOT NULL
                 );
             """;
 
     static final String NUMBERTYPE_TABLE_SQL = """
                 CREATE TABLE numberType (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    value TEXT NOT NULL
+                    value TEXT UNIQUE NOT NULL
                 );
             """;
+
+    static final String GT_TYPE_TABLE_SQL = """
+                CREATE TABLE gtType (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    value TEXT UNIQUE NOT NULL
+                );
+            """;
+
 
     public void executeSql(String sql, Connection connection) {
         try (Statement stmt = connection.createStatement()) {
@@ -227,6 +235,7 @@ public class DatabaseSchemaManager {
         sqlStatements.add(INFO_ORDER_TABLE_SQL);
         sqlStatements.add(APP_METADATA_TABLE_SQL);
         sqlStatements.add(HEADER_TABLE_SQL);
+        sqlStatements.add(GT_TYPE_TABLE_SQL);
         sqlStatements.add(getInfoTableSql(reportGeneratorSettings, vcfFileHeader));
         sqlStatements.add(getFormatTableSql(reportGeneratorSettings, vcfFileHeader));
         sqlStatements.add(CATEGORIES_TABLE_SQL);
@@ -287,7 +296,7 @@ public class DatabaseSchemaManager {
                 if (meta.getNumberType() == ValueCount.Type.FIXED && meta.getNumberCount() == 1) {
                     columns.add(String.format(SQL_COLUMN, entry.getKey(), toSqlType(meta.getType(), meta.getNumberCount())));
                     if(entry.getKey().equals("GT")){
-                        columns.add(String.format(SQL_COLUMN, GT_TYPE, "TEXT"));
+                        columns.add(String.format(SQL_COLUMN, GT_TYPE, "INTEGER REFERENCES gtType(id)"));
                     }
                 } else {
                     columns.add(String.format(TEXT_COLUMN, entry.getKey()));

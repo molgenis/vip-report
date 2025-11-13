@@ -2,6 +2,7 @@ package org.molgenis.vcf.report.repository;
 
 import htsjdk.samtools.SAMSequenceRecord;
 import htsjdk.tribble.readers.LineIteratorImpl;
+import htsjdk.variant.variantcontext.GenotypeType;
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.vcf.VCFCodec;
 import htsjdk.variant.vcf.VCFHeader;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 import static java.util.Objects.requireNonNull;
+import static org.molgenis.vcf.report.repository.SqlUtils.insertLookupValues;
 import static org.molgenis.vcf.utils.metadata.FieldType.INFO;
 
 @Component
@@ -127,6 +129,7 @@ public class DatabaseManager {
         List<String> infoColumns = getDatabaseInfoColumns();
 
         Map<Object, Integer> contigIds = SqlUtils.insertLookupValues(conn, "contig", header.getSequenceDictionary().getSequences().stream().map(SAMSequenceRecord::getSequenceName).toList());
+        Map<Object, Integer> gtIds = insertLookupValues(conn, "gtType", List.of(GenotypeType.values()));
         Map<String, Integer> formatLookup = new HashMap<>();
         String line;
         int formatId = 0;
@@ -151,13 +154,13 @@ public class DatabaseManager {
                 int variantId = vcfRepo.insertVariant(conn, vc, contigIds, formatValue);
 
                 String infoField = split[7];
-                String[] infoItems = infoField.split(";");
+                String[] infoItems = infoField.split(";", -1);
 
                 infoRepo.insertInfoFieldOrder(conn, metadataKeys, infoItems, variantId);
                 for (Map.Entry<String, List<String>> entry : nestedFields.entrySet()) {
                     nestedRepo.insertNested(conn, entry.getKey(), vc, entry.getValue(), fieldMetadatas, variantId, decisionTreePath != null);
                 }
-                formatRepo.insertFormatData(conn, vc, formatColumns, variantId, fieldMetadatas, samples.getItems(), sampleTreePath != null);
+                formatRepo.insertFormatData(conn, vc, formatColumns, variantId, fieldMetadatas, samples.getItems(), sampleTreePath != null, gtIds);
                 infoRepo.insertInfoData(conn, vc, infoColumns, fieldMetadatas, variantId, sampleTreePath != null);
             }
         }
