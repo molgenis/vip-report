@@ -24,11 +24,10 @@ class AppIT {
     String outputFile = sharedTempDir.resolve("example.vcf.html").toString();
     String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
     String treePath = ResourceUtils.getFile("classpath:tree.json").toString();
-    String sampleTreePath = ResourceUtils.getFile("classpath:tree.json").toString();
+    String sampleTreePath = ResourceUtils.getFile("classpath:sample_tree.json").toString();
     String probands = "NA00001";
     String phenotypes = "Jimmy/HP:123456,Unknown/test:Headache,Jane/OMIM:23456";
     String bamFile = ResourceUtils.getFile("classpath:example.cram").toString();
-    String wasmFile = ResourceUtils.getFile("classpath:sql-wasm.wasm").toString();
     String referenceFile = ResourceUtils.getFile("classpath:example.fna.gz").toString();
     String metadataFile = ResourceUtils.getFile("classpath:field_metadata.json").toString();
     String templateConfigPath = ResourceUtils.getFile("classpath:template_config.json").toString();
@@ -59,8 +58,6 @@ class AppIT {
       "NA00001=" + bamFile,
       "-r",
       referenceFile,
-      "-w",
-      wasmFile,
       "-f"
     };
     SpringApplication.run(App.class, args);
@@ -83,7 +80,6 @@ class AppIT {
     String probands = "NA00001";
     String phenotypes = "Jimmy/HP:123456,Unknown/test:Headache,Jane/OMIM:23456";
     String bamFile = ResourceUtils.getFile("classpath:example.cram").toString();
-    String wasmFile = ResourceUtils.getFile("classpath:sql-wasm.wasm").toString();
     String referenceFile = ResourceUtils.getFile("classpath:example.fna.gz").toString();
     String metadataFile = ResourceUtils.getFile("classpath:field_metadata.json").toString();
 
@@ -107,8 +103,6 @@ class AppIT {
             "NA00001=" + bamFile,
             "-r",
             referenceFile,
-            "-w",
-            wasmFile,
             "-f"
     };
     SpringApplication.run(App.class, args);

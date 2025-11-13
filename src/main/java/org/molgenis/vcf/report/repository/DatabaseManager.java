@@ -1,8 +1,7 @@
 package org.molgenis.vcf.report.repository;
 
 import htsjdk.samtools.SAMSequenceRecord;
-import htsjdk.tribble.readers.AsciiLineReader;
-import htsjdk.tribble.readers.AsciiLineReaderIterator;
+import htsjdk.tribble.readers.LineIteratorImpl;
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.vcf.VCFCodec;
 import htsjdk.variant.vcf.VCFHeader;
@@ -11,6 +10,7 @@ import lombok.NonNull;
 import org.molgenis.vcf.report.model.Bytes;
 import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.report.model.metadata.ReportMetadata;
+import org.molgenis.vcf.report.utils.Utf8LineReader;
 import org.molgenis.vcf.utils.metadata.FieldType;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadata;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadatas;
@@ -18,10 +18,8 @@ import org.molgenis.vcf.utils.sample.model.Phenopacket;
 import org.molgenis.vcf.utils.sample.model.Sample;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.*;
@@ -85,11 +83,14 @@ public class DatabaseManager {
                             @NonNull List<Phenopacket> phenopackets) throws IOException {
         getConnection(databaseLocation);
         boolean isGz = vcfFile.getName().toLowerCase().endsWith(".gz");
-        try (InputStream fis = isGz ?
-                new GZIPInputStream(new FileInputStream(vcfFile)) :
-                new FileInputStream(vcfFile);
-             AsciiLineReader reader = new AsciiLineReader(fis);
-             AsciiLineReaderIterator vcfIterator = new AsciiLineReaderIterator(reader);) {
+        try (
+                InputStream fis = isGz
+                        ? new GZIPInputStream(new FileInputStream(vcfFile))
+                        : new FileInputStream(vcfFile);
+                BufferedReader br = new BufferedReader(new InputStreamReader(fis, StandardCharsets.UTF_8));
+                Utf8LineReader utf8LineReader = new Utf8LineReader(br);
+                LineIteratorImpl vcfIterator = new LineIteratorImpl(utf8LineReader)
+        ) {
             VCFCodec codec = new VCFCodec();
             VCFHeader header = (VCFHeader) codec.readActualHeader(vcfIterator);
                 conn.setAutoCommit(false);
@@ -120,7 +121,7 @@ public class DatabaseManager {
     }
 
     private void insertVariants(FieldMetadatas fieldMetadatas, Items<Sample> samples, Path decisionTreePath,
-                                Path sampleTreePath, VCFHeader header, AsciiLineReaderIterator vcfIterator,
+                                Path sampleTreePath, VCFHeader header, LineIteratorImpl vcfIterator,
                                 Map<String, List<String>> nestedFields, VCFCodec vcfCodec, Map<FieldType, Map<String, Integer>> metadataKeys) throws DatabaseException {
         List<String> formatColumns = getDatabaseFormatColumns();
         List<String> infoColumns = getDatabaseInfoColumns();

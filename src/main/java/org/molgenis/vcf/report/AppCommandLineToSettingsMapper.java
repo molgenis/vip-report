@@ -3,6 +3,8 @@ package org.molgenis.vcf.report;
 import static org.molgenis.vcf.report.AppCommandLineOptions.*;
 import static org.molgenis.vcf.report.utils.PathUtils.parsePaths;
 
+import java.io.FileNotFoundException;
+import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -16,6 +18,7 @@ import org.molgenis.vcf.report.generator.SampleSettings.CramPath;
 import org.molgenis.vcf.report.generator.Settings;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ResourceUtils;
 
 @Component
 public class AppCommandLineToSettingsMapper {
@@ -44,14 +47,6 @@ public class AppCommandLineToSettingsMapper {
     } else {
       metadataPath = null;
     }
-
-      Path sqlWasmPath;
-      if (commandLine.hasOption(OPT_SQL_WASM)) {
-          String sqlWasmPathValue = commandLine.getOptionValue(OPT_SQL_WASM);
-          sqlWasmPath = Path.of(sqlWasmPathValue);
-      } else {
-          sqlWasmPath = null;
-      }
 
     Path outputPath;
     if (commandLine.hasOption(OPT_OUTPUT)) {
@@ -141,6 +136,12 @@ public class AppCommandLineToSettingsMapper {
     boolean debugMode = commandLine.hasOption(OPT_DEBUG);
 
     String appArgs = String.join(" ", args);
+    Path sqlWasmPath;
+    try {
+        sqlWasmPath = ResourceUtils.getFile("classpath:sql-wasm-1.13.wasm").toPath();
+    }catch(FileNotFoundException e){
+        throw new UncheckedIOException(e);
+    }
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
             appName, appVersion, appArgs, maxSamples, metadataPath, sqlWasmPath, referencePath, genesPath, decisionTreePath, sampleTreePath, templateConfigPath);

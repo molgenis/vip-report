@@ -23,7 +23,8 @@ public class SqlUtils {
                 i++;
             }
             ps.executeBatch();
-        }catch (SQLException e){
+        }
+        catch (SQLException e){
             throw new DatabaseException(e.getMessage(), String.format("insertLookupValues for: '%s'", tableName));
         }
         return idMap;

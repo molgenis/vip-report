@@ -47,7 +47,7 @@ public class JsonUtils {
     }
 
     public static String writeJsonListValue(String value, String separator){
-        return !value.equals(MISSING) ? toJson(value.split(separator)) : "[]";
+        return !value.equals(MISSING) ? toJson(value.split(separator, -1)) : "[]";
     }
 
 }

@@ -8,6 +8,7 @@ import java.sql.*;
 import java.util.*;
 
 import static org.molgenis.vcf.report.utils.JsonUtils.toJson;
+import static org.molgenis.vcf.report.utils.JsonUtils.writeJsonListValue;
 
 @Component
 public class VcfRepository {
@@ -23,7 +24,7 @@ public class VcfRepository {
         ) {
             insertVCF.setInt(1, contigIds.get(vc.getContig()));
             insertVCF.setInt(2, vc.getStart());
-            insertVCF.setString(3, writeJsonListValue(vc.getID()));
+            insertVCF.setString(3, writeJsonListValue(vc.getID(), ";"));
             insertVCF.setString(4, vc.getReference().getDisplayString());
             insertVCF.setString(5, toJson(vc.getAlternateAlleles().stream().map(this::getDisplayString).toList()));
             if(vc.hasLog10PError()) {
@@ -51,9 +52,5 @@ public class VcfRepository {
 
     private String getDisplayString(Allele allele) {
         return allele.getDisplayString().contains("<CNV:TR") ? allele.getDisplayString().replaceAll("<CNV:TR\\d+>", "<CNV:TR>") : allele.getDisplayString();
-    }
-
-    private static String writeJsonListValue(String value){
-        return !value.equals(MISSING) ? toJson(value.split(",")) : "[]";
     }
 }

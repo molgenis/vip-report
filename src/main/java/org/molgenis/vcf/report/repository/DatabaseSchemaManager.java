@@ -41,7 +41,7 @@ public class DatabaseSchemaManager {
     static final String CONTIG_TABLE_SQL = """
                 CREATE TABLE contig (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    value TEXT NOT NULL
+                    value TEXT UNIQUE NOT NULL
                 );
             """;
 
@@ -94,29 +94,29 @@ public class DatabaseSchemaManager {
             """;
 
     static final String DECISION_TREE_TABLE_SQL = """
-                CREATE TABLE decisiontree (
+                CREATE TABLE decisionTree (
                     id TEXT PRIMARY KEY,
-                    tree TEXT NOT NULL
+                    tree TEXT UNIQUE NOT NULL
                 );
             """;
 
     static final String APP_METADATA_TABLE_SQL = """
                 CREATE TABLE appMetadata (
                     id TEXT PRIMARY KEY,
-                    value TEXT NOT NULL
+                    value TEXT UNIQUE NOT NULL
                 );
             """;
 
     static final String SAMPLE_TABLE_SQL = """
                     CREATE TABLE sample (
                       sampleIndex INTEGER PRIMARY KEY,
-                      familyId TEXT,
-                      individualId TEXT,
+                      familyId TEXT NOT NULL,
+                      individualId TEXT UNIQUE,
                       paternalId INTEGER,
                       maternalId INTEGER,
                       sex INTEGER NOT NULL,
                       affectedStatus INTEGER NOT NULL,
-                      proband INTEGER,
+                      proband INTEGER NOT NULL,
                       FOREIGN KEY (paternalId) REFERENCES sample(sampleIndex),
                       FOREIGN KEY (maternalId) REFERENCES sample(sampleIndex)
                       FOREIGN KEY (sex) REFERENCES sex(id),
@@ -127,14 +127,14 @@ public class DatabaseSchemaManager {
     static final String AFFECTED_TABLE_SQL = """
                 CREATE TABLE affectedStatus (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    value TEXT NOT NULL
+                    value TEXT UNIQUE NOT NULL
                 );
             """;
 
     static final String SEX_TABLE_SQL = """
                 CREATE TABLE sex (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    value TEXT NOT NULL
+                    value TEXT UNIQUE NOT NULL
                 );
             """;
 
