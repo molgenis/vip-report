@@ -31,32 +31,32 @@ public class DatabaseSchemaManager {
                   ref TEXT NOT NULL,
                   alt TEXT NOT NULL,
                   qual REAL,
-                  filter INTEGER,
+                  filter TEXT,
                   format INTEGER,
                   FOREIGN KEY (chrom) REFERENCES contig(id)
                   FOREIGN KEY (format) REFERENCES formatLookup(id)
-                );
+                ) STRICT;
             """;
 
     static final String CONTIG_TABLE_SQL = """
                 CREATE TABLE contig (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     value TEXT UNIQUE NOT NULL
-                );
+                ) STRICT;
             """;
 
     static final String FORMAT_LOOKUP_TABLE_SQL = """
                 CREATE TABLE formatLookup (
                     id INTEGER PRIMARY KEY,
                     value TEXT UNIQUE NOT NULL
-                );
+                ) STRICT;
             """;
 
     static final String HEADER_TABLE_SQL = """
                 CREATE TABLE header (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     line TEXT NOT NULL
-                );
+                ) STRICT;
             """;
 
     static final String CATEGORIES_TABLE_SQL = """
@@ -66,45 +66,45 @@ public class DatabaseSchemaManager {
                     value TEXT NOT NULL,
                     label TEXT NOT NULL,
                     description TEXT
-                );
+                ) STRICT;
             """;
 
     static final String CONFIG_TABLE_SQL = """
                 CREATE TABLE config (
                     id TEXT PRIMARY KEY,
                     value TEXT NOT NULL
-                );
+                ) STRICT;
             """;
 
     static final String PHENOTYPE_TABLE_SQL = """
                 CREATE TABLE phenotype (
                     id TEXT PRIMARY KEY,
                     label TEXT NOT NULL
-                );
+                ) STRICT;
             """;
 
     static final String SAMPLE_PHENOTYPE_TABLE_SQL = """
                 CREATE TABLE samplePhenotype (
                   id INTEGER PRIMARY KEY AUTOINCREMENT,
                   sampleIndex INTEGER NOT NULL,
-                  phenotypeId INTEGER NOT NULL,
+                  phenotypeId TEXT NOT NULL,
                   FOREIGN KEY (sampleIndex) REFERENCES sample(sampleIndex),
                   FOREIGN KEY (phenotypeId) REFERENCES phenotype(id)
-                );
+                ) STRICT;
             """;
 
     static final String DECISION_TREE_TABLE_SQL = """
                 CREATE TABLE decisionTree (
                     id TEXT PRIMARY KEY,
                     tree TEXT UNIQUE NOT NULL
-                );
+                ) STRICT;
             """;
 
     static final String APP_METADATA_TABLE_SQL = """
                 CREATE TABLE appMetadata (
                     id TEXT PRIMARY KEY,
                     value TEXT UNIQUE NOT NULL
-                );
+                ) STRICT;
             """;
 
     static final String SAMPLE_TABLE_SQL = """
@@ -121,21 +121,21 @@ public class DatabaseSchemaManager {
                       FOREIGN KEY (maternalId) REFERENCES sample(sampleIndex)
                       FOREIGN KEY (sex) REFERENCES sex(id),
                       FOREIGN KEY (affectedStatus) REFERENCES affectedStatus(id)
-                    );
+                    ) STRICT;
                 """;
 
     static final String AFFECTED_TABLE_SQL = """
                 CREATE TABLE affectedStatus (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     value TEXT UNIQUE NOT NULL
-                );
+                ) STRICT;
             """;
 
     static final String SEX_TABLE_SQL = """
                 CREATE TABLE sex (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     value TEXT UNIQUE NOT NULL
-                );
+                ) STRICT;
             """;
 
     static final String METADATA_TABLE_SQL = """
@@ -159,7 +159,7 @@ public class DatabaseSchemaManager {
                       FOREIGN KEY (fieldType) REFERENCES fieldType(id),
                       FOREIGN KEY (valueType) REFERENCES valueType(id),
                       FOREIGN KEY (numberType) REFERENCES numberType(id)
-                    );
+                    ) STRICT;
                 """;
     static final String INFO_ORDER_TABLE_SQL = """
                     CREATE TABLE infoOrder (
@@ -169,35 +169,35 @@ public class DatabaseSchemaManager {
                         metadataId INTEGER NOT NULL,
                         FOREIGN KEY (variantId) REFERENCES vcf(id),
                         FOREIGN KEY (metadataId) REFERENCES metadata(id)
-                    );
+                    ) STRICT;
             """;
 
     static final String FIELDTYPE_TABLE_SQL = """
                 CREATE TABLE fieldType (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     value TEXT UNIQUE NOT NULL
-                );
+                ) STRICT;
             """;
 
     static final String VALUETYPE_TABLE_SQL = """
                 CREATE TABLE valueType (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     value TEXT UNIQUE NOT NULL
-                );
+                ) STRICT;
             """;
 
     static final String NUMBERTYPE_TABLE_SQL = """
                 CREATE TABLE numberType (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     value TEXT UNIQUE NOT NULL
-                );
+                ) STRICT;
             """;
 
     static final String GT_TYPE_TABLE_SQL = """
                 CREATE TABLE gtType (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     value TEXT UNIQUE NOT NULL
-                );
+                ) STRICT;
             """;
 
 
@@ -279,7 +279,7 @@ public class DatabaseSchemaManager {
             }
         }
         infoBuilder.append(String.join(",", columns));
-        infoBuilder.append(");");
+        infoBuilder.append(") STRICT;");
         return infoBuilder.toString();
     }
 
@@ -306,7 +306,7 @@ public class DatabaseSchemaManager {
             }
         }
         formatBuilder.append(String.join(",", columns));
-        formatBuilder.append(");");
+        formatBuilder.append(") STRICT;");
         return formatBuilder.toString();
     }
 
@@ -334,7 +334,7 @@ public class DatabaseSchemaManager {
             }
         }
         nestedBuilder.append(String.join(", ", nestedColumns));
-        nestedBuilder.append(");");
+        nestedBuilder.append(") STRICT;");
         return nestedBuilder.toString();
     }
 
