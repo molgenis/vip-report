@@ -1,13 +1,10 @@
 package org.molgenis.vcf.report;
 
-import static java.util.Collections.emptyList;
+import static java.nio.file.Files.readAllBytes;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.molgenis.vcf.utils.model.metadata.HtsFormat.VCF;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -24,13 +21,8 @@ import org.molgenis.vcf.report.generator.ReportWriter;
 import org.molgenis.vcf.report.generator.ReportWriterSettings;
 import org.molgenis.vcf.report.generator.SampleSettings;
 import org.molgenis.vcf.report.generator.Settings;
-import org.molgenis.vcf.report.model.Binary;
 import org.molgenis.vcf.report.model.Bytes;
 import org.molgenis.vcf.report.model.Report;
-import org.molgenis.vcf.report.model.ReportData;
-import org.molgenis.vcf.report.model.metadata.AppMetadata;
-import org.molgenis.vcf.report.model.metadata.ReportMetadata;
-import org.molgenis.vcf.utils.model.metadata.HtsFile;
 
 @ExtendWith(MockitoExtension.class)
 class ReportServiceTest {
@@ -52,26 +44,16 @@ class ReportServiceTest {
     String appVersion = "MyVersion";
     String appArguments = "MyArguments";
     Path inputVcfPath = Paths.get("src", "test", "resources", "example.vcf");
+    Path wasmPath = Paths.get("src", "test", "resources", "fake.wasm");
     Path outputReportPath = sharedTempDir.resolve("example.vcf.html");
     Path metadataPath = sharedTempDir.resolve("field_metadata.json");
 
     Report report =
         new Report(
-            new ReportMetadata(
-                new AppMetadata(appName, appVersion, appArguments),
-                new HtsFile(inputVcfPath.toString(), VCF, "UNKNOWN")),
-            new ReportData(emptyList(), emptyList()),
-            new Binary(new Bytes(Files.readAllBytes(inputVcfPath)), null, null, Map.of()),
-            new ObjectMapper()
-                .readValue(
-                    "{\"name\":\"testtree\", \"description\":\"no need for a valid tree\"}",
-                    Map.class),
-            new ObjectMapper()
-                .readValue(
-                        "{\"name\":\"sampletree\", \"description\":\"no need for a valid tree\"}",
-                        Map.class),
-            new ObjectMapper()
-                .readValue("{\"info\":{\"TEST\":{\"ALLELE_NUM\":{\"label\":\"test.\", \"description\":\"test.\", \"numberType\":\"NUMBER\", \"numberCount\":1, \"type\":\"STRING\"}}}}", Map.class),null);
+            null, null, Map.of(),
+            new Bytes(readAllBytes(wasmPath)),
+            new Bytes("DATABASE".getBytes())
+        );
 
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
@@ -80,9 +62,11 @@ class ReportServiceTest {
             appArguments,
             ReportGeneratorSettings.DEFAULT_MAX_NR_SAMPLES,
             metadataPath,
+            wasmPath,
             null,
             null,
-            null,null,
+            null,
+            null,
             null);
     ReportWriterSettings reportWriterSettings = new ReportWriterSettings(null, true);
     SampleSettings sampleSettings = new SampleSettings(null, null, null, Map.of());

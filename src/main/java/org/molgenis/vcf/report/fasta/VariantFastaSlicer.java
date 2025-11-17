@@ -1,11 +1,6 @@
 package org.molgenis.vcf.report.fasta;
 
 import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.toList;
-
-import htsjdk.variant.vcf.VCFFileReader;
-import htsjdk.variant.vcf.VCFIterator;
-import org.molgenis.vcf.report.generator.SampleSettings;
 import org.molgenis.vcf.report.model.Bytes;
 
 import java.nio.file.Path;

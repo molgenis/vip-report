@@ -3,6 +3,8 @@ package org.molgenis.vcf.report;
 import static org.molgenis.vcf.report.AppCommandLineOptions.*;
 import static org.molgenis.vcf.report.utils.PathUtils.parsePaths;
 
+import java.io.FileNotFoundException;
+import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -16,6 +18,7 @@ import org.molgenis.vcf.report.generator.SampleSettings.CramPath;
 import org.molgenis.vcf.report.generator.Settings;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ResourceUtils;
 
 @Component
 public class AppCommandLineToSettingsMapper {
@@ -133,9 +136,15 @@ public class AppCommandLineToSettingsMapper {
     boolean debugMode = commandLine.hasOption(OPT_DEBUG);
 
     String appArgs = String.join(" ", args);
+    Path sqlWasmPath;
+    try {
+        sqlWasmPath = ResourceUtils.getFile("classpath:sql-wasm-1.13.wasm").toPath();
+    }catch(FileNotFoundException e){
+        throw new UncheckedIOException(e);
+    }
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
-            appName, appVersion, appArgs, maxSamples, metadataPath, referencePath, genesPath, decisionTreePath, sampleTreePath, templateConfigPath);
+            appName, appVersion, appArgs, maxSamples, metadataPath, sqlWasmPath, referencePath, genesPath, decisionTreePath, sampleTreePath, templateConfigPath);
     ReportWriterSettings reportWriterSettings = new ReportWriterSettings(templatePath, debugMode);
     SampleSettings sampleSettings =
         new SampleSettings(probandNames, pedPaths, phenotypes, cramPaths);

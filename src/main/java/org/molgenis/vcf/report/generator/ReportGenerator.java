@@ -1,9 +1,7 @@
 package org.molgenis.vcf.report.generator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import htsjdk.variant.vcf.VCFHeader;
-import htsjdk.variant.vcf.VCFIterator;
-import htsjdk.variant.vcf.VCFIteratorBuilder;
+import htsjdk.variant.vcf.*;
 import org.molgenis.vcf.report.fasta.ContigInterval;
 import org.molgenis.vcf.report.fasta.VariantFastaSlicer;
 import org.molgenis.vcf.report.fasta.VariantIntervalCalculator;
@@ -11,11 +9,14 @@ import org.molgenis.vcf.report.fasta.VcfFastaSlicerFactory;
 import org.molgenis.vcf.report.genes.GenesFilter;
 import org.molgenis.vcf.report.genes.GenesFilterFactory;
 import org.molgenis.vcf.report.model.*;
-import org.molgenis.vcf.report.model.Binary.Cram;
 import org.molgenis.vcf.report.model.metadata.AppMetadata;
 import org.molgenis.vcf.report.model.metadata.ReportMetadata;
+import org.molgenis.vcf.report.repository.DatabaseManager;
+import org.molgenis.vcf.report.repository.DatabaseSchemaManager;
 import org.molgenis.vcf.report.utils.VcfInputStreamDecorator;
 import org.molgenis.vcf.utils.PersonListMerger;
+import org.molgenis.vcf.utils.metadata.*;
+import org.molgenis.vcf.utils.model.metadata.FieldMetadatas;
 import org.molgenis.vcf.utils.model.metadata.HtsFile;
 import org.molgenis.vcf.utils.sample.mapper.HtsFileMapper;
 import org.molgenis.vcf.utils.sample.mapper.HtsJdkToPersonsMapper;
@@ -28,13 +29,10 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.zip.GZIPInputStream;
+import java.util.*;
 
 import static java.util.Objects.requireNonNull;
+import static org.molgenis.vcf.report.utils.PathUtils.getDatabaseLocation;
 import static org.molgenis.vcf.utils.sample.mapper.PedToSamplesMapper.mapPedFileToPersons;
 
 @Component
@@ -46,6 +44,8 @@ public class ReportGenerator {
     private final GenesFilterFactory genesFilterFactory;
     private final VcfFastaSlicerFactory vcfFastaSlicerFactory;
     private final VariantIntervalCalculator variantIntervalCalculator;
+    private final DatabaseSchemaManager databaseSchemaManager;
+    private final DatabaseManager databaseManager;
 
     public ReportGenerator(
             HtsJdkToPersonsMapper htsJdkToPersonsMapper,
@@ -54,7 +54,9 @@ public class ReportGenerator {
             HtsFileMapper htsFileMapper,
             VcfFastaSlicerFactory vcfFastaSlicerFactory,
             GenesFilterFactory genesFilterFactory,
-            VariantIntervalCalculator variantIntervalCalculator) {
+            VariantIntervalCalculator variantIntervalCalculator,
+            DatabaseSchemaManager databaseSchemaManager,
+            DatabaseManager databaseManager) {
         this.htsJdkToPersonsMapper = requireNonNull(htsJdkToPersonsMapper);
         this.phenopacketMapper = requireNonNull(phenopacketMapper);
         this.personListMerger = requireNonNull(personListMerger);
@@ -62,6 +64,8 @@ public class ReportGenerator {
         this.genesFilterFactory = requireNonNull(genesFilterFactory);
         this.vcfFastaSlicerFactory = requireNonNull(vcfFastaSlicerFactory);
         this.variantIntervalCalculator = requireNonNull(variantIntervalCalculator);
+        this.databaseManager = requireNonNull(databaseManager);
+        this.databaseSchemaManager = requireNonNull(databaseSchemaManager);
     }
 
     public Report generateReport(
@@ -104,7 +108,6 @@ public class ReportGenerator {
                         reportGeneratorSettings.getAppVersion(),
                         reportGeneratorSettings.getAppArguments());
         ReportMetadata reportMetadata = new ReportMetadata(appMetadata, htsFile);
-        ReportData reportData = new ReportData(samples.getItems(), phenopackets.getItems());
 
         Map<String, Bytes> fastaGzMap;
         Path referencePath = reportGeneratorSettings.getReferencePath();
@@ -112,16 +115,24 @@ public class ReportGenerator {
         List<ContigInterval> contigIntervals = variantIntervalCalculator.calculate(vcfFileReader, cramPaths, referencePath);
         fastaGzMap = getReferenceTrackData(contigIntervals, referencePath);
         Bytes genesGz = getGenesTrackData(contigIntervals, reportGeneratorSettings);
-        Map<String, Cram> cramMap = getAlignmentTrackData(sampleSettings);
-        Bytes vcfBytes = getVariantTrackData(vcfPath);
+        Map<String, Report.Cram> cramMap = getAlignmentTrackData(sampleSettings);
 
-        Map<?, ?> decisionTree = parseJsonObject(reportGeneratorSettings.getDecisionTreePath());
-        Map<?, ?> sampleTree = parseJsonObject(reportGeneratorSettings.getSampleTreePath());
-        Map<?, ?> vcfMeta = parseJsonObject(reportGeneratorSettings.getMetadataPath());
         Map<?, ?> templateConfig = parseJsonObject(reportGeneratorSettings.getTemplateConfigPath());
+        String databaseLocation = getDatabaseLocation(vcfPath);
+        databaseSchemaManager.createDatabase(reportGeneratorSettings, vcfFileReader.getHeader(), databaseManager.getConnection(databaseLocation));
+        FieldMetadataService fieldMetadataService = new FieldMetadataServiceImpl(reportGeneratorSettings.getMetadataPath().toFile());
+        FieldMetadatas fieldMetadatas = fieldMetadataService.load(vcfFileReader.getHeader());
+        Bytes database;
+        try {
+            database = databaseManager.populateDb(databaseLocation, fieldMetadatas, samples, vcfPath.toFile(),
+                    reportGeneratorSettings.getDecisionTreePath(), reportGeneratorSettings.getSampleTreePath(),
+                    reportMetadata, templateConfig, phenopackets.getItems());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
 
-        Binary binary = new Binary(vcfBytes, fastaGzMap, genesGz, cramMap);
-        return new Report(reportMetadata, reportData, binary, decisionTree, sampleTree, vcfMeta, templateConfig);
+        Bytes sqlWasm = new Bytes(Files.readAllBytes(reportGeneratorSettings.getSqlWasmPath()));
+        return new Report(fastaGzMap, genesGz, cramMap, sqlWasm, database);
     }
 
     private static Map<?, ?> parseJsonObject(Path jsonPath) {
@@ -152,20 +163,8 @@ public class ReportGenerator {
         return phenopackets;
     }
 
-    private static Bytes getVariantTrackData(Path vcfPath) throws IOException {
-        Bytes vcfBytes;
-        if (vcfPath.toString().endsWith(".gz")) {
-            try (GZIPInputStream inputStream = new GZIPInputStream(Files.newInputStream(vcfPath))) {
-                vcfBytes = new Bytes(inputStream.readAllBytes());
-            }
-        } else {
-            vcfBytes = new Bytes(Files.readAllBytes(vcfPath));
-        }
-        return vcfBytes;
-    }
-
-    private static Map<String, Cram> getAlignmentTrackData(SampleSettings sampleSettings) {
-        Map<String, Cram> cramMap = new LinkedHashMap<>();
+    private static Map<String, Report.Cram> getAlignmentTrackData(SampleSettings sampleSettings) {
+        Map<String, Report.Cram> cramMap = new LinkedHashMap<>();
         sampleSettings
                 .getCramPaths()
                 .forEach(
@@ -178,7 +177,7 @@ public class ReportGenerator {
                             } catch (IOException e) {
                                 throw new UncheckedIOException(e);
                             }
-                            cramMap.put(sampleId, new Cram(new Bytes(cram), new Bytes(crai)));
+                            cramMap.put(sampleId, new Report.Cram(new Bytes(cram), new Bytes(crai)));
                         });
         return cramMap;
     }

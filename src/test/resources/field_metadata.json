@@ -6,16 +6,40 @@
       "numberType": "OTHER",
       "separator": ",",
       "type": "CATEGORICAL",
-      "categories": [
-        "AD",
-        "AD_IP",
-        "AR",
-        "AR_C",
-        "XLD",
-        "XLR",
-        "YL",
-        "MT"
-      ]
+      "categories": {
+        "AD": {
+          "label": "AD",
+          "description": "Autosomal dominant"
+        },
+        "AD_IP": {
+          "label": "AD_IP",
+          "description": "Autosomal dominant incomplete penetrance"
+        },
+        "AR": {
+          "label": "AR",
+          "description": "Autosomal recessive"
+        },
+        "AR_C": {
+          "label": "AR_C",
+          "description": "Autosomal recessive compound hetrozygote"
+        },
+        "XLD": {
+          "label": "XLD",
+          "description": "X-linked dominant"
+        },
+        "XLR": {
+          "label": "XLR",
+          "description": "X-linked recessive"
+        },
+        "YL": {
+          "label": "YL",
+          "description": "Y-linked"
+        },
+        "MT": {
+          "label": "MT",
+          "description": "Mitochondrial"
+        }
+      }
     }
   },
   "info": {
@@ -34,20 +58,6 @@
           "numberType": "NUMBER",
           "numberCount": 1,
           "type": "FLOAT"
-        },
-        "CAPICE_CL": {
-          "label": "CAPICE",
-          "description": "CAPICE classification",
-          "numberType": "NUMBER",
-          "numberCount": 1,
-          "type": "CATEGORICAL",
-          "categories": [
-            "B",
-            "LB",
-            "VUS",
-            "LP",
-            "P"
-          ]
         },
         "CAPICE_SC": {
           "label": "CAPICE",
@@ -89,53 +99,34 @@
           "numberType": "OTHER",
           "type": "INTEGER"
         },
-        "clinVar_CLNSIG": {
-          "label": "ClinVar variant",
-          "description": "Clinical significance for this single variant",
-          "numberType": "OTHER",
-          "separator": "/",
+        "CAPICE_CL": {
+          "label": "CAPICE",
+          "description": "CAPICE classification",
+          "numberType": "NUMBER",
+          "numberCount": 1,
           "type": "CATEGORICAL",
-          "categories": [
-            "Benign",
-            "Likely_benign",
-            "Uncertain_significance",
-            "Likely_pathogenic",
-            "Pathogenic",
-            "Conflicting_interpretations_of_pathogenicity"
-          ]
-        },
-        "clinVar_CLNSIGINCL": {
-          "label": "ClinVar variant combination",
-          "description": "Clinical significance for a haplotype or genotype that includes this variant",
-          "numberType": "OTHER",
-          "separator": "&",
-          "type": "CATEGORICAL",
-          "categories": [
-            "Benign",
-            "Likely_benign",
-            "Uncertain_significance",
-            "Likely_pathogenic",
-            "Pathogenic",
-            "Conflicting_interpretations_of_pathogenicity"
-          ]
-        },
-        "clinVar_CLNREVSTAT": {
-          "label": "ClinVar status",
-          "description": "ClinVar review status",
-          "numberType": "OTHER",
-          "separator": "&",
-          "type": "CATEGORICAL",
-          "categories": [
-            "practice_guideline",
-            "reviewed_by_expert_panel",
-            "criteria_provided",
-            "_multiple_submitters",
-            "_no_conflicts",
-            "_single_submitter",
-            "_conflicting_interpretations",
-            "no_assertion_criteria_provided",
-            "no_assertion_provided"
-          ]
+          "categories": {
+            "B": {
+              "label": "B",
+              "description": "Benign"
+            },
+            "LB": {
+              "label": "LB",
+              "description": "Likely benign"
+            },
+            "VUS": {
+              "label": "VUS",
+              "description": "Variant of uncertain significance"
+            },
+            "LP": {
+              "label": "LP",
+              "description": "Likely pathogenic"
+            },
+            "P": {
+              "label": "P",
+              "description": "Pathogenic"
+            }
+          }
         },
         "Consequence": {
           "label": "Effect",
@@ -157,11 +148,20 @@
           "numberType": "NUMBER",
           "numberCount": 1,
           "type": "CATEGORICAL",
-          "categories": [
-            "Transcript",
-            "RegulatoryFeature",
-            "MotifFeature"
-          ],
+          "categories": {
+            "Transcript": {
+              "label": "Transcript",
+              "description": "Transcript"
+            },
+            "RegulatoryFeature": {
+              "label": "Regulatory",
+              "description": "Regulatory feature"
+            },
+            "MotifFeature": {
+              "label": "Motif",
+              "description": "Motif feature"
+            }
+          },
           "required": true
         },
         "FLAGS": {
@@ -173,14 +173,20 @@
         },
         "GADO_PD": {
           "label": "GADO_PD",
-          "description": "The GADO prediction for the relation between the HPO terms of the proband(s) and the gene, HC: high confidence, LC: low confidence.",
+          "description": "Gene-phenotypes association based on the GeneNetwork Assisted Diagnostic Optimization (GADO) gene prioritization Z-scores, see https://www.genenetwork.nl/gado and https://doi.org/10.1038/s41467-019-10649-4",
           "numberType": "NUMBER",
           "numberCount": 1,
           "type": "CATEGORICAL",
-          "categories": [
-            "LC",
-            "HC"
-          ]
+          "categories": {
+            "HC": {
+              "label": "High confidence",
+              "description": "Gene phenotype relation predicted by GADO with high confidence; Z-Score greater than 5"
+            },
+            "LC": {
+              "label": "Low confidence",
+              "description": "Gene phenotype relation predicted by GADO with low confidence; Z-Score greater than 3 but below 5"
+            }
+          }
         },
         "GADO_SC": {
           "label": "GADO_SC",
@@ -226,15 +232,22 @@
         },
         "gnomAD_SRC": {
           "label": "gnomAD SRC",
-          "description": "gnomAD source (E=exomes, G=genomes, T=total)",
+          "description": "gnomAD source",
           "numberType": "NUMBER",
           "numberCount": 1,
           "type": "CATEGORICAL",
-          "categories": [
-            "E",
-            "G",
-            "T"
-          ]
+          "categories": {
+            "E": {
+              "label": "Exomes"
+            },
+            "G": {
+              "label": "Genomes"
+            },
+            "T": {
+              "label": "Total",
+              "description": "Total: exomes & genomes"
+            }
+          }
         },
         "gnomAD_QC": {
           "label": "gnomAD QC",
@@ -277,12 +290,20 @@
           "numberType": "NUMBER",
           "numberCount": 1,
           "type": "CATEGORICAL",
-          "categories": [
-            "LOW",
-            "MODERATE",
-            "HIGH",
-            "MODIFIER"
-          ],
+          "categories": {
+            "LOW": {
+              "label": "Low"
+            },
+            "MODERATE": {
+              "label": "Moderate"
+            },
+            "HIGH": {
+              "label": "High"
+            },
+            "MODIFIER": {
+              "label": "Modifier"
+            }
+          },
           "required": true
         },
         "IncompletePenetrance": {
@@ -422,17 +443,32 @@
         },
         "VKGL_CL": {
           "label": "VKGL",
-          "description": "VKGL consensus classification",
+          "description": "Variant consensus classification from the Vereniging Klinisch Genetische Laboratoriumdiagnostiek (VKGL) datashare database, see https://vkgl.nl/nl/diagnostiek/vkgl-datashare-database",
           "numberType": "NUMBER",
           "numberCount": 1,
           "type": "CATEGORICAL",
-          "categories": [
-            "B",
-            "LB",
-            "VUS",
-            "LP",
-            "P"
-          ]
+          "categories": {
+            "B": {
+              "label": "B",
+              "description": "Benign"
+            },
+            "LB": {
+              "label": "LB",
+              "description": "Likely benign"
+            },
+            "VUS": {
+              "label": "VUS",
+              "description": "Variant of uncertain significance"
+            },
+            "LP": {
+              "label": "LP",
+              "description": "Likely pathogenic"
+            },
+            "P": {
+              "label": "P",
+              "description": "Pathogenic"
+            }
+          }
         },
         "VKGL_UMCG": {
           "label": "MVL",
@@ -440,13 +476,28 @@
           "numberType": "NUMBER",
           "numberCount": 1,
           "type": "CATEGORICAL",
-          "categories": [
-            "B",
-            "LB",
-            "VUS",
-            "LP",
-            "P"
-          ]
+          "categories": {
+            "B": {
+              "label": "B",
+              "description": "Benign"
+            },
+            "LB": {
+              "label": "LB",
+              "description": "Likely benign"
+            },
+            "VUS": {
+              "label": "VUS",
+              "description": "Variant of uncertain significance"
+            },
+            "LP": {
+              "label": "LP",
+              "description": "Likely pathogenic"
+            },
+            "P": {
+              "label": "P",
+              "description": "Pathogenic"
+            }
+          }
         }
       }
     }

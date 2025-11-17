@@ -13,7 +13,7 @@
 
     <groupId>org.molgenis</groupId>
     <artifactId>vip-report</artifactId>
-    <version>7.2.1</version>
+    <version>8.0.0</version>
 
     <name>vip-report</name>
     <description>Report generator for Variant Call Format (VCF) files</description>
@@ -45,7 +45,7 @@
         <samtools.htsjdk.version>4.1.3</samtools.htsjdk.version>
         <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
         <opencsv.version>5.10</opencsv.version>
-        <vip.utils.version>3.1.0</vip.utils.version>
+        <vip.utils.version>4.0.0</vip.utils.version>
     </properties>
 
     <profiles>
@@ -120,6 +120,11 @@
                 <artifactId>opencsv</artifactId>
                 <version>${opencsv.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.xerial</groupId>
+                <artifactId>sqlite-jdbc</artifactId>
+                <version>3.49.1.0</version> <!-- keep in sync with src/main/resources/sql-wasm-*.wasm -->
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -152,6 +157,10 @@
         <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

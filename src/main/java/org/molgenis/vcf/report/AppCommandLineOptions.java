@@ -1,11 +1,13 @@
 package org.molgenis.vcf.report;
 
 import static java.lang.String.format;
-import static org.molgenis.vcf.report.utils.PathUtils.parsePaths;
+import static org.molgenis.vcf.report.utils.PathUtils.*;
 import static org.molgenis.vcf.utils.sample.mapper.PhenopacketMapper.PHENOTYPE_SEPARATOR;
 import static org.molgenis.vcf.utils.sample.mapper.PhenopacketMapper.SAMPLE_PHENOTYPE_SEPARATOR;
 import static org.molgenis.vcf.utils.sample.mapper.PhenopacketMapper.checkPhenotype;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -186,6 +188,7 @@ class AppCommandLineOptions {
   static void validateCommandLine(CommandLine commandLine) {
     validateInput(commandLine);
     validateOutput(commandLine);
+    validateDatabase(commandLine);
     validateTemplate(commandLine);
     validateProbands(commandLine);
     validatePed(commandLine);
@@ -344,7 +347,22 @@ class AppCommandLineOptions {
     }
   }
 
-  private static void validateTemplate(CommandLine commandLine) {
+  private static void validateDatabase(CommandLine commandLine) {
+      Path inputPath = Path.of(commandLine.getOptionValue(OPT_INPUT));
+      String databaseLocation = getDatabaseLocation(inputPath);
+      if(commandLine.hasOption(OPT_FORCE)) {
+          try {
+              Files.deleteIfExists(Path.of(databaseLocation));
+          } catch (IOException e) {
+              throw new UncheckedIOException(e);
+          }
+      } else if(Files.exists(Path.of(databaseLocation))){
+          throw new IllegalArgumentException(
+                  format("Database file '%s' already exists", databaseLocation));
+      }
+  }
+
+    private static void validateTemplate(CommandLine commandLine) {
     Path templatePath = Path.of(commandLine.getOptionValue(OPT_TEMPLATE));
     validateFilePath(templatePath, "Template");
 

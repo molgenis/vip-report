@@ -8,8 +8,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.molgenis.vcf.utils.model.metadata.HtsFormat.VCF;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import htsjdk.variant.vcf.VCFHeader;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,6 +17,7 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,12 +28,10 @@ import org.molgenis.vcf.report.generator.ReportGenerator;
 import org.molgenis.vcf.report.generator.ReportGeneratorSettings;
 import org.molgenis.vcf.report.generator.SampleSettings;
 import org.molgenis.vcf.report.genes.GenesFilterFactory;
-import org.molgenis.vcf.report.model.Binary;
 import org.molgenis.vcf.report.model.Bytes;
 import org.molgenis.vcf.report.model.Report;
-import org.molgenis.vcf.report.model.ReportData;
-import org.molgenis.vcf.report.model.metadata.AppMetadata;
-import org.molgenis.vcf.report.model.metadata.ReportMetadata;
+import org.molgenis.vcf.report.repository.DatabaseManager;
+import org.molgenis.vcf.report.repository.DatabaseSchemaManager;
 import org.molgenis.vcf.utils.PersonListMerger;
 import org.molgenis.vcf.utils.model.metadata.HtsFile;
 import org.molgenis.vcf.utils.sample.mapper.HtsFileMapper;
@@ -54,6 +53,8 @@ class ReportGeneratorTest {
   @Mock private VcfFastaSlicerFactory vcfFastaSlicerFactory;
   @Mock private GenesFilterFactory genesFilterFactory;
   @Mock private VariantIntervalCalculator variantIntervalCalculator;
+  @Mock private DatabaseManager databaseManager;
+  @Mock private DatabaseSchemaManager databaseSchemaManager;
   private ReportGenerator reportGenerator;
 
   @BeforeEach
@@ -66,7 +67,9 @@ class ReportGeneratorTest {
             htsFileMapper,
             vcfFastaSlicerFactory,
             genesFilterFactory,
-            variantIntervalCalculator);
+            variantIntervalCalculator,
+            databaseSchemaManager,
+            databaseManager);
   }
 
   @Test
@@ -78,16 +81,17 @@ class ReportGeneratorTest {
         .thenReturn(vcfSampleItems);
 
     List<Phenopacket> phenopacketList = emptyList();
-    List<Phenopacket> phenopacketItems = phenopacketList;
-    when(phenopacketMapper.mapPhenotypes(any(), any())).thenReturn(phenopacketItems);
+    when(phenopacketMapper.mapPhenotypes(any(), any())).thenReturn(phenopacketList);
 
     Path inputVcfPath = Paths.get("src", "test", "resources", "example.vcf");
+    Path database = Paths.get("src", "test", "resources", "example.db");
     Path treePath = Paths.get("src", "test", "resources", "tree.json");
     List<Path> pedPath =
         Collections.singletonList(Paths.get("src", "test", "resources", "example.ped"));
     Path referencePath = Paths.get("src", "test", "resources", "example.fasta.gz");
     Path metadataPath = Paths.get("src", "test", "resources", "minimal_field_metadata.json");
     Path templateConfigPath = Paths.get("src", "test", "resources", "template_config.json");
+    Path wasmPath = Paths.get("src", "test", "resources", "fake.wasm");
 
     Map<String, Sample> pedSampleItems =
         Map.of("John", Sample.builder().person(Person.builder().familyId("FAM001").sex(Sex.MALE).affectedStatus(
@@ -115,30 +119,19 @@ class ReportGeneratorTest {
     String appName = "MyApp";
     String appVersion = "MyVersion";
     String appArgs = "MyArgs";
+
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
-            appName, appVersion, appArgs, maxNrSamples, metadataPath, referencePath, null, treePath, treePath, templateConfigPath);
-    Report report =
+            appName, appVersion, appArgs, maxNrSamples, metadataPath, wasmPath, referencePath, null, treePath, treePath, templateConfigPath);
+      when(databaseManager.populateDb(any(),any(),any(),any(),any(),any(),any(),any(),any())).thenReturn(new Bytes(Files.readAllBytes(database)));
+
+      Report report =
         new Report(
-            new ReportMetadata(new AppMetadata(appName, appVersion, appArgs), htsFile),
-            new ReportData(sampleList, phenopacketList),
-            new Binary(
-                new Bytes(Files.readAllBytes(inputVcfPath)),
                 Map.of("1:2-3", new Bytes(new byte[] {0})),
                 null,
-                Map.of()),
-            new ObjectMapper()
-                .readValue(
-                    "{\"name\":\"testtree\", \"description\":\"no need for a valid tree\"}",
-                    Map.class),
-            new ObjectMapper()
-                .readValue(
-                    "{\"name\":\"testtree\", \"description\":\"no need for a valid tree\"}",
-                    Map.class), new ObjectMapper()
-                .readValue("{\"info\":{\"TEST\":{\"ALLELE_NUM\":{\"label\":\"test.\", \"description\":\"test.\", \"numberType\":\"NUMBER\", \"numberCount\":1, \"type\":\"STRING\"}}}}", Map.class),new ObjectMapper()
-                .readValue(
-                                "{\"my_template_config_key\": \"my_template_config_value\"}",
-                        Map.class));
+                Map.of(),
+                new Bytes(Files.readAllBytes(wasmPath)),
+                new Bytes(Files.readAllBytes(database)));
 
     assertEquals(
         report,

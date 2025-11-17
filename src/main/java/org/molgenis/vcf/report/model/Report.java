@@ -1,38 +1,39 @@
 package org.molgenis.vcf.report.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.Map;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.NonFinal;
-import org.molgenis.vcf.report.model.metadata.ReportMetadata;
+
+import java.util.Map;
 
 @Value
 @NonFinal
 public class Report {
 
-  @JsonProperty("metadata")
+  @JsonProperty("fastaGz")
+  Map<String, Bytes> fastaGz;
+
+  @JsonProperty("genesGz")
+  Bytes genesGz;
+
+  @JsonProperty("cram")
+  Map<String, Cram> cram;
+
+  @JsonProperty("wasmBinary")
   @NonNull
-  ReportMetadata reportMetadata;
+  Bytes wasmBinary;
 
-  @JsonProperty("data")
+  @Value
+  @NonFinal
+  public static class Cram {
+      @JsonProperty("cram")
+      Bytes cram;
+      @JsonProperty("crai")
+      Bytes crai;
+  }
+
+  @JsonProperty("database")
   @NonNull
-  ReportData reportData;
-
-  @JsonProperty("binary")
-  @NonNull
-  Binary binary;
-
-  @JsonProperty("decisionTree")
-  Map<?,?> decisionTree;
-
-  @JsonProperty("sampleTree")
-  Map<?,?> sampleTree;
-
-  @JsonProperty("vcfMeta")
-  @NonNull
-  Map<?,?> vcfMeta;
-
-  @JsonProperty("config")
-  Map<?,?> templateConfig;
+  Bytes database;
 }

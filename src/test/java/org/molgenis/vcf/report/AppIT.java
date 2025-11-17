@@ -16,7 +16,7 @@ class AppIT {
 
   @Test
   void test() throws IOException {
-    String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+    String inputFile = ResourceUtils.getFile("classpath:IT.vcf").toString();
     String pedFiles =
         ResourceUtils.getFile("classpath:example.ped")
             + ","
@@ -24,7 +24,7 @@ class AppIT {
     String outputFile = sharedTempDir.resolve("example.vcf.html").toString();
     String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
     String treePath = ResourceUtils.getFile("classpath:tree.json").toString();
-    String sampleTreePath = ResourceUtils.getFile("classpath:tree.json").toString();
+    String sampleTreePath = ResourceUtils.getFile("classpath:sample_tree.json").toString();
     String probands = "NA00001";
     String phenotypes = "Jimmy/HP:123456,Unknown/test:Headache,Jane/OMIM:23456";
     String bamFile = ResourceUtils.getFile("classpath:example.cram").toString();
@@ -57,7 +57,8 @@ class AppIT {
       "-c",
       "NA00001=" + bamFile,
       "-r",
-      referenceFile
+      referenceFile,
+      "-f"
     };
     SpringApplication.run(App.class, args);
 
@@ -69,7 +70,7 @@ class AppIT {
 
   @Test
   void testTreeLess() throws IOException {
-    String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+    String inputFile = ResourceUtils.getFile("classpath:IT2.vcf").toString();
     String pedFiles =
             ResourceUtils.getFile("classpath:example.ped")
                     + ","
@@ -101,7 +102,8 @@ class AppIT {
             "-c",
             "NA00001=" + bamFile,
             "-r",
-            referenceFile
+            referenceFile,
+            "-f"
     };
     SpringApplication.run(App.class, args);
 
