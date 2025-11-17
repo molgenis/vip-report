@@ -115,7 +115,8 @@ public class DatabaseManager {
                 reportMetadataRepo.insertReportMetadata(conn, reportMetadata);
 
                 conn.commit();
-        }catch (SQLException e){
+        }
+        catch (SQLException e){
             throw new DatabaseException(e.getMessage(), "populate db");
         }
         byte[] fileContent = Files.readAllBytes(Path.of(databaseLocation));
