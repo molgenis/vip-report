@@ -211,6 +211,7 @@ public class DatabaseSchemaManager {
 
     public void createDatabase(ReportGeneratorSettings settings, VCFHeader vcfFileHeader, Connection connection) {
         executeSql("PRAGMA foreign_keys = ON;", connection);
+        executeSql("PRAGMA encoding = UTF-8;", connection);
         for (String sql : generateAllTableSql(settings, vcfFileHeader)) {
             executeSql(sql, connection);
         }

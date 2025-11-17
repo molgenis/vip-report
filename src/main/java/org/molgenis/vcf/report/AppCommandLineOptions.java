@@ -189,7 +189,6 @@ class AppCommandLineOptions {
     validateInput(commandLine);
     validateOutput(commandLine);
     validateDatabase(commandLine);
-    validateDatabase(commandLine);
     validateTemplate(commandLine);
     validateProbands(commandLine);
     validatePed(commandLine);
