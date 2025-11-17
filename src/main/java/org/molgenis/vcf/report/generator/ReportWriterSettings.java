@@ -5,6 +5,7 @@ import lombok.Value;
 
 @Value
 public class ReportWriterSettings {
+
   Path templatePath;
   boolean prettyPrint;
 }

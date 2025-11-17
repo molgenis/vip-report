@@ -1,10 +1,11 @@
 package org.molgenis.vcf.report.utils;
 
-import java.io.Serial;
-
 import static java.lang.String.format;
 
+import java.io.Serial;
+
 public class InvalidSampleCramException extends RuntimeException {
+
   @Serial
   private static final long serialVersionUID = 1L;
   private static final String MESSAGE =

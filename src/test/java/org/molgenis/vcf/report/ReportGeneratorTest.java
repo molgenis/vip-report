@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 import static org.molgenis.vcf.utils.model.metadata.HtsFormat.VCF;
 
 import htsjdk.variant.vcf.VCFHeader;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,13 +16,14 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.molgenis.vcf.report.fasta.*;
+import org.molgenis.vcf.report.fasta.VariantFastaSlicer;
+import org.molgenis.vcf.report.fasta.VariantIntervalCalculator;
+import org.molgenis.vcf.report.fasta.VcfFastaSlicerFactory;
 import org.molgenis.vcf.report.generator.ReportGenerator;
 import org.molgenis.vcf.report.generator.ReportGeneratorSettings;
 import org.molgenis.vcf.report.generator.SampleSettings;
@@ -46,15 +46,24 @@ import org.molgenis.vcf.utils.sample.model.Sex;
 @ExtendWith(MockitoExtension.class)
 class ReportGeneratorTest {
 
-  @Mock private HtsJdkToPersonsMapper htsJdkToPersonsMapper;
-  @Mock private PhenopacketMapper phenopacketMapper;
-  @Mock private PersonListMerger personListMerger;
-  @Mock private HtsFileMapper htsFileMapper;
-  @Mock private VcfFastaSlicerFactory vcfFastaSlicerFactory;
-  @Mock private GenesFilterFactory genesFilterFactory;
-  @Mock private VariantIntervalCalculator variantIntervalCalculator;
-  @Mock private DatabaseManager databaseManager;
-  @Mock private DatabaseSchemaManager databaseSchemaManager;
+  @Mock
+  private HtsJdkToPersonsMapper htsJdkToPersonsMapper;
+  @Mock
+  private PhenopacketMapper phenopacketMapper;
+  @Mock
+  private PersonListMerger personListMerger;
+  @Mock
+  private HtsFileMapper htsFileMapper;
+  @Mock
+  private VcfFastaSlicerFactory vcfFastaSlicerFactory;
+  @Mock
+  private GenesFilterFactory genesFilterFactory;
+  @Mock
+  private VariantIntervalCalculator variantIntervalCalculator;
+  @Mock
+  private DatabaseManager databaseManager;
+  @Mock
+  private DatabaseSchemaManager databaseSchemaManager;
   private ReportGenerator reportGenerator;
 
   @BeforeEach
@@ -94,14 +103,22 @@ class ReportGeneratorTest {
     Path wasmPath = Paths.get("src", "test", "resources", "fake.wasm");
 
     Map<String, Sample> pedSampleItems =
-        Map.of("John", Sample.builder().person(Person.builder().familyId("FAM001").sex(Sex.MALE).affectedStatus(
-            AffectedStatus.AFFECTED).maternalId("Jane").individualId("John").paternalId("Jimmy").build()).proband(false).index(-1).build(),
-            "James", Sample.builder().person(Person.builder().familyId("FAM002").sex(Sex.MALE).affectedStatus(
-            AffectedStatus.UNAFFECTED).maternalId("0").individualId("James").paternalId("0").build()).proband(false).index(-1).build(),
-            "Jane", Sample.builder().person(Person.builder().familyId("FAM001").sex(Sex.FEMALE).affectedStatus(
-            AffectedStatus.UNAFFECTED).maternalId("0").individualId("Jane").paternalId("0").build()).proband(false).index(-1).build(),
-            "Jimmy", Sample.builder().person(Person.builder().familyId("FAM001").sex(Sex.MALE).affectedStatus(
-            AffectedStatus.UNAFFECTED).maternalId("0").individualId("Jimmy").paternalId("0").build()).proband(false).index(-1).build());
+        Map.of("John", Sample.builder()
+                .person(Person.builder().familyId("FAM001").sex(Sex.MALE).affectedStatus(
+                        AffectedStatus.AFFECTED).maternalId("Jane").individualId("John").paternalId("Jimmy")
+                    .build()).proband(false).index(-1).build(),
+            "James", Sample.builder()
+                .person(Person.builder().familyId("FAM002").sex(Sex.MALE).affectedStatus(
+                        AffectedStatus.UNAFFECTED).maternalId("0").individualId("James").paternalId("0")
+                    .build()).proband(false).index(-1).build(),
+            "Jane", Sample.builder()
+                .person(Person.builder().familyId("FAM001").sex(Sex.FEMALE).affectedStatus(
+                        AffectedStatus.UNAFFECTED).maternalId("0").individualId("Jane").paternalId("0")
+                    .build()).proband(false).index(-1).build(),
+            "Jimmy", Sample.builder()
+                .person(Person.builder().familyId("FAM001").sex(Sex.MALE).affectedStatus(
+                        AffectedStatus.UNAFFECTED).maternalId("0").individualId("Jimmy").paternalId("0")
+                    .build()).proband(false).index(-1).build());
 
     List<Sample> sampleList = emptyList();
     when(personListMerger.merge(vcfSampleItems, pedSampleItems, 10))
@@ -111,7 +128,7 @@ class ReportGeneratorTest {
     when(htsFileMapper.map(any(), eq(inputVcfPath.toString()))).thenReturn(htsFile);
 
     VariantFastaSlicer variantFastaSlicer = mock(VariantFastaSlicer.class);
-    Map<String, Bytes> fastaMap = Map.of("1:2-3", new Bytes(new byte[] {0}));
+    Map<String, Bytes> fastaMap = Map.of("1:2-3", new Bytes(new byte[]{0}));
     when(variantFastaSlicer.generate(any(), any())).thenReturn(fastaMap);
     when(vcfFastaSlicerFactory.create(referencePath)).thenReturn(variantFastaSlicer);
 
@@ -122,16 +139,18 @@ class ReportGeneratorTest {
 
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
-            appName, appVersion, appArgs, maxNrSamples, metadataPath, wasmPath, referencePath, null, treePath, treePath, templateConfigPath);
-      when(databaseManager.populateDb(any(),any(),any(),any(),any(),any(),any(),any(),any())).thenReturn(new Bytes(Files.readAllBytes(database)));
+            appName, appVersion, appArgs, maxNrSamples, metadataPath, wasmPath, referencePath, null,
+            treePath, treePath, templateConfigPath);
+    when(databaseManager.populateDb(any(), any(), any(), any(), any(), any(), any(), any(),
+        any())).thenReturn(new Bytes(Files.readAllBytes(database)));
 
-      Report report =
+    Report report =
         new Report(
-                Map.of("1:2-3", new Bytes(new byte[] {0})),
-                null,
-                Map.of(),
-                new Bytes(Files.readAllBytes(wasmPath)),
-                new Bytes(Files.readAllBytes(database)));
+            Map.of("1:2-3", new Bytes(new byte[]{0})),
+            null,
+            Map.of(),
+            new Bytes(Files.readAllBytes(wasmPath)),
+            new Bytes(Files.readAllBytes(database)));
 
     assertEquals(
         report,

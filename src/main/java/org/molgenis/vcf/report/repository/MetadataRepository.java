@@ -1,5 +1,21 @@
 package org.molgenis.vcf.report.repository;
 
+import static org.molgenis.vcf.report.repository.SqlUtils.insertLookupValues;
+import static org.molgenis.vcf.report.utils.CategoryUtils.getKey;
+import static org.molgenis.vcf.report.utils.JsonUtils.collectNodes;
+import static org.molgenis.vcf.report.utils.JsonUtils.toJson;
+import static org.molgenis.vcf.utils.metadata.ValueType.CATEGORICAL;
+
+import java.nio.file.Path;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import lombok.NonNull;
 import org.molgenis.vcf.utils.metadata.FieldType;
 import org.molgenis.vcf.utils.metadata.ValueCount;
@@ -13,201 +29,207 @@ import org.molgenis.vcf.utils.sample.model.Phenopacket;
 import org.molgenis.vcf.utils.sample.model.PhenotypicFeature;
 import org.springframework.stereotype.Component;
 
-import java.nio.file.Path;
-import java.sql.*;
-import java.util.*;
-
-import static org.molgenis.vcf.report.repository.SqlUtils.insertLookupValues;
-import static org.molgenis.vcf.report.utils.CategoryUtils.getKey;
-import static org.molgenis.vcf.report.utils.JsonUtils.collectNodes;
-import static org.molgenis.vcf.report.utils.JsonUtils.toJson;
-import static org.molgenis.vcf.utils.metadata.ValueType.CATEGORICAL;
-
 @Component
 class MetadataRepository {
 
-    static final String INSERT_METADATA_SQL = """
-                INSERT INTO metadata (
-                    name,
-                    fieldType,
-                    valueType,
-                    numberType,
-                    numberCount,
-                    required,
-                    separator,
-                    nestedSeparator,
-                    categories,
-                    label,
-                    description,
-                    parent,
-                    nested,
-                    nestedIndex,
-                    nullValue
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """;
-    static final String INSERT_CATEGORIES_SQL = """
-                    INSERT INTO categories (
-                        field,
-                        value,
-                        label,
-                        description
-                    ) VALUES (?, ?, ?, ?)
-                    """;
+  static final String INSERT_METADATA_SQL = """
+      INSERT INTO metadata (
+          name,
+          fieldType,
+          valueType,
+          numberType,
+          numberCount,
+          required,
+          separator,
+          nestedSeparator,
+          categories,
+          label,
+          description,
+          parent,
+          nested,
+          nestedIndex,
+          nullValue
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      """;
+  static final String INSERT_CATEGORIES_SQL = """
+      INSERT INTO categories (
+          field,
+          value,
+          label,
+          description
+      ) VALUES (?, ?, ?, ?)
+      """;
 
-    public Map<FieldType, Map<String, Integer>> insertMetadata(
-            Connection conn, FieldMetadatas fieldMetadatas,
-            Path decisionTreePath,
-            Path sampleTreePath,
-            @NonNull List<Phenopacket> phenopackets
-    ) throws SQLException {
-        Map<Object, Integer> numberTypeIds = insertLookupValues(conn, "numberType", List.of(ValueCount.Type.values()));
-        Map<Object, Integer> valueTypeIds = insertLookupValues(conn, "valueType", List.of(ValueType.values()));
-        Map<Object, Integer> fieldTypeIds = insertLookupValues(conn, "fieldType", List.of(FieldType.values()));
+  public Map<FieldType, Map<String, Integer>> insertMetadata(
+      Connection conn, FieldMetadatas fieldMetadatas,
+      Path decisionTreePath,
+      Path sampleTreePath,
+      @NonNull List<Phenopacket> phenopackets
+  ) throws SQLException {
+    Map<Object, Integer> numberTypeIds = insertLookupValues(conn, "numberType",
+        List.of(ValueCount.Type.values()));
+    Map<Object, Integer> valueTypeIds = insertLookupValues(conn, "valueType",
+        List.of(ValueType.values()));
+    Map<Object, Integer> fieldTypeIds = insertLookupValues(conn, "fieldType",
+        List.of(FieldType.values()));
 
-        Map<String, Integer> infoKeys;
-        Map<String, Integer> formatKeys;
-        try (PreparedStatement ps = conn.prepareStatement(INSERT_METADATA_SQL, Statement.RETURN_GENERATED_KEYS)) {
-            Map<String, Map<String, ValueDescription>> customCategories = getCustomCategories(decisionTreePath, sampleTreePath, phenopackets);
-            formatKeys = insertFields(conn, fieldMetadatas.getFormat().entrySet(), ps, FieldType.FORMAT, customCategories, numberTypeIds, valueTypeIds, fieldTypeIds);
-            infoKeys = insertFields(conn, fieldMetadatas.getInfo().entrySet(), ps, FieldType.INFO, customCategories, numberTypeIds, valueTypeIds, fieldTypeIds);
-            ps.executeBatch();
+    Map<String, Integer> infoKeys;
+    Map<String, Integer> formatKeys;
+    try (PreparedStatement ps = conn.prepareStatement(INSERT_METADATA_SQL,
+        Statement.RETURN_GENERATED_KEYS)) {
+      Map<String, Map<String, ValueDescription>> customCategories = getCustomCategories(
+          decisionTreePath, sampleTreePath, phenopackets);
+      formatKeys = insertFields(conn, fieldMetadatas.getFormat().entrySet(), ps, FieldType.FORMAT,
+          customCategories, numberTypeIds, valueTypeIds, fieldTypeIds);
+      infoKeys = insertFields(conn, fieldMetadatas.getInfo().entrySet(), ps, FieldType.INFO,
+          customCategories, numberTypeIds, valueTypeIds, fieldTypeIds);
+      ps.executeBatch();
+    }
+    return Map.of(FieldType.INFO, infoKeys, FieldType.FORMAT, formatKeys);
+  }
+
+  private Map<String, Map<String, ValueDescription>> getCustomCategories(Path decisionTreePath,
+      Path sampleTreePath, List<Phenopacket> phenopackets) {
+    Map<String, Map<String, ValueDescription>> customCategories = new HashMap<>();
+    if (sampleTreePath != null) {
+      customCategories.put("VIPC_S", collectNodes(sampleTreePath));
+    }
+    if (sampleTreePath != null) {
+      customCategories.put("VIPC", collectNodes(decisionTreePath));
+    }
+    customCategories.put("HPO", collectHpos(phenopackets));
+    return customCategories;
+  }
+
+  private Map<String, Integer> insertFields(
+      Connection conn,
+      Set<? extends Map.Entry<String, FieldMetadata>> entries,
+      PreparedStatement ps,
+      FieldType fieldType,
+      Map<String, Map<String, ValueDescription>> customCategories,
+      Map<Object, Integer> numberTypeIds, Map<Object, Integer> valueTypeIds,
+      Map<Object, Integer> fieldTypeIds) throws SQLException {
+    Map<String, Integer> result = new HashMap<>();
+    for (Map.Entry<String, ? extends FieldMetadata> entry : entries) {
+      int pk = addMetadata(conn, entry, ps, fieldType, null, customCategories, numberTypeIds,
+          valueTypeIds, fieldTypeIds);
+      result.put(entry.getKey(), pk);
+    }
+    return result;
+  }
+
+  private Map<String, ValueDescription> collectHpos(@NonNull List<Phenopacket> phenopackets) {
+    Map<String, ValueDescription> hpos = new HashMap<>();
+    for (Phenopacket phenopacket : phenopackets) {
+      for (PhenotypicFeature feature : phenopacket.getPhenotypicFeaturesList()) {
+        OntologyClass ontologyClass = feature.getOntologyClass();
+        if (!hpos.containsKey(ontologyClass.getId())) {
+          hpos.put(ontologyClass.getId(),
+              new ValueDescription(ontologyClass.getId(), ontologyClass.getLabel()));
         }
-        return Map.of(FieldType.INFO, infoKeys, FieldType.FORMAT, formatKeys);
+      }
+    }
+    return hpos;
+  }
+
+  private int addMetadata(
+      Connection conn, Map.Entry<String, ? extends FieldMetadata> metadataEntry,
+      PreparedStatement ps,
+      FieldType type,
+      String parent,
+      Map<String, Map<String, ValueDescription>> customCategories,
+      Map<Object, Integer> numberTypeIds, Map<Object, Integer> valueTypeIds,
+      Map<Object, Integer> fieldTypeIds) throws SQLException {
+    FieldMetadata meta = metadataEntry.getValue();
+    String fieldName = metadataEntry.getKey();
+    Map<String, ValueDescription> categories = getCategories(fieldName, meta, customCategories);
+
+    String key = getKey(type, fieldName, parent);
+    insertCategoriesBatch(conn, key, categories);
+
+    ps.setString(1, fieldName);
+    ps.setInt(2, fieldTypeIds.get(type));
+    ps.setInt(3, customCategories.containsKey(fieldName) ? valueTypeIds.get(CATEGORICAL)
+        : valueTypeIds.get(meta.getType()));
+    ps.setInt(4, numberTypeIds.get(meta.getNumberType()));
+    ps.setObject(5, meta.getNumberCount());
+    ps.setInt(6, meta.isRequired() ? 1 : 0);
+    ps.setString(7, meta.getSeparator() != null ? meta.getSeparator().toString() : null);
+    ps.setString(8,
+        meta.getNestedAttributes() != null ? meta.getNestedAttributes().getSeparator() : null);
+    ps.setString(9, categories != null ? toJson(categories) : null);
+    ps.setString(10, meta.getLabel());
+    ps.setString(11, meta.getDescription());
+    ps.setString(12, parent);
+    boolean nestedFlag = meta.getNestedFields() != null && !meta.getNestedFields().isEmpty();
+    ps.setInt(13, nestedFlag ? 1 : 0);
+    if (meta instanceof NestedFieldMetadata nestedFieldMetadata) { // Compliant
+      ps.setInt(14, nestedFieldMetadata.getIndex());
+    } else {
+      ps.setString(14, null);
+    }
+    ps.setString(15, meta.getNullValue() != null ? toJson(meta.getNullValue()) : null);
+    ps.executeUpdate();
+
+    int metadataId;
+    try (ResultSet rs = ps.getGeneratedKeys()) {
+      if (rs.next()) {
+        metadataId = rs.getInt(1);
+      } else {
+        throw new SQLException("Failed to retrieve metadataId from metadata insert.");
+      }
     }
 
-    private Map<String, Map<String, ValueDescription>> getCustomCategories(Path decisionTreePath, Path sampleTreePath, List<Phenopacket> phenopackets) {
-        Map<String, Map<String, ValueDescription>> customCategories = new HashMap<>();
-        if(sampleTreePath != null){
-            customCategories.put("VIPC_S", collectNodes(sampleTreePath));
-        }
-        if(sampleTreePath != null)
-            {customCategories.put("VIPC", collectNodes(decisionTreePath));
-        }
-        customCategories.put("HPO", collectHpos(phenopackets));
-        return customCategories;
+    if (nestedFlag) {
+      for (Map.Entry<String, NestedFieldMetadata> nestedEntry : meta.getNestedFields().entrySet()) {
+        addMetadata(conn, nestedEntry, ps, type, fieldName, customCategories, numberTypeIds,
+            valueTypeIds, fieldTypeIds);
+      }
     }
 
-    private Map<String, Integer> insertFields(
-            Connection conn,
-            Set<? extends Map.Entry<String, FieldMetadata>> entries,
-            PreparedStatement ps,
-            FieldType fieldType,
-            Map<String, Map<String, ValueDescription>> customCategories,
-            Map<Object, Integer> numberTypeIds, Map<Object, Integer> valueTypeIds, Map<Object, Integer> fieldTypeIds) throws SQLException {
-        Map<String, Integer> result = new HashMap<>();
-        for (Map.Entry<String, ? extends FieldMetadata> entry : entries) {
-            int pk = addMetadata(conn, entry, ps, fieldType, null, customCategories, numberTypeIds, valueTypeIds, fieldTypeIds);
-            result.put(entry.getKey(), pk);
+    return metadataId;
+  }
+
+  private void insertCategoriesBatch(Connection conn, String fieldName,
+      Map<String, ValueDescription> categories) throws SQLException {
+    if (categories != null && !categories.isEmpty()) {
+      try (PreparedStatement categoryPs = conn.prepareStatement(INSERT_CATEGORIES_SQL)) {
+        categoryPs.setString(1, fieldName);
+        for (Map.Entry<String, ValueDescription> entry : categories.entrySet()) {
+          categoryPs.setString(2, entry.getKey());
+          categoryPs.setString(3, entry.getValue().getLabel());
+          categoryPs.setString(4, entry.getValue().getDescription());
+          categoryPs.addBatch();
         }
-        return result;
+        categoryPs.executeBatch();
+      }
     }
+  }
 
-    private Map<String, ValueDescription> collectHpos(@NonNull List<Phenopacket> phenopackets) {
-        Map<String, ValueDescription> hpos = new HashMap<>();
-        for (Phenopacket phenopacket : phenopackets) {
-            for (PhenotypicFeature feature : phenopacket.getPhenotypicFeaturesList()) {
-                OntologyClass ontologyClass = feature.getOntologyClass();
-                if (!hpos.containsKey(ontologyClass.getId())) {
-                    hpos.put(ontologyClass.getId(), new ValueDescription(ontologyClass.getId(), ontologyClass.getLabel()));
-                }
-            }
-        }
-        return hpos;
+  private Map<String, ValueDescription> getCategories(
+      String fieldName,
+      FieldMetadata meta,
+      Map<String, Map<String, ValueDescription>> customCategories
+  ) {
+    if (customCategories.containsKey(fieldName)) {
+      return customCategories.get(fieldName);
+    } else {
+      return meta.getCategories() == null ? null : meta.getCategories();
     }
+  }
 
-    private int addMetadata(
-            Connection conn, Map.Entry<String, ? extends FieldMetadata> metadataEntry,
-            PreparedStatement ps,
-            FieldType type,
-            String parent,
-            Map<String, Map<String, ValueDescription>> customCategories,
-            Map<Object, Integer> numberTypeIds, Map<Object, Integer> valueTypeIds, Map<Object, Integer> fieldTypeIds) throws SQLException {
-        FieldMetadata meta = metadataEntry.getValue();
-        String fieldName = metadataEntry.getKey();
-        Map<String, ValueDescription> categories = getCategories(fieldName, meta, customCategories);
-
-        String key = getKey(type, fieldName, parent);
-        insertCategoriesBatch(conn, key, categories);
-
-        ps.setString(1, fieldName);
-        ps.setInt(2, fieldTypeIds.get(type));
-        ps.setInt(3, customCategories.containsKey(fieldName) ? valueTypeIds.get(CATEGORICAL) : valueTypeIds.get(meta.getType()));
-        ps.setInt(4, numberTypeIds.get(meta.getNumberType()));
-        ps.setObject(5, meta.getNumberCount());
-        ps.setInt(6, meta.isRequired() ? 1 : 0);
-        ps.setString(7, meta.getSeparator() != null ? meta.getSeparator().toString() : null);
-        ps.setString(8, meta.getNestedAttributes() != null ? meta.getNestedAttributes().getSeparator() : null);
-        ps.setString(9, categories != null ? toJson(categories) : null);
-        ps.setString(10, meta.getLabel());
-        ps.setString(11, meta.getDescription());
-        ps.setString(12, parent);
-        boolean nestedFlag = meta.getNestedFields() != null && !meta.getNestedFields().isEmpty();
-        ps.setInt(13, nestedFlag ? 1 : 0);
-        if (meta instanceof NestedFieldMetadata nestedFieldMetadata) { // Compliant
-            ps.setInt(14, nestedFieldMetadata.getIndex());
-        }else{
-            ps.setString(14, null);
-        }
-        ps.setString(15, meta.getNullValue() != null ? toJson(meta.getNullValue()) : null);
-        ps.executeUpdate();
-
-        int metadataId;
-        try (ResultSet rs = ps.getGeneratedKeys()) {
-            if(rs.next()) {
-                metadataId = rs.getInt(1);
-            } else {
-                throw new SQLException("Failed to retrieve metadataId from metadata insert.");
-            }
-        }
-
-        if (nestedFlag) {
-            for (Map.Entry<String, NestedFieldMetadata> nestedEntry : meta.getNestedFields().entrySet()) {
-                addMetadata(conn, nestedEntry, ps, type, fieldName, customCategories, numberTypeIds, valueTypeIds, fieldTypeIds);
-            }
-        }
-
-        return metadataId;
+  public void insertHeaderLine(Connection conn, List<String> lines, String headerline) {
+    String sql = "INSERT INTO header (line) VALUES (?)";
+    try (PreparedStatement insertStmt = conn.prepareStatement(sql)) {
+      for (String line : lines) {
+        insertStmt.setString(1, String.format("##%s", line));
+        insertStmt.addBatch();
+      }
+      insertStmt.setString(1, headerline);
+      insertStmt.addBatch();
+      insertStmt.executeBatch();
+    } catch (SQLException e) {
+      throw new DatabaseException(e.getMessage(), "insert header line");
     }
-
-    private void insertCategoriesBatch(Connection conn, String fieldName, Map<String, ValueDescription> categories) throws SQLException {
-        if (categories != null && !categories.isEmpty()) {
-            try (PreparedStatement categoryPs = conn.prepareStatement(INSERT_CATEGORIES_SQL)) {
-                categoryPs.setString(1, fieldName);
-                for (Map.Entry<String, ValueDescription> entry : categories.entrySet()) {
-                    categoryPs.setString(2, entry.getKey());
-                    categoryPs.setString(3, entry.getValue().getLabel());
-                    categoryPs.setString(4, entry.getValue().getDescription());
-                    categoryPs.addBatch();
-                }
-                categoryPs.executeBatch();
-            }
-        }
-    }
-
-    private Map<String, ValueDescription> getCategories(
-            String fieldName,
-            FieldMetadata meta,
-            Map<String, Map<String, ValueDescription>> customCategories
-    ) {
-        if (customCategories.containsKey(fieldName)) {
-            return customCategories.get(fieldName);
-        } else {
-            return meta.getCategories() == null ? null : meta.getCategories();
-        }
-    }
-
-    public void insertHeaderLine(Connection conn, List<String> lines, String headerline) {
-        String sql = "INSERT INTO header (line) VALUES (?)";
-        try (PreparedStatement insertStmt = conn.prepareStatement(sql)) {
-            for (String line : lines) {
-                insertStmt.setString(1, String.format("##%s", line));
-                insertStmt.addBatch();
-            }
-            insertStmt.setString(1, headerline);
-            insertStmt.addBatch();
-            insertStmt.executeBatch();
-        } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(), "insert header line");
-        }
-    }
+  }
 }

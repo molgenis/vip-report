@@ -17,56 +17,67 @@ import org.molgenis.vcf.report.model.Bytes;
 @ExtendWith(MockitoExtension.class)
 class VariantFastaSlicerTest {
 
-    @Mock
-    private FastaSlicer fastaSlicer;
-    @Mock
-    private VariantIntervalCalculator variantIntervalCalculator;
-    private VariantFastaSlicer variantFastaSlicer;
+  @Mock
+  private FastaSlicer fastaSlicer;
+  @Mock
+  private VariantIntervalCalculator variantIntervalCalculator;
+  private VariantFastaSlicer variantFastaSlicer;
 
-    @BeforeEach
-    void setUpBeforeEach() {
-        variantFastaSlicer = new VariantFastaSlicer(fastaSlicer);
-    }
+  @BeforeEach
+  void setUpBeforeEach() {
+    variantFastaSlicer = new VariantFastaSlicer(fastaSlicer);
+  }
 
-    @Test
-    void generate() {
-        ContigInterval contigInterval0 = new ContigInterval("1", 750, 1250);
-        ContigInterval contigInterval1 = new ContigInterval("2", 1750, 2250);
-        ContigInterval contigInterval2 = new ContigInterval("3", 2750, 3250);
-        ContigInterval contigInterval3 = new ContigInterval("4", 3750, 4250);
+  @Test
+  void generate() {
+    ContigInterval contigInterval0 = new ContigInterval("1", 750, 1250);
+    ContigInterval contigInterval1 = new ContigInterval("2", 1750, 2250);
+    ContigInterval contigInterval2 = new ContigInterval("3", 2750, 3250);
+    ContigInterval contigInterval3 = new ContigInterval("4", 3750, 4250);
 
-        Path referencePath = Path.of("fake/reference/path");
+    Path referencePath = Path.of("fake/reference/path");
 
-        FastaSlice fastaSlice0 = new FastaSlice(contigInterval0, "ACTG".getBytes(StandardCharsets.UTF_8));
-        FastaSlice fastaSlice1 = new FastaSlice(contigInterval1, "ACTG".getBytes(StandardCharsets.UTF_8));
-        FastaSlice fastaSlice2 = new FastaSlice(contigInterval2, "ACTG".getBytes(StandardCharsets.UTF_8));
-        FastaSlice fastaSlice3 = new FastaSlice(contigInterval3, "ACTG".getBytes(StandardCharsets.UTF_8));
+    FastaSlice fastaSlice0 = new FastaSlice(contigInterval0,
+        "ACTG".getBytes(StandardCharsets.UTF_8));
+    FastaSlice fastaSlice1 = new FastaSlice(contigInterval1,
+        "ACTG".getBytes(StandardCharsets.UTF_8));
+    FastaSlice fastaSlice2 = new FastaSlice(contigInterval2,
+        "ACTG".getBytes(StandardCharsets.UTF_8));
+    FastaSlice fastaSlice3 = new FastaSlice(contigInterval3,
+        "ACTG".getBytes(StandardCharsets.UTF_8));
 
-        doReturn(fastaSlice0).when(fastaSlicer).slice(contigInterval0);
-        doReturn(fastaSlice1).when(fastaSlicer).slice(contigInterval1);
-        doReturn(fastaSlice2).when(fastaSlicer).slice(contigInterval2);
-        doReturn(fastaSlice3).when(fastaSlicer).slice(contigInterval3);
+    doReturn(fastaSlice0).when(fastaSlicer).slice(contigInterval0);
+    doReturn(fastaSlice1).when(fastaSlicer).slice(contigInterval1);
+    doReturn(fastaSlice2).when(fastaSlicer).slice(contigInterval2);
+    doReturn(fastaSlice3).when(fastaSlicer).slice(contigInterval3);
 
-        assertEquals(Map.of(
-                "1:750-1250", new Bytes("ACTG".getBytes(StandardCharsets.UTF_8)),
-                "2:1750-2250", new Bytes("ACTG".getBytes(StandardCharsets.UTF_8)),
-                "3:2750-3250", new Bytes("ACTG".getBytes(StandardCharsets.UTF_8)),
-                "4:3750-4250", new Bytes("ACTG".getBytes(StandardCharsets.UTF_8))),
-                variantFastaSlicer.generate(List.of(contigInterval0,contigInterval1,contigInterval2,contigInterval3), referencePath));
-    }
+    assertEquals(Map.of(
+            "1:750-1250", new Bytes("ACTG".getBytes(StandardCharsets.UTF_8)),
+            "2:1750-2250", new Bytes("ACTG".getBytes(StandardCharsets.UTF_8)),
+            "3:2750-3250", new Bytes("ACTG".getBytes(StandardCharsets.UTF_8)),
+            "4:3750-4250", new Bytes("ACTG".getBytes(StandardCharsets.UTF_8))),
+        variantFastaSlicer.generate(
+            List.of(contigInterval0, contigInterval1, contigInterval2, contigInterval3),
+            referencePath));
+  }
 
-    @Test
-    void generateWithoutCram() {
-        ContigInterval contigInterval0 = new ContigInterval("1", 750, 1250);
-        ContigInterval contigInterval1 = new ContigInterval("2", 1750, 2250);
+  @Test
+  void generateWithoutCram() {
+    ContigInterval contigInterval0 = new ContigInterval("1", 750, 1250);
+    ContigInterval contigInterval1 = new ContigInterval("2", 1750, 2250);
 
-        FastaSlice fastaSlice0 = new FastaSlice(contigInterval0, "ACTG".getBytes(StandardCharsets.UTF_8));
-        FastaSlice fastaSlice1 = new FastaSlice(contigInterval1, "ACTG".getBytes(StandardCharsets.UTF_8));
+    FastaSlice fastaSlice0 = new FastaSlice(contigInterval0,
+        "ACTG".getBytes(StandardCharsets.UTF_8));
+    FastaSlice fastaSlice1 = new FastaSlice(contigInterval1,
+        "ACTG".getBytes(StandardCharsets.UTF_8));
 
-        doReturn(fastaSlice0).when(fastaSlicer).slice(contigInterval0);
-        doReturn(fastaSlice1).when(fastaSlicer).slice(contigInterval1);
+    doReturn(fastaSlice0).when(fastaSlicer).slice(contigInterval0);
+    doReturn(fastaSlice1).when(fastaSlicer).slice(contigInterval1);
 
-        assertEquals(Map.of("1:750-1250", new Bytes("ACTG".getBytes(StandardCharsets.UTF_8)), "2:1750-2250", new Bytes("ACTG".getBytes(StandardCharsets.UTF_8))),
-                variantFastaSlicer.generate(List.of(contigInterval0,contigInterval1), Path.of("fake/reference/path")));
-    }
+    assertEquals(
+        Map.of("1:750-1250", new Bytes("ACTG".getBytes(StandardCharsets.UTF_8)), "2:1750-2250",
+            new Bytes("ACTG".getBytes(StandardCharsets.UTF_8))),
+        variantFastaSlicer.generate(List.of(contigInterval0, contigInterval1),
+            Path.of("fake/reference/path")));
+  }
 }

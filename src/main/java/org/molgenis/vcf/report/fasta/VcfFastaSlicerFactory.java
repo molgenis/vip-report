@@ -3,7 +3,6 @@ package org.molgenis.vcf.report.fasta;
 import static java.util.Objects.requireNonNull;
 
 import java.nio.file.Path;
-
 import org.springframework.stereotype.Component;
 
 @Component

@@ -27,10 +27,13 @@ import org.molgenis.vcf.report.model.Report;
 @ExtendWith(MockitoExtension.class)
 class ReportServiceTest {
 
-  @TempDir static Path sharedTempDir;
+  @TempDir
+  static Path sharedTempDir;
 
-  @Mock private ReportGenerator reportGenerator;
-  @Mock private ReportWriter reportWriter;
+  @Mock
+  private ReportGenerator reportGenerator;
+  @Mock
+  private ReportWriter reportWriter;
   private ReportService reportService;
 
   @BeforeEach

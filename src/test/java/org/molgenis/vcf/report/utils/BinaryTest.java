@@ -102,7 +102,7 @@ class BinaryTest {
     }
   }
 
-  /////////// Generic Test Routines ///////////
+  /// //////// Generic Test Routines ///////////
 
   void testStrEncode(Base85.Encoder e, String[] map) {
     for (int i = 0; i < map.length; i += 2) {
@@ -212,7 +212,7 @@ class BinaryTest {
     recurTestValidate(validCodes, invalidCodes, new byte[11], 0, d);
   }
 
-  /////////// RFC Tests ///////////
+  /// //////// RFC Tests ///////////
 
   private final String[] rfcTests = {
       "", "",

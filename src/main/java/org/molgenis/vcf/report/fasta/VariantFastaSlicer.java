@@ -1,12 +1,15 @@
 package org.molgenis.vcf.report.fasta;
 
 import static java.util.Objects.requireNonNull;
-import org.molgenis.vcf.report.model.Bytes;
 
 import java.nio.file.Path;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import org.molgenis.vcf.report.model.Bytes;
 
 public class VariantFastaSlicer {
+
   private final FastaSlicer fastaSlicer;
 
   public VariantFastaSlicer(FastaSlicer fastaSlicer) {
@@ -20,10 +23,10 @@ public class VariantFastaSlicer {
       fastaGzSlices = contigIntervals.stream().map(fastaSlicer::slice).toList();
       fastaGzMap = new LinkedHashMap<>();
       fastaGzSlices.forEach(
-              fastaSlice -> {
-                String key = getFastaSliceIdentifier(fastaSlice);
-                fastaGzMap.put(key, new Bytes(fastaSlice.getFastaGz()));
-              });
+          fastaSlice -> {
+            String key = getFastaSliceIdentifier(fastaSlice);
+            fastaGzMap.put(key, new Bytes(fastaSlice.getFastaGz()));
+          });
     } else {
       fastaGzMap = null;
     }

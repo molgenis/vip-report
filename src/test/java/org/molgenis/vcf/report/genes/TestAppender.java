@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TestAppender extends AppenderBase<ILoggingEvent> {
+
   static List<ILoggingEvent> events = new ArrayList<>();
 
   public TestAppender() {

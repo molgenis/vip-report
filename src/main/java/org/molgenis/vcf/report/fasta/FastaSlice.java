@@ -8,6 +8,8 @@ import lombok.experimental.NonFinal;
 @NonFinal
 public class FastaSlice {
 
-  @NonNull ContigInterval interval;
-  @NonNull byte[] fastaGz;
+  @NonNull
+  ContigInterval interval;
+  @NonNull
+  byte[] fastaGz;
 }

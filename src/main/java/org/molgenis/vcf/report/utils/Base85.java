@@ -10,7 +10,8 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * Adapted from https://github.com/Sheep-y/Base85/blob/f14b0e9d6854fba56f0bc6457fa87880953a64c2/java/src/sheepy/util/text/Base85.java
+ * Adapted from
+ * https://github.com/Sheep-y/Base85/blob/f14b0e9d6854fba56f0bc6457fa87880953a64c2/java/src/sheepy/util/text/Base85.java
  *
  * <p>Example: <br>
  * <code> String encodedString = Base85.getZ85Encoder().encodeToString( byteArray ); <br>
@@ -53,7 +54,7 @@ public class Base85 {
     /**
      * Calculate byte length of encoded data.
      *
-     * @param data data to be encoded
+     * @param data   data to be encoded
      * @param offset byte offset that data starts
      * @param length number of data bytes
      * @return length of encoded data in byte
@@ -89,7 +90,7 @@ public class Base85 {
     /**
      * Encode part of binary data into Base85 string.
      *
-     * @param data data to encode
+     * @param data   data to encode
      * @param offset byte offset that data starts
      * @param length number of data bytes
      * @return encoded Base85 string
@@ -111,7 +112,7 @@ public class Base85 {
     /**
      * Encode part of a binary data into a new byte array.
      *
-     * @param data array with data to encode
+     * @param data   array with data to encode
      * @param offset byte offset to start reading data
      * @param length number of byte to read
      * @return encoded Base85 encoded data in ASCII charset
@@ -128,10 +129,10 @@ public class Base85 {
     /**
      * Encode part of a byte array and write the output into a byte array in ASCII charset.
      *
-     * @param data array with data to encode
-     * @param offset byte offset to start reading data
-     * @param length number of byte to read
-     * @param out array to write encoded data to
+     * @param data       array with data to encode
+     * @param offset     byte offset to start reading data
+     * @param length     number of byte to read
+     * @param out        array to write encoded data to
      * @param out_offset byte offset to start writing encoded data to
      * @return number of encoded bytes
      */
@@ -168,10 +169,10 @@ public class Base85 {
      * 16 bytes (128 bits) long. Because the whole input data part is encoded as one big block, this
      * is much less efficient than the more common encodings.
      *
-     * @param data array to read data from
-     * @param offset byte offset to start reading data
-     * @param length number of byte to read
-     * @param out array to write encoded data to
+     * @param data       array to read data from
+     * @param offset     byte offset to start reading data
+     * @param length     number of byte to read
+     * @param out        array to write encoded data to
      * @param out_offset byte offset to start writing encoded data to
      * @return number of encoded bytes
      * @see <a href="https://tools.ietf.org/html/rfc1924">https://tools.ietf.org/html/rfc1924</a>
@@ -446,7 +447,7 @@ public class Base85 {
      * Calculate byte length of decoded data. Assumes data is correct; use test method to validate
      * data.
      *
-     * @param data Encoded data in ascii charset
+     * @param data   Encoded data in ascii charset
      * @param offset byte offset that data starts
      * @param length number of data bytes
      * @return number of byte of decoded data
@@ -492,12 +493,12 @@ public class Base85 {
     /**
      * Decode ASCII Base85 data into a new byte array.
      *
-     * @param data array with data to decode
+     * @param data   array with data to decode
      * @param offset byte offset to start reading data
      * @param length number of byte to read
      * @return decoded binary data
      * @throws IllegalArgumentException if offset or length is negative, or if data array is not big
-     * enough (data won't be written)
+     *                                  enough (data won't be written)
      */
     public final byte[] decode(final byte[] data, final int offset, final int length) {
       byte[] result = new byte[calcDecodedLength(data, offset, length)];
@@ -516,14 +517,14 @@ public class Base85 {
     /**
      * Decode part of a byte array and write the output into a byte array in ASCII charset.
      *
-     * @param data array with data to encode
-     * @param offset byte offset to start reading data
-     * @param length number of byte to read
-     * @param out array to write decoded data to
+     * @param data       array with data to encode
+     * @param offset     byte offset to start reading data
+     * @param length     number of byte to read
+     * @param out        array to write decoded data to
      * @param out_offset byte offset to start writing decoded data to
      * @return number of decoded bytes
      * @throws IllegalArgumentException if offset or length is negative, or if either array is not
-     * big enough (data won't be written)
+     *                                  big enough (data won't be written)
      */
     public final int decode(
         final byte[] data,
@@ -560,10 +561,10 @@ public class Base85 {
      * algorithm specified by RFC 1924 for IP address decoding, when the data part is exactly 16
      * bytes (128 bits) long.
      *
-     * @param data array to read data from
-     * @param offset byte offset to start reading data
-     * @param length number of byte to read
-     * @param out array to write decoded data to
+     * @param data       array to read data from
+     * @param offset     byte offset to start reading data
+     * @param length     number of byte to read
+     * @param out        array to write decoded data to
      * @param out_offset byte offset to start writing decoded data to
      * @return number of decoded bytes
      * @see <a href="https://tools.ietf.org/html/rfc1924">https://tools.ietf.org/html/rfc1924</a>
@@ -607,8 +608,8 @@ public class Base85 {
      * Test that part of given data can be decoded correctly.
      *
      * @param encoded_data Encoded data in ascii charset
-     * @param offset byte offset that data starts
-     * @param length number of data bytes
+     * @param offset       byte offset that data starts
+     * @param length       number of data bytes
      * @return true if data is of correct length and composed of correct characters
      */
     public boolean test(byte[] encoded_data, int offset, int length) {

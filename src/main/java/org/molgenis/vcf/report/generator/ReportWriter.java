@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ReportWriter {
+
   private static final Logger LOGGER = LoggerFactory.getLogger(ReportWriter.class);
   private final Base85Encoder base85Encoder;
 

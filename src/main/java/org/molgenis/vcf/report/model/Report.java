@@ -1,11 +1,10 @@
 package org.molgenis.vcf.report.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Map;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.NonFinal;
-
-import java.util.Map;
 
 @Value
 @NonFinal
@@ -27,10 +26,11 @@ public class Report {
   @Value
   @NonFinal
   public static class Cram {
-      @JsonProperty("cram")
-      Bytes cram;
-      @JsonProperty("crai")
-      Bytes crai;
+
+    @JsonProperty("cram")
+    Bytes cram;
+    @JsonProperty("crai")
+    Bytes crai;
   }
 
   @JsonProperty("database")
