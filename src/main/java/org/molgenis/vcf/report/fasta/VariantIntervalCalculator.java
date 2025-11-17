@@ -21,19 +21,19 @@ public class VariantIntervalCalculator {
   private final VcfIntervalCalculator vcfIntervalCalculator;
   private final CramIntervalCalculator cramIntervalCalculator;
 
-  public VariantIntervalCalculator(VcfIntervalCalculator vcfIntervalCalculator,
-      CramIntervalCalculator cramIntervalCalculator) {
+  public VariantIntervalCalculator(
+      VcfIntervalCalculator vcfIntervalCalculator, CramIntervalCalculator cramIntervalCalculator) {
     this.vcfIntervalCalculator = requireNonNull(vcfIntervalCalculator);
     this.cramIntervalCalculator = requireNonNull(cramIntervalCalculator);
   }
 
-  public List<ContigInterval> calculate(VCFIterator vcfIterator,
-      Map<String, SampleSettings.CramPath> cramPaths, Path referencePath) {
+  public List<ContigInterval> calculate(
+      VCFIterator vcfIterator, Map<String, SampleSettings.CramPath> cramPaths, Path referencePath) {
     Map<String, List<ContigInterval>> cramIntervals;
     List<ContigInterval> intervals = new ArrayList<>();
     if (cramPaths != null && !cramPaths.isEmpty()) {
-      Map<String, List<ContigInterval>> vcfIntervals = vcfIntervalCalculator.calculate(
-          vcfIterator.getHeader(), vcfIterator, FLANKING, null);
+      Map<String, List<ContigInterval>> vcfIntervals =
+          vcfIntervalCalculator.calculate(vcfIterator.getHeader(), vcfIterator, FLANKING, null);
       cramIntervals = cramIntervalCalculator.calculate(cramPaths, referencePath);
       intervals = mergeIntervalLists(cramIntervals, vcfIntervals);
     } else {
@@ -46,7 +46,8 @@ public class VariantIntervalCalculator {
     return intervals;
   }
 
-  private List<ContigInterval> mergeIntervalLists(Map<String, List<ContigInterval>> cramIntervalMap,
+  private List<ContigInterval> mergeIntervalLists(
+      Map<String, List<ContigInterval>> cramIntervalMap,
       Map<String, List<ContigInterval>> vcfIntervalMap) {
     List<ContigInterval> intervals = new ArrayList<>();
     Set<String> keys = new HashSet<>();
@@ -64,5 +65,4 @@ public class VariantIntervalCalculator {
     }
     return intervals;
   }
-
 }

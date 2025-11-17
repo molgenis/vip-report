@@ -9,7 +9,6 @@ class MissingSampleExceptionTest {
   @Test
   void getMessage() {
     assertEquals(
-        "No sample found for sampleId 'TEST'",
-        new MissingSampleException("TEST").getMessage());
+        "No sample found for sampleId 'TEST'", new MissingSampleException("TEST").getMessage());
   }
 }

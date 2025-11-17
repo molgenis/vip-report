@@ -27,18 +27,19 @@ import org.springframework.stereotype.Component;
 public class InfoRepository {
 
   public void insertInfoData(
-      Connection conn, VariantContext vc,
+      Connection conn,
+      VariantContext vc,
       List<String> infoColumns,
       FieldMetadatas fieldMetadatas,
-      int variantId, boolean hasSampleTree
-  ) {
+      int variantId,
+      boolean hasSampleTree) {
     Map<FieldValueKey, Integer> categoryLookup = loadCategoriesMap(conn);
 
     try (PreparedStatement insertInfo = prepareInsertInfo(conn, infoColumns)) {
       insertInfo.setInt(1, variantId);
       for (int i = 0; i < infoColumns.size(); i++) {
-        insertInfoDataColumn(vc, infoColumns, fieldMetadatas, i, insertInfo, categoryLookup,
-            hasSampleTree);
+        insertInfoDataColumn(
+            vc, infoColumns, fieldMetadatas, i, insertInfo, categoryLookup, hasSampleTree);
       }
       insertInfo.executeUpdate();
     } catch (SQLException e) {
@@ -46,9 +47,15 @@ public class InfoRepository {
     }
   }
 
-  private static void insertInfoDataColumn(VariantContext vc, List<String> infoColumns,
-      FieldMetadatas fieldMetadatas, int i, PreparedStatement insertInfo,
-      Map<FieldValueKey, Integer> categoryLookup, boolean hasSampleTree) throws SQLException {
+  private static void insertInfoDataColumn(
+      VariantContext vc,
+      List<String> infoColumns,
+      FieldMetadatas fieldMetadatas,
+      int i,
+      PreparedStatement insertInfo,
+      Map<FieldValueKey, Integer> categoryLookup,
+      boolean hasSampleTree)
+      throws SQLException {
     final String key = infoColumns.get(i);
     final FieldMetadata meta = fieldMetadatas.getInfo().get(key);
     Object value = vc.getAttribute(key, null);
@@ -60,9 +67,10 @@ public class InfoRepository {
       addCategorical(INFO, meta, categoryLookup, key, value, insertInfo, i + 2);
     } else if ((meta.getNumberType() != FIXED || meta.getNumberCount() != 1) && value != null) {
       String separator = (meta.getSeparator() != null) ? meta.getSeparator().toString() : ",";
-      Object[] arr = (value instanceof ArrayList)
-          ? ((ArrayList<?>) value).toArray()
-          : value.toString().split(separator);
+      Object[] arr =
+          (value instanceof ArrayList)
+              ? ((ArrayList<?>) value).toArray()
+              : value.toString().split(separator);
       String jsonValue = toJson(arr);
       insertInfo.setString(i + 2, jsonValue);
     } else {
@@ -80,13 +88,17 @@ public class InfoRepository {
     return conn.prepareStatement(sql.toString());
   }
 
-  public void insertInfoFieldOrder(Connection conn,
-      Map<FieldType, Map<String, Integer>> metadataKeys, String[] infoItems, int variantId) {
-    String INSERT_INFO_ORDER_SQL = "INSERT INTO infoOrder (infoIndex, variantId, metadataId) VALUES (?, ?, ?)";
+  public void insertInfoFieldOrder(
+      Connection conn,
+      Map<FieldType, Map<String, Integer>> metadataKeys,
+      String[] infoItems,
+      int variantId) {
+    String INSERT_INFO_ORDER_SQL =
+        "INSERT INTO infoOrder (infoIndex, variantId, metadataId) VALUES (?, ?, ?)";
 
     try (PreparedStatement pstmt = conn.prepareStatement(INSERT_INFO_ORDER_SQL)) {
       if (infoItems.length == 0 || (infoItems.length == 1 && infoItems[0].equals(MISSING))) {
-        return;//No info order if INFO column is a missing value.
+        return; // No info order if INFO column is a missing value.
       }
       pstmt.setInt(2, variantId);
       for (int i = 0; i < infoItems.length; i++) {

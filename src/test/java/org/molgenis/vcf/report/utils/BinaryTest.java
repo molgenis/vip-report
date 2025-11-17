@@ -204,9 +204,9 @@ class BinaryTest {
 
   void testInvalidData(Base85.Encoder e, Base85.Decoder d) {
     testException(
-        () -> d.decode(new byte[]{127, 127}), IllegalArgumentException.class, "Decode char(127)");
+        () -> d.decode(new byte[] {127, 127}), IllegalArgumentException.class, "Decode char(127)");
     testException(
-        () -> d.decode(new byte[]{-1, -1}), IllegalArgumentException.class, "Decode char(-1)");
+        () -> d.decode(new byte[] {-1, -1}), IllegalArgumentException.class, "Decode char(-1)");
     byte[] validCodes = e.getCharset().getBytes(US_ASCII);
     byte[] invalidCodes = reverseCharset(validCodes);
     recurTestValidate(validCodes, invalidCodes, new byte[11], 0, d);
@@ -215,19 +215,30 @@ class BinaryTest {
   /// //////// RFC Tests ///////////
 
   private final String[] rfcTests = {
-      "", "",
-      "A", "K>",
-      "AB", "K|%",
-      "ABC", "K|(_",
-      "ABCD", "K|(`B",
-      "ABCDE", "K|(`BMF",
-      "ABCDEF", "K|(`BMMe",
-      "ABCDEFG", "K|(`BMMg&",
-      "ABCDEFGH", "K|(`BMMg(R",
-      "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!#$%&()*+-;<=>?@^_`{|}~",
-      "FflSSG&MFiI5|N=LqtVJM@UIZOH55pPf$@(Q&d$}S6EqEVPa!sWoBn+X=-b1ZEkOHadLBXb#`}nd3qruBqb&&DJm;1J3Ku;KR{kzV0(Oheg",
-      "測試中", "=D4irsix$(tp",
-      "اختبارات", "*r(X8*s9p5*r(XB*r(X4",
+    "",
+    "",
+    "A",
+    "K>",
+    "AB",
+    "K|%",
+    "ABC",
+    "K|(_",
+    "ABCD",
+    "K|(`B",
+    "ABCDE",
+    "K|(`BMF",
+    "ABCDEF",
+    "K|(`BMMe",
+    "ABCDEFG",
+    "K|(`BMMg&",
+    "ABCDEFGH",
+    "K|(`BMMg(R",
+    "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!#$%&()*+-;<=>?@^_`{|}~",
+    "FflSSG&MFiI5|N=LqtVJM@UIZOH55pPf$@(Q&d$}S6EqEVPa!sWoBn+X=-b1ZEkOHadLBXb#`}nd3qruBqb&&DJm;1J3Ku;KR{kzV0(Oheg",
+    "測試中",
+    "=D4irsix$(tp",
+    "اختبارات",
+    "*r(X8*s9p5*r(XB*r(X4",
   };
 
   @Test
@@ -275,46 +286,53 @@ class BinaryTest {
 
   @Test
   void testRfcDecodedLenErr6() {
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> rfcD.calcDecodedLength(null, 0, 6));
+    assertThrows(IllegalArgumentException.class, () -> rfcD.calcDecodedLength(null, 0, 6));
   }
 
   @Test
   void testRfcDecodedLenErr1() {
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> rfcD.calcDecodedLength(null, 0, 1));
+    assertThrows(IllegalArgumentException.class, () -> rfcD.calcDecodedLength(null, 0, 1));
   }
 
   private final String[] z85Tests = {
-      "", "",
-      "A", "k(",
-      "AB", "k%+",
-      "ABC", "k%^{",
-      "ABCD", "k%^}b",
-      "ABCDE", "k%^}bmf",
-      "ABCDEF", "k%^}bmmE",
-      "ABCDEFG", "k%^}bmmG=",
-      "ABCDEFGH", "k%^}bmmG^r",
-      "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.-:+=^!/*?&<>()[]{}@%$#",
-      "fFLssg=mfIi5$zRv}od.xj#0]yIW<9z/xYpB98LFCx!yVk%^}bmmG^rnLhSHo?[FXqbQs(rArg6sZ0BfiX9v1aULrfcoKEudo*88ElY87bl",
-      "測試中", ">d4IRSIX:^TP",
-      "اختبارات", "/R^x8/S9P5/R^xb/R^x4",
+    "",
+    "",
+    "A",
+    "k(",
+    "AB",
+    "k%+",
+    "ABC",
+    "k%^{",
+    "ABCD",
+    "k%^}b",
+    "ABCDE",
+    "k%^}bmf",
+    "ABCDEF",
+    "k%^}bmmE",
+    "ABCDEFG",
+    "k%^}bmmG=",
+    "ABCDEFGH",
+    "k%^}bmmG^r",
+    "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.-:+=^!/*?&<>()[]{}@%$#",
+    "fFLssg=mfIi5$zRv}od.xj#0]yIW<9z/xYpB98LFCx!yVk%^}bmmG^rnLhSHo?[FXqbQs(rArg6sZ0BfiX9v1aULrfcoKEudo*88ElY87bl",
+    "測試中",
+    ">d4IRSIX:^TP",
+    "اختبارات",
+    "/R^x8/S9P5/R^xb/R^x4",
   };
 
   @Test
   void testZ85Spec() {
     byte[] helloWorld =
-        new byte[]{
-            (byte) 0x86,
-            (byte) 0x4F,
-            (byte) 0xD2,
-            (byte) 0x6F,
-            (byte) 0xB5,
-            (byte) 0x59,
-            (byte) 0xF7,
-            (byte) 0x5B
+        new byte[] {
+          (byte) 0x86,
+          (byte) 0x4F,
+          (byte) 0xD2,
+          (byte) 0x6F,
+          (byte) 0xB5,
+          (byte) 0x59,
+          (byte) 0xF7,
+          (byte) 0x5B
         };
     assertEquals("HelloWorld", z85E.encodeToString(helloWorld), "HelloWorld encode");
     assertArrayEquals(helloWorld, z85D.decodeToBytes("HelloWorld"), "HelloWorld decode");
@@ -357,34 +375,43 @@ class BinaryTest {
 
   @Test
   void testZ85DecodedLenErr6() {
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> z85D.calcDecodedLength(null, 0, 6));
+    assertThrows(IllegalArgumentException.class, () -> z85D.calcDecodedLength(null, 0, 6));
   }
 
   @Test
   void testZ85DecodedLenErr1() {
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> z85D.calcDecodedLength(null, 0, 1));
+    assertThrows(IllegalArgumentException.class, () -> z85D.calcDecodedLength(null, 0, 1));
   }
 
   private final String[] A85Tests = {
-      "", "",
-      "A", "5l",
-      "AB", "5sb",
-      "ABC", "5sdp",
-      "ABCD", "5sdq,",
-      "ABCDE", "5sdq,70",
-      "ABCDEF", "5sdq,77I",
-      "ABCDEFG", "5sdq,77Kc",
-      "ABCDEFGH", "5sdq,77Kd<",
-      "\u0000\u0000\u0000\u0000", "z",
-      "    ", "y",
-      "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~",
-      "+X/-V,pjuf.4Qi!/M8\\10etOA2)[BQ3BB5a4[)(q5sdq,77Kd<8P2WL9hnJ\\;,U=l<E<1'=^#$7?!^lG@:E_WAS,RgBkhF\"D/O92EH6,BF`qtRH$XgbI=;",
-      "測試中", "k.%MVWM\\adXT",
-      "اختبارات", "fVdB)fW*T&fVdB,fVdB%",
+    "",
+    "",
+    "A",
+    "5l",
+    "AB",
+    "5sb",
+    "ABC",
+    "5sdp",
+    "ABCD",
+    "5sdq,",
+    "ABCDE",
+    "5sdq,70",
+    "ABCDEF",
+    "5sdq,77I",
+    "ABCDEFG",
+    "5sdq,77Kc",
+    "ABCDEFGH",
+    "5sdq,77Kd<",
+    "\u0000\u0000\u0000\u0000",
+    "z",
+    "    ",
+    "y",
+    "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~",
+    "+X/-V,pjuf.4Qi!/M8\\10etOA2)[BQ3BB5a4[)(q5sdq,77Kd<8P2WL9hnJ\\;,U=l<E<1'=^#$7?!^lG@:E_WAS,RgBkhF\"D/O92EH6,BF`qtRH$XgbI=;",
+    "測試中",
+    "k.%MVWM\\adXT",
+    "اختبارات",
+    "fVdB)fW*T&fVdB,fVdB%",
   };
 
   @Test

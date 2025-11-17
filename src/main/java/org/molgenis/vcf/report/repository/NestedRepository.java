@@ -25,23 +25,34 @@ public class NestedRepository {
 
   public static final String CSQ_INDEX = "CsqIndex";
 
-  public void insertNested(Connection conn, String fieldName, VariantContext vc,
+  public void insertNested(
+      Connection conn,
+      String fieldName,
+      VariantContext vc,
       List<String> matchingNestedFields,
-      FieldMetadatas fieldMetadatas, int variantId, boolean hasDecisionTree) {
+      FieldMetadatas fieldMetadatas,
+      int variantId,
+      boolean hasDecisionTree) {
     try {
       Map<FieldValueKey, Integer> categoryLookup = loadCategoriesMap(conn);
       if (fieldName.equals("CSQ")) {
         matchingNestedFields.add(CSQ_INDEX);
       }
       if (vc.hasAttribute(fieldName)) {
-        try (PreparedStatement insertNestedStmt = prepareInsertSQL(conn,
-            String.format("variant_%s", fieldName), matchingNestedFields)) {
+        try (PreparedStatement insertNestedStmt =
+            prepareInsertSQL(conn, String.format("variant_%s", fieldName), matchingNestedFields)) {
           List<String> nestedEntries = vc.getAttributeAsStringList(fieldName, "");
           insertNestedStmt.setInt(1, variantId);
           int index = 0;
           for (String nestedField : nestedEntries) {
-            insertNestedValue(index, matchingNestedFields, nestedField, fieldName,
-                fieldMetadatas.getInfo().get(fieldName), insertNestedStmt, categoryLookup,
+            insertNestedValue(
+                index,
+                matchingNestedFields,
+                nestedField,
+                fieldName,
+                fieldMetadatas.getInfo().get(fieldName),
+                insertNestedStmt,
+                categoryLookup,
                 hasDecisionTree);
             index++;
           }
@@ -53,12 +64,19 @@ public class NestedRepository {
     }
   }
 
-  private static void insertNestedValue(int index, List<String> matchingNestedFields,
-      String nestedStringValue, String parent, FieldMetadata parentMeta,
-      PreparedStatement insertNestedStmt, Map<FieldValueKey, Integer> categoryLookup,
-      boolean hasDecisionTree) throws SQLException {
+  private static void insertNestedValue(
+      int index,
+      List<String> matchingNestedFields,
+      String nestedStringValue,
+      String parent,
+      FieldMetadata parentMeta,
+      PreparedStatement insertNestedStmt,
+      Map<FieldValueKey, Integer> categoryLookup,
+      boolean hasDecisionTree)
+      throws SQLException {
     String separator =
-        (parentMeta.getNestedAttributes() != null) ? parentMeta.getNestedAttributes().getSeparator()
+        (parentMeta.getNestedAttributes() != null)
+            ? parentMeta.getNestedAttributes().getSeparator()
             : "|";
     String[] nestedValues = nestedStringValue.split(Pattern.quote(separator), -1);
     int i = 0;
@@ -73,15 +91,17 @@ public class NestedRepository {
         }
         int nestedIndex = meta.getIndex();
         String val =
-            (nestedIndex >= 0 && nestedIndex < nestedValues.length) ? nestedValues[nestedIndex]
+            (nestedIndex >= 0 && nestedIndex < nestedValues.length)
+                ? nestedValues[nestedIndex]
                 : null;
 
         if (val == null || val.isEmpty()) {
           insertNestedStmt.setString(stmtIdx, null);
-        } else if (meta.getType() == CATEGORICAL || nestedField.equals("HPO") || (
-            nestedField.equals("VIPC") && hasDecisionTree)) {
-          addCategorical(INFO, meta, categoryLookup, nestedField, parent, val, insertNestedStmt,
-              stmtIdx);
+        } else if (meta.getType() == CATEGORICAL
+            || nestedField.equals("HPO")
+            || (nestedField.equals("VIPC") && hasDecisionTree)) {
+          addCategorical(
+              INFO, meta, categoryLookup, nestedField, parent, val, insertNestedStmt, stmtIdx);
         } else if (meta.getSeparator() != null) {
           String jsonVal = writeJsonListValue(val, meta.getSeparator().toString());
           insertNestedStmt.setString(stmtIdx, jsonVal);
@@ -96,8 +116,8 @@ public class NestedRepository {
 
   private PreparedStatement prepareInsertSQL(Connection conn, String table, List<String> columns)
       throws SQLException {
-    StringBuilder sql = new StringBuilder("INSERT INTO ").append(table).append(" (")
-        .append(VARIANT_ID);
+    StringBuilder sql =
+        new StringBuilder("INSERT INTO ").append(table).append(" (").append(VARIANT_ID);
     for (String col : columns) {
       sql.append(", ").append(col);
     }

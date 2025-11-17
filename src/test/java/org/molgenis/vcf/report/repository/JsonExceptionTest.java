@@ -8,8 +8,6 @@ class JsonExceptionTest {
 
   @Test
   void getMessage() {
-    assertEquals(
-        "Error converting data to json: 'TEST'",
-        new JsonException("TEST").getMessage());
+    assertEquals("Error converting data to json: 'TEST'", new JsonException("TEST").getMessage());
   }
 }

@@ -6,8 +6,7 @@ import java.util.List;
 
 public class PathUtils {
 
-  private PathUtils() {
-  }
+  private PathUtils() {}
 
   public static List<Path> parsePaths(String optionValue) {
     List<Path> result = new ArrayList<>();
@@ -30,7 +29,7 @@ public class PathUtils {
 
   public static String getDatabaseLocation(Path inputPath) {
     Path parentDir = inputPath.getParent();
-    return String.format("%s.db",
-        Path.of(String.valueOf(parentDir), getNameWithoutVcfExtensions(inputPath)));
+    return String.format(
+        "%s.db", Path.of(String.valueOf(parentDir), getNameWithoutVcfExtensions(inputPath)));
   }
 }

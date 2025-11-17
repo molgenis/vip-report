@@ -14,10 +14,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class BytesSerializerTest {
 
-  @Mock
-  private JsonGenerator jsonGenerator;
-  @Mock
-  private SerializerProvider serializerProvider;
+  @Mock private JsonGenerator jsonGenerator;
+  @Mock private SerializerProvider serializerProvider;
 
   private BytesSerializer bytesSerializer;
 
@@ -28,7 +26,7 @@ class BytesSerializerTest {
 
   @Test
   void serialize() throws IOException {
-    bytesSerializer.serialize(new Bytes(new byte[]{0, 1, 2}), jsonGenerator, serializerProvider);
+    bytesSerializer.serialize(new Bytes(new byte[] {0, 1, 2}), jsonGenerator, serializerProvider);
     verify(jsonGenerator).writeRawValue("new Uint8Array([0,1,2])");
   }
 }

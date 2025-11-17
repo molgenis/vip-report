@@ -12,8 +12,7 @@ import org.springframework.util.ResourceUtils;
 
 class AppIT {
 
-  @TempDir
-  Path sharedTempDir;
+  @TempDir Path sharedTempDir;
 
   @Test
   void test() throws IOException {
@@ -34,32 +33,32 @@ class AppIT {
     String templateConfigPath = ResourceUtils.getFile("classpath:template_config.json").toString();
 
     String[] args = {
-        "-i",
-        inputFile,
-        "-m",
-        metadataFile,
-        "-o",
-        outputFile,
-        "-t",
-        templateFile,
-        "-tc",
-        templateConfigPath,
-        "-pb",
-        probands,
-        "-pd",
-        pedFiles,
-        "-ph",
-        phenotypes,
-        "-dt",
-        treePath,
-        "-st",
-        sampleTreePath,
-        "-d",
-        "-c",
-        "NA00001=" + bamFile,
-        "-r",
-        referenceFile,
-        "-f"
+      "-i",
+      inputFile,
+      "-m",
+      metadataFile,
+      "-o",
+      outputFile,
+      "-t",
+      templateFile,
+      "-tc",
+      templateConfigPath,
+      "-pb",
+      probands,
+      "-pd",
+      pedFiles,
+      "-ph",
+      phenotypes,
+      "-dt",
+      treePath,
+      "-st",
+      sampleTreePath,
+      "-d",
+      "-c",
+      "NA00001=" + bamFile,
+      "-r",
+      referenceFile,
+      "-f"
     };
     SpringApplication.run(App.class, args);
 
@@ -85,26 +84,26 @@ class AppIT {
     String metadataFile = ResourceUtils.getFile("classpath:field_metadata.json").toString();
 
     String[] args = {
-        "-i",
-        inputFile,
-        "-m",
-        metadataFile,
-        "-o",
-        outputFile,
-        "-t",
-        templateFile,
-        "-pb",
-        probands,
-        "-pd",
-        pedFiles,
-        "-ph",
-        phenotypes,
-        "-d",
-        "-c",
-        "NA00001=" + bamFile,
-        "-r",
-        referenceFile,
-        "-f"
+      "-i",
+      inputFile,
+      "-m",
+      metadataFile,
+      "-o",
+      outputFile,
+      "-t",
+      templateFile,
+      "-pb",
+      probands,
+      "-pd",
+      pedFiles,
+      "-ph",
+      phenotypes,
+      "-d",
+      "-c",
+      "NA00001=" + bamFile,
+      "-r",
+      referenceFile,
+      "-f"
     };
     SpringApplication.run(App.class, args);
 

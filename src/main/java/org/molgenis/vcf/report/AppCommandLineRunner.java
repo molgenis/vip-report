@@ -54,7 +54,7 @@ public class AppCommandLineRunner implements CommandLineRunner {
   public void run(String... args) {
     if (args.length == 1
         && (args[0].equals("-" + AppCommandLineOptions.OPT_VERSION)
-        || args[0].equals("--" + AppCommandLineOptions.OPT_VERSION_LONG))) {
+            || args[0].equals("--" + AppCommandLineOptions.OPT_VERSION_LONG))) {
       LOGGER.info("{} {}", appName, appVersion);
       return;
     }

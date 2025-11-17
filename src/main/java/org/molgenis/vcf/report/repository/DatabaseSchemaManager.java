@@ -29,7 +29,8 @@ public class DatabaseSchemaManager {
   public static final String AUTOID_COLUMN = "id INTEGER PRIMARY KEY AUTOINCREMENT";
   private final Set<String> nestedTables = new LinkedHashSet<>();
 
-  static final String VCF_TABLE_SQL = """
+  static final String VCF_TABLE_SQL =
+      """
           CREATE TABLE vcf (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             chrom INTEGER NOT NULL,
@@ -45,28 +46,32 @@ public class DatabaseSchemaManager {
           ) STRICT;
       """;
 
-  static final String CONTIG_TABLE_SQL = """
+  static final String CONTIG_TABLE_SQL =
+      """
           CREATE TABLE contig (
               id INTEGER PRIMARY KEY AUTOINCREMENT,
               value TEXT UNIQUE NOT NULL
           ) STRICT;
       """;
 
-  static final String FORMAT_LOOKUP_TABLE_SQL = """
+  static final String FORMAT_LOOKUP_TABLE_SQL =
+      """
           CREATE TABLE formatLookup (
               id INTEGER PRIMARY KEY,
               value TEXT UNIQUE NOT NULL
           ) STRICT;
       """;
 
-  static final String HEADER_TABLE_SQL = """
+  static final String HEADER_TABLE_SQL =
+      """
           CREATE TABLE header (
               id INTEGER PRIMARY KEY AUTOINCREMENT,
               line TEXT NOT NULL
           ) STRICT;
       """;
 
-  static final String CATEGORIES_TABLE_SQL = """
+  static final String CATEGORIES_TABLE_SQL =
+      """
           CREATE TABLE categories (
               id INTEGER PRIMARY KEY AUTOINCREMENT,
               field TEXT NOT NULL,
@@ -76,21 +81,24 @@ public class DatabaseSchemaManager {
           ) STRICT;
       """;
 
-  static final String CONFIG_TABLE_SQL = """
+  static final String CONFIG_TABLE_SQL =
+      """
           CREATE TABLE config (
               id TEXT PRIMARY KEY,
               value TEXT NOT NULL
           ) STRICT;
       """;
 
-  static final String PHENOTYPE_TABLE_SQL = """
+  static final String PHENOTYPE_TABLE_SQL =
+      """
           CREATE TABLE phenotype (
               id TEXT PRIMARY KEY,
               label TEXT NOT NULL
           ) STRICT;
       """;
 
-  static final String SAMPLE_PHENOTYPE_TABLE_SQL = """
+  static final String SAMPLE_PHENOTYPE_TABLE_SQL =
+      """
           CREATE TABLE samplePhenotype (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             sampleIndex INTEGER NOT NULL,
@@ -100,21 +108,24 @@ public class DatabaseSchemaManager {
           ) STRICT;
       """;
 
-  static final String DECISION_TREE_TABLE_SQL = """
+  static final String DECISION_TREE_TABLE_SQL =
+      """
           CREATE TABLE decisionTree (
               id TEXT PRIMARY KEY,
               tree TEXT UNIQUE NOT NULL
           ) STRICT;
       """;
 
-  static final String APP_METADATA_TABLE_SQL = """
+  static final String APP_METADATA_TABLE_SQL =
+      """
           CREATE TABLE appMetadata (
               id TEXT PRIMARY KEY,
               value TEXT UNIQUE NOT NULL
           ) STRICT;
       """;
 
-  static final String SAMPLE_TABLE_SQL = """
+  static final String SAMPLE_TABLE_SQL =
+      """
           CREATE TABLE sample (
             sampleIndex INTEGER PRIMARY KEY,
             familyId TEXT NOT NULL,
@@ -131,21 +142,24 @@ public class DatabaseSchemaManager {
           ) STRICT;
       """;
 
-  static final String AFFECTED_TABLE_SQL = """
+  static final String AFFECTED_TABLE_SQL =
+      """
           CREATE TABLE affectedStatus (
               id INTEGER PRIMARY KEY AUTOINCREMENT,
               value TEXT UNIQUE NOT NULL
           ) STRICT;
       """;
 
-  static final String SEX_TABLE_SQL = """
+  static final String SEX_TABLE_SQL =
+      """
           CREATE TABLE sex (
               id INTEGER PRIMARY KEY AUTOINCREMENT,
               value TEXT UNIQUE NOT NULL
           ) STRICT;
       """;
 
-  static final String METADATA_TABLE_SQL = """
+  static final String METADATA_TABLE_SQL =
+      """
           CREATE TABLE metadata (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT,
@@ -168,7 +182,8 @@ public class DatabaseSchemaManager {
             FOREIGN KEY (numberType) REFERENCES numberType(id)
           ) STRICT;
       """;
-  static final String INFO_ORDER_TABLE_SQL = """
+  static final String INFO_ORDER_TABLE_SQL =
+      """
               CREATE TABLE infoOrder (
                   id INTEGER PRIMARY KEY AUTOINCREMENT,
                   infoIndex INTEGER NOT NULL,
@@ -179,34 +194,37 @@ public class DatabaseSchemaManager {
               ) STRICT;
       """;
 
-  static final String FIELDTYPE_TABLE_SQL = """
+  static final String FIELDTYPE_TABLE_SQL =
+      """
           CREATE TABLE fieldType (
               id INTEGER PRIMARY KEY AUTOINCREMENT,
               value TEXT UNIQUE NOT NULL
           ) STRICT;
       """;
 
-  static final String VALUETYPE_TABLE_SQL = """
+  static final String VALUETYPE_TABLE_SQL =
+      """
           CREATE TABLE valueType (
               id INTEGER PRIMARY KEY AUTOINCREMENT,
               value TEXT UNIQUE NOT NULL
           ) STRICT;
       """;
 
-  static final String NUMBERTYPE_TABLE_SQL = """
+  static final String NUMBERTYPE_TABLE_SQL =
+      """
           CREATE TABLE numberType (
               id INTEGER PRIMARY KEY AUTOINCREMENT,
               value TEXT UNIQUE NOT NULL
           ) STRICT;
       """;
 
-  static final String GT_TYPE_TABLE_SQL = """
+  static final String GT_TYPE_TABLE_SQL =
+      """
           CREATE TABLE gtType (
               id INTEGER PRIMARY KEY AUTOINCREMENT,
               value TEXT UNIQUE NOT NULL
           ) STRICT;
       """;
-
 
   public void executeSql(String sql, Connection connection) {
     try (Statement stmt = connection.createStatement()) {
@@ -216,8 +234,8 @@ public class DatabaseSchemaManager {
     }
   }
 
-  public void createDatabase(ReportGeneratorSettings settings, VCFHeader vcfFileHeader,
-      Connection connection) {
+  public void createDatabase(
+      ReportGeneratorSettings settings, VCFHeader vcfFileHeader, Connection connection) {
     executeSql("PRAGMA foreign_keys = ON;", connection);
     executeSql("PRAGMA encoding = \"UTF-8\";", connection);
     for (String sql : generateAllTableSql(settings, vcfFileHeader)) {
@@ -225,8 +243,8 @@ public class DatabaseSchemaManager {
     }
   }
 
-  private List<String> generateAllTableSql(ReportGeneratorSettings reportGeneratorSettings,
-      VCFHeader vcfFileHeader) {
+  private List<String> generateAllTableSql(
+      ReportGeneratorSettings reportGeneratorSettings, VCFHeader vcfFileHeader) {
     List<String> sqlStatements = new ArrayList<>();
     sqlStatements.add(CONTIG_TABLE_SQL);
     sqlStatements.add(VCF_TABLE_SQL);
@@ -254,15 +272,15 @@ public class DatabaseSchemaManager {
   }
 
   public String getInfoTableSql(ReportGeneratorSettings settings, VCFHeader vcfFileHeader) {
-    FieldMetadataService fieldMetadataService = new FieldMetadataServiceImpl(
-        settings.getMetadataPath().toFile());
+    FieldMetadataService fieldMetadataService =
+        new FieldMetadataServiceImpl(settings.getMetadataPath().toFile());
     FieldMetadatas fieldMetadatas = loadFieldMetadatas(fieldMetadataService, vcfFileHeader);
     return buildInfoTable(fieldMetadatas.getInfo());
   }
 
   public String getFormatTableSql(ReportGeneratorSettings settings, VCFHeader vcfFileHeader) {
-    FieldMetadataService fieldMetadataService = new FieldMetadataServiceImpl(
-        settings.getMetadataPath().toFile());
+    FieldMetadataService fieldMetadataService =
+        new FieldMetadataServiceImpl(settings.getMetadataPath().toFile());
     FieldMetadatas fieldMetadatas = loadFieldMetadatas(fieldMetadataService, vcfFileHeader);
     return buildFormatTable(fieldMetadatas.getFormat());
   }
@@ -281,8 +299,9 @@ public class DatabaseSchemaManager {
       FieldMetadata meta = entry.getValue();
       if (meta.getNestedFields() == null || meta.getNestedFields().isEmpty()) {
         if (meta.getNumberType() == ValueCount.Type.FIXED && meta.getNumberCount() == 1) {
-          columns.add(String.format(SQL_COLUMN, entry.getKey(),
-              toSqlType(meta.getType(), meta.getNumberCount())));
+          columns.add(
+              String.format(
+                  SQL_COLUMN, entry.getKey(), toSqlType(meta.getType(), meta.getNumberCount())));
         } else {
           columns.add(String.format(TEXT_COLUMN, entry.getKey()));
         }
@@ -307,8 +326,9 @@ public class DatabaseSchemaManager {
       FieldMetadata meta = entry.getValue();
       if (meta.getNestedFields() == null || meta.getNestedFields().isEmpty()) {
         if (meta.getNumberType() == ValueCount.Type.FIXED && meta.getNumberCount() == 1) {
-          columns.add(String.format(SQL_COLUMN, entry.getKey(),
-              toSqlType(meta.getType(), meta.getNumberCount())));
+          columns.add(
+              String.format(
+                  SQL_COLUMN, entry.getKey(), toSqlType(meta.getType(), meta.getNumberCount())));
           if (entry.getKey().equals("GT")) {
             columns.add(String.format(SQL_COLUMN, GT_TYPE, "INTEGER REFERENCES gtType(id)"));
           }
@@ -324,15 +344,15 @@ public class DatabaseSchemaManager {
     return formatBuilder.toString();
   }
 
-  private String buildNestedTable(String prefix, String parentField,
-      Map<String, NestedFieldMetadata> nestedFieldMap) {
+  private String buildNestedTable(
+      String prefix, String parentField, Map<String, NestedFieldMetadata> nestedFieldMap) {
     String tableName = String.format("%s_%s", prefix, parentField);
     StringBuilder nestedBuilder = new StringBuilder("CREATE TABLE ").append(tableName).append(" (");
     List<String> nestedColumns = new ArrayList<>();
     nestedColumns.add(AUTOID_COLUMN);
     if (tableName.startsWith("variant_")) {
       nestedColumns.add("variantId INTEGER REFERENCES vcf(id)");
-      //CSQ index for postprocessing VIPC_S and VIPP_S
+      // CSQ index for postprocessing VIPC_S and VIPP_S
       if (parentField.equals("CSQ")) {
         nestedColumns.add("CsqIndex INTEGER");
       }
@@ -344,8 +364,11 @@ public class DatabaseSchemaManager {
       String columnName = nestedEntry.getKey();
       if (nestedField.getNumberType() == ValueCount.Type.FIXED
           && nestedField.getNumberCount() == 1) {
-        nestedColumns.add(String.format(SQL_COLUMN, columnName,
-            toSqlType(nestedField.getType(), nestedField.getNumberCount())));
+        nestedColumns.add(
+            String.format(
+                SQL_COLUMN,
+                columnName,
+                toSqlType(nestedField.getType(), nestedField.getNumberCount())));
       } else {
         nestedColumns.add(String.format(TEXT_COLUMN, columnName));
       }

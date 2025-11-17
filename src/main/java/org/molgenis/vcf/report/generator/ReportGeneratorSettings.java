@@ -9,17 +9,12 @@ public class ReportGeneratorSettings {
 
   public static final int DEFAULT_MAX_NR_SAMPLES = 100;
 
-  @NonNull
-  String appName;
-  @NonNull
-  String appVersion;
-  @NonNull
-  String appArguments;
+  @NonNull String appName;
+  @NonNull String appVersion;
+  @NonNull String appArguments;
   int maxNrSamples;
-  @NonNull
-  Path metadataPath;
-  @NonNull
-  Path sqlWasmPath;
+  @NonNull Path metadataPath;
+  @NonNull Path sqlWasmPath;
   Path referencePath;
   Path genesPath;
   Path decisionTreePath;

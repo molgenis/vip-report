@@ -120,26 +120,34 @@ public class ReportGenerator {
     Map<String, Bytes> fastaGzMap;
     Path referencePath = reportGeneratorSettings.getReferencePath();
     Map<String, SampleSettings.CramPath> cramPaths = sampleSettings.getCramPaths();
-    List<ContigInterval> contigIntervals = variantIntervalCalculator.calculate(vcfFileReader,
-        cramPaths, referencePath);
+    List<ContigInterval> contigIntervals =
+        variantIntervalCalculator.calculate(vcfFileReader, cramPaths, referencePath);
     fastaGzMap = getReferenceTrackData(contigIntervals, referencePath);
     Bytes genesGz = getGenesTrackData(contigIntervals, reportGeneratorSettings);
     Map<String, Report.Cram> cramMap = getAlignmentTrackData(sampleSettings);
 
     Map<?, ?> templateConfig = parseJsonObject(reportGeneratorSettings.getTemplateConfigPath());
     String databaseLocation = getDatabaseLocation(vcfPath);
-    databaseSchemaManager.createDatabase(reportGeneratorSettings, vcfFileReader.getHeader(),
+    databaseSchemaManager.createDatabase(
+        reportGeneratorSettings,
+        vcfFileReader.getHeader(),
         databaseManager.getConnection(databaseLocation));
-    FieldMetadataService fieldMetadataService = new FieldMetadataServiceImpl(
-        reportGeneratorSettings.getMetadataPath().toFile());
+    FieldMetadataService fieldMetadataService =
+        new FieldMetadataServiceImpl(reportGeneratorSettings.getMetadataPath().toFile());
     FieldMetadatas fieldMetadatas = fieldMetadataService.load(vcfFileReader.getHeader());
     Bytes database;
     try {
-      database = databaseManager.populateDb(databaseLocation, fieldMetadatas, samples,
-          vcfPath.toFile(),
-          reportGeneratorSettings.getDecisionTreePath(),
-          reportGeneratorSettings.getSampleTreePath(),
-          reportMetadata, templateConfig, phenopackets.getItems());
+      database =
+          databaseManager.populateDb(
+              databaseLocation,
+              fieldMetadatas,
+              samples,
+              vcfPath.toFile(),
+              reportGeneratorSettings.getDecisionTreePath(),
+              reportGeneratorSettings.getSampleTreePath(),
+              reportMetadata,
+              templateConfig,
+              phenopackets.getItems());
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }
@@ -163,13 +171,13 @@ public class ReportGenerator {
     return jsonObject;
   }
 
-  private Items<Phenopacket> createPhenopackets(SampleSettings sampleSettings,
-      Items<Sample> samples) {
+  private Items<Phenopacket> createPhenopackets(
+      SampleSettings sampleSettings, Items<Sample> samples) {
     Items<Phenopacket> phenopackets;
     String phenotypes = sampleSettings.getPhenotypeString();
     if (phenotypes != null && !phenotypes.isEmpty()) {
-      List<Phenopacket> phenopacketsList = phenopacketMapper.mapPhenotypes(
-          phenotypes, samples.getItems());
+      List<Phenopacket> phenopacketsList =
+          phenopacketMapper.mapPhenotypes(phenotypes, samples.getItems());
       phenopackets = new Items<>(phenopacketsList, phenopacketsList.size());
     } else {
       phenopackets = new Items<>(Collections.emptyList(), 0);
@@ -196,8 +204,8 @@ public class ReportGenerator {
     return cramMap;
   }
 
-  private Map<String, Bytes> getReferenceTrackData(List<ContigInterval> contigIntervals,
-      Path referencePath) {
+  private Map<String, Bytes> getReferenceTrackData(
+      List<ContigInterval> contigIntervals, Path referencePath) {
     Map<String, Bytes> fastaGzMap;
     if (referencePath != null) {
       VariantFastaSlicer variantFastaSlicer = vcfFastaSlicerFactory.create(referencePath);
@@ -208,8 +216,8 @@ public class ReportGenerator {
     return fastaGzMap;
   }
 
-  private Bytes getGenesTrackData(List<ContigInterval> contigIntervals,
-      ReportGeneratorSettings reportGeneratorSettings) {
+  private Bytes getGenesTrackData(
+      List<ContigInterval> contigIntervals, ReportGeneratorSettings reportGeneratorSettings) {
     Path genesPath = reportGeneratorSettings.getGenesPath();
     Bytes genesGz;
     if (genesPath != null) {
@@ -231,10 +239,9 @@ public class ReportGenerator {
     List<Sample> samplesList = htsJdkToPersonsMapper.map(fileHeader, maxNrSamples);
     Items<Sample> sampleItems = new Items<>(samplesList, samplesList.size());
     if (pedigreePaths != null) {
-      final Map<String, Sample> pedigreePersons =
-          mapPedFileToPersons(pedigreePaths, maxNrSamples);
-      List<Sample> mergedSamples = personListMerger.merge(samplesList, pedigreePersons,
-          maxNrSamples);
+      final Map<String, Sample> pedigreePersons = mapPedFileToPersons(pedigreePaths, maxNrSamples);
+      List<Sample> mergedSamples =
+          personListMerger.merge(samplesList, pedigreePersons, maxNrSamples);
       sampleItems = new Items<>(mergedSamples, mergedSamples.size());
     }
     if (!probandNames.isEmpty()) {

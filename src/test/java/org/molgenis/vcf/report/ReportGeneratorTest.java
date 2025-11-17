@@ -46,24 +46,15 @@ import org.molgenis.vcf.utils.sample.model.Sex;
 @ExtendWith(MockitoExtension.class)
 class ReportGeneratorTest {
 
-  @Mock
-  private HtsJdkToPersonsMapper htsJdkToPersonsMapper;
-  @Mock
-  private PhenopacketMapper phenopacketMapper;
-  @Mock
-  private PersonListMerger personListMerger;
-  @Mock
-  private HtsFileMapper htsFileMapper;
-  @Mock
-  private VcfFastaSlicerFactory vcfFastaSlicerFactory;
-  @Mock
-  private GenesFilterFactory genesFilterFactory;
-  @Mock
-  private VariantIntervalCalculator variantIntervalCalculator;
-  @Mock
-  private DatabaseManager databaseManager;
-  @Mock
-  private DatabaseSchemaManager databaseSchemaManager;
+  @Mock private HtsJdkToPersonsMapper htsJdkToPersonsMapper;
+  @Mock private PhenopacketMapper phenopacketMapper;
+  @Mock private PersonListMerger personListMerger;
+  @Mock private HtsFileMapper htsFileMapper;
+  @Mock private VcfFastaSlicerFactory vcfFastaSlicerFactory;
+  @Mock private GenesFilterFactory genesFilterFactory;
+  @Mock private VariantIntervalCalculator variantIntervalCalculator;
+  @Mock private DatabaseManager databaseManager;
+  @Mock private DatabaseSchemaManager databaseSchemaManager;
   private ReportGenerator reportGenerator;
 
   @BeforeEach
@@ -103,32 +94,72 @@ class ReportGeneratorTest {
     Path wasmPath = Paths.get("src", "test", "resources", "fake.wasm");
 
     Map<String, Sample> pedSampleItems =
-        Map.of("John", Sample.builder()
-                .person(Person.builder().familyId("FAM001").sex(Sex.MALE).affectedStatus(
-                        AffectedStatus.AFFECTED).maternalId("Jane").individualId("John").paternalId("Jimmy")
-                    .build()).proband(false).index(-1).build(),
-            "James", Sample.builder()
-                .person(Person.builder().familyId("FAM002").sex(Sex.MALE).affectedStatus(
-                        AffectedStatus.UNAFFECTED).maternalId("0").individualId("James").paternalId("0")
-                    .build()).proband(false).index(-1).build(),
-            "Jane", Sample.builder()
-                .person(Person.builder().familyId("FAM001").sex(Sex.FEMALE).affectedStatus(
-                        AffectedStatus.UNAFFECTED).maternalId("0").individualId("Jane").paternalId("0")
-                    .build()).proband(false).index(-1).build(),
-            "Jimmy", Sample.builder()
-                .person(Person.builder().familyId("FAM001").sex(Sex.MALE).affectedStatus(
-                        AffectedStatus.UNAFFECTED).maternalId("0").individualId("Jimmy").paternalId("0")
-                    .build()).proband(false).index(-1).build());
+        Map.of(
+            "John",
+            Sample.builder()
+                .person(
+                    Person.builder()
+                        .familyId("FAM001")
+                        .sex(Sex.MALE)
+                        .affectedStatus(AffectedStatus.AFFECTED)
+                        .maternalId("Jane")
+                        .individualId("John")
+                        .paternalId("Jimmy")
+                        .build())
+                .proband(false)
+                .index(-1)
+                .build(),
+            "James",
+            Sample.builder()
+                .person(
+                    Person.builder()
+                        .familyId("FAM002")
+                        .sex(Sex.MALE)
+                        .affectedStatus(AffectedStatus.UNAFFECTED)
+                        .maternalId("0")
+                        .individualId("James")
+                        .paternalId("0")
+                        .build())
+                .proband(false)
+                .index(-1)
+                .build(),
+            "Jane",
+            Sample.builder()
+                .person(
+                    Person.builder()
+                        .familyId("FAM001")
+                        .sex(Sex.FEMALE)
+                        .affectedStatus(AffectedStatus.UNAFFECTED)
+                        .maternalId("0")
+                        .individualId("Jane")
+                        .paternalId("0")
+                        .build())
+                .proband(false)
+                .index(-1)
+                .build(),
+            "Jimmy",
+            Sample.builder()
+                .person(
+                    Person.builder()
+                        .familyId("FAM001")
+                        .sex(Sex.MALE)
+                        .affectedStatus(AffectedStatus.UNAFFECTED)
+                        .maternalId("0")
+                        .individualId("Jimmy")
+                        .paternalId("0")
+                        .build())
+                .proband(false)
+                .index(-1)
+                .build());
 
     List<Sample> sampleList = emptyList();
-    when(personListMerger.merge(vcfSampleItems, pedSampleItems, 10))
-        .thenReturn(sampleList);
+    when(personListMerger.merge(vcfSampleItems, pedSampleItems, 10)).thenReturn(sampleList);
 
     HtsFile htsFile = new HtsFile("test.vcf", VCF, "GRCh38");
     when(htsFileMapper.map(any(), eq(inputVcfPath.toString()))).thenReturn(htsFile);
 
     VariantFastaSlicer variantFastaSlicer = mock(VariantFastaSlicer.class);
-    Map<String, Bytes> fastaMap = Map.of("1:2-3", new Bytes(new byte[]{0}));
+    Map<String, Bytes> fastaMap = Map.of("1:2-3", new Bytes(new byte[] {0}));
     when(variantFastaSlicer.generate(any(), any())).thenReturn(fastaMap);
     when(vcfFastaSlicerFactory.create(referencePath)).thenReturn(variantFastaSlicer);
 
@@ -139,14 +170,23 @@ class ReportGeneratorTest {
 
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
-            appName, appVersion, appArgs, maxNrSamples, metadataPath, wasmPath, referencePath, null,
-            treePath, treePath, templateConfigPath);
-    when(databaseManager.populateDb(any(), any(), any(), any(), any(), any(), any(), any(),
-        any())).thenReturn(new Bytes(Files.readAllBytes(database)));
+            appName,
+            appVersion,
+            appArgs,
+            maxNrSamples,
+            metadataPath,
+            wasmPath,
+            referencePath,
+            null,
+            treePath,
+            treePath,
+            templateConfigPath);
+    when(databaseManager.populateDb(any(), any(), any(), any(), any(), any(), any(), any(), any()))
+        .thenReturn(new Bytes(Files.readAllBytes(database)));
 
     Report report =
         new Report(
-            Map.of("1:2-3", new Bytes(new byte[]{0})),
+            Map.of("1:2-3", new Bytes(new byte[] {0})),
             null,
             Map.of(),
             new Bytes(Files.readAllBytes(wasmPath)),

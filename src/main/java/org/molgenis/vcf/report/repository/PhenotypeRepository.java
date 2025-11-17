@@ -9,12 +9,11 @@ import org.molgenis.vcf.utils.sample.model.PhenotypicFeature;
 import org.molgenis.vcf.utils.sample.model.Sample;
 import org.springframework.stereotype.Component;
 
-
 @Component
 public class PhenotypeRepository {
 
-  public void insertPhenotypeData(Connection conn, List<Phenopacket> packets,
-      List<Sample> samples) {
+  public void insertPhenotypeData(
+      Connection conn, List<Phenopacket> packets, List<Sample> samples) {
     String phenotypeSql = "INSERT OR IGNORE INTO phenotype (id, label) VALUES (?, ?)";
     String samplePhenoSql = "INSERT INTO samplePhenotype (sampleIndex, phenotypeId) VALUES (?, ?)";
 
@@ -22,8 +21,10 @@ public class PhenotypeRepository {
         PreparedStatement samplePhenoStmt = conn.prepareStatement(samplePhenoSql)) {
 
       for (Phenopacket packet : packets) {
-        List<Sample> matchedSamples = samples.stream().filter(s -> s.getPerson().getIndividualId()
-            .equals(packet.getSubject().getId())).toList();
+        List<Sample> matchedSamples =
+            samples.stream()
+                .filter(s -> s.getPerson().getIndividualId().equals(packet.getSubject().getId()))
+                .toList();
         if (matchedSamples.size() == 1) {
           Sample sample = matchedSamples.getFirst();
 

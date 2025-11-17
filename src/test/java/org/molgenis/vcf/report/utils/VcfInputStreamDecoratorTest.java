@@ -18,7 +18,8 @@ class VcfInputStreamDecoratorTest {
   @Test
   void testPreprocessVCFWithValidInput() throws IOException {
     // Given a VCF file with a CNV:TR allele in the ALT field
-    String vcfContent = """
+    String vcfContent =
+        """
         ##fileformat=VCFv4.2
         #CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO
         1\t123456\t.\tA\t<CNV:TR>,<CNV:TR>\t.\tPASS\t.
@@ -27,10 +28,13 @@ class VcfInputStreamDecoratorTest {
     File mockFile = tmpFileFromString(vcfContent);
     InputStream resultStream = VcfInputStreamDecorator.preprocessVCF(mockFile);
 
-    String result = new BufferedReader(new InputStreamReader(resultStream, StandardCharsets.UTF_8))
-        .lines().collect(Collectors.joining("\n"));
+    String result =
+        new BufferedReader(new InputStreamReader(resultStream, StandardCharsets.UTF_8))
+            .lines()
+            .collect(Collectors.joining("\n"));
 
-    String expectedResult = """
+    String expectedResult =
+        """
         ##fileformat=VCFv4.2
         #CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO
         1\t123456\t.\tA\t<CNV:TR1>,<CNV:TR2>\t.\tPASS\t.
@@ -41,27 +45,31 @@ class VcfInputStreamDecoratorTest {
 
   @Test
   void testPreprocessVCFWithNoCNVAltField() throws IOException {
-    String vcfContent = """
+    String vcfContent =
+        """
         ##fileformat=VCFv4.2
         #CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO
         1\t123456\t.\tA\tT\t.\tPASS\t.
         1\t123456\t.\tA\tC,T\t.\tPASS\t.
-        
+
         """;
 
     File mockFile = tmpFileFromString(vcfContent);
 
     InputStream resultStream = VcfInputStreamDecorator.preprocessVCF(mockFile);
 
-    String result = new BufferedReader(new InputStreamReader(resultStream, StandardCharsets.UTF_8))
-        .lines().collect(Collectors.joining("\n"));
+    String result =
+        new BufferedReader(new InputStreamReader(resultStream, StandardCharsets.UTF_8))
+            .lines()
+            .collect(Collectors.joining("\n"));
 
     assertEquals(vcfContent.trim(), result.trim());
   }
 
   @Test
   void testPreprocessVCFWithInvalidLine() throws IOException {
-    String invalidContent = """
+    String invalidContent =
+        """
         ##fileformat=VCFv4.2
         #CHROM\tPOS\tID\tREF
         1\t123456\t.
@@ -69,8 +77,8 @@ class VcfInputStreamDecoratorTest {
 
     File mockFile = tmpFileFromString(invalidContent);
 
-    assertThrows(InvalidVcfLineException.class,
-        () -> VcfInputStreamDecorator.preprocessVCF(mockFile));
+    assertThrows(
+        InvalidVcfLineException.class, () -> VcfInputStreamDecorator.preprocessVCF(mockFile));
   }
 
   private File tmpFileFromString(String content) throws IOException {

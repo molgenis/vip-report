@@ -20,7 +20,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class SampleRepository {
 
-  static final String INSERT_SAMPLE_SQL = """
+  static final String INSERT_SAMPLE_SQL =
+      """
       INSERT INTO sample (
           sampleIndex,
           familyId,
@@ -36,8 +37,8 @@ public class SampleRepository {
   public void insertSamples(Connection conn, Items<Sample> sampleItems) {
 
     Map<Object, Integer> sexIds = insertLookupValues(conn, "sex", List.of(Sex.values()));
-    Map<Object, Integer> affectedIds = insertLookupValues(conn, "affectedStatus",
-        List.of(AffectedStatus.values()));
+    Map<Object, Integer> affectedIds =
+        insertLookupValues(conn, "affectedStatus", List.of(AffectedStatus.values()));
 
     try (PreparedStatement pstmt = conn.prepareStatement(INSERT_SAMPLE_SQL)) {
       @NonNull List<Sample> samples = sampleItems.getItems();
@@ -51,8 +52,13 @@ public class SampleRepository {
     }
   }
 
-  private Set<Integer> addSample(Sample sample, List<Sample> samples, PreparedStatement pstmt,
-      Map<Object, Integer> affectedIds, Map<Object, Integer> sexIds, Set<Integer> addedSamples)
+  private Set<Integer> addSample(
+      Sample sample,
+      List<Sample> samples,
+      PreparedStatement pstmt,
+      Map<Object, Integer> affectedIds,
+      Map<Object, Integer> sexIds,
+      Set<Integer> addedSamples)
       throws SQLException {
     Person p = sample.getPerson();
     if (!addedSamples.contains(sample.getIndex())) {

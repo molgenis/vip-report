@@ -33,7 +33,8 @@ class JsonUtilsTest {
 
   @Test
   void testCollectNodesLoadsLeafDescriptions() throws Exception {
-    String content = """
+    String content =
+        """
         {
           "nodes": [
             { "type": "LEAF", "class": "B", "label": "label1", "description": "desc1" },
@@ -50,8 +51,7 @@ class JsonUtilsTest {
     assertAll(
         () -> assertEquals(2, result.size()),
         () -> assertEquals(new ValueDescription("label1", "desc1"), result.get("B")),
-        () -> assertEquals(new ValueDescription("label3", "desc3"), result.get("P"))
-    );
+        () -> assertEquals(new ValueDescription("label3", "desc3"), result.get("P")));
 
     Files.deleteIfExists(file);
   }

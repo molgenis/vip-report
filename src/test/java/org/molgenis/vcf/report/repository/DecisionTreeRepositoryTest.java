@@ -44,7 +44,7 @@ class DecisionTreeRepositoryTest {
       files.when(() -> java.nio.file.Files.readString(samplePath)).thenReturn("{tree:2}");
 
       doNothing().when(stmt).addBatch();
-      doReturn(new int[]{1}).when(stmt).executeBatch();
+      doReturn(new int[] {1}).when(stmt).executeBatch();
 
       repo.insertDecisionTreeData(conn, treePath, samplePath);
 
@@ -66,7 +66,7 @@ class DecisionTreeRepositoryTest {
       files.when(() -> java.nio.file.Files.readString(treePath)).thenReturn("{tree:1}");
 
       doNothing().when(stmt).addBatch();
-      doReturn(new int[]{1}).when(stmt).executeBatch();
+      doReturn(new int[] {1}).when(stmt).executeBatch();
 
       repo.insertDecisionTreeData(conn, treePath, null);
 

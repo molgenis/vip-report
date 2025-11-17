@@ -8,8 +8,7 @@ import java.io.Serial;
 
 public class BytesSerializer extends StdSerializer<Bytes> {
 
-  @Serial
-  private static final long serialVersionUID = 1L;
+  @Serial private static final long serialVersionUID = 1L;
 
   public BytesSerializer() {
     super(Bytes.class);

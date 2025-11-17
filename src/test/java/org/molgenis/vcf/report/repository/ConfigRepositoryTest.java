@@ -36,12 +36,9 @@ class ConfigRepositoryTest {
 
   @Test
   void testInsertConfigDataWithPrimitives() throws Exception {
-    Map<String, Object> config = Map.of(
-        "id1", "string",
-        "id2", 12345
-    );
+    Map<String, Object> config = Map.of("id1", "string", "id2", 12345);
     doNothing().when(insertStmt).addBatch();
-    doReturn(new int[]{1}).when(insertStmt).executeBatch();
+    doReturn(new int[] {1}).when(insertStmt).executeBatch();
 
     repo.insertConfigData(conn, config);
 
@@ -61,7 +58,7 @@ class ConfigRepositoryTest {
     config.put("id2", List.of(1, 2, 3));
 
     doNothing().when(insertStmt).addBatch();
-    doReturn(new int[]{1}).when(insertStmt).executeBatch();
+    doReturn(new int[] {1}).when(insertStmt).executeBatch();
 
     repo.insertConfigData(conn, config);
 

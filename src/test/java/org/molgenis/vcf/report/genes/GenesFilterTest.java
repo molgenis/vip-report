@@ -54,8 +54,9 @@ class GenesFilterTest {
             chr1\tBestRefSeq\ttranscript\t11874\t14409\t.\t+\t.\tID=rna-NR_046018.2;Parent=gene-DDX11L1;Dbxref=GeneID%3A100287102,Genbank%3ANR_046018.2,HGNC%3AHGNC%3A37102;Name=NR_046018.2;gbkey=misc_RNA;gene=DDX11L1;product=DEAD%2FH-box helicase 11 like 1 %28pseudogene%29;pseudo=true;transcript_id=NR_046018.2
             chr1\tBestRefSeq\texon\t11874\t12227\t.\t+\t.\tID=exon-NR_046018.2-1;Parent=rna-NR_046018.2;Dbxref=GeneID%3A100287102,Genbank%3ANR_046018.2,HGNC%3AHGNC%3A37102;gbkey=misc_RNA;gene=DDX11L1;product=DEAD%2FH-box helicase 11 like 1 %28pseudogene%29;pseudo=true;transcript_id=NR_046018.2
             """,
-        decompress(genesFilter.filter(
-            List.of(contigInterval, contigInterval2, contigInterval3, contigInterval4))));
+        decompress(
+            genesFilter.filter(
+                List.of(contigInterval, contigInterval2, contigInterval3, contigInterval4))));
   }
 
   private static String decompress(byte[] bytes) {

@@ -9,15 +9,10 @@ import lombok.experimental.NonFinal;
 @NonFinal
 public class Settings {
 
-  @NonNull
-  Path inputVcfPath;
-  @NonNull
-  ReportGeneratorSettings reportGeneratorSettings;
-  @NonNull
-  Path outputReportPath;
+  @NonNull Path inputVcfPath;
+  @NonNull ReportGeneratorSettings reportGeneratorSettings;
+  @NonNull Path outputReportPath;
   boolean overwriteOutputReport;
-  @NonNull
-  ReportWriterSettings reportWriterSettings;
-  @NonNull
-  SampleSettings sampleSettings;
+  @NonNull ReportWriterSettings reportWriterSettings;
+  @NonNull SampleSettings sampleSettings;
 }

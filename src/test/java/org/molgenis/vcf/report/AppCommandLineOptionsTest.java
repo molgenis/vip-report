@@ -34,8 +34,7 @@ import org.springframework.util.ResourceUtils;
 @ExtendWith(MockitoExtension.class)
 class AppCommandLineOptionsTest {
 
-  @TempDir
-  Path sharedTempDir;
+  @TempDir Path sharedTempDir;
 
   @Test
   void validateCommandLine() throws FileNotFoundException {
@@ -179,8 +178,7 @@ class AppCommandLineOptionsTest {
   @Test
   void validateCommandLinePedNotExists() throws FileNotFoundException {
     String inputFile = ResourceUtils.getFile("classpath:exampleCmdline.vcf").toString();
-    String pedFiles =
-        "notexists.ped" + "," + ResourceUtils.getFile("classpath:example2.ped");
+    String pedFiles = "notexists.ped" + "," + ResourceUtils.getFile("classpath:example2.ped");
     String outputFile = sharedTempDir.resolve("exampleCmdline.vcf.html").toString();
     String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
 

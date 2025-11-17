@@ -18,16 +18,13 @@ import org.molgenis.vcf.utils.model.metadata.FieldMetadata;
 
 public class CategoryUtils {
 
-  private CategoryUtils() {
-  }
+  private CategoryUtils() {}
 
   public static Map<FieldValueKey, Integer> loadCategoriesMap(Connection conn) {
     Map<FieldValueKey, Integer> idLookupMap = new HashMap<>();
     String sql = "SELECT id, field, value FROM categories";
-    try (
-        Statement stmt = conn.createStatement();
-        ResultSet rs = stmt.executeQuery(sql)
-    ) {
+    try (Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery(sql)) {
       while (rs.next()) {
         String field = rs.getString("field");
         String value = rs.getString("value");
@@ -41,15 +38,28 @@ public class CategoryUtils {
     return idLookupMap;
   }
 
-  public static void addCategorical(FieldType type, FieldMetadata meta,
-      Map<FieldValueKey, Integer> categoryLookup, String field, Object val,
-      PreparedStatement insertNestedStmt, int index) throws SQLException {
+  public static void addCategorical(
+      FieldType type,
+      FieldMetadata meta,
+      Map<FieldValueKey, Integer> categoryLookup,
+      String field,
+      Object val,
+      PreparedStatement insertNestedStmt,
+      int index)
+      throws SQLException {
     addCategorical(type, meta, categoryLookup, field, null, val, insertNestedStmt, index);
   }
 
-  public static void addCategorical(FieldType type, FieldMetadata meta,
-      Map<FieldValueKey, Integer> categoryLookup, String field, String parent, Object val,
-      PreparedStatement insertNestedStmt, int index) throws SQLException {
+  public static void addCategorical(
+      FieldType type,
+      FieldMetadata meta,
+      Map<FieldValueKey, Integer> categoryLookup,
+      String field,
+      String parent,
+      Object val,
+      PreparedStatement insertNestedStmt,
+      int index)
+      throws SQLException {
     String key = getKey(type, field, parent);
     if (val == null || val.equals("")) {
       insertNestedStmt.setString(index, null);

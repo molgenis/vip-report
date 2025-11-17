@@ -50,7 +50,7 @@ class ReportMetadataRepositoryTest {
     when(reportMetadata.getHtsFile()).thenReturn(htsFileObj);
 
     doNothing().when(stmt).addBatch();
-    doReturn(new int[]{1}).when(stmt).executeBatch();
+    doReturn(new int[] {1}).when(stmt).executeBatch();
 
     repo.insertReportMetadata(conn, reportMetadata);
 
@@ -61,8 +61,8 @@ class ReportMetadataRepositoryTest {
     verify(stmt).setString(1, "name");
     verify(stmt).setString(2, "NAME");
     verify(stmt).setString(1, "htsFile");
-    verify(stmt).setString(2,
-        "{\"uri\":\"uri\",\"htsFormat\":\"VCF\",\"genomeAssembly\":\"assembly\"}");
+    verify(stmt)
+        .setString(2, "{\"uri\":\"uri\",\"htsFormat\":\"VCF\",\"genomeAssembly\":\"assembly\"}");
     verify(stmt, times(4)).addBatch();
     verify(stmt, times(1)).executeBatch();
   }

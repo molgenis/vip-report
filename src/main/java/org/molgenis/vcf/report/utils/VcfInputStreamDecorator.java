@@ -14,23 +14,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
-//Workaround for https://github.com/samtools/htsjdk/issues/1718
+// Workaround for https://github.com/samtools/htsjdk/issues/1718
 public class VcfInputStreamDecorator {
 
   public static final String TR_ALLELE = "<CNV:TR>";
   public static final String FORMAT = "<CNV:TR%d>";
 
-  private VcfInputStreamDecorator() {
-  }
+  private VcfInputStreamDecorator() {}
 
   public static InputStream preprocessVCF(File inputVCF) throws IOException {
     try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(byteArrayOutputStream));
         InputStream inputStream = new FileInputStream(inputVCF);
-        BufferedReader reader = inputVCF.toPath().toString().endsWith(".vcf.gz") ?
-            new BufferedReader(new InputStreamReader(new GZIPInputStream(inputStream))) :
-            new BufferedReader(new InputStreamReader(inputStream));
-    ) {
+        BufferedReader reader =
+            inputVCF.toPath().toString().endsWith(".vcf.gz")
+                ? new BufferedReader(new InputStreamReader(new GZIPInputStream(inputStream)))
+                : new BufferedReader(new InputStreamReader(inputStream)); ) {
       String line;
       while ((line = reader.readLine()) != null) {
         line = processLine(line);

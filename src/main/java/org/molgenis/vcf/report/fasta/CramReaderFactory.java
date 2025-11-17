@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 public class CramReaderFactory {
 
   public CRAMFileReader create(SampleSettings.CramPath cramPath, Path reference) {
-    return new CRAMFileReader(cramPath.getCram().toFile(), cramPath.getCrai().toFile(),
-        new ReferenceSource(reference));
+    return new CRAMFileReader(
+        cramPath.getCram().toFile(), cramPath.getCrai().toFile(), new ReferenceSource(reference));
   }
 }

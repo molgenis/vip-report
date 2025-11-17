@@ -19,16 +19,14 @@ import org.molgenis.vcf.report.generator.SampleSettings;
 @ExtendWith(MockitoExtension.class)
 class VariantIntervalCalculatorTest {
 
-  @Mock
-  private VcfIntervalCalculator vcfIntervalCalculator;
-  @Mock
-  private CramIntervalCalculator cramIntervalCalculator;
+  @Mock private VcfIntervalCalculator vcfIntervalCalculator;
+  @Mock private CramIntervalCalculator cramIntervalCalculator;
   private VariantIntervalCalculator variantIntervalCalculator;
 
   @BeforeEach
   void setUpBeforeEach() {
-    variantIntervalCalculator = new VariantIntervalCalculator(vcfIntervalCalculator,
-        cramIntervalCalculator);
+    variantIntervalCalculator =
+        new VariantIntervalCalculator(vcfIntervalCalculator, cramIntervalCalculator);
   }
 
   @Test
@@ -40,16 +38,25 @@ class VariantIntervalCalculatorTest {
     Map<String, SampleSettings.CramPath> cramPaths = Map.of("TEST", cramPath);
     Path reference = Path.of("fake/reference/path");
 
-    when(vcfIntervalCalculator.calculate(vcfHeader, vcfFileReader, 250, null)).thenReturn(
-        Map.of("1", List.of(new ContigInterval("1", 1, 100), new ContigInterval("1", 200, 300))));
-    when(cramIntervalCalculator.calculate(cramPaths, reference)).thenReturn(
-        Map.of("1", List.of(new ContigInterval("1", 50, 150), new ContigInterval("1", 500, 600)),
-            "4", List.of(new ContigInterval("4", 50, 150))));
+    when(vcfIntervalCalculator.calculate(vcfHeader, vcfFileReader, 250, null))
+        .thenReturn(
+            Map.of(
+                "1", List.of(new ContigInterval("1", 1, 100), new ContigInterval("1", 200, 300))));
+    when(cramIntervalCalculator.calculate(cramPaths, reference))
+        .thenReturn(
+            Map.of(
+                "1",
+                List.of(new ContigInterval("1", 50, 150), new ContigInterval("1", 500, 600)),
+                "4",
+                List.of(new ContigInterval("4", 50, 150))));
 
-    List<ContigInterval> expected = List.of(new ContigInterval("1", 1, 150),
-        new ContigInterval("1", 200, 300), new ContigInterval("1", 500, 600),
-        new ContigInterval("4", 50, 150));
-    assertEquals(expected,
-        variantIntervalCalculator.calculate(vcfFileReader, cramPaths, reference));
+    List<ContigInterval> expected =
+        List.of(
+            new ContigInterval("1", 1, 150),
+            new ContigInterval("1", 200, 300),
+            new ContigInterval("1", 500, 600),
+            new ContigInterval("4", 50, 150));
+    assertEquals(
+        expected, variantIntervalCalculator.calculate(vcfFileReader, cramPaths, reference));
   }
 }

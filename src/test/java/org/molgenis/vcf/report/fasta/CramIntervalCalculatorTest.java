@@ -25,16 +25,12 @@ class CramIntervalCalculatorTest {
 
   private CramIntervalCalculator cramIntervalCalculator;
 
-  @Mock
-  CramReaderFactory cramReaderFactory;
-  @Mock
-  CRAMFileReader cramFileReader;
-  @Mock
-  SAMRecordIterator samRecordIterator;
+  @Mock CramReaderFactory cramReaderFactory;
+  @Mock CRAMFileReader cramFileReader;
+  @Mock SAMRecordIterator samRecordIterator;
 
   @BeforeEach
-  void setUp() {
-  }
+  void setUp() {}
 
   @BeforeEach
   void setUpBeforeEach() {
@@ -46,8 +42,8 @@ class CramIntervalCalculatorTest {
     File cramFile = ResourceUtils.getFile("classpath:example.cram");
     File craiFile = ResourceUtils.getFile("classpath:example.cram.crai");
 
-    SampleSettings.CramPath cramPath = new SampleSettings.CramPath(cramFile.toPath(),
-        craiFile.toPath());
+    SampleSettings.CramPath cramPath =
+        new SampleSettings.CramPath(cramFile.toPath(), craiFile.toPath());
     Path reference = Path.of("fake/reference/path");
 
     SAMRecord samRecord1 = mock(SAMRecord.class);
@@ -64,7 +60,10 @@ class CramIntervalCalculatorTest {
     when(samRecordIterator.stream()).thenReturn(List.of(samRecord1, samRecord2).stream());
 
     assertEquals(
-        Map.of("chr2", List.of(new ContigInterval("chr2", 123, 1234)), "chrX",
+        Map.of(
+            "chr2",
+            List.of(new ContigInterval("chr2", 123, 1234)),
+            "chrX",
             List.of(new ContigInterval("chrX", 999, 19999))),
         cramIntervalCalculator.calculate(Map.of("TEST", cramPath), reference));
   }

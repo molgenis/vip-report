@@ -8,8 +8,7 @@ import org.molgenis.vcf.report.fasta.ContigInterval;
 
 public class IntervalUtils {
 
-  private IntervalUtils() {
-  }
+  private IntervalUtils() {}
 
   public static List<ContigInterval> mergeIntervals(List<ContigInterval> intervals) {
     List<ContigInterval> mergedIntervals = new ArrayList<>();
@@ -21,12 +20,14 @@ public class IntervalUtils {
       for (int i = 1; i < intervals.size(); ++i) {
         ContigInterval nextInterval = intervals.get(i);
         if (nextInterval.getStart() <= interval.getStop() + 1) {
-          //when intervals are based on crams the length can differ and although the start is greater
-          //the stop position can be lesser than the previous interval
-          int stop = interval.getStop() < nextInterval.getStop() ? nextInterval.getStop()
-              : interval.getStop();
-          interval =
-              new ContigInterval(interval.getContig(), interval.getStart(), stop);
+          // when intervals are based on crams the length can differ and although the start is
+          // greater
+          // the stop position can be lesser than the previous interval
+          int stop =
+              interval.getStop() < nextInterval.getStop()
+                  ? nextInterval.getStop()
+                  : interval.getStop();
+          interval = new ContigInterval(interval.getContig(), interval.getStart(), stop);
         } else {
           mergedIntervals.add(interval);
           interval = nextInterval;

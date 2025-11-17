@@ -38,8 +38,8 @@ class SampleRepositoryTest {
     affectedpstmt = mock(PreparedStatement.class);
     when(conn.prepareStatement(INSERT_SAMPLE_SQL)).thenReturn(pstmt);
     when(conn.prepareStatement("INSERT INTO sex (id, value) VALUES (?, ?)")).thenReturn(sexPstmt);
-    when(conn.prepareStatement("INSERT INTO affectedStatus (id, value) VALUES (?, ?)")).thenReturn(
-        affectedpstmt);
+    when(conn.prepareStatement("INSERT INTO affectedStatus (id, value) VALUES (?, ?)"))
+        .thenReturn(affectedpstmt);
     repo = new SampleRepository();
   }
 
@@ -97,7 +97,7 @@ class SampleRepositoryTest {
     when(sampleItems.getItems()).thenReturn(List.of(sample1, sample2, dad1, mom1));
 
     doNothing().when(pstmt).addBatch();
-    doReturn(new int[]{1}).when(pstmt).executeBatch();
+    doReturn(new int[] {1}).when(pstmt).executeBatch();
 
     repo.insertSamples(conn, sampleItems);
 
@@ -113,10 +113,10 @@ class SampleRepositoryTest {
     verify(pstmt).setString(3, "ind2");
     verify(pstmt).setInt(4, 3);
     verify(pstmt).setInt(5, 4);
-    verify(pstmt, times(2)).setInt(6, 0); //2 MALE
-    verify(pstmt, times(2)).setInt(6, 1); //2 FEMALE
-    verify(pstmt, times(1)).setInt(7, 0); //1 AFFECTED
-    verify(pstmt, times(3)).setInt(7, 1); //3 UNAFFECTED
+    verify(pstmt, times(2)).setInt(6, 0); // 2 MALE
+    verify(pstmt, times(2)).setInt(6, 1); // 2 FEMALE
+    verify(pstmt, times(1)).setInt(7, 0); // 1 AFFECTED
+    verify(pstmt, times(3)).setInt(7, 1); // 3 UNAFFECTED
     verify(pstmt).setInt(8, 1);
     verify(pstmt).setInt(1, 2);
     verify(pstmt).setInt(1, 3);

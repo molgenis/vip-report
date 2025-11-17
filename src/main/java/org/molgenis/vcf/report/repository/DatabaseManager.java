@@ -63,10 +63,16 @@ public class DatabaseManager {
   private final ReportMetadataRepository reportMetadataRepo;
   public static final String VARIANT_ID = "variantId";
 
-  public DatabaseManager(VcfRepository vcfRepo, InfoRepository infoRepo,
-      NestedRepository nestedRepo, FormatRepository formatRepo, PhenotypeRepository phenotypeRepo,
-      MetadataRepository metadataRepo, ConfigRepository configRepo,
-      DecisionTreeRepository decisionTreeRepo, SampleRepository sampleRepo,
+  public DatabaseManager(
+      VcfRepository vcfRepo,
+      InfoRepository infoRepo,
+      NestedRepository nestedRepo,
+      FormatRepository formatRepo,
+      PhenotypeRepository phenotypeRepo,
+      MetadataRepository metadataRepo,
+      ConfigRepository configRepo,
+      DecisionTreeRepository decisionTreeRepo,
+      SampleRepository sampleRepo,
       ReportMetadataRepository reportMetadataRepo) {
     this.vcfRepo = vcfRepo;
     this.infoRepo = infoRepo;
@@ -80,11 +86,10 @@ public class DatabaseManager {
     this.reportMetadataRepo = reportMetadataRepo;
   }
 
-  //For unit testing
+  // For unit testing
   void setConnection(Connection connection) {
     this.conn = requireNonNull(connection);
   }
-
 
   public Connection getConnection(String databaseLocation) {
     String databaseUrl = String.format("jdbc:sqlite:%s", databaseLocation);
@@ -98,21 +103,26 @@ public class DatabaseManager {
     return this.conn;
   }
 
-  public Bytes populateDb(String databaseLocation, FieldMetadatas fieldMetadatas,
-      Items<Sample> samples, File vcfFile,
-      Path decisionTreePath, Path sampleTreePath, ReportMetadata reportMetadata,
+  public Bytes populateDb(
+      String databaseLocation,
+      FieldMetadatas fieldMetadatas,
+      Items<Sample> samples,
+      File vcfFile,
+      Path decisionTreePath,
+      Path sampleTreePath,
+      ReportMetadata reportMetadata,
       Map<?, ?> templateConfig,
-      @NonNull List<Phenopacket> phenopackets) throws IOException {
+      @NonNull List<Phenopacket> phenopackets)
+      throws IOException {
     getConnection(databaseLocation);
     boolean isGz = vcfFile.getName().toLowerCase().endsWith(".gz");
-    try (
-        InputStream fis = isGz
-            ? new GZIPInputStream(new FileInputStream(vcfFile))
-            : new FileInputStream(vcfFile);
+    try (InputStream fis =
+            isGz
+                ? new GZIPInputStream(new FileInputStream(vcfFile))
+                : new FileInputStream(vcfFile);
         BufferedReader br = new BufferedReader(new InputStreamReader(fis, StandardCharsets.UTF_8));
         Utf8LineReader utf8LineReader = new Utf8LineReader(br);
-        LineIteratorImpl vcfIterator = new LineIteratorImpl(utf8LineReader)
-    ) {
+        LineIteratorImpl vcfIterator = new LineIteratorImpl(utf8LineReader)) {
       VCFCodec codec = new VCFCodec();
       VCFHeader header = (VCFHeader) codec.readActualHeader(vcfIterator);
       conn.setAutoCommit(false);
@@ -122,14 +132,24 @@ public class DatabaseManager {
       for (String field : parentFields.keySet()) {
         nestedFields.put(field, getDatabaseNestedColumns(field));
       }
-      List<String> lines = new ArrayList<>(
-          header.getMetaDataInInputOrder().stream().map(VCFHeaderLine::toString).toList());
+      List<String> lines =
+          new ArrayList<>(
+              header.getMetaDataInInputOrder().stream().map(VCFHeaderLine::toString).toList());
       metadataRepo.insertHeaderLine(conn, lines, getHeaderLine(samples));
-      Map<FieldType, Map<String, Integer>> metadataKeys = metadataRepo.insertMetadata(conn,
-          fieldMetadatas, decisionTreePath, sampleTreePath, phenopackets);
+      Map<FieldType, Map<String, Integer>> metadataKeys =
+          metadataRepo.insertMetadata(
+              conn, fieldMetadatas, decisionTreePath, sampleTreePath, phenopackets);
       sampleRepo.insertSamples(conn, samples);
-      insertVariants(fieldMetadatas, samples, decisionTreePath, sampleTreePath, header, vcfIterator,
-          nestedFields, codec, metadataKeys);
+      insertVariants(
+          fieldMetadatas,
+          samples,
+          decisionTreePath,
+          sampleTreePath,
+          header,
+          vcfIterator,
+          nestedFields,
+          codec,
+          metadataKeys);
       phenotypeRepo.insertPhenotypeData(conn, phenopackets, samples.getItems());
       if (templateConfig != null) {
         configRepo.insertConfigData(conn, templateConfig);
@@ -145,17 +165,27 @@ public class DatabaseManager {
     return new Bytes(fileContent);
   }
 
-  private void insertVariants(FieldMetadatas fieldMetadatas, Items<Sample> samples,
+  private void insertVariants(
+      FieldMetadatas fieldMetadatas,
+      Items<Sample> samples,
       Path decisionTreePath,
-      Path sampleTreePath, VCFHeader header, LineIteratorImpl vcfIterator,
-      Map<String, List<String>> nestedFields, VCFCodec vcfCodec,
-      Map<FieldType, Map<String, Integer>> metadataKeys) throws DatabaseException {
+      Path sampleTreePath,
+      VCFHeader header,
+      LineIteratorImpl vcfIterator,
+      Map<String, List<String>> nestedFields,
+      VCFCodec vcfCodec,
+      Map<FieldType, Map<String, Integer>> metadataKeys)
+      throws DatabaseException {
     List<String> formatColumns = getDatabaseFormatColumns();
     List<String> infoColumns = getDatabaseInfoColumns();
 
-    Map<Object, Integer> contigIds = SqlUtils.insertLookupValues(conn, "contig",
-        header.getSequenceDictionary().getSequences().stream()
-            .map(SAMSequenceRecord::getSequenceName).toList());
+    Map<Object, Integer> contigIds =
+        SqlUtils.insertLookupValues(
+            conn,
+            "contig",
+            header.getSequenceDictionary().getSequences().stream()
+                .map(SAMSequenceRecord::getSequenceName)
+                .toList());
     Map<Object, Integer> gtIds = insertLookupValues(conn, "gtType", List.of(GenotypeType.values()));
     Map<String, Integer> formatLookup = new HashMap<>();
     String line;
@@ -185,17 +215,29 @@ public class DatabaseManager {
 
         infoRepo.insertInfoFieldOrder(conn, metadataKeys, infoItems, variantId);
         for (Map.Entry<String, List<String>> entry : nestedFields.entrySet()) {
-          nestedRepo.insertNested(conn, entry.getKey(), vc, entry.getValue(), fieldMetadatas,
-              variantId, decisionTreePath != null);
+          nestedRepo.insertNested(
+              conn,
+              entry.getKey(),
+              vc,
+              entry.getValue(),
+              fieldMetadatas,
+              variantId,
+              decisionTreePath != null);
         }
-        formatRepo.insertFormatData(conn, vc, formatColumns, variantId, fieldMetadatas,
-            samples.getItems(), sampleTreePath != null, gtIds);
-        infoRepo.insertInfoData(conn, vc, infoColumns, fieldMetadatas, variantId,
-            sampleTreePath != null);
+        formatRepo.insertFormatData(
+            conn,
+            vc,
+            formatColumns,
+            variantId,
+            fieldMetadatas,
+            samples.getItems(),
+            sampleTreePath != null,
+            gtIds);
+        infoRepo.insertInfoData(
+            conn, vc, infoColumns, fieldMetadatas, variantId, sampleTreePath != null);
       }
     }
   }
-
 
   private void insertFormatValue(int key, String value) {
     String sql = "INSERT INTO formatLookup (id, value) VALUES (?, ?)";
@@ -208,14 +250,15 @@ public class DatabaseManager {
     }
   }
 
-  private Map<String, FieldMetadata> getNestedFields(FieldMetadatas fieldMetadatas,
-      FieldType fieldType) {
+  private Map<String, FieldMetadata> getNestedFields(
+      FieldMetadatas fieldMetadatas, FieldType fieldType) {
     if (fieldType != INFO) {
       throw new UnsupportedOperationException("Nested fields are only supported for INFO fields.");
     }
     return fieldMetadatas.getInfo().entrySet().stream()
-        .filter(e -> e.getValue().getNestedFields() != null && !e.getValue().getNestedFields()
-            .isEmpty())
+        .filter(
+            e ->
+                e.getValue().getNestedFields() != null && !e.getValue().getNestedFields().isEmpty())
         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
@@ -225,17 +268,23 @@ public class DatabaseManager {
     if (samples.getItems().isEmpty()) {
       headerLine = fixedCols;
     } else {
-      headerLine = fixedCols + "\t" + String.join("\t",
-          samples.getItems().stream().sorted(Comparator.comparingInt(Sample::getIndex))
-              .map(sample -> sample.getPerson().getIndividualId()).toList());
+      headerLine =
+          fixedCols
+              + "\t"
+              + String.join(
+                  "\t",
+                  samples.getItems().stream()
+                      .sorted(Comparator.comparingInt(Sample::getIndex))
+                      .map(sample -> sample.getPerson().getIndividualId())
+                      .toList());
     }
     return headerLine;
   }
 
   private List<String> getDatabaseInfoColumns() {
     try {
-      return getTableColumns("info",
-          c -> !c.equalsIgnoreCase("id") && !c.equalsIgnoreCase(VARIANT_ID));
+      return getTableColumns(
+          "info", c -> !c.equalsIgnoreCase("id") && !c.equalsIgnoreCase(VARIANT_ID));
     } catch (SQLException e) {
       throw new DatabaseException(e.getMessage(), "get info columns");
     }
@@ -243,9 +292,12 @@ public class DatabaseManager {
 
   private List<String> getDatabaseFormatColumns() {
     try {
-      return getTableColumns("format", c -> !c.equalsIgnoreCase("id")
-          && !c.equalsIgnoreCase(SAMPLE_INDEX)
-          && !c.equalsIgnoreCase(VARIANT_ID));
+      return getTableColumns(
+          "format",
+          c ->
+              !c.equalsIgnoreCase("id")
+                  && !c.equalsIgnoreCase(SAMPLE_INDEX)
+                  && !c.equalsIgnoreCase(VARIANT_ID));
     } catch (SQLException e) {
       throw new DatabaseException(e.getMessage(), "get format columns");
     }
@@ -253,7 +305,8 @@ public class DatabaseManager {
 
   private List<String> getDatabaseNestedColumns(String field) {
     try {
-      return getTableColumns(String.format("variant_%s", field),
+      return getTableColumns(
+          String.format("variant_%s", field),
           c -> !c.equalsIgnoreCase("id") && !c.equalsIgnoreCase(VARIANT_ID));
     } catch (SQLException e) {
       throw new DatabaseException(e.getMessage(), "get nested columns");

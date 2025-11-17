@@ -63,17 +63,17 @@ class PhenotypeRepositoryTest {
     when(person.getId()).thenReturn("INDIVIDUAL1");
 
     Sample sample = mock(Sample.class);
-    org.molgenis.vcf.utils.sample.model.Person samplePerson = mock(
-        org.molgenis.vcf.utils.sample.model.Person.class);
+    org.molgenis.vcf.utils.sample.model.Person samplePerson =
+        mock(org.molgenis.vcf.utils.sample.model.Person.class);
     when(sample.getPerson()).thenReturn(samplePerson);
     when(samplePerson.getIndividualId()).thenReturn("INDIVIDUAL1");
     when(sample.getIndex()).thenReturn(42);
 
     doNothing().when(phenotypeStmt).addBatch();
-    doReturn(new int[]{1}).when(phenotypeStmt).executeBatch();
+    doReturn(new int[] {1}).when(phenotypeStmt).executeBatch();
     doNothing().when(phenotypeStmt).setString(anyInt(), anyString());
     doNothing().when(samplePhenoStmt).addBatch();
-    doReturn(new int[]{1}).when(samplePhenoStmt).executeBatch();
+    doReturn(new int[] {1}).when(samplePhenoStmt).executeBatch();
     doNothing().when(samplePhenoStmt).setInt(anyInt(), anyInt());
     doNothing().when(samplePhenoStmt).setString(anyInt(), anyString());
 

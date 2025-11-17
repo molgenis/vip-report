@@ -16,8 +16,7 @@ public class JsonUtils {
 
   public static final String MISSING = ".";
 
-  private JsonUtils() {
-  }
+  private JsonUtils() {}
 
   public static String toJson(Object input) {
     try {
@@ -50,5 +49,4 @@ public class JsonUtils {
   public static String writeJsonListValue(String value, String separator) {
     return !value.equals(MISSING) ? toJson(value.split(separator, -1)) : "[]";
   }
-
 }

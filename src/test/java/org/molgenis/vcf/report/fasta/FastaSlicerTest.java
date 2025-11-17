@@ -21,8 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class FastaSlicerTest {
 
-  @Mock
-  private ReferenceSequenceFile referenceSequenceFile;
+  @Mock private ReferenceSequenceFile referenceSequenceFile;
   private FastaSlicer fastaSlicer;
 
   @BeforeEach

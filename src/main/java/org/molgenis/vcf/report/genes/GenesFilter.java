@@ -26,7 +26,6 @@ public class GenesFilter {
 
   public GenesFilter(Path genesFile) {
     this.genesFile = requireNonNull(genesFile);
-
   }
 
   public byte[] filter(List<ContigInterval> contigIntervals) {
@@ -34,8 +33,8 @@ public class GenesFilter {
 
     final Gff3Codec codec = new Gff3Codec(DecodeDepth.SHALLOW);
     try (final AbstractFeatureReader<Gff3Feature, LineIterator> reader =
-        AbstractFeatureReader.getFeatureReader(
-            genesFile.toAbsolutePath().toString(), null, codec, false);
+            AbstractFeatureReader.getFeatureReader(
+                genesFile.toAbsolutePath().toString(), null, codec, false);
         Gff3Writer writer = new Gff3Writer(output)) {
       for (final Gff3Feature feature : reader.iterator()) {
         boolean isAdded = false;
@@ -58,10 +57,10 @@ public class GenesFilter {
 
   private boolean isOverlappingFeature(Gff3Feature feature, ContigInterval contigInterval) {
     return (feature.getStart() >= contigInterval.getStart()
-        && feature.getStart() <= contigInterval.getStop()) // feature start in region
+            && feature.getStart() <= contigInterval.getStop()) // feature start in region
         || (feature.getEnd() >= contigInterval.getStart()
-        && feature.getEnd() <= contigInterval.getStop()) // feature end in region
+            && feature.getEnd() <= contigInterval.getStop()) // feature end in region
         || (feature.getStart() <= contigInterval.getStart()
-        && feature.getEnd() >= contigInterval.getStop());
+            && feature.getEnd() >= contigInterval.getStop());
   }
 }

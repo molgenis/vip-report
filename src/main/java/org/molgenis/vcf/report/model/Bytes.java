@@ -10,6 +10,5 @@ import lombok.experimental.NonFinal;
 @NonFinal
 public class Bytes {
 
-  @NonNull
-  byte[] bytes;
+  @NonNull byte[] bytes;
 }

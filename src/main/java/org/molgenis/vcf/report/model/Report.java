@@ -29,6 +29,7 @@ public class Report {
 
     @JsonProperty("cram")
     Bytes cram;
+
     @JsonProperty("crai")
     Bytes crai;
   }

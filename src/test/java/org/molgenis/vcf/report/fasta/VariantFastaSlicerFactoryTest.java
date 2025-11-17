@@ -16,8 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class VariantFastaSlicerFactoryTest {
 
-  @Mock
-  private FastaSlicerFactory fastaSlicerFactory;
+  @Mock private FastaSlicerFactory fastaSlicerFactory;
 
   private VcfFastaSlicerFactory vcfFastaSlicerFactory;
 

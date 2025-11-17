@@ -49,8 +49,19 @@ class DatabaseSchemaManagerTest {
     Path wasmPath = Paths.get("src", "test", "resources", "fake.wasm");
 
     VCFFileReader vcfReader = new VCFFileReader(inputVcfPath, false);
-    ReportGeneratorSettings settings = new ReportGeneratorSettings("Test", "v1.0.0", "arg",
-        10, metaJson, wasmPath, null, null, decisionTree, sampleTree, config);
+    ReportGeneratorSettings settings =
+        new ReportGeneratorSettings(
+            "Test",
+            "v1.0.0",
+            "arg",
+            10,
+            metaJson,
+            wasmPath,
+            null,
+            null,
+            decisionTree,
+            sampleTree,
+            config);
     dbSchemaManager.createDatabase(settings, vcfReader.getFileHeader(), conn);
 
     verify(stmt).execute(VCF_TABLE_SQL);
@@ -87,12 +98,15 @@ class DatabaseSchemaManagerTest {
     assertEquals("TEXT", DatabaseSchemaManager.toSqlType(ValueType.STRING, 1));
     assertEquals("TEXT", DatabaseSchemaManager.toSqlType(ValueType.CHARACTER, 1));
     assertEquals("INTEGER", DatabaseSchemaManager.toSqlType(ValueType.FLAG, 1));
-    assertEquals("TEXT",
-        DatabaseSchemaManager.toSqlType(ValueType.INTEGER, 2)); // count != 1 is TEXT
+    assertEquals(
+        "TEXT", DatabaseSchemaManager.toSqlType(ValueType.INTEGER, 2)); // count != 1 is TEXT
     assertEquals("TEXT", DatabaseSchemaManager.toSqlType(ValueType.STRING, null));
   }
 
-  private static final String NESTED_TABLE_SQL = "CREATE TABLE info (id INTEGER PRIMARY KEY AUTOINCREMENT,variantId INTEGER REFERENCES vcf(id),AA TEXT,NS INTEGER,AF TEXT,H2 TEXT,DP INTEGER,DB TEXT) STRICT;";
-  private static final String EXPECTED_INFO_TABLE = "CREATE TABLE info (id INTEGER PRIMARY KEY AUTOINCREMENT,variantId INTEGER REFERENCES vcf(id),AA TEXT,NS INTEGER,AF TEXT,H2 TEXT,DP INTEGER,DB TEXT) STRICT;";
-  private static final String EXPECTED_FORMAT_TABLE = "CREATE TABLE format (id INTEGER PRIMARY KEY AUTOINCREMENT,sampleIndex INTEGER REFERENCES sample(sampleIndex),variantId INTEGER REFERENCES vcf(id),HQ TEXT,GQ INTEGER,DP INTEGER,GT TEXT,GtType INTEGER REFERENCES gtType(id)) STRICT;";
+  private static final String NESTED_TABLE_SQL =
+      "CREATE TABLE info (id INTEGER PRIMARY KEY AUTOINCREMENT,variantId INTEGER REFERENCES vcf(id),AA TEXT,NS INTEGER,AF TEXT,H2 TEXT,DP INTEGER,DB TEXT) STRICT;";
+  private static final String EXPECTED_INFO_TABLE =
+      "CREATE TABLE info (id INTEGER PRIMARY KEY AUTOINCREMENT,variantId INTEGER REFERENCES vcf(id),AA TEXT,NS INTEGER,AF TEXT,H2 TEXT,DP INTEGER,DB TEXT) STRICT;";
+  private static final String EXPECTED_FORMAT_TABLE =
+      "CREATE TABLE format (id INTEGER PRIMARY KEY AUTOINCREMENT,sampleIndex INTEGER REFERENCES sample(sampleIndex),variantId INTEGER REFERENCES vcf(id),HQ TEXT,GQ INTEGER,DP INTEGER,GT TEXT,GtType INTEGER REFERENCES gtType(id)) STRICT;";
 }

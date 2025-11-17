@@ -176,8 +176,7 @@ class AppCommandLineOptions {
     APP_VERSION_OPTIONS = appVersionOptions;
   }
 
-  private AppCommandLineOptions() {
-  }
+  private AppCommandLineOptions() {}
 
   static Options getAppOptions() {
     return APP_OPTIONS;

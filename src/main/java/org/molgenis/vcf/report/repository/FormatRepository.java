@@ -41,23 +41,39 @@ public class FormatRepository {
     return gtString.toString();
   }
 
-  public void insertFormatData(Connection conn, VariantContext vc, List<String> formatColumns,
-      int variantId, FieldMetadatas fieldMetadatas, List<Sample> samples,
-      boolean hasSampleTree, Map<Object, Integer> gtIds) {
+  public void insertFormatData(
+      Connection conn,
+      VariantContext vc,
+      List<String> formatColumns,
+      int variantId,
+      FieldMetadatas fieldMetadatas,
+      List<Sample> samples,
+      boolean hasSampleTree,
+      Map<Object, Integer> gtIds) {
     Map<FieldValueKey, Integer> categoryLookup = loadCategoriesMap(conn);
     try (PreparedStatement insertFormat = prepareInsertFormat(conn, formatColumns)) {
       insertFormat.setInt(1, variantId);
       for (Genotype genotype : vc.getGenotypes()) {
-        Sample sample = samples.stream().filter(s -> s.getPerson().getIndividualId()
-            .equals(genotype.getSampleName())).toList().getFirst();
+        Sample sample =
+            samples.stream()
+                .filter(s -> s.getPerson().getIndividualId().equals(genotype.getSampleName()))
+                .toList()
+                .getFirst();
         int sampleIndex = sample.getIndex();
         insertFormat.setInt(2, sampleIndex);
         for (int i = 0; i < formatColumns.size(); i++) {
           if (formatColumns.get(i).equals(GT_TYPE)) {
             insertFormat.setInt(i + 3, gtIds.get(genotype.getType()));
           } else {
-            insertFormatDataColumn(vc, formatColumns, fieldMetadatas, genotype, i, categoryLookup,
-                insertFormat, hasSampleTree);
+            insertFormatDataColumn(
+                vc,
+                formatColumns,
+                fieldMetadatas,
+                genotype,
+                i,
+                categoryLookup,
+                insertFormat,
+                hasSampleTree);
           }
         }
         insertFormat.addBatch();
@@ -68,12 +84,16 @@ public class FormatRepository {
     }
   }
 
-  private static void insertFormatDataColumn(VariantContext vc, List<String> formatColumns,
+  private static void insertFormatDataColumn(
+      VariantContext vc,
+      List<String> formatColumns,
       FieldMetadatas fieldMetadatas,
-      Genotype genotype, int i, Map<FieldValueKey, Integer> categoryLookup,
+      Genotype genotype,
+      int i,
+      Map<FieldValueKey, Integer> categoryLookup,
       PreparedStatement insertFormat,
-      boolean hasSampleTree
-  ) throws SQLException {
+      boolean hasSampleTree)
+      throws SQLException {
 
     final String key = formatColumns.get(i);
     final FieldMetadata meta = fieldMetadatas.getFormat().get(key);
@@ -93,9 +113,10 @@ public class FormatRepository {
     }
   }
 
-  private static Object getFormatValue(VariantContext vc, Genotype genotype, FieldMetadata meta,
-      Object value, String key) {
-    if ((meta.getNumberType() != FIXED || meta.getNumberCount() != 1) && value != null
+  private static Object getFormatValue(
+      VariantContext vc, Genotype genotype, FieldMetadata meta, Object value, String key) {
+    if ((meta.getNumberType() != FIXED || meta.getNumberCount() != 1)
+        && value != null
         && !(value instanceof Iterable<?>)) {
       String separator = meta.getSeparator() != null ? meta.getSeparator().toString() : ",";
       value = List.of(value.toString().split(separator));
@@ -105,7 +126,6 @@ public class FormatRepository {
     }
     return value;
   }
-
 
   private PreparedStatement prepareInsertFormat(Connection conn, List<String> columns)
       throws SQLException {
