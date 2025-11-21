@@ -3,9 +3,16 @@ package org.molgenis.vcf.report;
 import static org.molgenis.vcf.report.AppCommandLineOptions.*;
 import static org.molgenis.vcf.report.utils.PathUtils.parsePaths;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -136,12 +143,7 @@ public class AppCommandLineToSettingsMapper {
     boolean debugMode = commandLine.hasOption(OPT_DEBUG);
 
     String appArgs = String.join(" ", args);
-    Path sqlWasmPath;
-    try {
-        sqlWasmPath = ResourceUtils.getFile("classpath:sql-wasm-1.13.wasm").toPath();
-    }catch(FileNotFoundException e){
-        throw new UncheckedIOException(e);
-    }
+    Path sqlWasmPath = getWasmPath();
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
             appName, appVersion, appArgs, maxSamples, metadataPath, sqlWasmPath, referencePath, genesPath, decisionTreePath, sampleTreePath, templateConfigPath);
@@ -155,6 +157,19 @@ public class AppCommandLineToSettingsMapper {
         overwriteOutput,
         reportWriterSettings,
         sampleSettings);
+  }
+
+  private Path getWasmPath() {
+    Path sqlWasmPath;
+    try (InputStream is = getClass().getClassLoader().getResourceAsStream("sql-wasm-1.13.wasm")) {
+      if (is == null) throw new FileNotFoundException("Wasm file not found");
+
+      sqlWasmPath = Files.createTempFile("sql-wasm-", ".wasm");
+      Files.copy(is, sqlWasmPath, StandardCopyOption.REPLACE_EXISTING);
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+    return sqlWasmPath;
   }
 
   private Map<String, CramPath> toCramPaths(String cramPathValue) {
