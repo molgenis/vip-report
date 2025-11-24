@@ -28,6 +28,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
+import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 import static org.molgenis.vcf.report.repository.SqlUtils.insertLookupValues;
 import static org.molgenis.vcf.utils.metadata.FieldType.INFO;
@@ -129,7 +130,8 @@ public class DatabaseManager {
         List<String> formatColumns = getDatabaseFormatColumns();
         List<String> infoColumns = getDatabaseInfoColumns();
 
-        Map<Object, Integer> contigIds = SqlUtils.insertLookupValues(conn, "contig", header.getSequenceDictionary().getSequences().stream().map(SAMSequenceRecord::getSequenceName).toList());
+        Map<Object, Integer> contigIds = SqlUtils.insertLookupValues(conn, "contig", header.getSequenceDictionary() != null ?
+            header.getSequenceDictionary().getSequences().stream().map(SAMSequenceRecord::getSequenceName).toList() : emptyList());
         Map<Object, Integer> gtIds = insertLookupValues(conn, "gtType", List.of(GenotypeType.values()));
         Map<String, Integer> formatLookup = new HashMap<>();
         String line;
