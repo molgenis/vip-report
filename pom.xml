@@ -176,6 +176,8 @@
             <directory>src/main/resources</directory>
             <includes>
               <include>**/*.wasm</include>
+              <include>application.properties</include>
+              <include>logback-spring.xml</include>
             </includes>
             <filtering>false</filtering>
           </resource>
