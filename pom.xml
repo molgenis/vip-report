@@ -171,7 +171,15 @@
 
     <build>
         <finalName>vcf-report</finalName>
-
+        <resources>
+          <resource>
+            <directory>src/main/resources</directory>
+            <includes>
+              <include>**/*.wasm</include>
+            </includes>
+            <filtering>false</filtering>
+          </resource>
+        </resources>
         <pluginManagement>
             <plugins>
                 <plugin>
