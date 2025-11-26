@@ -18,7 +18,7 @@ public class VcfRepository {
     public int insertVariant(Connection conn, VariantContext vc, Map<Object, Integer> contigIds, Integer format) {
         try (
                 PreparedStatement insertVCF = conn.prepareStatement(
-                        "INSERT INTO vcf (chrom, pos, idVcf, ref, alt, qual, filter, format) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                        "INSERT INTO vcf (chrom, pos, id, ref, alt, qual, filter, format) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                         Statement.RETURN_GENERATED_KEYS
                 )
         ) {

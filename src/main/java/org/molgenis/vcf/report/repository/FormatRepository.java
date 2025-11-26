@@ -22,7 +22,7 @@ import static org.molgenis.vcf.utils.metadata.ValueType.CATEGORICAL;
 @Component
 public class FormatRepository {
 
-    public static final String GT_TYPE = "GtType";
+    public static final String GT_TYPE = "_GtType";
     static final String VIPC_S = "VIPC_S";
 
     private static String getOriginalGTString(Genotype genotype, VariantContext variantContext) {
@@ -99,7 +99,7 @@ public class FormatRepository {
 
 
     private PreparedStatement prepareInsertFormat(Connection conn, List<String> columns) throws SQLException {
-        StringBuilder sql = new StringBuilder("INSERT INTO format (variantId, sampleIndex");
+        StringBuilder sql = new StringBuilder("INSERT INTO format (_variantId, _sampleIndex");
         for (String column : columns) {
             sql.append(", ").append(column);
         }

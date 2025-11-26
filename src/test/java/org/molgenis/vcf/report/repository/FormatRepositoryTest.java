@@ -33,7 +33,7 @@ class FormatRepositoryTest {
         Connection conn = mock(Connection.class);
         PreparedStatement ps = mock(PreparedStatement.class);
         PreparedStatement lookupPs = mock(PreparedStatement.class);
-        when(conn.prepareStatement("INSERT INTO format (variantId, sampleIndex, GT, DP) VALUES (?, ?, ?, ?)")).thenReturn(ps);
+        when(conn.prepareStatement("INSERT INTO format (_variantId, _sampleIndex, GT, DP) VALUES (?, ?, ?, ?)")).thenReturn(ps);
         when(conn.prepareStatement("INSERT INTO gtType (id, value) VALUES (?, ?)")).thenReturn(lookupPs);
         when(conn.createStatement()).thenReturn(ps);
         ResultSet rs = mock(ResultSet.class);
@@ -98,6 +98,6 @@ class FormatRepositoryTest {
         verify(ps).setString(4, null);
         verify(ps, times(2)).addBatch();
         verify(ps).executeBatch();
-        verify(conn).prepareStatement("INSERT INTO format (variantId, sampleIndex, GT, DP) VALUES (?, ?, ?, ?)");
+        verify(conn).prepareStatement("INSERT INTO format (_variantId, _sampleIndex, GT, DP) VALUES (?, ?, ?, ?)");
     }
 }
