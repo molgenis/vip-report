@@ -19,15 +19,15 @@ import static org.molgenis.vcf.report.repository.FormatRepository.GT_TYPE;
 public class DatabaseSchemaManager {
     public static final String TEXT_COLUMN = "%s TEXT";
     public static final String SQL_COLUMN = "%s %s";
-    public static final String AUTOID_COLUMN = "id INTEGER PRIMARY KEY AUTOINCREMENT";
+    public static final String AUTOID_COLUMN = "_id INTEGER PRIMARY KEY AUTOINCREMENT";
     private final Set<String> nestedTables = new LinkedHashSet<>();
 
     static final String VCF_TABLE_SQL = """
                 CREATE TABLE vcf (
-                  id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  _id INTEGER PRIMARY KEY AUTOINCREMENT,
                   chrom INTEGER NOT NULL,
                   pos INTEGER NOT NULL,
-                  idVcf TEXT,
+                  id TEXT,
                   ref TEXT NOT NULL,
                   alt TEXT NOT NULL,
                   qual REAL,
@@ -167,7 +167,7 @@ public class DatabaseSchemaManager {
                         infoIndex INTEGER NOT NULL,
                         variantId INTEGER NOT NULL,
                         metadataId INTEGER NOT NULL,
-                        FOREIGN KEY (variantId) REFERENCES vcf(id),
+                        FOREIGN KEY (variantId) REFERENCES vcf(_id),
                         FOREIGN KEY (metadataId) REFERENCES metadata(id)
                     ) STRICT;
             """;
@@ -264,7 +264,7 @@ public class DatabaseSchemaManager {
         StringBuilder infoBuilder = new StringBuilder("CREATE TABLE info (");
         List<String> columns = new ArrayList<>();
         columns.add(AUTOID_COLUMN);
-        columns.add("variantId INTEGER REFERENCES vcf(id)");
+        columns.add("_variantId INTEGER REFERENCES vcf(_id)");
 
         for (var entry : infoFields.entrySet()) {
             FieldMetadata meta = entry.getValue();
@@ -288,8 +288,8 @@ public class DatabaseSchemaManager {
         StringBuilder formatBuilder = new StringBuilder("CREATE TABLE format (");
         List<String> columns = new ArrayList<>();
         columns.add(AUTOID_COLUMN);
-        columns.add("sampleIndex INTEGER REFERENCES sample(sampleIndex)");
-        columns.add("variantId INTEGER REFERENCES vcf(id)");
+        columns.add("_sampleIndex INTEGER REFERENCES sample(sampleIndex)");
+        columns.add("_variantId INTEGER REFERENCES vcf(_id)");
 
         for (var entry : formatFields.entrySet()) {
             FieldMetadata meta = entry.getValue();
@@ -317,13 +317,13 @@ public class DatabaseSchemaManager {
         List<String> nestedColumns = new ArrayList<>();
         nestedColumns.add(AUTOID_COLUMN);
         if (tableName.startsWith("variant_")) {
-            nestedColumns.add("variantId INTEGER REFERENCES vcf(id)");
+            nestedColumns.add("_variantId INTEGER REFERENCES vcf(_id)");
             //CSQ index for postprocessing VIPC_S and VIPP_S
             if(parentField.equals("CSQ")){
                 nestedColumns.add("CsqIndex INTEGER");
             }
         } else if (tableName.startsWith("format_")) {
-            nestedColumns.add("formatId INTEGER REFERENCES format(id)");
+            nestedColumns.add("formatId INTEGER REFERENCES format(_id)");
         }
         for (var nestedEntry : nestedFieldMap.entrySet()) {
             NestedFieldMetadata nestedField = nestedEntry.getValue();

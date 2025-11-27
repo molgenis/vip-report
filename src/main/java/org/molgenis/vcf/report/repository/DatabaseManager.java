@@ -35,7 +35,7 @@ import static org.molgenis.vcf.utils.metadata.FieldType.INFO;
 
 @Component
 public class DatabaseManager {
-    public static final String SAMPLE_INDEX = "sampleIndex";
+    public static final String SAMPLE_INDEX = "_sampleIndex";
     Connection conn;
 
     private final VcfRepository vcfRepo;
@@ -48,7 +48,7 @@ public class DatabaseManager {
     private final DecisionTreeRepository decisionTreeRepo;
     private final SampleRepository sampleRepo;
     private final ReportMetadataRepository reportMetadataRepo;
-    public static final String VARIANT_ID = "variantId";
+    public static final String VARIANT_ID = "_variantId";
 
     public DatabaseManager(VcfRepository vcfRepo, InfoRepository infoRepo, NestedRepository nestedRepo, FormatRepository formatRepo, PhenotypeRepository phenotypeRepo, MetadataRepository metadataRepo, ConfigRepository configRepo, DecisionTreeRepository decisionTreeRepo, SampleRepository sampleRepo, ReportMetadataRepository reportMetadataRepo) {
         this.vcfRepo = vcfRepo;
@@ -205,7 +205,7 @@ public class DatabaseManager {
 
     private List<String> getDatabaseInfoColumns() {
         try {
-            return getTableColumns("info", c -> !c.equalsIgnoreCase("id") && !c.equalsIgnoreCase(VARIANT_ID));
+            return getTableColumns("info", c -> !c.equalsIgnoreCase("_id") && !c.equalsIgnoreCase(VARIANT_ID));
         } catch (SQLException e) {
             throw new DatabaseException(e.getMessage(), "get info columns");
         }
@@ -213,7 +213,7 @@ public class DatabaseManager {
 
     private List<String> getDatabaseFormatColumns() {
         try {
-            return getTableColumns("format", c -> !c.equalsIgnoreCase("id")
+            return getTableColumns("format", c -> !c.equalsIgnoreCase("_id")
                     && !c.equalsIgnoreCase(SAMPLE_INDEX)
                     && !c.equalsIgnoreCase(VARIANT_ID));
         } catch (SQLException e) {
@@ -224,7 +224,7 @@ public class DatabaseManager {
     private List<String> getDatabaseNestedColumns(String field) {
         try {
             return getTableColumns(String.format("variant_%s", field),
-                    c -> !c.equalsIgnoreCase("id") && !c.equalsIgnoreCase(VARIANT_ID));
+                    c -> !c.equalsIgnoreCase("_id") && !c.equalsIgnoreCase(VARIANT_ID));
         } catch (SQLException e) {
             throw new DatabaseException(e.getMessage(), "get nested columns");
         }
