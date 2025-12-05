@@ -21,6 +21,7 @@ public class DatabaseSchemaManager {
     public static final String SQL_COLUMN = "%s %s";
     public static final String AUTOID_COLUMN = "_id INTEGER PRIMARY KEY AUTOINCREMENT";
     private final Map<String, String> nestedTables = new LinkedHashMap<>();
+    private boolean hasGt = false;
 
   static final String VCF_TABLE_SQL =
       """
@@ -246,7 +247,6 @@ public class DatabaseSchemaManager {
         sqlStatements.add("CREATE INDEX idx_format_variantId ON format(_variantId);");
         sqlStatements.add("CREATE INDEX idx_format_sampleIndex ON format(_sampleIndex);");
         sqlStatements.add("CREATE INDEX idx_format_variantId_sampleIndex ON format(_variantId,_sampleIndex);");
-        sqlStatements.add("CREATE INDEX idx_format_GtType ON format(_GtType);");
         sqlStatements.add("CREATE INDEX idx_vcf_chrom ON vcf(chrom);");
         sqlStatements.add("CREATE INDEX idx_vcf_format ON vcf(format);");
         sqlStatements.add("CREATE INDEX idx_vcf_pos ON vcf(pos);");
@@ -254,6 +254,10 @@ public class DatabaseSchemaManager {
         sqlStatements.add("CREATE INDEX idx_contig_value ON contig(value);");
         sqlStatements.add("CREATE INDEX idx_gtType_value ON gtType(value);");
         sqlStatements.add("CREATE INDEX idx_info_variantId ON info(_variantId);");
+
+        if(hasGt){
+          sqlStatements.add("CREATE INDEX idx_format_GtType ON format(_GtType);");
+        }
         for(String tableName : nestedTables.keySet()) {
           sqlStatements.add(String.format("CREATE INDEX idx_%s_variantId ON %s(_variantId);", tableName, tableName));
         }
@@ -314,6 +318,7 @@ public class DatabaseSchemaManager {
                 if (meta.getNumberType() == ValueCount.Type.FIXED && meta.getNumberCount() == 1) {
                     columns.add(String.format(SQL_COLUMN, entry.getKey(), toSqlType(meta.getType(), meta.getNumberCount())));
                     if(entry.getKey().equals("GT")){
+                      this.hasGt = true;
                       columns.add(String.format(SQL_COLUMN, GT_TYPE, "INTEGER REFERENCES gtType(id)"));
                     }
                 } else {
