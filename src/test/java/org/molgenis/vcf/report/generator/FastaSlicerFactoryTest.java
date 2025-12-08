@@ -34,7 +34,7 @@ class FastaSlicerFactoryTest {
         () -> assertEquals(fastaSlice.getInterval(), interval),
         () ->
             assertEquals(
-                ">1:10-20\nACCAGTAGCTG\n", decompress(fastaSlice.getFastaGz())));
+                ">1:10-20@len=10\nACCAGTAGCTG\n", decompress(fastaSlice.getFastaGz())));
   }
 
   // decode,because gzip can differ between operating systems
