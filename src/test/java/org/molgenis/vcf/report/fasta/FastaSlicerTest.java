@@ -41,7 +41,7 @@ class FastaSlicerTest {
     FastaSlice fastaSlice = fastaSlicer.slice(contigInterval);
     assertAll(
         () -> assertEquals(contigInterval, fastaSlice.getInterval()),
-        () -> assertEquals(">1:100-200\nACTG\n", decompress(fastaSlice.getFastaGz())));
+        () -> assertEquals(">1:100-200@len=100\nACTG\n", decompress(fastaSlice.getFastaGz())));
   }
 
   private static String decompress(byte[] bytes) {

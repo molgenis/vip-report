@@ -20,9 +20,11 @@ public class DatabaseSchemaManager {
     public static final String TEXT_COLUMN = "%s TEXT";
     public static final String SQL_COLUMN = "%s %s";
     public static final String AUTOID_COLUMN = "_id INTEGER PRIMARY KEY AUTOINCREMENT";
-    private final Set<String> nestedTables = new LinkedHashSet<>();
+    private final Map<String, String> nestedTables = new LinkedHashMap<>();
+    private boolean hasGt = false;
 
-    static final String VCF_TABLE_SQL = """
+  static final String VCF_TABLE_SQL =
+      """
                 CREATE TABLE vcf (
                   _id INTEGER PRIMARY KEY AUTOINCREMENT,
                   chrom INTEGER NOT NULL,
@@ -240,8 +242,26 @@ public class DatabaseSchemaManager {
         sqlStatements.add(getInfoTableSql(reportGeneratorSettings, vcfFileHeader));
         sqlStatements.add(getFormatTableSql(reportGeneratorSettings, vcfFileHeader));
         sqlStatements.add(CATEGORIES_TABLE_SQL);
-        sqlStatements.addAll(nestedTables);
-        return sqlStatements;
+        sqlStatements.addAll(nestedTables.values());
+
+        sqlStatements.add("CREATE INDEX idx_format_variantId ON format(_variantId);");
+        sqlStatements.add("CREATE INDEX idx_format_sampleIndex ON format(_sampleIndex);");
+        sqlStatements.add("CREATE INDEX idx_format_variantId_sampleIndex ON format(_variantId,_sampleIndex);");
+        sqlStatements.add("CREATE INDEX idx_vcf_chrom ON vcf(chrom);");
+        sqlStatements.add("CREATE INDEX idx_vcf_format ON vcf(format);");
+        sqlStatements.add("CREATE INDEX idx_vcf_pos ON vcf(pos);");
+        sqlStatements.add("CREATE INDEX idx_vcf_chrom_pos ON vcf(chrom, pos);");
+        sqlStatements.add("CREATE INDEX idx_contig_value ON contig(value);");
+        sqlStatements.add("CREATE INDEX idx_gtType_value ON gtType(value);");
+        sqlStatements.add("CREATE INDEX idx_info_variantId ON info(_variantId);");
+
+        if(hasGt){
+          sqlStatements.add("CREATE INDEX idx_format_GtType ON format(_GtType);");
+        }
+        for(String tableName : nestedTables.keySet()) {
+          sqlStatements.add(String.format("CREATE INDEX idx_%s_variantId ON %s(_variantId);", tableName, tableName));
+        }
+      return sqlStatements;
     }
 
     public String getInfoTableSql(ReportGeneratorSettings settings, VCFHeader vcfFileHeader) {
@@ -275,8 +295,9 @@ public class DatabaseSchemaManager {
                     columns.add(String.format(TEXT_COLUMN, entry.getKey()));
                 }
             } else {
-                String nestedTableSql = buildNestedTable("variant", entry.getKey(), meta.getNestedFields());
-                nestedTables.add(nestedTableSql);
+                String tableName = String.format("variant_%s", entry.getKey());
+                String nestedTableSql = buildNestedTable(tableName, meta.getNestedFields());
+                nestedTables.put(tableName, nestedTableSql);
             }
         }
         infoBuilder.append(String.join(",", columns));
@@ -297,7 +318,8 @@ public class DatabaseSchemaManager {
                 if (meta.getNumberType() == ValueCount.Type.FIXED && meta.getNumberCount() == 1) {
                     columns.add(String.format(SQL_COLUMN, entry.getKey(), toSqlType(meta.getType(), meta.getNumberCount())));
                     if(entry.getKey().equals("GT")){
-                        columns.add(String.format(SQL_COLUMN, GT_TYPE, "INTEGER REFERENCES gtType(id)"));
+                      this.hasGt = true;
+                      columns.add(String.format(SQL_COLUMN, GT_TYPE, "INTEGER REFERENCES gtType(id)"));
                     }
                 } else {
                     columns.add(String.format(TEXT_COLUMN, entry.getKey()));
@@ -311,15 +333,14 @@ public class DatabaseSchemaManager {
         return formatBuilder.toString();
     }
 
-    private String buildNestedTable(String prefix, String parentField, Map<String, NestedFieldMetadata> nestedFieldMap) {
-        String tableName = String.format("%s_%s", prefix, parentField);
+    private String buildNestedTable(String tableName, Map<String, NestedFieldMetadata> nestedFieldMap) {
         StringBuilder nestedBuilder = new StringBuilder("CREATE TABLE ").append(tableName).append(" (");
         List<String> nestedColumns = new ArrayList<>();
         nestedColumns.add(AUTOID_COLUMN);
         if (tableName.startsWith("variant_")) {
             nestedColumns.add("_variantId INTEGER REFERENCES vcf(_id)");
             //CSQ index for postprocessing VIPC_S and VIPP_S
-            if(parentField.equals("CSQ")){
+            if(tableName.equals("variant_CSQ")){
                 nestedColumns.add("CsqIndex INTEGER");
             }
         } else if (tableName.startsWith("format_")) {
