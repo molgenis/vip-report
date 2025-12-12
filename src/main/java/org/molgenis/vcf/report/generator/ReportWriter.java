@@ -6,13 +6,12 @@ import static java.util.Objects.requireNonNull;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.ByteArrayOutputStream;
+import com.github.luben.zstd.Zstd;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import org.molgenis.vcf.report.model.Report;
-import org.molgenis.vcf.report.utils.BestCompressionGZIPOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -64,15 +63,14 @@ public class ReportWriter {
       json = objectMapper.writeValueAsString(report);
     }
     String str = "window.api=" + json;
-    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-    try (BestCompressionGZIPOutputStream outputStream =
-        new BestCompressionGZIPOutputStream(byteArrayOutputStream)) {
-      outputStream.write(str.getBytes(UTF_8));
-    } catch (IOException e) {
-      throw new UncheckedIOException(e);
-    }
-    return "<script type=\"application/gzip\" class=\"ldr-js\">"
-        + base85Encoder.encode(byteArrayOutputStream.toByteArray())
+    byte[] uncompressedBytes = str.getBytes(UTF_8);
+    byte[] compressedBytes = Zstd.compress(uncompressedBytes, 19);
+    return "<script type=\"application/zstd\" class=\"ldr-js\" data-csize=\""
+        + compressedBytes.length
+        + "\" data-dsize=\""
+        + uncompressedBytes.length
+        + "\">"
+        + base85Encoder.encode(compressedBytes)
         + "</script>";
   }
 }
