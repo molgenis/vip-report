@@ -13,7 +13,7 @@
 
     <groupId>org.molgenis</groupId>
     <artifactId>vip-report</artifactId>
-    <version>8.0.3</version>
+    <version>8.1.0</version>
 
     <name>vip-report</name>
     <description>Report generator for Variant Call Format (VCF) files</description>
@@ -46,6 +46,7 @@
         <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
         <opencsv.version>5.10</opencsv.version>
         <vip.utils.version>4.0.0</vip.utils.version>
+        <zstd.jni.version>1.5.7-6</zstd.jni.version>
     </properties>
 
     <profiles>
@@ -125,6 +126,11 @@
                 <artifactId>sqlite-jdbc</artifactId>
                 <version>3.49.1.0</version> <!-- keep in sync with src/main/resources/sql-wasm-*.wasm -->
             </dependency>
+            <dependency>
+                <groupId>com.github.luben</groupId>
+                <artifactId>zstd-jni</artifactId>
+                <version>${zstd.jni.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -167,26 +173,30 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.github.luben</groupId>
+            <artifactId>zstd-jni</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
         <finalName>vcf-report</finalName>
         <resources>
-          <resource>
-            <directory>src/main/resources</directory>
-            <includes>
-              <include>application.properties</include>
-              <include>logback-spring.xml</include>
-            </includes>
-            <filtering>true</filtering>
-          </resource>
-          <resource>
-            <directory>src/main/resources</directory>
-            <includes>
-              <include>**/*.wasm</include>
-            </includes>
-            <filtering>false</filtering>
-          </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>application.properties</include>
+                    <include>logback-spring.xml</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*.wasm</include>
+                </includes>
+                <filtering>false</filtering>
+            </resource>
         </resources>
         <pluginManagement>
             <plugins>
