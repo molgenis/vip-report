@@ -31,6 +31,8 @@ class AppCommandLineOptions {
   static final String OPT_TEMPLATE_LONG = "template";
   static final String OPT_TEMPLATE_CONFIG = "tc";
   static final String OPT_TEMPLATE_CONFIG_LONG = "template_config";
+  static final String OPT_HPO_FILE = "h";
+  static final String OPT_HPO_FILE_LONG = "hpo";
   static final String OPT_PROBANDS = "pb";
   static final String OPT_PROBANDS_LONG = "probands";
   static final String OPT_PED = "pd";
@@ -91,6 +93,12 @@ class AppCommandLineOptions {
             .longOpt(OPT_TEMPLATE_LONG)
             .desc("Report template file (.html).")
             .required()
+            .build());
+    appOptions.addOption(
+        Option.builder(OPT_HPO_FILE)
+            .hasArg(true)
+            .longOpt(OPT_HPO_FILE_LONG)
+            .desc("VIP HPO file containing id, label and description.")
             .build());
     appOptions.addOption(
             Option.builder(OPT_TEMPLATE_CONFIG)
@@ -190,6 +198,7 @@ class AppCommandLineOptions {
     validateOutput(commandLine);
     validateDatabase(commandLine);
     validateTemplate(commandLine);
+    validateHpo(commandLine);
     validateProbands(commandLine);
     validatePed(commandLine);
     validatePhenotypes(commandLine);
@@ -362,7 +371,7 @@ class AppCommandLineOptions {
       }
   }
 
-    private static void validateTemplate(CommandLine commandLine) {
+  private static void validateTemplate(CommandLine commandLine) {
     Path templatePath = Path.of(commandLine.getOptionValue(OPT_TEMPLATE));
     validateFilePath(templatePath, "Template");
 
@@ -370,6 +379,19 @@ class AppCommandLineOptions {
     if (!templatePathStr.endsWith(".html")) {
       throw new IllegalArgumentException(
           format("Template file '%s' is not a .html file.", templatePathStr));
+    }
+  }
+
+  private static void validateHpo(CommandLine commandLine) {
+    if (commandLine.hasOption(OPT_HPO_FILE)) {
+      Path templatePath = Path.of(commandLine.getOptionValue(OPT_HPO_FILE));
+      validateFilePath(templatePath, "HPO");
+
+      String templatePathStr = templatePath.toString();
+      if (!templatePathStr.endsWith(".tsv")) {
+        throw new IllegalArgumentException(
+            format("HPO file '%s' is not a .tsv file.", templatePathStr));
+      }
     }
   }
 

@@ -4,19 +4,25 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.molgenis.vcf.report.model.HpoTerm;
 import org.molgenis.vcf.utils.metadata.ValueCount;
+import org.molgenis.vcf.utils.metadata.ValueCount.Type;
 import org.molgenis.vcf.utils.metadata.ValueType;
 import org.molgenis.vcf.utils.model.ValueDescription;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadata;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadatas;
+import org.molgenis.vcf.utils.sample.model.Individual;
+import org.molgenis.vcf.utils.sample.model.OntologyClass;
 import org.molgenis.vcf.utils.sample.model.Phenopacket;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.*;
 import java.util.*;
+import org.molgenis.vcf.utils.sample.model.PhenotypicFeature;
 
 import static org.mockito.Mockito.*;
+import static org.molgenis.vcf.report.repository.MetadataRepository.INSERT_CATEGORIES_SQL;
 import static org.molgenis.vcf.report.repository.MetadataRepository.INSERT_METADATA_SQL;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,6 +39,7 @@ class MetadataRepositoryTest {
     @Test
     void testInsertMetadata() throws Exception {
         PreparedStatement preparedMetadata = mock(PreparedStatement.class);
+        PreparedStatement preparedCategories = mock(PreparedStatement.class);
         PreparedStatement preparedNumberType = mock(PreparedStatement.class);
         PreparedStatement preparedFieldTypes = mock(PreparedStatement.class);
         PreparedStatement preparedValueTypes = mock(PreparedStatement.class);
@@ -44,25 +51,39 @@ class MetadataRepositoryTest {
         when(resultSet.next()).thenReturn(true);
         when(preparedMetadata.getGeneratedKeys()).thenReturn(resultSet);
         when(conn.prepareStatement(INSERT_METADATA_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(preparedMetadata);
+        when(conn.prepareStatement(INSERT_CATEGORIES_SQL)).thenReturn(preparedCategories);
 
-        FieldMetadata fieldMeta = mock(FieldMetadata.class, RETURNS_DEEP_STUBS);
-        when(fieldMeta.getType()).thenReturn(ValueType.CATEGORICAL);
-        when(fieldMeta.getNumberType()).thenReturn(ValueCount.Type.FIXED);
-        when(fieldMeta.isRequired()).thenReturn(true);
-        when(fieldMeta.getSeparator()).thenReturn(null);
-        when(fieldMeta.getNumberCount()).thenReturn(1);
-        when(fieldMeta.getLabel()).thenReturn("Test");
-        when(fieldMeta.getDescription()).thenReturn("Test Desc");
-        when(fieldMeta.getCategories()).thenReturn(Map.of("U1", new ValueDescription("U1", "Desc")));
+        FieldMetadata vipcSFieldMeta = mock(FieldMetadata.class, RETURNS_DEEP_STUBS);
+        when(vipcSFieldMeta.getType()).thenReturn(ValueType.CATEGORICAL);
+        when(vipcSFieldMeta.getNumberType()).thenReturn(ValueCount.Type.FIXED);
+        when(vipcSFieldMeta.isRequired()).thenReturn(true);
+        when(vipcSFieldMeta.getSeparator()).thenReturn(null);
+        when(vipcSFieldMeta.getNumberCount()).thenReturn(1);
+        when(vipcSFieldMeta.getLabel()).thenReturn("Test");
+        when(vipcSFieldMeta.getDescription()).thenReturn("Test Desc");
+        when(vipcSFieldMeta.getCategories()).thenReturn(Map.of("U1", new ValueDescription("U1", "Desc")));
 
-        Map<String, FieldMetadata> formatFields = Map.of("VIPC_S", fieldMeta);
-        Map<String, FieldMetadata> infoFields = Map.of();
+        FieldMetadata hpoFieldMeta = mock(FieldMetadata.class, RETURNS_DEEP_STUBS);
+        when(hpoFieldMeta.getType()).thenReturn(ValueType.CATEGORICAL);
+        when(hpoFieldMeta.getNumberType()).thenReturn(Type.VARIABLE);
+        when(hpoFieldMeta.isRequired()).thenReturn(false);
+        when(hpoFieldMeta.getSeparator()).thenReturn(';');
+        when(hpoFieldMeta.getLabel()).thenReturn("HPO");
+        when(hpoFieldMeta.getDescription()).thenReturn("HPO Desc");
+
+        Map<String, FieldMetadata> formatFields = Map.of("VIPC_S", vipcSFieldMeta);
+        Map<String, FieldMetadata> infoFields = Map.of("HPO", hpoFieldMeta);
+        Map<String, HpoTerm> hpoTerms = new HashMap<>();
+        hpoTerms.put("HPO term", new HpoTerm("HPO term", "HPO label", "HPO desc"));
 
         FieldMetadatas metadatas = mock(FieldMetadatas.class);
         when(metadatas.getFormat()).thenReturn(formatFields);
         when(metadatas.getInfo()).thenReturn(infoFields);
 
-        List<Phenopacket> phenopackets = List.of();
+        PhenotypicFeature phenotypicFeature = mock(PhenotypicFeature.class);
+        when(phenotypicFeature.getOntologyClass()).thenReturn(new OntologyClass("HPO term","MyLabel"));
+        Phenopacket phenopacket = new Phenopacket(List.of(phenotypicFeature), new Individual("sample"));
+        List<Phenopacket> phenopackets = List.of(phenopacket);
         Path decisionTreePath = Paths.get("src", "test", "resources", "tree.json");
         Path sampleTreePath = Paths.get("src", "test", "resources", "tree.json");
 
@@ -71,10 +92,12 @@ class MetadataRepositoryTest {
         doReturn(new int[]{1}).when(preparedMetadata).executeBatch();
         doReturn(new int[]{1}).when(preparedNumberType).executeBatch();
 
-        repository.insertMetadata(conn, metadatas, decisionTreePath, sampleTreePath, phenopackets);
+        repository.insertMetadata(conn, metadatas, decisionTreePath, sampleTreePath, phenopackets, hpoTerms);
 
         verify(conn).prepareStatement(INSERT_METADATA_SQL, Statement.RETURN_GENERATED_KEYS);
-        verify(preparedMetadata).executeUpdate();
+        verify(preparedMetadata, times(2)).executeUpdate();
+        verify(preparedCategories).setString(3, "HPO label");
+        verify(preparedCategories).setString(4, "HPO desc (HPO term)");
     }
 
     @Test

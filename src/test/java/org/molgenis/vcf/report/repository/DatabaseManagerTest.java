@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.molgenis.vcf.report.model.HpoTerm;
 import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.report.model.metadata.AppMetadata;
 import org.molgenis.vcf.report.model.metadata.ReportMetadata;
@@ -71,17 +72,19 @@ class DatabaseManagerTest {
         Path decisionTree = Paths.get("src", "test", "resources", "tree.json");
         Path sampleTree = Paths.get("src", "test", "resources", "tree.json");
 
-        when(metadataRepo.insertMetadata(any(),any(),any(),any(),any())).thenReturn(Collections.emptyMap());
+        Map<String, HpoTerm> hpoTerms = new HashMap<>();
+
+        when(metadataRepo.insertMetadata(any(),any(),any(),any(),any(),any())).thenReturn(Collections.emptyMap());
 
         manager.setConnection(conn);
         manager.populateDb(exampleDb.toString(), fieldMetadatas, samples, inputVcfPath.toFile(),
-                decisionTree, sampleTree, reportMetadata, config, phenopackets);
+                decisionTree, sampleTree, reportMetadata, config, phenopackets, hpoTerms);
 
         verify(vcfRepo).insertVariant(eq(conn), any(), any(), anyInt());
         verify(infoRepo).insertInfoData(eq(conn), any(), eq(List.of()), eq(fieldMetadatas), eq(0), eq(true));
         verify(formatRepo).insertFormatData(eq(conn), any(), eq(List.of()), eq(0), eq(fieldMetadatas), eq(sampleList), eq(true), eq(Map.of(UNAVAILABLE,4, HOM_REF,1, HET,2, HOM_VAR,3, MIXED,5, NO_CALL,0)));
         verify(phenotypeRepo).insertPhenotypeData(conn, phenopackets, sampleList);
-        verify(metadataRepo).insertMetadata(conn, fieldMetadatas,  decisionTree, sampleTree, phenopackets);
+        verify(metadataRepo).insertMetadata(conn, fieldMetadatas,  decisionTree, sampleTree, phenopackets, hpoTerms);
         verify(configRepo).insertConfigData(conn, Map.of());
         verify(decisionTreeRepo).insertDecisionTreeData(conn, decisionTree, sampleTree);
         verify(sampleRepo).insertSamples(conn, samples);

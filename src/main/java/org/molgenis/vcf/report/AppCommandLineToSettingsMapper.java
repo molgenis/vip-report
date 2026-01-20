@@ -126,6 +126,14 @@ public class AppCommandLineToSettingsMapper {
       templateConfigPath = null;
     }
 
+    Path hpoPath;
+    if (commandLine.hasOption(OPT_HPO_FILE)) {
+      String hpoConfigValue = commandLine.getOptionValue(OPT_HPO_FILE);
+      hpoPath = Path.of(hpoConfigValue);
+    } else {
+      hpoPath = null;
+    }
+
     Map<String, CramPath> cramPaths;
     if (commandLine.hasOption(OPT_CRAM)) {
       String cramPathValue = commandLine.getOptionValue(OPT_CRAM);
@@ -142,7 +150,7 @@ public class AppCommandLineToSettingsMapper {
     Path sqlWasmPath = getWasmPath();
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
-            appName, appVersion, appArgs, maxSamples, metadataPath, sqlWasmPath, referencePath, genesPath, decisionTreePath, sampleTreePath, templateConfigPath);
+            appName, appVersion, appArgs, maxSamples, metadataPath, sqlWasmPath, hpoPath, referencePath, genesPath, decisionTreePath, sampleTreePath, templateConfigPath);
     ReportWriterSettings reportWriterSettings = new ReportWriterSettings(templatePath, debugMode);
     SampleSettings sampleSettings =
         new SampleSettings(probandNames, pedPaths, phenotypes, cramPaths);

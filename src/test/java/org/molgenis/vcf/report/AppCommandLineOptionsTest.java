@@ -39,7 +39,7 @@ class AppCommandLineOptionsTest {
         doReturn(true).when(cmd).hasOption(OPT_FORCE);
         doReturn(true).when(cmd).hasOption(OPT_PED);
         doReturn(true).when(cmd).hasOption(OPT_OUTPUT);
-
+        doReturn(false).when(cmd).hasOption(OPT_HPO_FILE);
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(pedFiles).when(cmd).getOptionValue(OPT_PED);
         doReturn(outputFile).when(cmd).getOptionValue(OPT_OUTPUT);
@@ -58,6 +58,7 @@ class AppCommandLineOptionsTest {
         doReturn(true).when(cmd).hasOption(OPT_FORCE);
         doReturn(false).when(cmd).hasOption(OPT_PED);
         doReturn(true).when(cmd).hasOption(OPT_OUTPUT);
+        doReturn(false).when(cmd).hasOption(OPT_HPO_FILE);
 
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(outputFile).when(cmd).getOptionValue(OPT_OUTPUT);
@@ -80,6 +81,7 @@ class AppCommandLineOptionsTest {
         doReturn(true).when(cmd).hasOption(OPT_FORCE);
         doReturn(true).when(cmd).hasOption(OPT_PED);
         doReturn(true).when(cmd).hasOption(OPT_OUTPUT);
+        doReturn(false).when(cmd).hasOption(OPT_HPO_FILE);
 
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(pedFiles).when(cmd).getOptionValue(OPT_PED);
@@ -177,6 +179,7 @@ class AppCommandLineOptionsTest {
         doReturn(true).when(cmd).hasOption(OPT_FORCE);
         doReturn(true).when(cmd).hasOption(OPT_PED);
         doReturn(true).when(cmd).hasOption(OPT_OUTPUT);
+        doReturn(false).when(cmd).hasOption(OPT_HPO_FILE);
 
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(pedFiles).when(cmd).getOptionValue(OPT_PED);
@@ -202,6 +205,7 @@ class AppCommandLineOptionsTest {
         doReturn(true).when(cmd).hasOption(OPT_FORCE);
         doReturn(true).when(cmd).hasOption(OPT_PED);
         doReturn(true).when(cmd).hasOption(OPT_OUTPUT);
+        doReturn(false).when(cmd).hasOption(OPT_HPO_FILE);
 
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(pedFiles).when(cmd).getOptionValue(OPT_PED);
@@ -229,6 +233,7 @@ class AppCommandLineOptionsTest {
         doReturn(true).when(cmd).hasOption(OPT_FORCE);
         doReturn(true).when(cmd).hasOption(OPT_PED);
         doReturn(true).when(cmd).hasOption(OPT_OUTPUT);
+        doReturn(false).when(cmd).hasOption(OPT_HPO_FILE);
 
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(pedFiles).when(cmd).getOptionValue(OPT_PED);
@@ -255,6 +260,7 @@ class AppCommandLineOptionsTest {
         doReturn(true).when(cmd).hasOption(OPT_FORCE);
         doReturn(true).when(cmd).hasOption(OPT_PED);
         doReturn(true).when(cmd).hasOption(OPT_OUTPUT);
+        doReturn(false).when(cmd).hasOption(OPT_HPO_FILE);
 
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(pedFiles).when(cmd).getOptionValue(OPT_PED);
@@ -317,6 +323,7 @@ class AppCommandLineOptionsTest {
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(pheno).when(cmd).getOptionValue(OPT_PHENOTYPES);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
+        doReturn(false).when(cmd).hasOption(OPT_HPO_FILE);
 
         AppCommandLineOptions.validateCommandLine(cmd);
     }
@@ -332,6 +339,7 @@ class AppCommandLineOptionsTest {
         doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
         doReturn(false).when(cmd).hasOption(OPT_PED);
         doReturn(false).when(cmd).hasOption(OPT_FORCE);
+        doReturn(false).when(cmd).hasOption(OPT_HPO_FILE);
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(pheno).when(cmd).getOptionValue(OPT_PHENOTYPES);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
@@ -351,6 +359,7 @@ class AppCommandLineOptionsTest {
         doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
         doReturn(false).when(cmd).hasOption(OPT_FORCE);
         doReturn(false).when(cmd).hasOption(OPT_PED);
+        doReturn(false).when(cmd).hasOption(OPT_HPO_FILE);
         
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(pheno).when(cmd).getOptionValue(OPT_PHENOTYPES);
@@ -372,6 +381,7 @@ class AppCommandLineOptionsTest {
         doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
         doReturn(false).when(cmd).hasOption(OPT_FORCE);
         doReturn(false).when(cmd).hasOption(OPT_PED);
+        doReturn(false).when(cmd).hasOption(OPT_HPO_FILE);
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(pheno).when(cmd).getOptionValue(OPT_PHENOTYPES);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
@@ -392,6 +402,7 @@ class AppCommandLineOptionsTest {
         doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
         doReturn(false).when(cmd).hasOption(OPT_FORCE);
         doReturn(false).when(cmd).hasOption(OPT_PED);
+        doReturn(false).when(cmd).hasOption(OPT_HPO_FILE);
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(pheno).when(cmd).getOptionValue(OPT_PHENOTYPES);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
@@ -411,6 +422,7 @@ class AppCommandLineOptionsTest {
         doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
         doReturn(false).when(cmd).hasOption(OPT_PED);
         doReturn(false).when(cmd).hasOption(OPT_FORCE);
+        doReturn(false).when(cmd).hasOption(OPT_HPO_FILE);
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn("10").when(cmd).getOptionValue(OPT_MAX_SAMPLES);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
@@ -429,6 +441,7 @@ class AppCommandLineOptionsTest {
         doReturn(false).when(cmd).hasOption(OPT_OUTPUT);
         doReturn(false).when(cmd).hasOption(OPT_FORCE);
         doReturn(false).when(cmd).hasOption(OPT_PED);
+        doReturn(false).when(cmd).hasOption(OPT_HPO_FILE);
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn("test").when(cmd).getOptionValue(OPT_MAX_SAMPLES);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
@@ -451,6 +464,7 @@ class AppCommandLineOptionsTest {
         doReturn(false).when(cmd).hasOption(OPT_PED);
         doReturn(false).when(cmd).hasOption(OPT_REFERENCE);
         doReturn(true).when(cmd).hasOption(OPT_GENES);
+        doReturn(false).when(cmd).hasOption(OPT_HPO_FILE);
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(genesFile).when(cmd).getOptionValue(OPT_GENES);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
@@ -471,6 +485,7 @@ class AppCommandLineOptionsTest {
         doReturn(false).when(cmd).hasOption(OPT_FORCE);
         doReturn(false).when(cmd).hasOption(OPT_PED);
         doReturn(true).when(cmd).hasOption(OPT_REFERENCE);
+        doReturn(false).when(cmd).hasOption(OPT_HPO_FILE);
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(referenceFile).when(cmd).getOptionValue(OPT_REFERENCE);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
@@ -491,6 +506,7 @@ class AppCommandLineOptionsTest {
         doReturn(false).when(cmd).hasOption(OPT_FORCE);
         doReturn(false).when(cmd).hasOption(OPT_PED);
         doReturn(true).when(cmd).hasOption(OPT_REFERENCE);
+        doReturn(false).when(cmd).hasOption(OPT_HPO_FILE);
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(referenceFile).when(cmd).getOptionValue(OPT_REFERENCE);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
@@ -512,6 +528,7 @@ class AppCommandLineOptionsTest {
         doReturn(false).when(cmd).hasOption(OPT_PED);
         doReturn(true).when(cmd).hasOption(OPT_REFERENCE);
         doReturn(false).when(cmd).hasOption(OPT_FORCE);
+        doReturn(false).when(cmd).hasOption(OPT_HPO_FILE);
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(referenceFile).when(cmd).getOptionValue(OPT_REFERENCE);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
@@ -533,6 +550,7 @@ class AppCommandLineOptionsTest {
         doReturn(false).when(cmd).hasOption(OPT_FORCE);
         doReturn(false).when(cmd).hasOption(OPT_PED);
         doReturn(true).when(cmd).hasOption(OPT_REFERENCE);
+        doReturn(false).when(cmd).hasOption(OPT_HPO_FILE);
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(referenceFile).when(cmd).getOptionValue(OPT_REFERENCE);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
@@ -555,6 +573,7 @@ class AppCommandLineOptionsTest {
         doReturn(true).when(cmd).hasOption(OPT_REFERENCE);
         doReturn(false).when(cmd).hasOption(OPT_GENES);
         doReturn(true).when(cmd).hasOption(OPT_CRAM);
+        doReturn(false).when(cmd).hasOption(OPT_HPO_FILE);
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(bamPathString).when(cmd).getOptionValue(OPT_CRAM);
         doReturn(referenceFile).when(cmd).getOptionValue(OPT_REFERENCE);
@@ -576,6 +595,7 @@ class AppCommandLineOptionsTest {
         doReturn(false).when(cmd).hasOption(OPT_REFERENCE);
         doReturn(false).when(cmd).hasOption(OPT_GENES);
         doReturn(true).when(cmd).hasOption(OPT_CRAM);
+        doReturn(false).when(cmd).hasOption(OPT_HPO_FILE);
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
 
@@ -631,6 +651,7 @@ class AppCommandLineOptionsTest {
         doReturn(false).when(cmd).hasOption(OPT_GENES);
         doReturn(false).when(cmd).hasOption(OPT_CRAM);
         doReturn(true).when(cmd).hasOption(OPT_TREE);
+        doReturn(false).when(cmd).hasOption(OPT_HPO_FILE);
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         doReturn(treePathString).when(cmd).getOptionValue(OPT_TREE);
         doReturn(templateFile).when(cmd).getOptionValue(OPT_TEMPLATE);
@@ -675,6 +696,7 @@ class AppCommandLineOptionsTest {
         doReturn(false).when(cmd).hasOption(OPT_CRAM);
         doReturn(false).when(cmd).hasOption(OPT_TREE);
         doReturn(true).when(cmd).hasOption(OPT_TEMPLATE_CONFIG);
+        doReturn(false).when(cmd).hasOption(OPT_HPO_FILE);
         doReturn(inputFile).when(cmd).getOptionValue(OPT_INPUT);
         
         doReturn(templateConfigPathString).when(cmd).getOptionValue(OPT_TEMPLATE_CONFIG);
