@@ -15,8 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class Base85EncoderTest {
 
-  @Mock
-  private BinaryEncoder binaryEncoder;
+  @Mock private BinaryEncoder binaryEncoder;
   private Base85Encoder base85Encoder;
 
   @BeforeEach

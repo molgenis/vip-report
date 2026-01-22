@@ -10,7 +10,8 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * Adapted from https://github.com/Sheep-y/Base85/blob/f14b0e9d6854fba56f0bc6457fa87880953a64c2/java/src/sheepy/util/text/Base85.java
+ * Adapted from
+ * https://github.com/Sheep-y/Base85/blob/f14b0e9d6854fba56f0bc6457fa87880953a64c2/java/src/sheepy/util/text/Base85.java
  *
  * <p>Example: <br>
  * <code> String encodedString = Base85.getZ85Encoder().encodeToString( byteArray ); <br>
@@ -497,7 +498,7 @@ public class Base85 {
      * @param length number of byte to read
      * @return decoded binary data
      * @throws IllegalArgumentException if offset or length is negative, or if data array is not big
-     * enough (data won't be written)
+     *     enough (data won't be written)
      */
     public final byte[] decode(final byte[] data, final int offset, final int length) {
       byte[] result = new byte[calcDecodedLength(data, offset, length)];
@@ -523,7 +524,7 @@ public class Base85 {
      * @param out_offset byte offset to start writing decoded data to
      * @return number of decoded bytes
      * @throws IllegalArgumentException if offset or length is negative, or if either array is not
-     * big enough (data won't be written)
+     *     big enough (data won't be written)
      */
     public final int decode(
         final byte[] data,
@@ -755,8 +756,8 @@ public class Base85 {
    */
   private static class Ascii85Decoder extends Decoder {
 
-    private static final byte[] zeros = new byte[]{0, 0, 0, 0};
-    private static final byte[] spaces = new byte[]{32, 32, 32, 32};
+    private static final byte[] zeros = new byte[] {0, 0, 0, 0};
+    private static final byte[] spaces = new byte[] {32, 32, 32, 32};
 
     @Override
     public int calcDecodedLength(byte[] encoded_data, int offset, int length) {

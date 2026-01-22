@@ -1,6 +1,12 @@
 package org.molgenis.vcf.report.repository;
 
+import static org.molgenis.vcf.report.repository.FormatRepository.GT_TYPE;
+
 import htsjdk.variant.vcf.VCFHeader;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.*;
 import org.molgenis.vcf.report.generator.ReportGeneratorSettings;
 import org.molgenis.vcf.utils.metadata.*;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadata;
@@ -8,20 +14,13 @@ import org.molgenis.vcf.utils.model.metadata.FieldMetadatas;
 import org.molgenis.vcf.utils.model.metadata.NestedFieldMetadata;
 import org.springframework.stereotype.Component;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.*;
-
-import static org.molgenis.vcf.report.repository.FormatRepository.GT_TYPE;
-
 @Component
 public class DatabaseSchemaManager {
-    public static final String TEXT_COLUMN = "%s TEXT";
-    public static final String SQL_COLUMN = "%s %s";
-    public static final String AUTOID_COLUMN = "_id INTEGER PRIMARY KEY AUTOINCREMENT";
-    private final Map<String, String> nestedTables = new LinkedHashMap<>();
-    private boolean hasGt = false;
+  public static final String TEXT_COLUMN = "%s TEXT";
+  public static final String SQL_COLUMN = "%s %s";
+  public static final String AUTOID_COLUMN = "_id INTEGER PRIMARY KEY AUTOINCREMENT";
+  private final Map<String, String> nestedTables = new LinkedHashMap<>();
+  private boolean hasGt = false;
 
   static final String VCF_TABLE_SQL =
       """
@@ -40,28 +39,32 @@ public class DatabaseSchemaManager {
                 ) STRICT;
             """;
 
-    static final String CONTIG_TABLE_SQL = """
+  static final String CONTIG_TABLE_SQL =
+      """
                 CREATE TABLE contig (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     value TEXT UNIQUE NOT NULL
                 ) STRICT;
             """;
 
-    static final String FORMAT_LOOKUP_TABLE_SQL = """
+  static final String FORMAT_LOOKUP_TABLE_SQL =
+      """
                 CREATE TABLE formatLookup (
                     id INTEGER PRIMARY KEY,
                     value TEXT UNIQUE NOT NULL
                 ) STRICT;
             """;
 
-    static final String HEADER_TABLE_SQL = """
+  static final String HEADER_TABLE_SQL =
+      """
                 CREATE TABLE header (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     line TEXT NOT NULL
                 ) STRICT;
             """;
 
-    static final String CATEGORIES_TABLE_SQL = """
+  static final String CATEGORIES_TABLE_SQL =
+      """
                 CREATE TABLE categories (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     field TEXT NOT NULL,
@@ -71,21 +74,24 @@ public class DatabaseSchemaManager {
                 ) STRICT;
             """;
 
-    static final String CONFIG_TABLE_SQL = """
+  static final String CONFIG_TABLE_SQL =
+      """
                 CREATE TABLE config (
                     id TEXT PRIMARY KEY,
                     value TEXT NOT NULL
                 ) STRICT;
             """;
 
-    static final String PHENOTYPE_TABLE_SQL = """
+  static final String PHENOTYPE_TABLE_SQL =
+      """
                 CREATE TABLE phenotype (
                     id TEXT PRIMARY KEY,
                     label TEXT NOT NULL
                 ) STRICT;
             """;
 
-    static final String SAMPLE_PHENOTYPE_TABLE_SQL = """
+  static final String SAMPLE_PHENOTYPE_TABLE_SQL =
+      """
                 CREATE TABLE samplePhenotype (
                   id INTEGER PRIMARY KEY AUTOINCREMENT,
                   sampleIndex INTEGER NOT NULL,
@@ -95,21 +101,24 @@ public class DatabaseSchemaManager {
                 ) STRICT;
             """;
 
-    static final String DECISION_TREE_TABLE_SQL = """
+  static final String DECISION_TREE_TABLE_SQL =
+      """
                 CREATE TABLE decisionTree (
                     id TEXT PRIMARY KEY,
                     tree TEXT UNIQUE NOT NULL
                 ) STRICT;
             """;
 
-    static final String APP_METADATA_TABLE_SQL = """
+  static final String APP_METADATA_TABLE_SQL =
+      """
                 CREATE TABLE appMetadata (
                     id TEXT PRIMARY KEY,
                     value TEXT UNIQUE NOT NULL
                 ) STRICT;
             """;
 
-    static final String SAMPLE_TABLE_SQL = """
+  static final String SAMPLE_TABLE_SQL =
+      """
                     CREATE TABLE sample (
                       sampleIndex INTEGER PRIMARY KEY,
                       familyId TEXT NOT NULL,
@@ -126,21 +135,24 @@ public class DatabaseSchemaManager {
                     ) STRICT;
                 """;
 
-    static final String AFFECTED_TABLE_SQL = """
+  static final String AFFECTED_TABLE_SQL =
+      """
                 CREATE TABLE affectedStatus (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     value TEXT UNIQUE NOT NULL
                 ) STRICT;
             """;
 
-    static final String SEX_TABLE_SQL = """
+  static final String SEX_TABLE_SQL =
+      """
                 CREATE TABLE sex (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     value TEXT UNIQUE NOT NULL
                 ) STRICT;
             """;
 
-    static final String METADATA_TABLE_SQL = """
+  static final String METADATA_TABLE_SQL =
+      """
                     CREATE TABLE metadata (
                       id INTEGER PRIMARY KEY AUTOINCREMENT,
                       name TEXT,
@@ -163,7 +175,8 @@ public class DatabaseSchemaManager {
                       FOREIGN KEY (numberType) REFERENCES numberType(id)
                     ) STRICT;
                 """;
-    static final String INFO_ORDER_TABLE_SQL = """
+  static final String INFO_ORDER_TABLE_SQL =
+      """
                     CREATE TABLE infoOrder (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         infoIndex INTEGER NOT NULL,
@@ -174,200 +187,219 @@ public class DatabaseSchemaManager {
                     ) STRICT;
             """;
 
-    static final String FIELDTYPE_TABLE_SQL = """
+  static final String FIELDTYPE_TABLE_SQL =
+      """
                 CREATE TABLE fieldType (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     value TEXT UNIQUE NOT NULL
                 ) STRICT;
             """;
 
-    static final String VALUETYPE_TABLE_SQL = """
+  static final String VALUETYPE_TABLE_SQL =
+      """
                 CREATE TABLE valueType (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     value TEXT UNIQUE NOT NULL
                 ) STRICT;
             """;
 
-    static final String NUMBERTYPE_TABLE_SQL = """
+  static final String NUMBERTYPE_TABLE_SQL =
+      """
                 CREATE TABLE numberType (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     value TEXT UNIQUE NOT NULL
                 ) STRICT;
             """;
 
-    static final String GT_TYPE_TABLE_SQL = """
+  static final String GT_TYPE_TABLE_SQL =
+      """
                 CREATE TABLE gtType (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     value TEXT UNIQUE NOT NULL
                 ) STRICT;
             """;
 
+  public void executeSql(String sql, Connection connection) {
+    try (Statement stmt = connection.createStatement()) {
+      stmt.execute(sql);
+    } catch (SQLException e) {
+      throw new DatabaseException(e.getMessage(), String.format("execute: '%s'", sql));
+    }
+  }
 
-    public void executeSql(String sql, Connection connection) {
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute(sql);
-        } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(), String.format("execute: '%s'", sql));
+  public void createDatabase(
+      ReportGeneratorSettings settings, VCFHeader vcfFileHeader, Connection connection) {
+    executeSql("PRAGMA foreign_keys = ON;", connection);
+    executeSql("PRAGMA encoding = \"UTF-8\";", connection);
+    for (String sql : generateAllTableSql(settings, vcfFileHeader)) {
+      executeSql(sql, connection);
+    }
+  }
+
+  private List<String> generateAllTableSql(
+      ReportGeneratorSettings reportGeneratorSettings, VCFHeader vcfFileHeader) {
+    List<String> sqlStatements = new ArrayList<>();
+    sqlStatements.add(CONTIG_TABLE_SQL);
+    sqlStatements.add(VCF_TABLE_SQL);
+    sqlStatements.add(CONFIG_TABLE_SQL);
+    sqlStatements.add(FORMAT_LOOKUP_TABLE_SQL);
+    sqlStatements.add(AFFECTED_TABLE_SQL);
+    sqlStatements.add(SAMPLE_TABLE_SQL);
+    sqlStatements.add(SEX_TABLE_SQL);
+    sqlStatements.add(PHENOTYPE_TABLE_SQL);
+    sqlStatements.add(SAMPLE_PHENOTYPE_TABLE_SQL);
+    sqlStatements.add(DECISION_TREE_TABLE_SQL);
+    sqlStatements.add(FIELDTYPE_TABLE_SQL);
+    sqlStatements.add(NUMBERTYPE_TABLE_SQL);
+    sqlStatements.add(VALUETYPE_TABLE_SQL);
+    sqlStatements.add(METADATA_TABLE_SQL);
+    sqlStatements.add(INFO_ORDER_TABLE_SQL);
+    sqlStatements.add(APP_METADATA_TABLE_SQL);
+    sqlStatements.add(HEADER_TABLE_SQL);
+    sqlStatements.add(GT_TYPE_TABLE_SQL);
+    sqlStatements.add(getInfoTableSql(reportGeneratorSettings, vcfFileHeader));
+    sqlStatements.add(getFormatTableSql(reportGeneratorSettings, vcfFileHeader));
+    sqlStatements.add(CATEGORIES_TABLE_SQL);
+    sqlStatements.addAll(nestedTables.values());
+
+    sqlStatements.add("CREATE INDEX idx_format_variantId ON format(_variantId);");
+    sqlStatements.add("CREATE INDEX idx_format_sampleIndex ON format(_sampleIndex);");
+    sqlStatements.add(
+        "CREATE INDEX idx_format_variantId_sampleIndex ON format(_variantId,_sampleIndex);");
+    sqlStatements.add("CREATE INDEX idx_vcf_chrom ON vcf(chrom);");
+    sqlStatements.add("CREATE INDEX idx_vcf_format ON vcf(format);");
+    sqlStatements.add("CREATE INDEX idx_vcf_pos ON vcf(pos);");
+    sqlStatements.add("CREATE INDEX idx_vcf_chrom_pos ON vcf(chrom, pos);");
+    sqlStatements.add("CREATE INDEX idx_contig_value ON contig(value);");
+    sqlStatements.add("CREATE INDEX idx_gtType_value ON gtType(value);");
+    sqlStatements.add("CREATE INDEX idx_info_variantId ON info(_variantId);");
+
+    if (hasGt) {
+      sqlStatements.add("CREATE INDEX idx_format_GtType ON format(_GtType);");
+    }
+    for (String tableName : nestedTables.keySet()) {
+      sqlStatements.add(
+          String.format("CREATE INDEX idx_%s_variantId ON %s(_variantId);", tableName, tableName));
+    }
+    return sqlStatements;
+  }
+
+  public String getInfoTableSql(ReportGeneratorSettings settings, VCFHeader vcfFileHeader) {
+    FieldMetadataService fieldMetadataService =
+        new FieldMetadataServiceImpl(settings.getMetadataPath().toFile());
+    FieldMetadatas fieldMetadatas = loadFieldMetadatas(fieldMetadataService, vcfFileHeader);
+    return buildInfoTable(fieldMetadatas.getInfo());
+  }
+
+  public String getFormatTableSql(ReportGeneratorSettings settings, VCFHeader vcfFileHeader) {
+    FieldMetadataService fieldMetadataService =
+        new FieldMetadataServiceImpl(settings.getMetadataPath().toFile());
+    FieldMetadatas fieldMetadatas = loadFieldMetadatas(fieldMetadataService, vcfFileHeader);
+    return buildFormatTable(fieldMetadatas.getFormat());
+  }
+
+  private FieldMetadatas loadFieldMetadatas(FieldMetadataService service, VCFHeader vcfFileHeader) {
+    return service.load(vcfFileHeader);
+  }
+
+  private String buildInfoTable(Map<String, FieldMetadata> infoFields) {
+    StringBuilder infoBuilder = new StringBuilder("CREATE TABLE info (");
+    List<String> columns = new ArrayList<>();
+    columns.add(AUTOID_COLUMN);
+    columns.add("_variantId INTEGER REFERENCES vcf(_id)");
+
+    for (var entry : infoFields.entrySet()) {
+      FieldMetadata meta = entry.getValue();
+      if (meta.getNestedFields() == null || meta.getNestedFields().isEmpty()) {
+        if (meta.getNumberType() == ValueCount.Type.FIXED && meta.getNumberCount() == 1) {
+          columns.add(
+              String.format(
+                  SQL_COLUMN, entry.getKey(), toSqlType(meta.getType(), meta.getNumberCount())));
+        } else {
+          columns.add(String.format(TEXT_COLUMN, entry.getKey()));
         }
+      } else {
+        String tableName = String.format("variant_%s", entry.getKey());
+        String nestedTableSql = buildNestedTable(tableName, meta.getNestedFields());
+        nestedTables.put(tableName, nestedTableSql);
+      }
     }
+    infoBuilder.append(String.join(",", columns));
+    infoBuilder.append(") STRICT;");
+    return infoBuilder.toString();
+  }
 
-    public void createDatabase(ReportGeneratorSettings settings, VCFHeader vcfFileHeader, Connection connection) {
-        executeSql("PRAGMA foreign_keys = ON;", connection);
-        executeSql("PRAGMA encoding = \"UTF-8\";", connection);
-        for (String sql : generateAllTableSql(settings, vcfFileHeader)) {
-            executeSql(sql, connection);
+  private String buildFormatTable(Map<String, FieldMetadata> formatFields) {
+    StringBuilder formatBuilder = new StringBuilder("CREATE TABLE format (");
+    List<String> columns = new ArrayList<>();
+    columns.add(AUTOID_COLUMN);
+    columns.add("_sampleIndex INTEGER REFERENCES sample(sampleIndex)");
+    columns.add("_variantId INTEGER REFERENCES vcf(_id)");
+
+    for (var entry : formatFields.entrySet()) {
+      FieldMetadata meta = entry.getValue();
+      if (meta.getNestedFields() == null || meta.getNestedFields().isEmpty()) {
+        if (meta.getNumberType() == ValueCount.Type.FIXED && meta.getNumberCount() == 1) {
+          columns.add(
+              String.format(
+                  SQL_COLUMN, entry.getKey(), toSqlType(meta.getType(), meta.getNumberCount())));
+          if (entry.getKey().equals("GT")) {
+            this.hasGt = true;
+            columns.add(String.format(SQL_COLUMN, GT_TYPE, "INTEGER REFERENCES gtType(id)"));
+          }
+        } else {
+          columns.add(String.format(TEXT_COLUMN, entry.getKey()));
         }
+      } else {
+        throw new UnsupportedOperationException("Nested Formats are not yet supported");
+      }
     }
+    formatBuilder.append(String.join(",", columns));
+    formatBuilder.append(") STRICT;");
+    return formatBuilder.toString();
+  }
 
-    private List<String> generateAllTableSql(ReportGeneratorSettings reportGeneratorSettings, VCFHeader vcfFileHeader) {
-        List<String> sqlStatements = new ArrayList<>();
-        sqlStatements.add(CONTIG_TABLE_SQL);
-        sqlStatements.add(VCF_TABLE_SQL);
-        sqlStatements.add(CONFIG_TABLE_SQL);
-        sqlStatements.add(FORMAT_LOOKUP_TABLE_SQL);
-        sqlStatements.add(AFFECTED_TABLE_SQL);
-        sqlStatements.add(SAMPLE_TABLE_SQL);
-        sqlStatements.add(SEX_TABLE_SQL);
-        sqlStatements.add(PHENOTYPE_TABLE_SQL);
-        sqlStatements.add(SAMPLE_PHENOTYPE_TABLE_SQL);
-        sqlStatements.add(DECISION_TREE_TABLE_SQL);
-        sqlStatements.add(FIELDTYPE_TABLE_SQL);
-        sqlStatements.add(NUMBERTYPE_TABLE_SQL);
-        sqlStatements.add(VALUETYPE_TABLE_SQL);
-        sqlStatements.add(METADATA_TABLE_SQL);
-        sqlStatements.add(INFO_ORDER_TABLE_SQL);
-        sqlStatements.add(APP_METADATA_TABLE_SQL);
-        sqlStatements.add(HEADER_TABLE_SQL);
-        sqlStatements.add(GT_TYPE_TABLE_SQL);
-        sqlStatements.add(getInfoTableSql(reportGeneratorSettings, vcfFileHeader));
-        sqlStatements.add(getFormatTableSql(reportGeneratorSettings, vcfFileHeader));
-        sqlStatements.add(CATEGORIES_TABLE_SQL);
-        sqlStatements.addAll(nestedTables.values());
-
-        sqlStatements.add("CREATE INDEX idx_format_variantId ON format(_variantId);");
-        sqlStatements.add("CREATE INDEX idx_format_sampleIndex ON format(_sampleIndex);");
-        sqlStatements.add("CREATE INDEX idx_format_variantId_sampleIndex ON format(_variantId,_sampleIndex);");
-        sqlStatements.add("CREATE INDEX idx_vcf_chrom ON vcf(chrom);");
-        sqlStatements.add("CREATE INDEX idx_vcf_format ON vcf(format);");
-        sqlStatements.add("CREATE INDEX idx_vcf_pos ON vcf(pos);");
-        sqlStatements.add("CREATE INDEX idx_vcf_chrom_pos ON vcf(chrom, pos);");
-        sqlStatements.add("CREATE INDEX idx_contig_value ON contig(value);");
-        sqlStatements.add("CREATE INDEX idx_gtType_value ON gtType(value);");
-        sqlStatements.add("CREATE INDEX idx_info_variantId ON info(_variantId);");
-
-        if(hasGt){
-          sqlStatements.add("CREATE INDEX idx_format_GtType ON format(_GtType);");
-        }
-        for(String tableName : nestedTables.keySet()) {
-          sqlStatements.add(String.format("CREATE INDEX idx_%s_variantId ON %s(_variantId);", tableName, tableName));
-        }
-      return sqlStatements;
+  private String buildNestedTable(
+      String tableName, Map<String, NestedFieldMetadata> nestedFieldMap) {
+    StringBuilder nestedBuilder = new StringBuilder("CREATE TABLE ").append(tableName).append(" (");
+    List<String> nestedColumns = new ArrayList<>();
+    nestedColumns.add(AUTOID_COLUMN);
+    if (tableName.startsWith("variant_")) {
+      nestedColumns.add("_variantId INTEGER REFERENCES vcf(_id)");
+      // CSQ index for postprocessing VIPC_S and VIPP_S
+      if (tableName.equals("variant_CSQ")) {
+        nestedColumns.add("CsqIndex INTEGER");
+      }
+    } else if (tableName.startsWith("format_")) {
+      nestedColumns.add("formatId INTEGER REFERENCES format(_id)");
     }
-
-    public String getInfoTableSql(ReportGeneratorSettings settings, VCFHeader vcfFileHeader) {
-        FieldMetadataService fieldMetadataService = new FieldMetadataServiceImpl(settings.getMetadataPath().toFile());
-        FieldMetadatas fieldMetadatas = loadFieldMetadatas(fieldMetadataService, vcfFileHeader);
-        return buildInfoTable(fieldMetadatas.getInfo());
+    for (var nestedEntry : nestedFieldMap.entrySet()) {
+      NestedFieldMetadata nestedField = nestedEntry.getValue();
+      String columnName = nestedEntry.getKey();
+      if (nestedField.getNumberType() == ValueCount.Type.FIXED
+          && nestedField.getNumberCount() == 1) {
+        nestedColumns.add(
+            String.format(
+                SQL_COLUMN,
+                columnName,
+                toSqlType(nestedField.getType(), nestedField.getNumberCount())));
+      } else {
+        nestedColumns.add(String.format(TEXT_COLUMN, columnName));
+      }
     }
+    nestedBuilder.append(String.join(", ", nestedColumns));
+    nestedBuilder.append(") STRICT;");
+    return nestedBuilder.toString();
+  }
 
-    public String getFormatTableSql(ReportGeneratorSettings settings, VCFHeader vcfFileHeader) {
-        FieldMetadataService fieldMetadataService = new FieldMetadataServiceImpl(settings.getMetadataPath().toFile());
-        FieldMetadatas fieldMetadatas = loadFieldMetadatas(fieldMetadataService, vcfFileHeader);
-        return buildFormatTable(fieldMetadatas.getFormat());
+  public static String toSqlType(ValueType type, Integer count) {
+    if (count != null && count != 1) {
+      return "TEXT";
     }
-
-    private FieldMetadatas loadFieldMetadatas(FieldMetadataService service, VCFHeader vcfFileHeader) {
-        return service.load(vcfFileHeader);
-    }
-
-    private String buildInfoTable(Map<String, FieldMetadata> infoFields) {
-        StringBuilder infoBuilder = new StringBuilder("CREATE TABLE info (");
-        List<String> columns = new ArrayList<>();
-        columns.add(AUTOID_COLUMN);
-        columns.add("_variantId INTEGER REFERENCES vcf(_id)");
-
-        for (var entry : infoFields.entrySet()) {
-            FieldMetadata meta = entry.getValue();
-            if (meta.getNestedFields() == null || meta.getNestedFields().isEmpty()) {
-                if (meta.getNumberType() == ValueCount.Type.FIXED && meta.getNumberCount() == 1) {
-                    columns.add(String.format(SQL_COLUMN, entry.getKey(), toSqlType(meta.getType(), meta.getNumberCount())));
-                } else {
-                    columns.add(String.format(TEXT_COLUMN, entry.getKey()));
-                }
-            } else {
-                String tableName = String.format("variant_%s", entry.getKey());
-                String nestedTableSql = buildNestedTable(tableName, meta.getNestedFields());
-                nestedTables.put(tableName, nestedTableSql);
-            }
-        }
-        infoBuilder.append(String.join(",", columns));
-        infoBuilder.append(") STRICT;");
-        return infoBuilder.toString();
-    }
-
-    private String buildFormatTable(Map<String, FieldMetadata> formatFields) {
-        StringBuilder formatBuilder = new StringBuilder("CREATE TABLE format (");
-        List<String> columns = new ArrayList<>();
-        columns.add(AUTOID_COLUMN);
-        columns.add("_sampleIndex INTEGER REFERENCES sample(sampleIndex)");
-        columns.add("_variantId INTEGER REFERENCES vcf(_id)");
-
-        for (var entry : formatFields.entrySet()) {
-            FieldMetadata meta = entry.getValue();
-            if (meta.getNestedFields() == null || meta.getNestedFields().isEmpty()) {
-                if (meta.getNumberType() == ValueCount.Type.FIXED && meta.getNumberCount() == 1) {
-                    columns.add(String.format(SQL_COLUMN, entry.getKey(), toSqlType(meta.getType(), meta.getNumberCount())));
-                    if(entry.getKey().equals("GT")){
-                      this.hasGt = true;
-                      columns.add(String.format(SQL_COLUMN, GT_TYPE, "INTEGER REFERENCES gtType(id)"));
-                    }
-                } else {
-                    columns.add(String.format(TEXT_COLUMN, entry.getKey()));
-                }
-            } else {
-                throw new UnsupportedOperationException("Nested Formats are not yet supported");
-            }
-        }
-        formatBuilder.append(String.join(",", columns));
-        formatBuilder.append(") STRICT;");
-        return formatBuilder.toString();
-    }
-
-    private String buildNestedTable(String tableName, Map<String, NestedFieldMetadata> nestedFieldMap) {
-        StringBuilder nestedBuilder = new StringBuilder("CREATE TABLE ").append(tableName).append(" (");
-        List<String> nestedColumns = new ArrayList<>();
-        nestedColumns.add(AUTOID_COLUMN);
-        if (tableName.startsWith("variant_")) {
-            nestedColumns.add("_variantId INTEGER REFERENCES vcf(_id)");
-            //CSQ index for postprocessing VIPC_S and VIPP_S
-            if(tableName.equals("variant_CSQ")){
-                nestedColumns.add("CsqIndex INTEGER");
-            }
-        } else if (tableName.startsWith("format_")) {
-            nestedColumns.add("formatId INTEGER REFERENCES format(_id)");
-        }
-        for (var nestedEntry : nestedFieldMap.entrySet()) {
-            NestedFieldMetadata nestedField = nestedEntry.getValue();
-            String columnName = nestedEntry.getKey();
-            if (nestedField.getNumberType() == ValueCount.Type.FIXED && nestedField.getNumberCount() == 1) {
-                nestedColumns.add(String.format(SQL_COLUMN, columnName, toSqlType(nestedField.getType(), nestedField.getNumberCount())));
-            } else {
-                nestedColumns.add(String.format(TEXT_COLUMN, columnName));
-            }
-        }
-        nestedBuilder.append(String.join(", ", nestedColumns));
-        nestedBuilder.append(") STRICT;");
-        return nestedBuilder.toString();
-    }
-
-    public static String toSqlType(ValueType type, Integer count) {
-        if (count != null && count != 1) {
-            return "TEXT";
-        }
-        return switch (type) {
-            case FLAG, INTEGER, CATEGORICAL -> "INTEGER";
-            case FLOAT -> "REAL";
-            case CHARACTER, STRING -> "TEXT";
-        };
-    }
+    return switch (type) {
+      case FLAG, INTEGER, CATEGORICAL -> "INTEGER";
+      case FLOAT -> "REAL";
+      case CHARACTER, STRING -> "TEXT";
+    };
+  }
 }

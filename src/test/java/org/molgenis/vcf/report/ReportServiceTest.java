@@ -50,10 +50,11 @@ class ReportServiceTest {
 
     Report report =
         new Report(
-            null, null, Map.of(),
+            null,
+            null,
+            Map.of(),
             new Bytes(readAllBytes(wasmPath)),
-            new Bytes("DATABASE".getBytes())
-        );
+            new Bytes("DATABASE".getBytes()));
 
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(

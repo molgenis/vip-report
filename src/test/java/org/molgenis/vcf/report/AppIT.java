@@ -72,9 +72,9 @@ class AppIT {
   void testTreeLess() throws IOException {
     String inputFile = ResourceUtils.getFile("classpath:IT2.vcf").toString();
     String pedFiles =
-            ResourceUtils.getFile("classpath:example.ped")
-                    + ","
-                    + ResourceUtils.getFile("classpath:example2.ped");
+        ResourceUtils.getFile("classpath:example.ped")
+            + ","
+            + ResourceUtils.getFile("classpath:example2.ped");
     String outputFile = sharedTempDir.resolve("example.vcf.html").toString();
     String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
     String probands = "NA00001";
@@ -84,26 +84,26 @@ class AppIT {
     String metadataFile = ResourceUtils.getFile("classpath:field_metadata.json").toString();
 
     String[] args = {
-            "-i",
-            inputFile,
-            "-m",
-            metadataFile,
-            "-o",
-            outputFile,
-            "-t",
-            templateFile,
-            "-pb",
-            probands,
-            "-pd",
-            pedFiles,
-            "-ph",
-            phenotypes,
-            "-d",
-            "-c",
-            "NA00001=" + bamFile,
-            "-r",
-            referenceFile,
-            "-f"
+      "-i",
+      inputFile,
+      "-m",
+      metadataFile,
+      "-o",
+      outputFile,
+      "-t",
+      templateFile,
+      "-pb",
+      probands,
+      "-pd",
+      pedFiles,
+      "-ph",
+      phenotypes,
+      "-d",
+      "-c",
+      "NA00001=" + bamFile,
+      "-r",
+      referenceFile,
+      "-f"
     };
     SpringApplication.run(App.class, args);
 

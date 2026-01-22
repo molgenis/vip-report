@@ -1,11 +1,10 @@
 package org.molgenis.vcf.report.utils;
 
-import org.junit.jupiter.api.Test;
-import org.molgenis.vcf.report.fasta.ContigInterval;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+import org.molgenis.vcf.report.fasta.ContigInterval;
 
 class IntervalUtilsTest {
   @Test
@@ -17,14 +16,14 @@ class IntervalUtilsTest {
   void mergeIntervalsOne() {
     assertEquals(
         Arrays.asList(new ContigInterval("x", 1, 3)),
-            IntervalUtils.mergeIntervals(Arrays.asList(new ContigInterval("x", 1, 3))));
+        IntervalUtils.mergeIntervals(Arrays.asList(new ContigInterval("x", 1, 3))));
   }
 
   @Test
   void mergeIntervalsNoOverlap() {
     assertEquals(
         Arrays.asList(new ContigInterval("x", 1, 3), new ContigInterval("x", 5, 7)),
-            IntervalUtils.mergeIntervals(
+        IntervalUtils.mergeIntervals(
             Arrays.asList(new ContigInterval("x", 1, 3), new ContigInterval("x", 5, 7))));
   }
 
@@ -32,15 +31,15 @@ class IntervalUtilsTest {
   void mergeIntervalsOverlap() {
     assertEquals(
         Arrays.asList(new ContigInterval("x", 1, 4)),
-            IntervalUtils.mergeIntervals(
-                    Arrays.asList(new ContigInterval("x", 1, 3), new ContigInterval("x", 2, 4))));
+        IntervalUtils.mergeIntervals(
+            Arrays.asList(new ContigInterval("x", 1, 3), new ContigInterval("x", 2, 4))));
   }
 
   @Test
   void mergeIntervalsOverlapBoundary() {
     assertEquals(
         Arrays.asList(new ContigInterval("x", 1, 5)),
-            IntervalUtils.mergeIntervals(
+        IntervalUtils.mergeIntervals(
             Arrays.asList(new ContigInterval("x", 1, 3), new ContigInterval("x", 3, 5))));
   }
 
@@ -48,7 +47,7 @@ class IntervalUtilsTest {
   void mergeIntervalsOverlapAdjacent() {
     assertEquals(
         Arrays.asList(new ContigInterval("x", 1, 6)),
-            IntervalUtils.mergeIntervals(
+        IntervalUtils.mergeIntervals(
             Arrays.asList(new ContigInterval("x", 1, 3), new ContigInterval("x", 4, 6))));
   }
 
@@ -56,7 +55,7 @@ class IntervalUtilsTest {
   void mergeIntervalsMultipleLastOverlap() {
     assertEquals(
         Arrays.asList(new ContigInterval("x", 1, 3), new ContigInterval("x", 5, 8)),
-            IntervalUtils.mergeIntervals(
+        IntervalUtils.mergeIntervals(
             Arrays.asList(
                 new ContigInterval("x", 1, 3),
                 new ContigInterval("x", 5, 7),
@@ -67,7 +66,7 @@ class IntervalUtilsTest {
   void mergeIntervalsMultipleFirstOverlap() {
     assertEquals(
         Arrays.asList(new ContigInterval("x", 1, 4), new ContigInterval("x", 6, 8)),
-            IntervalUtils.mergeIntervals(
+        IntervalUtils.mergeIntervals(
             Arrays.asList(
                 new ContigInterval("x", 1, 3),
                 new ContigInterval("x", 2, 4),
@@ -78,7 +77,7 @@ class IntervalUtilsTest {
   void mergeIntervalsMultipleAllOverlap() {
     assertEquals(
         Arrays.asList(new ContigInterval("x", 1, 6)),
-            IntervalUtils.mergeIntervals(
+        IntervalUtils.mergeIntervals(
             Arrays.asList(
                 new ContigInterval("x", 1, 3),
                 new ContigInterval("x", 2, 4),

@@ -8,13 +8,11 @@ import htsjdk.tribble.gff.Gff3Codec.DecodeDepth;
 import htsjdk.tribble.gff.Gff3Feature;
 import htsjdk.tribble.gff.Gff3Writer;
 import htsjdk.tribble.readers.LineIterator;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.List;
-
 import org.molgenis.vcf.report.fasta.ContigInterval;
 import org.molgenis.vcf.report.utils.BestCompressionGZIPOutputStream;
 
@@ -27,10 +25,9 @@ public class GenesFilter {
 
   public GenesFilter(Path genesFile) {
     this.genesFile = requireNonNull(genesFile);
-
   }
 
-  public byte[] filter(List<ContigInterval> contigIntervals){
+  public byte[] filter(List<ContigInterval> contigIntervals) {
     ByteArrayOutputStream output = new ByteArrayOutputStream();
 
     final Gff3Codec codec = new Gff3Codec(DecodeDepth.SHALLOW);

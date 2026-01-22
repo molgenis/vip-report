@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 import static org.molgenis.vcf.utils.model.metadata.HtsFormat.VCF;
 
 import htsjdk.variant.vcf.VCFHeader;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,7 +16,6 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -95,18 +93,66 @@ class ReportGeneratorTest {
     Path wasmPath = Paths.get("src", "test", "resources", "fake.wasm");
 
     Map<String, Sample> pedSampleItems =
-        Map.of("John", Sample.builder().person(Person.builder().familyId("FAM001").sex(Sex.MALE).affectedStatus(
-            AffectedStatus.AFFECTED).maternalId("Jane").individualId("John").paternalId("Jimmy").build()).proband(false).index(-1).build(),
-            "James", Sample.builder().person(Person.builder().familyId("FAM002").sex(Sex.MALE).affectedStatus(
-            AffectedStatus.UNAFFECTED).maternalId("0").individualId("James").paternalId("0").build()).proband(false).index(-1).build(),
-            "Jane", Sample.builder().person(Person.builder().familyId("FAM001").sex(Sex.FEMALE).affectedStatus(
-            AffectedStatus.UNAFFECTED).maternalId("0").individualId("Jane").paternalId("0").build()).proband(false).index(-1).build(),
-            "Jimmy", Sample.builder().person(Person.builder().familyId("FAM001").sex(Sex.MALE).affectedStatus(
-            AffectedStatus.UNAFFECTED).maternalId("0").individualId("Jimmy").paternalId("0").build()).proband(false).index(-1).build());
+        Map.of(
+            "John",
+            Sample.builder()
+                .person(
+                    Person.builder()
+                        .familyId("FAM001")
+                        .sex(Sex.MALE)
+                        .affectedStatus(AffectedStatus.AFFECTED)
+                        .maternalId("Jane")
+                        .individualId("John")
+                        .paternalId("Jimmy")
+                        .build())
+                .proband(false)
+                .index(-1)
+                .build(),
+            "James",
+            Sample.builder()
+                .person(
+                    Person.builder()
+                        .familyId("FAM002")
+                        .sex(Sex.MALE)
+                        .affectedStatus(AffectedStatus.UNAFFECTED)
+                        .maternalId("0")
+                        .individualId("James")
+                        .paternalId("0")
+                        .build())
+                .proband(false)
+                .index(-1)
+                .build(),
+            "Jane",
+            Sample.builder()
+                .person(
+                    Person.builder()
+                        .familyId("FAM001")
+                        .sex(Sex.FEMALE)
+                        .affectedStatus(AffectedStatus.UNAFFECTED)
+                        .maternalId("0")
+                        .individualId("Jane")
+                        .paternalId("0")
+                        .build())
+                .proband(false)
+                .index(-1)
+                .build(),
+            "Jimmy",
+            Sample.builder()
+                .person(
+                    Person.builder()
+                        .familyId("FAM001")
+                        .sex(Sex.MALE)
+                        .affectedStatus(AffectedStatus.UNAFFECTED)
+                        .maternalId("0")
+                        .individualId("Jimmy")
+                        .paternalId("0")
+                        .build())
+                .proband(false)
+                .index(-1)
+                .build());
 
     List<Sample> sampleList = emptyList();
-    when(personListMerger.merge(vcfSampleItems, pedSampleItems, 10))
-        .thenReturn(sampleList);
+    when(personListMerger.merge(vcfSampleItems, pedSampleItems, 10)).thenReturn(sampleList);
 
     HtsFile htsFile = new HtsFile("test.vcf", VCF, "GRCh38");
     when(htsFileMapper.map(any(), eq(inputVcfPath.toString()))).thenReturn(htsFile);
@@ -123,16 +169,29 @@ class ReportGeneratorTest {
 
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
-            appName, appVersion, appArgs, maxNrSamples, metadataPath, wasmPath, hpoPath, referencePath, null, treePath, treePath, templateConfigPath);
-      when(databaseManager.populateDb(any(),any(),any(),any(),any(),any(),any(),any(),any(),any())).thenReturn(new Bytes(Files.readAllBytes(database)));
+            appName,
+            appVersion,
+            appArgs,
+            maxNrSamples,
+            metadataPath,
+            wasmPath,
+            hpoPath,
+            referencePath,
+            null,
+            treePath,
+            treePath,
+            templateConfigPath);
+    when(databaseManager.populateDb(
+            any(), any(), any(), any(), any(), any(), any(), any(), any(), any()))
+        .thenReturn(new Bytes(Files.readAllBytes(database)));
 
-      Report report =
+    Report report =
         new Report(
-                Map.of("1:2-3", new Bytes(new byte[] {0})),
-                null,
-                Map.of(),
-                new Bytes(Files.readAllBytes(wasmPath)),
-                new Bytes(Files.readAllBytes(database)));
+            Map.of("1:2-3", new Bytes(new byte[] {0})),
+            null,
+            Map.of(),
+            new Bytes(Files.readAllBytes(wasmPath)),
+            new Bytes(Files.readAllBytes(database)));
 
     assertEquals(
         report,

@@ -31,7 +31,13 @@ public class FastaSlicer {
         referenceSequenceFile.getSubsequenceAt(
             interval.getContig(), interval.getStart(), interval.getStop());
 
-    String referenceSequenceName = String.format("%s:%s-%s@len=%s", interval.getContig(),interval.getStart(),interval.getStop(),(interval.getStop() - interval.getStart()));
+    String referenceSequenceName =
+        String.format(
+            "%s:%s-%s@len=%s",
+            interval.getContig(),
+            interval.getStart(),
+            interval.getStop(),
+            (interval.getStop() - interval.getStart()));
     ReferenceSequence renamedReferenceSequence =
         new ReferenceSequence(
             referenceSequenceName,
