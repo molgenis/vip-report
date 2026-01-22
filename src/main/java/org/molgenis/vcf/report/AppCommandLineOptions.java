@@ -70,7 +70,7 @@ class AppCommandLineOptions {
             .desc("Input VCF file (.vcf or .vcf.gz).")
             .build());
     appOptions.addOption(
-          Option.builder(OPT_METADATA)
+        Option.builder(OPT_METADATA)
             .hasArg(true)
             .longOpt(OPT_METADATA_LONG)
             .desc("VCF metadata file (.json).")
@@ -101,11 +101,11 @@ class AppCommandLineOptions {
             .desc("VIP HPO .tsv file containing 'id', 'label' and 'description'.")
             .build());
     appOptions.addOption(
-            Option.builder(OPT_TEMPLATE_CONFIG)
-                    .hasArg(true)
-                    .longOpt(OPT_TEMPLATE_CONFIG_LONG)
-                    .desc("Report template config file (.json).")
-                    .build());
+        Option.builder(OPT_TEMPLATE_CONFIG)
+            .hasArg(true)
+            .longOpt(OPT_TEMPLATE_CONFIG_LONG)
+            .desc("Report template config file (.json).")
+            .build());
     appOptions.addOption(
         Option.builder(OPT_PROBANDS)
             .hasArg(true)
@@ -250,7 +250,8 @@ class AppCommandLineOptions {
 
     String genesPathStr = genesPath.toString();
     if (!genesPathStr.endsWith(".gff.gz") && !genesPathStr.endsWith(".gff3.gz")) {
-      throw new IllegalArgumentException(format("Input file '%s' is not a .gff.gz or gff3.gz", genesPathStr));
+      throw new IllegalArgumentException(
+          format("Input file '%s' is not a .gff.gz or gff3.gz", genesPathStr));
     }
   }
 
@@ -261,7 +262,9 @@ class AppCommandLineOptions {
 
     if (!commandLine.hasOption(OPT_REFERENCE)) {
       throw new IllegalArgumentException(
-              format("Cram files cannot be used without providing the reference Fasta file. (-%s, --%s).", OPT_REFERENCE, OPT_REFERENCE_LONG));
+          format(
+              "Cram files cannot be used without providing the reference Fasta file. (-%s, --%s).",
+              OPT_REFERENCE, OPT_REFERENCE_LONG));
     }
 
     String cramString = commandLine.getOptionValue(OPT_CRAM);
@@ -357,18 +360,18 @@ class AppCommandLineOptions {
   }
 
   private static void validateDatabase(CommandLine commandLine) {
-      Path inputPath = Path.of(commandLine.getOptionValue(OPT_INPUT));
-      String databaseLocation = getDatabaseLocation(inputPath);
-      if(commandLine.hasOption(OPT_FORCE)) {
-          try {
-              Files.deleteIfExists(Path.of(databaseLocation));
-          } catch (IOException e) {
-              throw new UncheckedIOException(e);
-          }
-      } else if(Files.exists(Path.of(databaseLocation))){
-          throw new IllegalArgumentException(
-                  format("Database file '%s' already exists", databaseLocation));
+    Path inputPath = Path.of(commandLine.getOptionValue(OPT_INPUT));
+    String databaseLocation = getDatabaseLocation(inputPath);
+    if (commandLine.hasOption(OPT_FORCE)) {
+      try {
+        Files.deleteIfExists(Path.of(databaseLocation));
+      } catch (IOException e) {
+        throw new UncheckedIOException(e);
       }
+    } else if (Files.exists(Path.of(databaseLocation))) {
+      throw new IllegalArgumentException(
+          format("Database file '%s' already exists", databaseLocation));
+    }
   }
 
   private static void validateTemplate(CommandLine commandLine) {
@@ -405,7 +408,7 @@ class AppCommandLineOptions {
     String templateConfigPathStr = templateConfigPath.toString();
     if (!templateConfigPathStr.endsWith(".json")) {
       throw new IllegalArgumentException(
-              format("Template config file '%s' is not a .json file.", templateConfigPathStr));
+          format("Template config file '%s' is not a .json file.", templateConfigPathStr));
     }
   }
 

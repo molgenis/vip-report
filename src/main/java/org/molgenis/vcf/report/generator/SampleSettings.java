@@ -11,6 +11,7 @@ public class SampleSettings {
   List<Path> pedigreePaths;
   String phenotypeString;
   Map<String, CramPath> cramPaths;
+
   @Value
   public static class CramPath {
     Path cram;

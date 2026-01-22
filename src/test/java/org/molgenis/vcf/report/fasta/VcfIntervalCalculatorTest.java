@@ -6,11 +6,10 @@ import static org.mockito.Mockito.when;
 
 import htsjdk.variant.variantcontext.Genotype;
 import htsjdk.variant.variantcontext.VariantContext;
-import java.util.List;
-import java.util.Map;
-
 import htsjdk.variant.vcf.VCFContigHeaderLine;
 import htsjdk.variant.vcf.VCFHeader;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -32,9 +31,10 @@ class VcfIntervalCalculatorTest {
     when(variantContext1.getContig()).thenReturn("1");
     when(variantContext1.getStart()).thenReturn(110);
     VCFHeader vcfHeader = mock(VCFHeader.class);
-    assertEquals(Map.of("1",
-        List.of(new ContigInterval("1", 75, 125), new ContigInterval("1", 85, 135))),
-        vcfIntervalCalculator.calculate(vcfHeader, List.of(variantContext0, variantContext1).iterator(), 25));
+    assertEquals(
+        Map.of("1", List.of(new ContigInterval("1", 75, 125), new ContigInterval("1", 85, 135))),
+        vcfIntervalCalculator.calculate(
+            vcfHeader, List.of(variantContext0, variantContext1).iterator(), 25));
   }
 
   @Test
@@ -44,8 +44,8 @@ class VcfIntervalCalculatorTest {
     when(variantContext0.getStart()).thenReturn(100);
     VCFHeader vcfHeader = mock(VCFHeader.class);
     assertEquals(
-            Map.of("1",List.of(new ContigInterval("1", 1, 300))),
-            vcfIntervalCalculator.calculate(vcfHeader, List.of(variantContext0).iterator(), 200));
+        Map.of("1", List.of(new ContigInterval("1", 1, 300))),
+        vcfIntervalCalculator.calculate(vcfHeader, List.of(variantContext0).iterator(), 200));
   }
 
   @Test
@@ -61,9 +61,10 @@ class VcfIntervalCalculatorTest {
     when(vcfHeader.getContigLines()).thenReturn(List.of(vcfContigHeaderLine));
 
     assertEquals(
-            Map.of("1",List.of(new ContigInterval("1", 300, 600))),
-            vcfIntervalCalculator.calculate(vcfHeader, List.of(variantContext0).iterator(), 200));
+        Map.of("1", List.of(new ContigInterval("1", 300, 600))),
+        vcfIntervalCalculator.calculate(vcfHeader, List.of(variantContext0).iterator(), 200));
   }
+
   @Test
   void calculateWithSample() {
     String sampleId = "sample0";
@@ -91,8 +92,11 @@ class VcfIntervalCalculatorTest {
     VCFHeader vcfHeader = mock(VCFHeader.class);
 
     assertEquals(
-            Map.of("1",List.of(new ContigInterval("1", 75, 125))),
-        vcfIntervalCalculator.calculate(vcfHeader,
-            List.of(variantContext0, variantContext1, variantContext2).iterator(), 25, sampleId));
+        Map.of("1", List.of(new ContigInterval("1", 75, 125))),
+        vcfIntervalCalculator.calculate(
+            vcfHeader,
+            List.of(variantContext0, variantContext1, variantContext2).iterator(),
+            25,
+            sampleId));
   }
 }

@@ -150,7 +150,18 @@ public class AppCommandLineToSettingsMapper {
     Path sqlWasmPath = getWasmPath();
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
-            appName, appVersion, appArgs, maxSamples, metadataPath, sqlWasmPath, hpoPath, referencePath, genesPath, decisionTreePath, sampleTreePath, templateConfigPath);
+            appName,
+            appVersion,
+            appArgs,
+            maxSamples,
+            metadataPath,
+            sqlWasmPath,
+            hpoPath,
+            referencePath,
+            genesPath,
+            decisionTreePath,
+            sampleTreePath,
+            templateConfigPath);
     ReportWriterSettings reportWriterSettings = new ReportWriterSettings(templatePath, debugMode);
     SampleSettings sampleSettings =
         new SampleSettings(probandNames, pedPaths, phenotypes, cramPaths);

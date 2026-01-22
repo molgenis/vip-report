@@ -6,6 +6,7 @@ public class InvalidHpoLineException extends RuntimeException {
   public InvalidHpoLineException(String line, String filename) {
     super(
         format(
-            "Invalid HPO line '%s' in file '%s'. Expected format id<tab>label<tab>description.", line, filename));
+            "Invalid HPO line '%s' in file '%s'. Expected format id<tab>label<tab>description.",
+            line, filename));
   }
 }

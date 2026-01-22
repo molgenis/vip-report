@@ -47,6 +47,7 @@
         <opencsv.version>5.10</opencsv.version>
         <vip.utils.version>4.0.0</vip.utils.version>
         <zstd.jni.version>1.5.7-6</zstd.jni.version>
+        <version.spotless.maven.plugin>3.0.0</version.spotless.maven.plugin>
     </properties>
 
     <profiles>
@@ -257,6 +258,24 @@
                 <configuration>
                     <!-- no argLine here -->
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>${version.spotless.maven.plugin}</version>
+                <configuration>
+                    <java>
+                        <googleJavaFormat/>
+                    </java>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <phase>verify</phase>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
