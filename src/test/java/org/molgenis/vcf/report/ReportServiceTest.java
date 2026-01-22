@@ -67,6 +67,7 @@ class ReportServiceTest {
             null,
             null,
             null,
+            null,
             null);
     ReportWriterSettings reportWriterSettings = new ReportWriterSettings(null, true);
     SampleSettings sampleSettings = new SampleSettings(null, null, null, Map.of());

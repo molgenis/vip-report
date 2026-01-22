@@ -9,6 +9,7 @@ import htsjdk.variant.vcf.VCFHeader;
 import htsjdk.variant.vcf.VCFHeaderLine;
 import lombok.NonNull;
 import org.molgenis.vcf.report.model.Bytes;
+import org.molgenis.vcf.report.model.HpoTerm;
 import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.report.model.metadata.ReportMetadata;
 import org.molgenis.vcf.report.utils.Utf8LineReader;
@@ -83,7 +84,7 @@ public class DatabaseManager {
 
     public Bytes populateDb(String databaseLocation, FieldMetadatas fieldMetadatas, Items<Sample> samples, File vcfFile,
                             Path decisionTreePath, Path sampleTreePath, ReportMetadata reportMetadata, Map<?, ?> templateConfig,
-                            @NonNull List<Phenopacket> phenopackets) throws IOException {
+                            @NonNull List<Phenopacket> phenopackets, Map<String, HpoTerm> hpoTerms) throws IOException {
         getConnection(databaseLocation);
         boolean isGz = vcfFile.getName().toLowerCase().endsWith(".gz");
         try (
@@ -105,7 +106,7 @@ public class DatabaseManager {
                 }
                 List<String> lines = new ArrayList<>(header.getMetaDataInInputOrder().stream().map(VCFHeaderLine::toString).toList());
                 metadataRepo.insertHeaderLine(conn, lines, getHeaderLine(samples));
-                Map<FieldType, Map<String, Integer>> metadataKeys = metadataRepo.insertMetadata(conn, fieldMetadatas, decisionTreePath, sampleTreePath, phenopackets);
+                Map<FieldType, Map<String, Integer>> metadataKeys = metadataRepo.insertMetadata(conn, fieldMetadatas, decisionTreePath, sampleTreePath, phenopackets, hpoTerms);
                 sampleRepo.insertSamples(conn, samples);
                 insertVariants(fieldMetadatas, samples, decisionTreePath, sampleTreePath, header, vcfIterator, nestedFields, codec, metadataKeys);
                 phenotypeRepo.insertPhenotypeData(conn, phenopackets, samples.getItems());

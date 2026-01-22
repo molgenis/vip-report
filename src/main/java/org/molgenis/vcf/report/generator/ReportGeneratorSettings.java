@@ -15,6 +15,7 @@ public class ReportGeneratorSettings {
   int maxNrSamples;
   @NonNull Path metadataPath;
   @NonNull Path sqlWasmPath;
+  Path hpoPath;
   Path referencePath;
   Path genesPath;
   Path decisionTreePath;

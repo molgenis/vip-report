@@ -39,7 +39,7 @@ class DatabaseSchemaManagerTest {
 
         VCFFileReader vcfReader = new VCFFileReader(inputVcfPath, false);
         ReportGeneratorSettings settings = new ReportGeneratorSettings("Test", "v1.0.0", "arg",
-                10, metaJson, wasmPath,null, null, decisionTree, sampleTree, config);
+                10, metaJson, wasmPath,null,null, null, decisionTree, sampleTree, config);
         dbSchemaManager.createDatabase(settings, vcfReader.getFileHeader(), conn);
 
         verify(stmt).execute(VCF_TABLE_SQL);

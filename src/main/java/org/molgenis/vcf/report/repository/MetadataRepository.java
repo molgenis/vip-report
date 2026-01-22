@@ -1,6 +1,7 @@
 package org.molgenis.vcf.report.repository;
 
 import lombok.NonNull;
+import org.molgenis.vcf.report.model.HpoTerm;
 import org.molgenis.vcf.utils.metadata.FieldType;
 import org.molgenis.vcf.utils.metadata.ValueCount;
 import org.molgenis.vcf.utils.metadata.ValueType;
@@ -58,7 +59,8 @@ class MetadataRepository {
             Connection conn, FieldMetadatas fieldMetadatas,
             Path decisionTreePath,
             Path sampleTreePath,
-            @NonNull List<Phenopacket> phenopackets
+            @NonNull List<Phenopacket> phenopackets,
+            Map<String, HpoTerm> hpoTerms
     ) throws SQLException {
         Map<Object, Integer> numberTypeIds = insertLookupValues(conn, "numberType", List.of(ValueCount.Type.values()));
         Map<Object, Integer> valueTypeIds = insertLookupValues(conn, "valueType", List.of(ValueType.values()));
@@ -67,7 +69,7 @@ class MetadataRepository {
         Map<String, Integer> infoKeys;
         Map<String, Integer> formatKeys;
         try (PreparedStatement ps = conn.prepareStatement(INSERT_METADATA_SQL, Statement.RETURN_GENERATED_KEYS)) {
-            Map<String, Map<String, ValueDescription>> customCategories = getCustomCategories(decisionTreePath, sampleTreePath, phenopackets);
+            Map<String, Map<String, ValueDescription>> customCategories = getCustomCategories(decisionTreePath, sampleTreePath, phenopackets, hpoTerms);
             formatKeys = insertFields(conn, fieldMetadatas.getFormat().entrySet(), ps, FieldType.FORMAT, customCategories, numberTypeIds, valueTypeIds, fieldTypeIds);
             infoKeys = insertFields(conn, fieldMetadatas.getInfo().entrySet(), ps, FieldType.INFO, customCategories, numberTypeIds, valueTypeIds, fieldTypeIds);
             ps.executeBatch();
@@ -75,7 +77,7 @@ class MetadataRepository {
         return Map.of(FieldType.INFO, infoKeys, FieldType.FORMAT, formatKeys);
     }
 
-    private Map<String, Map<String, ValueDescription>> getCustomCategories(Path decisionTreePath, Path sampleTreePath, List<Phenopacket> phenopackets) {
+    private Map<String, Map<String, ValueDescription>> getCustomCategories(Path decisionTreePath, Path sampleTreePath, List<Phenopacket> phenopackets, Map<String, HpoTerm> hpoLookup) {
         Map<String, Map<String, ValueDescription>> customCategories = new HashMap<>();
         if(sampleTreePath != null){
             customCategories.put("VIPC_S", collectNodes(sampleTreePath));
@@ -83,7 +85,7 @@ class MetadataRepository {
         if(sampleTreePath != null)
             {customCategories.put("VIPC", collectNodes(decisionTreePath));
         }
-        customCategories.put("HPO", collectHpos(phenopackets));
+        customCategories.put("HPO", collectHpos(phenopackets, hpoLookup));
         return customCategories;
     }
 
@@ -102,13 +104,19 @@ class MetadataRepository {
         return result;
     }
 
-    private Map<String, ValueDescription> collectHpos(@NonNull List<Phenopacket> phenopackets) {
+    private Map<String, ValueDescription> collectHpos(@NonNull List<Phenopacket> phenopackets,
+        Map<String, HpoTerm> hpoLookup) {
         Map<String, ValueDescription> hpos = new HashMap<>();
         for (Phenopacket phenopacket : phenopackets) {
             for (PhenotypicFeature feature : phenopacket.getPhenotypicFeaturesList()) {
                 OntologyClass ontologyClass = feature.getOntologyClass();
                 if (!hpos.containsKey(ontologyClass.getId())) {
-                    hpos.put(ontologyClass.getId(), new ValueDescription(ontologyClass.getId(), ontologyClass.getLabel()));
+                    if(hpoLookup.containsKey(ontologyClass.getId())){
+                        HpoTerm hpoTerm = hpoLookup.get(ontologyClass.getId());
+                        hpos.put(ontologyClass.getId(), new ValueDescription(hpoTerm.label(), String.format("%s (%s)", hpoTerm.description(), ontologyClass.getId())));
+                    }else{
+                        hpos.put(ontologyClass.getId(), new ValueDescription(ontologyClass.getId(), ontologyClass.getLabel()));
+                    }
                 }
             }
         }

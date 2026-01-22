@@ -91,6 +91,7 @@ class ReportGeneratorTest {
     Path referencePath = Paths.get("src", "test", "resources", "example.fasta.gz");
     Path metadataPath = Paths.get("src", "test", "resources", "minimal_field_metadata.json");
     Path templateConfigPath = Paths.get("src", "test", "resources", "template_config.json");
+    Path hpoPath = Paths.get("src", "test", "resources", "hpo.tsv");
     Path wasmPath = Paths.get("src", "test", "resources", "fake.wasm");
 
     Map<String, Sample> pedSampleItems =
@@ -122,8 +123,8 @@ class ReportGeneratorTest {
 
     ReportGeneratorSettings reportGeneratorSettings =
         new ReportGeneratorSettings(
-            appName, appVersion, appArgs, maxNrSamples, metadataPath, wasmPath, referencePath, null, treePath, treePath, templateConfigPath);
-      when(databaseManager.populateDb(any(),any(),any(),any(),any(),any(),any(),any(),any())).thenReturn(new Bytes(Files.readAllBytes(database)));
+            appName, appVersion, appArgs, maxNrSamples, metadataPath, wasmPath, hpoPath, referencePath, null, treePath, treePath, templateConfigPath);
+      when(databaseManager.populateDb(any(),any(),any(),any(),any(),any(),any(),any(),any(),any())).thenReturn(new Bytes(Files.readAllBytes(database)));
 
       Report report =
         new Report(

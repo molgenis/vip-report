@@ -2,6 +2,10 @@ package org.molgenis.vcf.report.generator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import htsjdk.variant.vcf.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.nio.charset.StandardCharsets;
 import org.molgenis.vcf.report.fasta.ContigInterval;
 import org.molgenis.vcf.report.fasta.VariantFastaSlicer;
 import org.molgenis.vcf.report.fasta.VariantIntervalCalculator;
@@ -37,6 +41,8 @@ import static org.molgenis.vcf.utils.sample.mapper.PedToSamplesMapper.mapPedFile
 
 @Component
 public class ReportGenerator {
+
+  private static final String HPO_HEADER = "id\tlabel\tdescription";
     private final HtsJdkToPersonsMapper htsJdkToPersonsMapper;
     private final PhenopacketMapper phenopacketMapper;
     private final PersonListMerger personListMerger;
@@ -116,6 +122,7 @@ public class ReportGenerator {
         fastaGzMap = getReferenceTrackData(contigIntervals, referencePath);
         Bytes genesGz = getGenesTrackData(contigIntervals, reportGeneratorSettings);
         Map<String, Report.Cram> cramMap = getAlignmentTrackData(sampleSettings);
+        Map<String, HpoTerm> hpoTerms = getHpoTerms(reportGeneratorSettings);
 
         Map<?, ?> templateConfig = parseJsonObject(reportGeneratorSettings.getTemplateConfigPath());
         String databaseLocation = getDatabaseLocation(vcfPath);
@@ -126,13 +133,41 @@ public class ReportGenerator {
         try {
             database = databaseManager.populateDb(databaseLocation, fieldMetadatas, samples, vcfPath.toFile(),
                     reportGeneratorSettings.getDecisionTreePath(), reportGeneratorSettings.getSampleTreePath(),
-                    reportMetadata, templateConfig, phenopackets.getItems());
+                    reportMetadata, templateConfig, phenopackets.getItems(), hpoTerms);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
 
         Bytes sqlWasm = new Bytes(Files.readAllBytes(reportGeneratorSettings.getSqlWasmPath()));
         return new Report(fastaGzMap, genesGz, cramMap, sqlWasm, database);
+    }
+
+    private Map<String, HpoTerm> getHpoTerms(ReportGeneratorSettings reportGeneratorSettings) {
+      if(reportGeneratorSettings.getHpoPath() == null){
+          return Collections.emptyMap();
+      }
+        Map<String, HpoTerm> termsById = new HashMap<>();
+        File hpoFile = reportGeneratorSettings.getHpoPath().toFile();
+        try (BufferedReader br = new BufferedReader(new FileReader(hpoFile, StandardCharsets.UTF_8))) {
+            String header = br.readLine();
+            if(!header.equals(HPO_HEADER)){
+                throw new IllegalArgumentException(String.format("HPO file '%s' has invalid headerline '%s', should be '%s'", hpoFile.getName(), header, HPO_HEADER));
+            }
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] cols = line.split("\\t", 3);
+                if (cols.length == 3) {
+                    String id = cols[0].trim();
+                    HpoTerm term = new HpoTerm(id, cols[1].trim(), cols[2].trim());
+                    termsById.put(id, term);
+                }else{
+                    throw new InvalidHpoLineException(line, hpoFile.getName());
+                }
+            }
+        } catch (IOException e) {
+      throw new UncheckedIOException(e);
+        }
+      return termsById;
     }
 
     private static Map<?, ?> parseJsonObject(Path jsonPath) {
