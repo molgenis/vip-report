@@ -98,7 +98,7 @@ class AppCommandLineOptions {
         Option.builder(OPT_HPO_FILE)
             .hasArg(true)
             .longOpt(OPT_HPO_FILE_LONG)
-            .desc("VIP HPO file containing id, label and description.")
+            .desc("VIP HPO .tsv file containing 'id', 'label' and 'description'.")
             .build());
     appOptions.addOption(
             Option.builder(OPT_TEMPLATE_CONFIG)

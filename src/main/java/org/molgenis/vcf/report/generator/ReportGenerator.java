@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import htsjdk.variant.vcf.*;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.nio.charset.StandardCharsets;
 import org.molgenis.vcf.report.fasta.ContigInterval;
 import org.molgenis.vcf.report.fasta.VariantFastaSlicer;
 import org.molgenis.vcf.report.fasta.VariantIntervalCalculator;
@@ -41,6 +41,8 @@ import static org.molgenis.vcf.utils.sample.mapper.PedToSamplesMapper.mapPedFile
 
 @Component
 public class ReportGenerator {
+
+  private static final String HPO_HEADER = "id\tlabel\tdescription";
     private final HtsJdkToPersonsMapper htsJdkToPersonsMapper;
     private final PhenopacketMapper phenopacketMapper;
     private final PersonListMerger personListMerger;
@@ -146,8 +148,11 @@ public class ReportGenerator {
       }
         Map<String, HpoTerm> termsById = new HashMap<>();
         File hpoFile = reportGeneratorSettings.getHpoPath().toFile();
-        try (BufferedReader br = new BufferedReader(new FileReader(hpoFile))) {
-            br.readLine();
+        try (BufferedReader br = new BufferedReader(new FileReader(hpoFile, StandardCharsets.UTF_8))) {
+            String header = br.readLine();
+            if(!header.equals(HPO_HEADER)){
+                throw new IllegalArgumentException(String.format("HPO file '%s' has invalid headerline '%s', should be '%s'", hpoFile.getName(), header, HPO_HEADER));
+            }
             String line;
             while ((line = br.readLine()) != null) {
                 String[] cols = line.split("\\t", 3);
