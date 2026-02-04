@@ -30,4 +30,8 @@ public class SqlUtils {
     }
     return idMap;
   }
+
+  public static String quote(String input) {
+    return String.format("\"%s\"", input);
+  }
 }

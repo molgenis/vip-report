@@ -1,6 +1,7 @@
 package org.molgenis.vcf.report.repository;
 
 import static org.molgenis.vcf.report.repository.FormatRepository.GT_TYPE;
+import static org.molgenis.vcf.report.repository.SqlUtils.quote;
 
 import htsjdk.variant.vcf.VCFHeader;
 import java.sql.Connection;
@@ -314,9 +315,11 @@ public class DatabaseSchemaManager {
         if (meta.getNumberType() == ValueCount.Type.FIXED && meta.getNumberCount() == 1) {
           columns.add(
               String.format(
-                  SQL_COLUMN, entry.getKey(), toSqlType(meta.getType(), meta.getNumberCount())));
+                  SQL_COLUMN,
+                  quote(entry.getKey()),
+                  toSqlType(meta.getType(), meta.getNumberCount())));
         } else {
-          columns.add(String.format(TEXT_COLUMN, entry.getKey()));
+          columns.add(String.format(TEXT_COLUMN, quote(entry.getKey())));
         }
       } else {
         String tableName = String.format("variant_%s", entry.getKey());
@@ -342,13 +345,15 @@ public class DatabaseSchemaManager {
         if (meta.getNumberType() == ValueCount.Type.FIXED && meta.getNumberCount() == 1) {
           columns.add(
               String.format(
-                  SQL_COLUMN, entry.getKey(), toSqlType(meta.getType(), meta.getNumberCount())));
+                  SQL_COLUMN,
+                  quote(entry.getKey()),
+                  toSqlType(meta.getType(), meta.getNumberCount())));
           if (entry.getKey().equals("GT")) {
             this.hasGt = true;
             columns.add(String.format(SQL_COLUMN, GT_TYPE, "INTEGER REFERENCES gtType(id)"));
           }
         } else {
-          columns.add(String.format(TEXT_COLUMN, entry.getKey()));
+          columns.add(String.format(TEXT_COLUMN, quote(entry.getKey())));
         }
       } else {
         throw new UnsupportedOperationException("Nested Formats are not yet supported");
@@ -375,7 +380,7 @@ public class DatabaseSchemaManager {
     }
     for (var nestedEntry : nestedFieldMap.entrySet()) {
       NestedFieldMetadata nestedField = nestedEntry.getValue();
-      String columnName = nestedEntry.getKey();
+      String columnName = quote(nestedEntry.getKey());
       if (nestedField.getNumberType() == ValueCount.Type.FIXED
           && nestedField.getNumberCount() == 1) {
         nestedColumns.add(

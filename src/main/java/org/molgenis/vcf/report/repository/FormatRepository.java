@@ -1,5 +1,6 @@
 package org.molgenis.vcf.report.repository;
 
+import static org.molgenis.vcf.report.repository.SqlUtils.quote;
 import static org.molgenis.vcf.report.utils.CategoryUtils.addCategorical;
 import static org.molgenis.vcf.report.utils.CategoryUtils.loadCategoriesMap;
 import static org.molgenis.vcf.report.utils.JsonUtils.toJson;
@@ -127,7 +128,7 @@ public class FormatRepository {
       throws SQLException {
     StringBuilder sql = new StringBuilder("INSERT INTO format (_variantId, _sampleIndex");
     for (String column : columns) {
-      sql.append(", ").append(column);
+      sql.append(", ").append(quote(column));
     }
     sql.append(") VALUES (?, ?");
     sql.append(", ?".repeat(columns.size()));

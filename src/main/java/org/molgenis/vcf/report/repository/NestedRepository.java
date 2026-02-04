@@ -1,6 +1,7 @@
 package org.molgenis.vcf.report.repository;
 
 import static org.molgenis.vcf.report.repository.DatabaseManager.VARIANT_ID;
+import static org.molgenis.vcf.report.repository.SqlUtils.quote;
 import static org.molgenis.vcf.report.utils.CategoryUtils.addCategorical;
 import static org.molgenis.vcf.report.utils.CategoryUtils.loadCategoriesMap;
 import static org.molgenis.vcf.report.utils.JsonUtils.writeJsonListValue;
@@ -116,7 +117,7 @@ public class NestedRepository {
     StringBuilder sql =
         new StringBuilder("INSERT INTO ").append(table).append(" (").append(VARIANT_ID);
     for (String col : columns) {
-      sql.append(", ").append(col);
+      sql.append(", ").append(quote(col));
     }
     sql.append(") VALUES (?").append(", ?".repeat(columns.size())).append(")");
     return conn.prepareStatement(sql.toString());

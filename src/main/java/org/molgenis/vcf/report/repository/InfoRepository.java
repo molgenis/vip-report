@@ -2,6 +2,7 @@ package org.molgenis.vcf.report.repository;
 
 import static java.util.Collections.emptyMap;
 import static org.molgenis.vcf.report.repository.FormatRepository.VIPC_S;
+import static org.molgenis.vcf.report.repository.SqlUtils.quote;
 import static org.molgenis.vcf.report.utils.CategoryUtils.addCategorical;
 import static org.molgenis.vcf.report.utils.CategoryUtils.loadCategoriesMap;
 import static org.molgenis.vcf.report.utils.JsonUtils.MISSING;
@@ -80,7 +81,7 @@ public class InfoRepository {
       throws SQLException {
     StringBuilder sql = new StringBuilder("INSERT INTO info (_variantId");
     for (String col : columns) {
-      sql.append(", ").append(col);
+      sql.append(", ").append(quote(col));
     }
     sql.append(") VALUES (?").append(", ?".repeat(columns.size())).append(")");
     return conn.prepareStatement(sql.toString());
