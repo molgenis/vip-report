@@ -66,23 +66,21 @@ class DatabaseSchemaManagerTest {
     verify(stmt).execute(EXPECTED_INFO_TABLE);
     verify(stmt).execute(EXPECTED_FORMAT_TABLE);
     verify(stmt).execute(CATEGORIES_TABLE_SQL);
-
-    verify(stmt).execute("CREATE INDEX idx_format_variantId ON format(_variantId);");
-    verify(stmt).execute("CREATE INDEX idx_format_sampleIndex ON format(_sampleIndex);");
-    verify(stmt)
-        .execute(
-            "CREATE INDEX idx_format_variantId_sampleIndex ON format(_variantId,_sampleIndex);");
-    verify(stmt).execute("CREATE INDEX idx_format_GtType ON format(_GtType);");
-    verify(stmt).execute("CREATE INDEX idx_vcf_chrom ON vcf(chrom);");
-    verify(stmt).execute("CREATE INDEX idx_vcf_format ON vcf(format);");
-    verify(stmt).execute("CREATE INDEX idx_vcf_pos ON vcf(pos);");
-    verify(stmt).execute("CREATE INDEX idx_vcf_chrom_pos ON vcf(chrom, pos);");
-    verify(stmt).execute("CREATE INDEX idx_contig_value ON contig(value);");
-    verify(stmt).execute("CREATE INDEX idx_gtType_value ON gtType(value);");
-    verify(stmt).execute("CREATE INDEX idx_info_variantId ON info(_variantId);");
+    verify(stmt).execute(FORMAT_VARIANT_ID_INDEX_SQL);
+    verify(stmt).execute(FORMAT_SAMPLE_INDEX_SQL);
+    verify(stmt).execute(FORMAT_VARIANT_ID_SAMPLE_INDEX_SQL);
+    verify(stmt).execute(VCF_CHROM_INDEX_SQL);
+    verify(stmt).execute(VCF_FORMAT_INDEX_SQL);
+    verify(stmt).execute(VCF_POS_INDEX_SQL);
+    verify(stmt).execute(VCF_CHROM_POS_INDEX_SQL);
+    verify(stmt).execute(CONTIG_VALUE_INDEX_SQL);
+    verify(stmt).execute(GT_TYPE_VALUE_INDEX_SQL);
+    verify(stmt).execute(INFO_VARIANT_ID_INDEX_SQL);
+    verify(stmt).execute(FORMAT_GT_TYPE);
 
     // check INDEX for nested table
-    verify(stmt).execute("CREATE INDEX idx_variant_CSQ_variantId ON variant_CSQ(_variantId);");
+    verify(stmt)
+        .execute("CREATE INDEX \"idx_variant_CSQ_variantId\" ON \"variant_CSQ\"(\"_variantId\");");
   }
 
   @Test
@@ -110,9 +108,51 @@ class DatabaseSchemaManagerTest {
   }
 
   private static final String NESTED_TABLE_SQL =
-      "CREATE TABLE variant_CSQ (_id INTEGER PRIMARY KEY AUTOINCREMENT, _variantId INTEGER REFERENCES vcf(_id), CsqIndex INTEGER, \"PolyPhen\" TEXT, \"SIFT\" TEXT, \"SYMBOL_SOURCE\" TEXT, \"SpliceAI_pred_DP_AG\" TEXT, \"PICK\" TEXT, \"CAPICE_CL\" TEXT, \"Consequence\" TEXT, \"Feature\" TEXT, \"VIPC\" TEXT, \"Allele\" TEXT, \"IMPACT\" TEXT, \"SYMBOL\" TEXT, \"Gene\" TEXT, \"HGNC_ID\" TEXT, \"VIPP\" TEXT, \"CAPICE_SC\" TEXT, \"Feature_type\" TEXT) STRICT;";
+      "CREATE TABLE \"variant_CSQ\" ("
+          + "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT, "
+          + "\"_variantId\" INTEGER REFERENCES \"vcf\"(\"_id\"), "
+          + "\"CsqIndex\" INTEGER, "
+          + // if you want it quoted too
+          "\"PolyPhen\" TEXT, "
+          + "\"SIFT\" TEXT, "
+          + "\"SYMBOL_SOURCE\" TEXT, "
+          + "\"SpliceAI_pred_DP_AG\" TEXT, "
+          + "\"PICK\" TEXT, "
+          + "\"CAPICE_CL\" TEXT, "
+          + "\"Consequence\" TEXT, "
+          + "\"Feature\" TEXT, "
+          + "\"VIPC\" TEXT, "
+          + "\"Allele\" TEXT, "
+          + "\"IMPACT\" TEXT, "
+          + "\"SYMBOL\" TEXT, "
+          + "\"Gene\" TEXT, "
+          + "\"HGNC_ID\" TEXT, "
+          + "\"VIPP\" TEXT, "
+          + "\"CAPICE_SC\" TEXT, "
+          + "\"Feature_type\" TEXT"
+          + ") STRICT;";
+
   private static final String EXPECTED_INFO_TABLE =
-      "CREATE TABLE info (_id INTEGER PRIMARY KEY AUTOINCREMENT,_variantId INTEGER REFERENCES vcf(_id),\"AA\" TEXT,\"NS\" INTEGER,\"AF\" TEXT,\"H2\" TEXT,\"DP\" INTEGER,\"DB\" TEXT) STRICT;";
+      "CREATE TABLE \"info\" ("
+          + "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT,"
+          + "\"_variantId\" INTEGER REFERENCES \"vcf\"(\"_id\"),"
+          + "\"AA\" TEXT,"
+          + "\"NS\" INTEGER,"
+          + "\"AF\" TEXT,"
+          + "\"H2\" TEXT,"
+          + "\"DP\" INTEGER,"
+          + "\"DB\" TEXT"
+          + ") STRICT;";
+
   private static final String EXPECTED_FORMAT_TABLE =
-      "CREATE TABLE format (_id INTEGER PRIMARY KEY AUTOINCREMENT,_sampleIndex INTEGER REFERENCES sample(sampleIndex),_variantId INTEGER REFERENCES vcf(_id),\"HQ\" TEXT,\"GQ\" INTEGER,\"DP\" INTEGER,\"GT\" TEXT,_GtType INTEGER REFERENCES gtType(id)) STRICT;";
+      "CREATE TABLE \"format\" ("
+          + "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT,"
+          + "\"_sampleIndex\" INTEGER REFERENCES \"sample\"(\"sampleIndex\"),"
+          + "\"_variantId\" INTEGER REFERENCES \"vcf\"(\"_id\"),"
+          + "\"HQ\" TEXT,"
+          + "\"GQ\" INTEGER,"
+          + "\"DP\" INTEGER,"
+          + "\"GT\" TEXT,"
+          + "\"_GtType\" INTEGER REFERENCES \"gtType\"(\"id\")"
+          + ") STRICT;";
 }

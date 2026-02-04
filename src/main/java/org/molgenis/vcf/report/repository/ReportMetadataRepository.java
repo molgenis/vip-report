@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 public class ReportMetadataRepository {
 
   public void insertReportMetadata(Connection conn, ReportMetadata reportMetadata) {
-    String sql = "INSERT INTO appMetadata (id, value) VALUES (?, ?)";
+    String sql = "INSERT INTO \"appMetadata\" (\"id\", \"value\") VALUES (?, ?)";
     ObjectMapper objectMapper = new ObjectMapper();
     try (PreparedStatement insertStmt = conn.prepareStatement(sql)) {
       insertStmt.setString(1, "appArguments");

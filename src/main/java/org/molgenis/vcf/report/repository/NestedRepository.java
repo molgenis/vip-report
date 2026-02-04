@@ -115,7 +115,10 @@ public class NestedRepository {
   private PreparedStatement prepareInsertSQL(Connection conn, String table, List<String> columns)
       throws SQLException {
     StringBuilder sql =
-        new StringBuilder("INSERT INTO ").append(table).append(" (").append(VARIANT_ID);
+        new StringBuilder("INSERT INTO ")
+            .append(quote(table))
+            .append(" (")
+            .append(quote(VARIANT_ID));
     for (String col : columns) {
       sql.append(", ").append(quote(col));
     }

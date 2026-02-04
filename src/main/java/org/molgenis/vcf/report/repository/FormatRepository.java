@@ -126,7 +126,8 @@ public class FormatRepository {
 
   private PreparedStatement prepareInsertFormat(Connection conn, List<String> columns)
       throws SQLException {
-    StringBuilder sql = new StringBuilder("INSERT INTO format (_variantId, _sampleIndex");
+    StringBuilder sql =
+        new StringBuilder("INSERT INTO \"format\" (\"_variantId\", \"_sampleIndex\"");
     for (String column : columns) {
       sql.append(", ").append(quote(column));
     }

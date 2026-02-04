@@ -22,15 +22,15 @@ public class SampleRepository {
 
   static final String INSERT_SAMPLE_SQL =
       """
-            INSERT INTO sample (
-                sampleIndex,
-                familyId,
-                individualId,
-                paternalId,
-                maternalId,
-                sex,
-                affectedStatus,
-                proband
+            INSERT INTO \"sample\" (
+                \"sampleIndex\",
+                \"familyId\",
+                \"individualId\",
+                \"paternalId\",
+                \"maternalId\",
+                \"sex\",
+                \"affectedStatus\",
+                \"proband\"
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """;
 

@@ -36,7 +36,7 @@ class NestedRepositoryTest {
     when(rs.getString("value")).thenReturn("synonymous_variant").thenReturn("missense_variant");
     when(rs.getInt("id")).thenReturn(1).thenReturn(2);
     when(rs.next()).thenReturn(true).thenReturn(true).thenReturn(false);
-    when(ps.executeQuery("SELECT id, field, value FROM categories")).thenReturn(rs);
+    when(ps.executeQuery("SELECT \"id\", \"field\", \"value\" FROM \"categories\"")).thenReturn(rs);
 
     String fieldName = "CSQ";
     List<String> matchingNestedFields = new ArrayList<>();

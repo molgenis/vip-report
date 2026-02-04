@@ -43,11 +43,11 @@ class MetadataRepositoryTest {
     PreparedStatement preparedFieldTypes = mock(PreparedStatement.class);
     PreparedStatement preparedValueTypes = mock(PreparedStatement.class);
 
-    when(conn.prepareStatement("INSERT INTO numberType (id, value) VALUES (?, ?)"))
+    when(conn.prepareStatement("INSERT INTO \"numberType\" (\"id\", \"value\") VALUES (?, ?)"))
         .thenReturn(preparedNumberType);
-    when(conn.prepareStatement("INSERT INTO fieldType (id, value) VALUES (?, ?)"))
+    when(conn.prepareStatement("INSERT INTO \"fieldType\" (\"id\", \"value\") VALUES (?, ?)"))
         .thenReturn(preparedFieldTypes);
-    when(conn.prepareStatement("INSERT INTO valueType (id, value) VALUES (?, ?)"))
+    when(conn.prepareStatement("INSERT INTO \"valueType\" (\"id\", \"value\") VALUES (?, ?)"))
         .thenReturn(preparedValueTypes);
     ResultSet resultSet = mock(ResultSet.class);
     when(resultSet.next()).thenReturn(true);
@@ -93,7 +93,7 @@ class MetadataRepositoryTest {
 
     // collectNodes and collectHpos use file IO. You might want to stub them with static mocking or
     // refactor to accept injected results for true isolation. This test expects static methods that
-    // won't actually read a file.
+    // won\"t actually read a file.
 
     doReturn(new int[] {1}).when(preparedMetadata).executeBatch();
     doReturn(new int[] {1}).when(preparedNumberType).executeBatch();

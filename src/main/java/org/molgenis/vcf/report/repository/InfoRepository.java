@@ -93,7 +93,7 @@ public class InfoRepository {
       String[] infoItems,
       int variantId) {
     String INSERT_INFO_ORDER_SQL =
-        "INSERT INTO infoOrder (infoIndex, variantId, metadataId) VALUES (?, ?, ?)";
+        "INSERT INTO \"infoOrder\" (\"infoIndex\", \"variantId\", \"metadataId\") VALUES (?, ?, ?)";
 
     try (PreparedStatement pstmt = conn.prepareStatement(INSERT_INFO_ORDER_SQL)) {
       if (infoItems.length == 0 || (infoItems.length == 1 && infoItems[0].equals(MISSING))) {

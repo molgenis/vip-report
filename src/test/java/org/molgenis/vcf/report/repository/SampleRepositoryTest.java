@@ -32,8 +32,9 @@ class SampleRepositoryTest {
     sexPstmt = mock(PreparedStatement.class);
     affectedpstmt = mock(PreparedStatement.class);
     when(conn.prepareStatement(INSERT_SAMPLE_SQL)).thenReturn(pstmt);
-    when(conn.prepareStatement("INSERT INTO sex (id, value) VALUES (?, ?)")).thenReturn(sexPstmt);
-    when(conn.prepareStatement("INSERT INTO affectedStatus (id, value) VALUES (?, ?)"))
+    when(conn.prepareStatement("INSERT INTO \"sex\" (\"id\", \"value\") VALUES (?, ?)"))
+        .thenReturn(sexPstmt);
+    when(conn.prepareStatement("INSERT INTO \"affectedStatus\" (\"id\", \"value\") VALUES (?, ?)"))
         .thenReturn(affectedpstmt);
     repo = new SampleRepository();
   }

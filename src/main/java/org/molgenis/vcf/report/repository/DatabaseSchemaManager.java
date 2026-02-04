@@ -1,7 +1,6 @@
 package org.molgenis.vcf.report.repository;
 
 import static org.molgenis.vcf.report.repository.FormatRepository.GT_TYPE;
-import static org.molgenis.vcf.report.repository.SqlUtils.quote;
 
 import htsjdk.variant.vcf.VCFHeader;
 import java.sql.Connection;
@@ -17,206 +16,231 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class DatabaseSchemaManager {
-  public static final String TEXT_COLUMN = "%s TEXT";
-  public static final String SQL_COLUMN = "%s %s";
-  public static final String AUTOID_COLUMN = "_id INTEGER PRIMARY KEY AUTOINCREMENT";
+  public static final String TEXT_COLUMN = "\"%s\" TEXT";
+  public static final String SQL_COLUMN = "\"%s\" %s";
   private final Map<String, String> nestedTables = new LinkedHashMap<>();
   private boolean hasGt = false;
 
+  public static final String AUTOID_COLUMN = "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT";
+  public static final String FORMAT_VARIANT_ID_INDEX_SQL =
+      "CREATE INDEX \"idx_format_variantId\" ON \"format\"(\"_variantId\");";
+  public static final String FORMAT_SAMPLE_INDEX_SQL =
+      "CREATE INDEX \"idx_format_sampleIndex\" ON \"format\"(\"_sampleIndex\");";
+  public static final String FORMAT_VARIANT_ID_SAMPLE_INDEX_SQL =
+      "CREATE INDEX \"idx_format_variantId_sampleIndex\" ON \"format\"(\"_variantId\",\"_sampleIndex\");";
+  public static final String VCF_CHROM_INDEX_SQL =
+      "CREATE INDEX \"idx_vcf_chrom\" ON \"vcf\"(\"chrom\");";
+  public static final String VCF_FORMAT_INDEX_SQL =
+      "CREATE INDEX \"idx_vcf_format\" ON \"vcf\"(\"format\");";
+  public static final String VCF_POS_INDEX_SQL =
+      "CREATE INDEX \"idx_vcf_pos\" ON \"vcf\"(\"pos\");";
+  public static final String VCF_CHROM_POS_INDEX_SQL =
+      "CREATE INDEX \"idx_vcf_chrom_pos\" ON \"vcf\"(\"chrom\", \"pos\");";
+  public static final String CONTIG_VALUE_INDEX_SQL =
+      "CREATE INDEX \"idx_contig_value\" ON \"contig\"(\"value\");";
+  public static final String GT_TYPE_VALUE_INDEX_SQL =
+      "CREATE INDEX \"idx_gtType_value\" ON \"gtType\"(\"value\");";
+  public static final String INFO_VARIANT_ID_INDEX_SQL =
+      "CREATE INDEX \"idx_info_variantId\" ON \"info\"(_variantId);";
+  public static final String FORMAT_GT_TYPE =
+      "CREATE INDEX \"idx_format_GtType\" ON \"format\"(\"_GtType\");";
+  public static final String INDEX_SQL =
+      "CREATE INDEX \"idx_%s_variantId\" ON \"%s\"(\"_variantId\");";
+
   static final String VCF_TABLE_SQL =
       """
-                CREATE TABLE vcf (
-                  _id INTEGER PRIMARY KEY AUTOINCREMENT,
-                  chrom INTEGER NOT NULL,
-                  pos INTEGER NOT NULL,
-                  id TEXT,
-                  ref TEXT NOT NULL,
-                  alt TEXT NOT NULL,
-                  qual REAL,
-                  filter TEXT,
-                  format INTEGER,
-                  FOREIGN KEY (chrom) REFERENCES contig(id)
-                  FOREIGN KEY (format) REFERENCES formatLookup(id)
+                CREATE TABLE "vcf" (
+                  "_id" INTEGER PRIMARY KEY AUTOINCREMENT,
+                  "chrom" INTEGER NOT NULL,
+                  "pos" INTEGER NOT NULL,
+                  "id" TEXT,
+                  "ref" TEXT NOT NULL,
+                  "alt" TEXT NOT NULL,
+                  "qual" REAL,
+                  "filter" TEXT,
+                  "format" INTEGER,
+                  FOREIGN KEY ("chrom") REFERENCES contig("id")
+                  FOREIGN KEY ("format") REFERENCES formatLookup("id")
                 ) STRICT;
             """;
 
   static final String CONTIG_TABLE_SQL =
       """
-                CREATE TABLE contig (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    value TEXT UNIQUE NOT NULL
+                CREATE TABLE "contig" (
+                    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+                    "value" TEXT UNIQUE NOT NULL
                 ) STRICT;
             """;
 
   static final String FORMAT_LOOKUP_TABLE_SQL =
       """
-                CREATE TABLE formatLookup (
-                    id INTEGER PRIMARY KEY,
-                    value TEXT UNIQUE NOT NULL
+                CREATE TABLE "formatLookup" (
+                    "id" INTEGER PRIMARY KEY,
+                    "value" TEXT UNIQUE NOT NULL
                 ) STRICT;
             """;
 
   static final String HEADER_TABLE_SQL =
       """
-                CREATE TABLE header (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    line TEXT NOT NULL
+                CREATE TABLE "header" (
+                    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+                    "line" TEXT NOT NULL
                 ) STRICT;
             """;
 
   static final String CATEGORIES_TABLE_SQL =
       """
-                CREATE TABLE categories (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    field TEXT NOT NULL,
-                    value TEXT NOT NULL,
-                    label TEXT NOT NULL,
-                    description TEXT
+                CREATE TABLE "categories" (
+                    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+                    "field" TEXT NOT NULL,
+                    "value" TEXT NOT NULL,
+                    "label" TEXT NOT NULL,
+                    "description" TEXT
                 ) STRICT;
             """;
 
   static final String CONFIG_TABLE_SQL =
       """
-                CREATE TABLE config (
-                    id TEXT PRIMARY KEY,
-                    value TEXT NOT NULL
+                CREATE TABLE "config" (
+                    "id" TEXT PRIMARY KEY,
+                    "value" TEXT NOT NULL
                 ) STRICT;
             """;
 
   static final String PHENOTYPE_TABLE_SQL =
       """
-                CREATE TABLE phenotype (
-                    id TEXT PRIMARY KEY,
-                    label TEXT NOT NULL
+                CREATE TABLE "phenotype" (
+                    "id" TEXT PRIMARY KEY,
+                    "label" TEXT NOT NULL
                 ) STRICT;
             """;
 
   static final String SAMPLE_PHENOTYPE_TABLE_SQL =
       """
-                CREATE TABLE samplePhenotype (
-                  id INTEGER PRIMARY KEY AUTOINCREMENT,
-                  sampleIndex INTEGER NOT NULL,
-                  phenotypeId TEXT NOT NULL,
-                  FOREIGN KEY (sampleIndex) REFERENCES sample(sampleIndex),
-                  FOREIGN KEY (phenotypeId) REFERENCES phenotype(id)
+                CREATE TABLE "samplePhenotype" (
+                  "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+                  "sampleIndex" INTEGER NOT NULL,
+                  "phenotypeId" TEXT NOT NULL,
+                  FOREIGN KEY ("sampleIndex") REFERENCES "sample"("sampleIndex"),
+                  FOREIGN KEY ("phenotypeId") REFERENCES "phenotype"("id")
                 ) STRICT;
             """;
 
   static final String DECISION_TREE_TABLE_SQL =
       """
-                CREATE TABLE decisionTree (
-                    id TEXT PRIMARY KEY,
-                    tree TEXT UNIQUE NOT NULL
+                CREATE TABLE "decisionTree" (
+                    "id" TEXT PRIMARY KEY,
+                    "tree" TEXT UNIQUE NOT NULL
                 ) STRICT;
             """;
 
   static final String APP_METADATA_TABLE_SQL =
       """
-                CREATE TABLE appMetadata (
-                    id TEXT PRIMARY KEY,
-                    value TEXT UNIQUE NOT NULL
+                CREATE TABLE "appMetadata" (
+                    "id" TEXT PRIMARY KEY,
+                    "value" TEXT UNIQUE NOT NULL
                 ) STRICT;
             """;
 
   static final String SAMPLE_TABLE_SQL =
       """
-                    CREATE TABLE sample (
-                      sampleIndex INTEGER PRIMARY KEY,
-                      familyId TEXT NOT NULL,
-                      individualId TEXT UNIQUE,
-                      paternalId INTEGER,
-                      maternalId INTEGER,
-                      sex INTEGER NOT NULL,
-                      affectedStatus INTEGER NOT NULL,
-                      proband INTEGER NOT NULL,
-                      FOREIGN KEY (paternalId) REFERENCES sample(sampleIndex),
-                      FOREIGN KEY (maternalId) REFERENCES sample(sampleIndex)
-                      FOREIGN KEY (sex) REFERENCES sex(id),
-                      FOREIGN KEY (affectedStatus) REFERENCES affectedStatus(id)
-                    ) STRICT;
+                    CREATE TABLE "sample" (
+                     "sampleIndex" INTEGER PRIMARY KEY,
+                     "familyId" TEXT NOT NULL,
+                     "individualId" TEXT UNIQUE,
+                     "paternalId" INTEGER,
+                     "maternalId" INTEGER,
+                     "sex" INTEGER NOT NULL,
+                     "affectedStatus" INTEGER NOT NULL,
+                     "proband" INTEGER NOT NULL,
+                     FOREIGN KEY ("paternalId") REFERENCES "sample"("sampleIndex"),
+                     FOREIGN KEY ("maternalId") REFERENCES "sample"("sampleIndex")
+                     FOREIGN KEY ("sex") REFERENCES "sex"("id"),
+                     FOREIGN KEY ("affectedStatus") REFERENCES "affectedStatus"("id")
+                   ) STRICT;
                 """;
 
   static final String AFFECTED_TABLE_SQL =
       """
-                CREATE TABLE affectedStatus (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    value TEXT UNIQUE NOT NULL
+                CREATE TABLE "affectedStatus" (
+                    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+                    "value" TEXT UNIQUE NOT NULL
                 ) STRICT;
             """;
 
   static final String SEX_TABLE_SQL =
       """
-                CREATE TABLE sex (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    value TEXT UNIQUE NOT NULL
+                CREATE TABLE "sex" (
+                    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+                    "value" TEXT UNIQUE NOT NULL
                 ) STRICT;
             """;
 
   static final String METADATA_TABLE_SQL =
       """
-                    CREATE TABLE metadata (
-                      id INTEGER PRIMARY KEY AUTOINCREMENT,
-                      name TEXT,
-                      fieldType INTEGER NOT NULL,
-                      valueType INTEGER NOT NULL,
-                      numberType INTEGER NOT NULL,
-                      numberCount INTEGER,
-                      required INTEGER NOT NULL,
-                      separator TEXT,
-                      nestedSeparator TEXT,
-                      categories TEXT,
-                      label TEXT,
-                      description TEXT,
-                      parent TEXT,
-                      nested INTEGER,
-                      nestedIndex INTEGER,
-                      nullValue TEXT,
-                      FOREIGN KEY (fieldType) REFERENCES fieldType(id),
-                      FOREIGN KEY (valueType) REFERENCES valueType(id),
-                      FOREIGN KEY (numberType) REFERENCES numberType(id)
+                    CREATE TABLE "metadata" (
+                      "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+                      "name" TEXT,
+                      "fieldType" INTEGER NOT NULL,
+                      "valueType" INTEGER NOT NULL,
+                      "numberType" INTEGER NOT NULL,
+                      "numberCount" INTEGER,
+                      "required" INTEGER NOT NULL,
+                      "separator" TEXT,
+                      "nestedSeparator" TEXT,
+                      "categories" TEXT,
+                      "label" TEXT,
+                      "description" TEXT,
+                      "parent" TEXT,
+                      "nested" INTEGER,
+                      "nestedIndex" INTEGER,
+                      "nullValue" TEXT,
+                      FOREIGN KEY ("fieldType") REFERENCES "fieldType"("id"),
+                      FOREIGN KEY ("valueType") REFERENCES "valueType"("id"),
+                      FOREIGN KEY ("numberType") REFERENCES "numberType"("id")
                     ) STRICT;
                 """;
   static final String INFO_ORDER_TABLE_SQL =
       """
-                    CREATE TABLE infoOrder (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        infoIndex INTEGER NOT NULL,
-                        variantId INTEGER NOT NULL,
-                        metadataId INTEGER NOT NULL,
-                        FOREIGN KEY (variantId) REFERENCES vcf(_id),
-                        FOREIGN KEY (metadataId) REFERENCES metadata(id)
+                    CREATE TABLE "infoOrder" (
+                        "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+                        "infoIndex" INTEGER NOT NULL,
+                        "variantId" INTEGER NOT NULL,
+                        "metadataId" INTEGER NOT NULL,
+                        FOREIGN KEY ("variantId") REFERENCES "vcf"("_id"),
+                        FOREIGN KEY ("metadataId") REFERENCES "metadata"("id")
                     ) STRICT;
             """;
 
   static final String FIELDTYPE_TABLE_SQL =
       """
-                CREATE TABLE fieldType (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    value TEXT UNIQUE NOT NULL
+                CREATE TABLE "fieldType" (
+                    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+                    "value" TEXT UNIQUE NOT NULL
                 ) STRICT;
             """;
 
   static final String VALUETYPE_TABLE_SQL =
       """
-                CREATE TABLE valueType (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    value TEXT UNIQUE NOT NULL
+                CREATE TABLE "valueType" (
+                    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+                    "value" TEXT UNIQUE NOT NULL
                 ) STRICT;
             """;
 
   static final String NUMBERTYPE_TABLE_SQL =
       """
-                CREATE TABLE numberType (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    value TEXT UNIQUE NOT NULL
+                CREATE TABLE "numberType" (
+                    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+                    "value" TEXT UNIQUE NOT NULL
                 ) STRICT;
             """;
 
   static final String GT_TYPE_TABLE_SQL =
       """
-                CREATE TABLE gtType (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    value TEXT UNIQUE NOT NULL
+                CREATE TABLE "gtType" (
+                    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+                    "value" TEXT UNIQUE NOT NULL
                 ) STRICT;
             """;
 
@@ -224,7 +248,7 @@ public class DatabaseSchemaManager {
     try (Statement stmt = connection.createStatement()) {
       stmt.execute(sql);
     } catch (SQLException e) {
-      throw new DatabaseException(e.getMessage(), String.format("execute: '%s'", sql));
+      throw new DatabaseException(e.getMessage(), String.format("execute: \"%s\"", sql));
     }
   }
 
@@ -263,24 +287,22 @@ public class DatabaseSchemaManager {
     sqlStatements.add(CATEGORIES_TABLE_SQL);
     sqlStatements.addAll(nestedTables.values());
 
-    sqlStatements.add("CREATE INDEX idx_format_variantId ON format(_variantId);");
-    sqlStatements.add("CREATE INDEX idx_format_sampleIndex ON format(_sampleIndex);");
-    sqlStatements.add(
-        "CREATE INDEX idx_format_variantId_sampleIndex ON format(_variantId,_sampleIndex);");
-    sqlStatements.add("CREATE INDEX idx_vcf_chrom ON vcf(chrom);");
-    sqlStatements.add("CREATE INDEX idx_vcf_format ON vcf(format);");
-    sqlStatements.add("CREATE INDEX idx_vcf_pos ON vcf(pos);");
-    sqlStatements.add("CREATE INDEX idx_vcf_chrom_pos ON vcf(chrom, pos);");
-    sqlStatements.add("CREATE INDEX idx_contig_value ON contig(value);");
-    sqlStatements.add("CREATE INDEX idx_gtType_value ON gtType(value);");
-    sqlStatements.add("CREATE INDEX idx_info_variantId ON info(_variantId);");
+    sqlStatements.add(FORMAT_VARIANT_ID_INDEX_SQL);
+    sqlStatements.add(FORMAT_SAMPLE_INDEX_SQL);
+    sqlStatements.add(FORMAT_VARIANT_ID_SAMPLE_INDEX_SQL);
+    sqlStatements.add(VCF_CHROM_INDEX_SQL);
+    sqlStatements.add(VCF_FORMAT_INDEX_SQL);
+    sqlStatements.add(VCF_POS_INDEX_SQL);
+    sqlStatements.add(VCF_CHROM_POS_INDEX_SQL);
+    sqlStatements.add(CONTIG_VALUE_INDEX_SQL);
+    sqlStatements.add(GT_TYPE_VALUE_INDEX_SQL);
+    sqlStatements.add(INFO_VARIANT_ID_INDEX_SQL);
 
     if (hasGt) {
-      sqlStatements.add("CREATE INDEX idx_format_GtType ON format(_GtType);");
+      sqlStatements.add(FORMAT_GT_TYPE);
     }
     for (String tableName : nestedTables.keySet()) {
-      sqlStatements.add(
-          String.format("CREATE INDEX idx_%s_variantId ON %s(_variantId);", tableName, tableName));
+      sqlStatements.add(String.format(INDEX_SQL, tableName, tableName));
     }
     return sqlStatements;
   }
@@ -304,10 +326,10 @@ public class DatabaseSchemaManager {
   }
 
   private String buildInfoTable(Map<String, FieldMetadata> infoFields) {
-    StringBuilder infoBuilder = new StringBuilder("CREATE TABLE info (");
+    StringBuilder infoBuilder = new StringBuilder("CREATE TABLE \"info\" (");
     List<String> columns = new ArrayList<>();
     columns.add(AUTOID_COLUMN);
-    columns.add("_variantId INTEGER REFERENCES vcf(_id)");
+    columns.add("\"_variantId\" INTEGER REFERENCES \"vcf\"(\"_id\")");
 
     for (var entry : infoFields.entrySet()) {
       FieldMetadata meta = entry.getValue();
@@ -315,11 +337,9 @@ public class DatabaseSchemaManager {
         if (meta.getNumberType() == ValueCount.Type.FIXED && meta.getNumberCount() == 1) {
           columns.add(
               String.format(
-                  SQL_COLUMN,
-                  quote(entry.getKey()),
-                  toSqlType(meta.getType(), meta.getNumberCount())));
+                  SQL_COLUMN, entry.getKey(), toSqlType(meta.getType(), meta.getNumberCount())));
         } else {
-          columns.add(String.format(TEXT_COLUMN, quote(entry.getKey())));
+          columns.add(String.format(TEXT_COLUMN, entry.getKey()));
         }
       } else {
         String tableName = String.format("variant_%s", entry.getKey());
@@ -333,27 +353,26 @@ public class DatabaseSchemaManager {
   }
 
   private String buildFormatTable(Map<String, FieldMetadata> formatFields) {
-    StringBuilder formatBuilder = new StringBuilder("CREATE TABLE format (");
     List<String> columns = new ArrayList<>();
     columns.add(AUTOID_COLUMN);
-    columns.add("_sampleIndex INTEGER REFERENCES sample(sampleIndex)");
-    columns.add("_variantId INTEGER REFERENCES vcf(_id)");
+    columns.add("\"_sampleIndex\" INTEGER REFERENCES \"sample\"(\"sampleIndex\")");
+    columns.add("\"_variantId\" INTEGER REFERENCES \"vcf\"(\"_id\")");
 
+    StringBuilder formatBuilder = new StringBuilder("CREATE TABLE \"format\" (");
     for (var entry : formatFields.entrySet()) {
       FieldMetadata meta = entry.getValue();
       if (meta.getNestedFields() == null || meta.getNestedFields().isEmpty()) {
         if (meta.getNumberType() == ValueCount.Type.FIXED && meta.getNumberCount() == 1) {
           columns.add(
               String.format(
-                  SQL_COLUMN,
-                  quote(entry.getKey()),
-                  toSqlType(meta.getType(), meta.getNumberCount())));
+                  SQL_COLUMN, entry.getKey(), toSqlType(meta.getType(), meta.getNumberCount())));
           if (entry.getKey().equals("GT")) {
             this.hasGt = true;
-            columns.add(String.format(SQL_COLUMN, GT_TYPE, "INTEGER REFERENCES gtType(id)"));
+            columns.add(
+                String.format(SQL_COLUMN, GT_TYPE, "INTEGER REFERENCES \"gtType\"(\"id\")"));
           }
         } else {
-          columns.add(String.format(TEXT_COLUMN, quote(entry.getKey())));
+          columns.add(String.format(TEXT_COLUMN, entry.getKey()));
         }
       } else {
         throw new UnsupportedOperationException("Nested Formats are not yet supported");
@@ -366,21 +385,22 @@ public class DatabaseSchemaManager {
 
   private String buildNestedTable(
       String tableName, Map<String, NestedFieldMetadata> nestedFieldMap) {
-    StringBuilder nestedBuilder = new StringBuilder("CREATE TABLE ").append(tableName).append(" (");
+    StringBuilder nestedBuilder =
+        new StringBuilder("CREATE TABLE \"").append(tableName).append("\" (");
     List<String> nestedColumns = new ArrayList<>();
     nestedColumns.add(AUTOID_COLUMN);
     if (tableName.startsWith("variant_")) {
-      nestedColumns.add("_variantId INTEGER REFERENCES vcf(_id)");
+      nestedColumns.add("\"_variantId\" INTEGER REFERENCES \"vcf\"(\"_id\")");
       // CSQ index for postprocessing VIPC_S and VIPP_S
       if (tableName.equals("variant_CSQ")) {
-        nestedColumns.add("CsqIndex INTEGER");
+        nestedColumns.add("\"CsqIndex\" INTEGER");
       }
-    } else if (tableName.startsWith("format_")) {
-      nestedColumns.add("formatId INTEGER REFERENCES format(_id)");
+    } else if (tableName.startsWith("\"format_\"")) {
+      nestedColumns.add("\"formatId\" INTEGER REFERENCES \"format\"(\"_id\")");
     }
     for (var nestedEntry : nestedFieldMap.entrySet()) {
       NestedFieldMetadata nestedField = nestedEntry.getValue();
-      String columnName = quote(nestedEntry.getKey());
+      String columnName = nestedEntry.getKey();
       if (nestedField.getNumberType() == ValueCount.Type.FIXED
           && nestedField.getNumberCount() == 1) {
         nestedColumns.add(

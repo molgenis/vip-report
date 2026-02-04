@@ -28,31 +28,31 @@ class MetadataRepository {
 
   static final String INSERT_METADATA_SQL =
       """
-                INSERT INTO metadata (
-                    name,
-                    fieldType,
-                    valueType,
-                    numberType,
-                    numberCount,
-                    required,
-                    separator,
-                    nestedSeparator,
-                    categories,
-                    label,
-                    description,
-                    parent,
-                    nested,
-                    nestedIndex,
-                    nullValue
+                INSERT INTO \"metadata\" (
+                    \"name\",
+                    \"fieldType\",
+                    \"valueType\",
+                    \"numberType\",
+                    \"numberCount\",
+                    \"required\",
+                    \"separator\",
+                    \"nestedSeparator\",
+                    \"categories\",
+                    \"label\",
+                    \"description\",
+                    \"parent\",
+                    \"nested\",
+                    \"nestedIndex\",
+                    \"nullValue\"
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
   static final String INSERT_CATEGORIES_SQL =
       """
-                    INSERT INTO categories (
-                        field,
-                        value,
-                        label,
-                        description
+                    INSERT INTO "categories" (
+                        "field",
+                        "value",
+                        "label",
+                        "description"
                     ) VALUES (?, ?, ?, ?)
                     """;
 
