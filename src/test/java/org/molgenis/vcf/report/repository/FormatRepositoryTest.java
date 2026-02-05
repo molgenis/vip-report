@@ -33,9 +33,9 @@ class FormatRepositoryTest {
     PreparedStatement ps = mock(PreparedStatement.class);
     PreparedStatement lookupPs = mock(PreparedStatement.class);
     when(conn.prepareStatement(
-            "INSERT INTO format (_variantId, _sampleIndex, GT, DP) VALUES (?, ?, ?, ?)"))
+            "INSERT INTO \"format\" (\"_variantId\", \"_sampleIndex\", \"GT\", \"DP\") VALUES (?, ?, ?, ?)"))
         .thenReturn(ps);
-    when(conn.prepareStatement("INSERT INTO gtType (id, value) VALUES (?, ?)"))
+    when(conn.prepareStatement("INSERT INTO \"gtType\" (\"id\", \"value\") VALUES (?, ?)"))
         .thenReturn(lookupPs);
     when(conn.createStatement()).thenReturn(ps);
     ResultSet rs = mock(ResultSet.class);
@@ -43,7 +43,7 @@ class FormatRepositoryTest {
     when(rs.getString("value")).thenReturn("value");
     when(rs.getInt("id")).thenReturn(1);
     when(rs.next()).thenReturn(true).thenReturn(false);
-    when(ps.executeQuery("SELECT id, field, value FROM categories")).thenReturn(rs);
+    when(ps.executeQuery("SELECT \"id\", \"field\", \"value\" FROM \"categories\"")).thenReturn(rs);
 
     VariantContext vc = mock(VariantContext.class);
     Genotype genotype1 = mock(Genotype.class);
@@ -103,6 +103,6 @@ class FormatRepositoryTest {
     verify(ps).executeBatch();
     verify(conn)
         .prepareStatement(
-            "INSERT INTO format (_variantId, _sampleIndex, GT, DP) VALUES (?, ?, ?, ?)");
+            "INSERT INTO \"format\" (\"_variantId\", \"_sampleIndex\", \"GT\", \"DP\") VALUES (?, ?, ?, ?)");
   }
 }

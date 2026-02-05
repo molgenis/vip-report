@@ -35,7 +35,7 @@ class InfoRepositoryTest {
     when(rs.getString("value")).thenReturn("A");
     when(rs.getInt("id")).thenReturn(1);
     when(rs.next()).thenReturn(true).thenReturn(false);
-    when(ps.executeQuery("SELECT id, field, value FROM categories")).thenReturn(rs);
+    when(ps.executeQuery("SELECT \"id\", \"field\", \"value\" FROM \"categories\"")).thenReturn(rs);
 
     List<String> infoColumns = Arrays.asList("FLAG", "CAT", "INT_ARRAY", "SIMPLE");
     FieldMetadatas fieldMetadatas = mock(FieldMetadatas.class);

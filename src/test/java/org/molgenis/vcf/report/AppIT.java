@@ -112,4 +112,22 @@ class AppIT {
     // report was created
     assertNotNull(report);
   }
+
+  @Test
+  void testReservedKeywords() throws IOException {
+    String inputFile = ResourceUtils.getFile("classpath:example_reserved.vcf").toString();
+    String outputFile = sharedTempDir.resolve("example_reserved.vcf.html").toString();
+    String templateFile = ResourceUtils.getFile("classpath:example-template.html").toString();
+    String metadataFile = ResourceUtils.getFile("classpath:field_metadata.json").toString();
+
+    String[] args = {
+      "-i", inputFile, "-m", metadataFile, "-o", outputFile, "-t", templateFile, "-f"
+    };
+    SpringApplication.run(App.class, args);
+
+    String report = Files.readString(Path.of(outputFile));
+    // due to report content encoding we only check whether the application ran without error and a
+    // report was created
+    assertNotNull(report);
+  }
 }

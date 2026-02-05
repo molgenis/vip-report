@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 public class DecisionTreeRepository {
 
   public void insertDecisionTreeData(Connection conn, Path decisionTreePath, Path sampleTreePath) {
-    String sql = "INSERT INTO decisiontree (id, tree) VALUES (?, ?)";
+    String sql = "INSERT INTO \"decisiontree\" (\"id\", \"tree\") VALUES (?, ?) ";
 
     try (PreparedStatement insertStmt = conn.prepareStatement(sql)) {
       if (decisionTreePath != null) {

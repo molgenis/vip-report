@@ -18,7 +18,7 @@ public class CategoryUtils {
 
   public static Map<FieldValueKey, Integer> loadCategoriesMap(Connection conn) {
     Map<FieldValueKey, Integer> idLookupMap = new HashMap<>();
-    String sql = "SELECT id, field, value FROM categories";
+    String sql = "SELECT \"id\", \"field\", \"value\" FROM \"categories\"";
     try (Statement stmt = conn.createStatement();
         ResultSet rs = stmt.executeQuery(sql)) {
       while (rs.next()) {
