@@ -3,8 +3,11 @@ package org.molgenis.vcf.report.repository;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.StreamSupport;
 
 public class SqlUtils {
 
@@ -33,5 +36,15 @@ public class SqlUtils {
 
   public static String quote(String input) {
     return String.format("\"%s\"", input);
+  }
+
+  public static List<?> replaceMissingValueWithNull(Iterable<?> iterable) {
+    return StreamSupport.stream(iterable.spliterator(), false)
+        .map(value -> ".".equals(value) ? null : value)
+        .toList();
+  }
+
+  public static List<Object> replaceMissingValueWithNull(Object[] valueArray) {
+    return Arrays.stream(valueArray).map(value -> ".".equals(value) ? null : value).toList();
   }
 }

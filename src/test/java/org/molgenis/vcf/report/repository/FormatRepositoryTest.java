@@ -33,7 +33,7 @@ class FormatRepositoryTest {
     PreparedStatement ps = mock(PreparedStatement.class);
     PreparedStatement lookupPs = mock(PreparedStatement.class);
     when(conn.prepareStatement(
-            "INSERT INTO \"format\" (\"_variantId\", \"_sampleIndex\", \"GT\", \"DP\") VALUES (?, ?, ?, ?)"))
+            "INSERT INTO \"format\" (\"_variantId\", \"_sampleIndex\", \"GT\", \"ATTR\") VALUES (?, ?, ?, ?)"))
         .thenReturn(ps);
     when(conn.prepareStatement("INSERT INTO \"gtType\" (\"id\", \"value\") VALUES (?, ?)"))
         .thenReturn(lookupPs);
@@ -55,11 +55,11 @@ class FormatRepositoryTest {
     GenotypesContext genotypesContext = GenotypesContext.create(genotypes);
     when(vc.getGenotypes()).thenReturn(genotypesContext);
 
-    List<String> formatColumns = Arrays.asList("GT", "DP");
+    List<String> formatColumns = Arrays.asList("GT", "ATTR");
     FieldMetadatas fieldMetadatas = mock(FieldMetadatas.class);
     FieldMetadata fmGT = mock(FieldMetadata.class);
-    FieldMetadata fmDP = mock(FieldMetadata.class);
-    when(fieldMetadatas.getFormat()).thenReturn(Map.of("GT", fmGT, "DP", fmDP));
+    FieldMetadata fmAttr = mock(FieldMetadata.class);
+    when(fieldMetadatas.getFormat()).thenReturn(Map.of("GT", fmGT, "ATTR", fmAttr));
 
     Sample sample1 = mock(Sample.class);
     Sample sample2 = mock(Sample.class);
@@ -86,7 +86,8 @@ class FormatRepositoryTest {
     when(vc.getAlleleIndex(any(Allele.class))).thenReturn(0);
 
     when(genotype1.hasAnyAttribute(anyString())).thenReturn(true);
-    when(genotype1.getAnyAttribute(anyString())).thenReturn("testValue");
+    when(genotype1.getAnyAttribute("GT")).thenReturn("0/0");
+    when(genotype1.getAnyAttribute("ATTR")).thenReturn(List.of("testValue", ".", "otherValue"));
     when(genotype2.hasAnyAttribute(anyString())).thenReturn(false);
 
     formatRepository.insertFormatData(
@@ -96,13 +97,13 @@ class FormatRepositoryTest {
     verify(ps).setInt(2, 2);
     verify(ps).setInt(2, 1);
     verify(ps).setString(3, "0/0");
-    verify(ps).setString(4, "[\"testValue\"]");
+    verify(ps).setString(4, "[\"testValue\",null,\"otherValue\"]");
     verify(ps).setString(3, null);
     verify(ps).setString(4, null);
     verify(ps, times(2)).addBatch();
     verify(ps).executeBatch();
     verify(conn)
         .prepareStatement(
-            "INSERT INTO \"format\" (\"_variantId\", \"_sampleIndex\", \"GT\", \"DP\") VALUES (?, ?, ?, ?)");
+            "INSERT INTO \"format\" (\"_variantId\", \"_sampleIndex\", \"GT\", \"ATTR\") VALUES (?, ?, ?, ?)");
   }
 }
