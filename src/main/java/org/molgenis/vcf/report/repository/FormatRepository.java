@@ -1,6 +1,7 @@
 package org.molgenis.vcf.report.repository;
 
 import static org.molgenis.vcf.report.repository.SqlUtils.quote;
+import static org.molgenis.vcf.report.repository.SqlUtils.replaceMissingValueWithNull;
 import static org.molgenis.vcf.report.utils.CategoryUtils.addCategorical;
 import static org.molgenis.vcf.report.utils.CategoryUtils.loadCategoriesMap;
 import static org.molgenis.vcf.report.utils.JsonUtils.toJson;
@@ -102,7 +103,7 @@ public class FormatRepository {
       value = getFormatValue(vc, genotype, meta, value, key);
       String dbValue;
       if (value instanceof Iterable<?>) {
-        dbValue = toJson(value);
+        dbValue = toJson(replaceMissingValueWithNull((Iterable<?>) value));
       } else {
         dbValue = value != null ? value.toString() : null;
       }

@@ -62,7 +62,7 @@ class InfoRepositoryTest {
     when(vc.getAttribute(eq("FLAG"), isNull())).thenReturn(null); // No value for FLAG field
     Object catVal = "A";
     when(vc.getAttribute(eq("CAT"), isNull())).thenReturn(catVal);
-    when(vc.getAttribute(eq("INT_ARRAY"), isNull())).thenReturn("1,2");
+    when(vc.getAttribute(eq("INT_ARRAY"), isNull())).thenReturn("1,.,2");
     when(vc.getAttribute(eq("SIMPLE"), isNull())).thenReturn("B");
 
     infoRepository.insertInfoData(conn, vc, infoColumns, fieldMetadatas, 1, true);
@@ -71,7 +71,7 @@ class InfoRepositoryTest {
     verify(ps).setInt(1, 1);
     verify(ps).setInt(2, 0);
     verify(ps).setString(3, "[1]");
-    verify(ps).setString(4, "[\"1\",\"2\"]");
+    verify(ps).setString(4, "[\"1\",null,\"2\"]");
     verify(ps).setString(5, "[\"B\"]");
     verify(ps).executeUpdate();
   }

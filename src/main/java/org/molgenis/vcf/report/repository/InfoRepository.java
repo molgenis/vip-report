@@ -3,6 +3,7 @@ package org.molgenis.vcf.report.repository;
 import static java.util.Collections.emptyMap;
 import static org.molgenis.vcf.report.repository.FormatRepository.VIPC_S;
 import static org.molgenis.vcf.report.repository.SqlUtils.quote;
+import static org.molgenis.vcf.report.repository.SqlUtils.replaceMissingValueWithNull;
 import static org.molgenis.vcf.report.utils.CategoryUtils.addCategorical;
 import static org.molgenis.vcf.report.utils.CategoryUtils.loadCategoriesMap;
 import static org.molgenis.vcf.report.utils.JsonUtils.MISSING;
@@ -70,7 +71,7 @@ public class InfoRepository {
           (value instanceof ArrayList)
               ? ((ArrayList<?>) value).toArray()
               : value.toString().split(separator);
-      String jsonValue = toJson(arr);
+      String jsonValue = toJson(replaceMissingValueWithNull(arr));
       insertInfo.setString(i + 2, jsonValue);
     } else {
       insertInfo.setString(i + 2, value != null ? value.toString() : null);
