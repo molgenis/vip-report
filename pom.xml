@@ -42,7 +42,7 @@
         <argLine>-XX:+EnableDynamicAgentLoading</argLine>
         <java.version>21</java.version>
         <commons.cli.version>1.9.0</commons.cli.version>
-        <samtools.htsjdk.version>4.1.3</samtools.htsjdk.version>
+        <samtools.htsjdk.version>4.3.0</samtools.htsjdk.version>
         <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
         <opencsv.version>5.10</opencsv.version>
         <vip.utils.version>4.0.0</vip.utils.version>
