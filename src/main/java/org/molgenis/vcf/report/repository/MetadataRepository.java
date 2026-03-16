@@ -9,7 +9,7 @@ import static org.molgenis.vcf.utils.metadata.ValueType.CATEGORICAL;
 import java.nio.file.Path;
 import java.sql.*;
 import java.util.*;
-import lombok.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.molgenis.vcf.report.model.HpoTerm;
 import org.molgenis.vcf.utils.metadata.FieldType;
 import org.molgenis.vcf.utils.metadata.ValueCount;
@@ -59,9 +59,9 @@ class MetadataRepository {
   public Map<FieldType, Map<String, Integer>> insertMetadata(
       Connection conn,
       FieldMetadatas fieldMetadatas,
-      Path decisionTreePath,
-      Path sampleTreePath,
-      @NonNull List<Phenopacket> phenopackets,
+      @Nullable Path decisionTreePath,
+      @Nullable Path sampleTreePath,
+      List<Phenopacket> phenopackets,
       Map<String, HpoTerm> hpoTerms)
       throws SQLException {
     Map<Object, Integer> numberTypeIds =
@@ -103,15 +103,15 @@ class MetadataRepository {
   }
 
   private Map<String, Map<String, ValueDescription>> getCustomCategories(
-      Path decisionTreePath,
-      Path sampleTreePath,
+      @Nullable Path decisionTreePath,
+      @Nullable Path sampleTreePath,
       List<Phenopacket> phenopackets,
       Map<String, HpoTerm> hpoLookup) {
     Map<String, Map<String, ValueDescription>> customCategories = new HashMap<>();
     if (sampleTreePath != null) {
       customCategories.put("VIPC_S", collectNodes(sampleTreePath));
     }
-    if (sampleTreePath != null) {
+    if (decisionTreePath != null) {
       customCategories.put("VIPC", collectNodes(decisionTreePath));
     }
     customCategories.put("HPO", collectHpos(phenopackets, hpoLookup));
@@ -147,7 +147,7 @@ class MetadataRepository {
   }
 
   private Map<String, ValueDescription> collectHpos(
-      @NonNull List<Phenopacket> phenopackets, Map<String, HpoTerm> hpoLookup) {
+      List<Phenopacket> phenopackets, Map<String, HpoTerm> hpoLookup) {
     Map<String, ValueDescription> hpos = new HashMap<>();
     for (Phenopacket phenopacket : phenopackets) {
       for (PhenotypicFeature feature : phenopacket.getPhenotypicFeaturesList()) {
@@ -176,7 +176,7 @@ class MetadataRepository {
       Map.Entry<String, ? extends FieldMetadata> metadataEntry,
       PreparedStatement ps,
       FieldType type,
-      String parent,
+      @Nullable String parent,
       Map<String, Map<String, ValueDescription>> customCategories,
       Map<Object, Integer> numberTypeIds,
       Map<Object, Integer> valueTypeIds,
@@ -190,13 +190,23 @@ class MetadataRepository {
     insertCategoriesBatch(conn, key, categories);
 
     ps.setString(1, fieldName);
-    ps.setInt(2, fieldTypeIds.get(type));
+    Integer fieldTypeId = fieldTypeIds.get(type);
+    if (fieldTypeId == null) {
+      throw new NoSuchElementException(type.toString());
+    }
+    ps.setInt(2, fieldTypeId);
     ps.setInt(
         3,
         customCategories.containsKey(fieldName)
-            ? valueTypeIds.get(CATEGORICAL)
-            : valueTypeIds.get(meta.getType()));
-    ps.setInt(4, numberTypeIds.get(meta.getNumberType()));
+            ? Optional.ofNullable(valueTypeIds.get(CATEGORICAL))
+                .orElseThrow(() -> new NoSuchElementException(CATEGORICAL.toString()))
+            : Optional.ofNullable(valueTypeIds.get(meta.getType()))
+                .orElseThrow(() -> new NoSuchElementException(meta.getType().toString())));
+    Integer numberTypeId = numberTypeIds.get(meta.getNumberType());
+    if (numberTypeId == null) {
+      throw new NoSuchElementException(meta.getNumberType().toString());
+    }
+    ps.setInt(4, numberTypeId);
     ps.setObject(5, meta.getNumberCount());
     ps.setInt(6, meta.isRequired() ? 1 : 0);
     ps.setString(7, meta.getSeparator() != null ? meta.getSeparator().toString() : null);
@@ -244,7 +254,7 @@ class MetadataRepository {
   }
 
   private void insertCategoriesBatch(
-      Connection conn, String fieldName, Map<String, ValueDescription> categories)
+      Connection conn, String fieldName, @Nullable Map<String, ValueDescription> categories)
       throws SQLException {
     if (categories != null && !categories.isEmpty()) {
       try (PreparedStatement categoryPs = conn.prepareStatement(INSERT_CATEGORIES_SQL)) {
@@ -260,7 +270,7 @@ class MetadataRepository {
     }
   }
 
-  private Map<String, ValueDescription> getCategories(
+  private @Nullable Map<String, ValueDescription> getCategories(
       String fieldName,
       FieldMetadata meta,
       Map<String, Map<String, ValueDescription>> customCategories) {

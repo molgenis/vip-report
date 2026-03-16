@@ -68,63 +68,63 @@ class AppCommandLineOptions {
             .required()
             .longOpt(OPT_INPUT_LONG)
             .desc("Input VCF file (.vcf or .vcf.gz).")
-            .build());
+            .get());
     appOptions.addOption(
         Option.builder(OPT_METADATA)
             .hasArg(true)
             .longOpt(OPT_METADATA_LONG)
             .desc("VCF metadata file (.json).")
             .required()
-            .build());
+            .get());
     appOptions.addOption(
         Option.builder(OPT_OUTPUT)
             .hasArg(true)
             .longOpt(OPT_OUTPUT_LONG)
             .desc("Output report file (.html).")
-            .build());
+            .get());
     appOptions.addOption(
         Option.builder(OPT_FORCE)
             .longOpt(OPT_FORCE_LONG)
             .desc("Override the output file if it already exists.")
-            .build());
+            .get());
     appOptions.addOption(
         Option.builder(OPT_TEMPLATE)
             .hasArg(true)
             .longOpt(OPT_TEMPLATE_LONG)
             .desc("Report template file (.html).")
             .required()
-            .build());
+            .get());
     appOptions.addOption(
         Option.builder(OPT_HPO_FILE)
             .hasArg(true)
             .longOpt(OPT_HPO_FILE_LONG)
             .desc("VIP HPO .tsv file containing 'id', 'label' and 'description'.")
-            .build());
+            .get());
     appOptions.addOption(
         Option.builder(OPT_TEMPLATE_CONFIG)
             .hasArg(true)
             .longOpt(OPT_TEMPLATE_CONFIG_LONG)
             .desc("Report template config file (.json).")
-            .build());
+            .get());
     appOptions.addOption(
         Option.builder(OPT_PROBANDS)
             .hasArg(true)
             .longOpt(OPT_PROBANDS_LONG)
             .desc("Comma-separated list of proband names.")
-            .build());
+            .get());
     appOptions.addOption(
         Option.builder(OPT_PED)
             .hasArg(true)
             .longOpt(OPT_PED_LONG)
             .desc("Comma-separated list of pedigree files (.ped).")
-            .build());
+            .get());
     appOptions.addOption(
         Option.builder(OPT_PHENOTYPES)
             .hasArg(true)
             .longOpt(OPT_PHENOTYPES_LONG)
             .desc(
                 "Comma-separated list of sample-phenotypes (e.g. HP:123 or HP:123;HP:234 or sample0/HP:123,sample1/HP:234). Phenotypes are CURIE formatted (prefix:reference) and separated by a semicolon.")
-            .build());
+            .get());
     appOptions.addOption(
         Option.builder(OPT_MAX_SAMPLES)
             .hasArg(true)
@@ -133,45 +133,45 @@ class AppCommandLineOptions {
                 format(
                     "Integer stating the maximum number of samples to be available in the report. Default: %s",
                     ReportGeneratorSettings.DEFAULT_MAX_NR_SAMPLES))
-            .build());
+            .get());
     appOptions.addOption(
         Option.builder(OPT_REFERENCE)
             .hasArg(true)
             .longOpt(OPT_REFERENCE_LONG)
             .desc(
                 "Reference sequence file (.fasta.gz, .fna.gz, .fa.gz, .ffn.gz, .faa.gz or .frn.gz).")
-            .build());
+            .get());
     appOptions.addOption(
         Option.builder(OPT_GENES)
             .hasArg(true)
             .longOpt(OPT_GENES_LONG)
             .desc(
                 "Genes file to be used as reference track in the genome browser, UCSC NCBI RefSeq GFF file (gff.gz or gff3.gz).")
-            .build());
+            .get());
     appOptions.addOption(
         Option.builder(OPT_CRAM)
             .hasArg(true)
             .longOpt(OPT_CRAM_LONG)
             .desc(
                 "Comma-separated list of sample-cram files (e.g. sample0=/path/to/0.cram,sample1=/path/to/1.cram).")
-            .build());
+            .get());
     appOptions.addOption(
         Option.builder(OPT_TREE)
             .hasArg(true)
             .longOpt(OPT_TREE_LONG)
             .desc("Decision tree file as used in vip-decision-tree (.json).")
-            .build());
+            .get());
     appOptions.addOption(
         Option.builder(OPT_SAMPLE_TREE)
             .hasArg(true)
             .longOpt(OPT_SAMPLE_TREE_LONG)
             .desc("Sample decision tree file as used in vip-decision-tree (.json).")
-            .build());
+            .get());
     appOptions.addOption(
         Option.builder(OPT_DEBUG)
             .longOpt(OPT_DEBUG_LONG)
             .desc("Enable debug mode (additional logging and pretty printed report).")
-            .build());
+            .get());
     APP_OPTIONS = appOptions;
     Options appVersionOptions = new Options();
     appVersionOptions.addOption(
@@ -179,7 +179,7 @@ class AppCommandLineOptions {
             .required()
             .longOpt(OPT_VERSION_LONG)
             .desc("Print version.")
-            .build());
+            .get());
     APP_VERSION_OPTIONS = appVersionOptions;
   }
 
@@ -268,8 +268,8 @@ class AppCommandLineOptions {
     }
 
     String cramString = commandLine.getOptionValue(OPT_CRAM);
-    for (String sampleCramString : cramString.split(",")) {
-      String[] tokens = sampleCramString.split("=");
+    for (String sampleCramString : cramString.split(",", -1)) {
+      String[] tokens = sampleCramString.split("=", -1);
       if (tokens.length != 2) {
         throw new InvalidSampleCramException(sampleCramString);
       }
@@ -312,7 +312,7 @@ class AppCommandLineOptions {
     }
     String phenotypesString = commandLine.getOptionValue(OPT_PHENOTYPES);
     if (phenotypesString.contains(SAMPLE_PHENOTYPE_SEPARATOR)) {
-      for (String samplePhenotypes : phenotypesString.split(",")) {
+      for (String samplePhenotypes : phenotypesString.split(",", -1)) {
         if (samplePhenotypes.contains("/")) {
           if (samplePhenotypes.split("/").length != 2) {
             throw new InvalidSamplePhenotypesException(samplePhenotypes);
@@ -322,7 +322,7 @@ class AppCommandLineOptions {
         }
       }
     } else {
-      String[] phenotypes = phenotypesString.split(PHENOTYPE_SEPARATOR);
+      String[] phenotypes = phenotypesString.split(PHENOTYPE_SEPARATOR, -1);
       for (String phenotype : phenotypes) {
         checkPhenotype(phenotype);
       }
@@ -354,8 +354,7 @@ class AppCommandLineOptions {
     }
 
     if (!commandLine.hasOption(OPT_FORCE) && Files.exists(outputPath)) {
-      throw new IllegalArgumentException(
-          format("Output file '%s' already exists", outputPath.toString()));
+      throw new IllegalArgumentException(format("Output file '%s' already exists", outputPath));
     }
   }
 
@@ -447,16 +446,13 @@ class AppCommandLineOptions {
 
   private static void validateFilePath(Path filePath, String prefix) {
     if (!Files.exists(filePath)) {
-      throw new IllegalArgumentException(
-          format("%s file '%s' does not exist.", prefix, filePath.toString()));
+      throw new IllegalArgumentException(format("%s file '%s' does not exist.", prefix, filePath));
     }
     if (Files.isDirectory(filePath)) {
-      throw new IllegalArgumentException(
-          format("%s file '%s' is a directory.", prefix, filePath.toString()));
+      throw new IllegalArgumentException(format("%s file '%s' is a directory.", prefix, filePath));
     }
     if (!Files.isReadable(filePath)) {
-      throw new IllegalArgumentException(
-          format("%s file '%s' is not readable.", prefix, filePath.toString()));
+      throw new IllegalArgumentException(format("%s file '%s' is not readable.", prefix, filePath));
     }
   }
 }

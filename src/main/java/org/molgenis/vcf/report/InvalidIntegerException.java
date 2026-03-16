@@ -7,8 +7,6 @@ import java.io.Serial;
 
 public class InvalidIntegerException extends IllegalArgumentException {
   @Serial private static final long serialVersionUID = 1L;
-  private static final String INVALID_INTEGER_MESSAGE =
-      "Invalid integer value '%s' for option '%s', value must be 0 or more.";
   private final String stringValue;
   private final String opt;
 
@@ -19,6 +17,7 @@ public class InvalidIntegerException extends IllegalArgumentException {
 
   @Override
   public String getMessage() {
-    return format(INVALID_INTEGER_MESSAGE, stringValue, opt);
+    return format(
+        "Invalid integer value '%s' for option '%s', value must be 0 or more.", stringValue, opt);
   }
 }

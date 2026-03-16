@@ -8,6 +8,7 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Adapted from
@@ -142,7 +143,6 @@ public class Base85 {
         final int length,
         final byte[] out,
         final int out_offset) {
-      int size = calcEncodedLength(data, offset, length);
       return _encode(data, offset, length, out, out_offset);
     }
 
@@ -632,7 +632,7 @@ public class Base85 {
       return true;
     }
 
-    protected RuntimeException throwMalformed(Exception ex) {
+    protected void throwMalformed(@Nullable Exception ex) {
       throw new IllegalArgumentException("Malformed Base85/" + getName() + " data", ex);
     }
 
@@ -775,7 +775,7 @@ public class Base85 {
           i -= 4;
         }
       }
-      return super.calcDecodedLength(null, 0, deflated);
+      return super.calcDecodedLength(encoded_data, 0, deflated);
     }
 
     @Override
@@ -792,7 +792,7 @@ public class Base85 {
             }
           }
         }
-        super.calcDecodedLength(null, 0, length + deviation); // Validate length
+        super.calcDecodedLength(encoded_data, 0, length + deviation); // Validate length
       } catch (ArrayIndexOutOfBoundsException | IllegalArgumentException ignored) {
         return false;
       }
@@ -822,15 +822,12 @@ public class Base85 {
       final byte[] buf = buffer.array(), decodeMap = getDecodeMap();
       for (int max = ri + rlen, max2 = max - 4; ri < max; wi += 4) {
         while (ri < max && (in[ri] == 'z' || in[ri] == 'y')) {
-          byte[] src = null;
-          switch (in[ri++]) {
-            case 'z':
-              src = zeros;
-              break;
-            case 'y':
-              src = spaces;
-              break;
-          }
+          byte[] src =
+              switch (in[ri++]) {
+                case 'z' -> zeros;
+                case 'y' -> spaces;
+                default -> null;
+              };
           System.arraycopy(src, 0, out, wi, 4);
           wi += 4;
         }
@@ -860,8 +857,8 @@ public class Base85 {
     }
   }
 
-  private static Encoder RFC1924ENCODER, Z85ENCODER, ASCII85ENCODER;
-  private static Decoder RFC1924DECODER, Z85DECODER, ASCII85DECODER;
+  private static @Nullable Encoder RFC1924ENCODER, Z85ENCODER, ASCII85ENCODER;
+  private static @Nullable Decoder RFC1924DECODER, Z85DECODER, ASCII85DECODER;
 
   public static Encoder getRfc1924Encoder() {
     if (RFC1924ENCODER == null) {

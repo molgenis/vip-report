@@ -7,12 +7,14 @@ import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 @Component
 public class DecisionTreeRepository {
 
-  public void insertDecisionTreeData(Connection conn, Path decisionTreePath, Path sampleTreePath) {
+  public void insertDecisionTreeData(
+      Connection conn, @Nullable Path decisionTreePath, @Nullable Path sampleTreePath) {
     String sql = "INSERT INTO \"decisiontree\" (\"id\", \"tree\") VALUES (?, ?) ";
 
     try (PreparedStatement insertStmt = conn.prepareStatement(sql)) {

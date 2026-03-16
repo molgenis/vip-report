@@ -5,11 +5,8 @@ import static org.molgenis.vcf.report.repository.SqlUtils.insertLookupValues;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import lombok.NonNull;
+import java.util.*;
+import org.jspecify.annotations.Nullable;
 import org.molgenis.vcf.report.model.Items;
 import org.molgenis.vcf.utils.sample.model.AffectedStatus;
 import org.molgenis.vcf.utils.sample.model.Person;
@@ -41,7 +38,7 @@ public class SampleRepository {
         insertLookupValues(conn, "affectedStatus", List.of(AffectedStatus.values()));
 
     try (PreparedStatement pstmt = conn.prepareStatement(INSERT_SAMPLE_SQL)) {
-      @NonNull List<Sample> samples = sampleItems.getItems();
+      List<Sample> samples = sampleItems.getItems();
       Set<Integer> addedSamples = new HashSet<>();
       for (Sample sample : samples) {
         addedSamples = addSample(sample, samples, pstmt, affectedIds, sexIds, addedSamples);
@@ -84,8 +81,16 @@ public class SampleRepository {
       if (mother != null) {
         pstmt.setInt(5, mother.getIndex());
       }
-      pstmt.setInt(6, sexIds.get(p.getSex()));
-      pstmt.setInt(7, affectedIds.get(p.getAffectedStatus()));
+      Integer sexId = sexIds.get(p.getSex());
+      if (sexId == null) {
+        throw new NoSuchElementException(p.getSex().toString());
+      }
+      pstmt.setInt(6, sexId);
+      Integer affectedId = affectedIds.get(p.getAffectedStatus());
+      if (affectedId == null) {
+        throw new NoSuchElementException(p.getAffectedStatus().toString());
+      }
+      pstmt.setInt(7, affectedId);
       pstmt.setInt(8, sample.isProband() ? 1 : 0);
       pstmt.addBatch();
       addedSamples.add(sample.getIndex());
@@ -93,7 +98,7 @@ public class SampleRepository {
     return addedSamples;
   }
 
-  private Sample getSample(String individualId, List<Sample> samples) {
+  private @Nullable Sample getSample(String individualId, List<Sample> samples) {
     if (individualId == null || individualId.equals("0")) {
       return null;
     }

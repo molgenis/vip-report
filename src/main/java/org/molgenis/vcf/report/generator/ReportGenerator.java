@@ -15,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import org.jspecify.annotations.Nullable;
 import org.molgenis.vcf.report.fasta.ContigInterval;
 import org.molgenis.vcf.report.fasta.VariantFastaSlicer;
 import org.molgenis.vcf.report.fasta.VariantIntervalCalculator;
@@ -155,6 +156,7 @@ public class ReportGenerator {
     return new Report(fastaGzMap, genesGz, cramMap, sqlWasm, database);
   }
 
+  @SuppressWarnings("MixedMutabilityReturnType")
   private Map<String, HpoTerm> getHpoTerms(ReportGeneratorSettings reportGeneratorSettings) {
     if (reportGeneratorSettings.getHpoPath() == null) {
       return Collections.emptyMap();
@@ -186,7 +188,7 @@ public class ReportGenerator {
     return termsById;
   }
 
-  private static Map<?, ?> parseJsonObject(Path jsonPath) {
+  private static @Nullable Map<?, ?> parseJsonObject(@Nullable Path jsonPath) {
     Map<?, ?> jsonObject;
     if (jsonPath != null) {
       try {
@@ -234,8 +236,8 @@ public class ReportGenerator {
     return cramMap;
   }
 
-  private Map<String, Bytes> getReferenceTrackData(
-      List<ContigInterval> contigIntervals, Path referencePath) {
+  private @Nullable Map<String, Bytes> getReferenceTrackData(
+      List<ContigInterval> contigIntervals, @Nullable Path referencePath) {
     Map<String, Bytes> fastaGzMap;
     if (referencePath != null) {
       VariantFastaSlicer variantFastaSlicer = vcfFastaSlicerFactory.create(referencePath);
@@ -246,7 +248,7 @@ public class ReportGenerator {
     return fastaGzMap;
   }
 
-  private Bytes getGenesTrackData(
+  private @Nullable Bytes getGenesTrackData(
       List<ContigInterval> contigIntervals, ReportGeneratorSettings reportGeneratorSettings) {
     Path genesPath = reportGeneratorSettings.getGenesPath();
     Bytes genesGz;
@@ -262,7 +264,7 @@ public class ReportGenerator {
   private Items<Sample> createPersons(
       VCFIterator vcfFileReader,
       List<String> probandNames,
-      List<Path> pedigreePaths,
+      @Nullable List<Path> pedigreePaths,
       ReportGeneratorSettings settings) {
     VCFHeader fileHeader = vcfFileReader.getHeader();
     int maxNrSamples = settings.getMaxNrSamples();

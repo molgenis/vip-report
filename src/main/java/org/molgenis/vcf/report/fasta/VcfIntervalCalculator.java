@@ -4,6 +4,7 @@ import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.vcf.VCFContigHeaderLine;
 import htsjdk.variant.vcf.VCFHeader;
 import java.util.*;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,7 +16,10 @@ public class VcfIntervalCalculator {
   }
 
   public Map<String, List<ContigInterval>> calculate(
-      VCFHeader vcfHeader, Iterator<VariantContext> vcfIterator, int flanking, String sampleId) {
+      VCFHeader vcfHeader,
+      Iterator<VariantContext> vcfIterator,
+      int flanking,
+      @Nullable String sampleId) {
     Map<String, List<ContigInterval>> intervalMap = new LinkedHashMap<>();
     Map<String, Integer> contigLengthMap = createContigLengthMap(vcfHeader.getContigLines());
     vcfIterator.forEachRemaining(
@@ -47,7 +51,8 @@ public class VcfIntervalCalculator {
     return contigLengthMap;
   }
 
-  private static boolean includeVariantContext(String sampleId, VariantContext variantContext) {
+  private static boolean includeVariantContext(
+      @Nullable String sampleId, VariantContext variantContext) {
     return sampleId == null
         || (variantContext.hasGenotype(sampleId)
             && variantContext.getGenotype(sampleId).isCalled());
