@@ -261,10 +261,9 @@
                             </path>
                         </annotationProcessorPaths>
                         <compilerArgs>
-                            <arg>-Xlint:deprecation</arg>
+                            <arg>-Xlint</arg>
                             <arg>-Xlint:-processing</arg>
                             <arg>-Xlint:-restricted</arg>
-                            <arg>-Xlint:unchecked</arg>
                             <arg>-XDcompilePolicy=simple</arg>
                             <arg>--should-stop=ifError=FLOW</arg>
                             <arg>-Xplugin:ErrorProne -XepOpt:NullAway:AnnotatedPackages=org.molgenis
