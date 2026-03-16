@@ -7,13 +7,14 @@ import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_FORCE;
 import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_FORCE_LONG;
 
 import ch.qos.logback.classic.Level;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.molgenis.vcf.report.generator.ReportService;
 import org.molgenis.vcf.report.generator.Settings;
 import org.slf4j.Logger;
@@ -111,11 +112,15 @@ public class AppCommandLineRunner implements CommandLineRunner {
 
     // following information is only logged to system out
     System.out.println();
-    HelpFormatter formatter = new HelpFormatter();
-    formatter.setOptionComparator(null);
+    HelpFormatter formatter = HelpFormatter.builder().setComparator(null).get();
     String cmdLineSyntax = "java -jar " + appName + ".jar";
-    formatter.printHelp(cmdLineSyntax, AppCommandLineOptions.getAppOptions(), true);
-    System.out.println();
-    formatter.printHelp(cmdLineSyntax, AppCommandLineOptions.getAppVersionOptions(), true);
+    try {
+      formatter.printHelp(cmdLineSyntax, "", AppCommandLineOptions.getAppOptions(), "", true);
+      System.out.println();
+      formatter.printHelp(
+          cmdLineSyntax, "", AppCommandLineOptions.getAppVersionOptions(), "", true);
+    } catch (IOException ex) {
+      LOGGER.error("failed to log exception");
+    }
   }
 }
