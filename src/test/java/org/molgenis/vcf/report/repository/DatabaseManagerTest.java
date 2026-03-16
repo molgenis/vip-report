@@ -59,7 +59,7 @@ class DatabaseManagerTest {
     PreparedStatement pstm = mock(PreparedStatement.class);
     when(conn.prepareStatement(any())).thenReturn(pstm);
 
-    Items samples = mock(Items.class);
+    Items<Sample> samples = mock(Items.class);
     Sample sample = mock(Sample.class);
     Person person = mock(Person.class);
     when(person.getIndividualId()).thenReturn("NA00001");
