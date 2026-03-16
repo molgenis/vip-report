@@ -1,24 +1,24 @@
 package org.molgenis.vcf.report.generator;
 
 import java.nio.file.Path;
-import lombok.NonNull;
 import lombok.Value;
+import org.jspecify.annotations.Nullable;
 
 @Value
 public class ReportGeneratorSettings {
 
   public static final int DEFAULT_MAX_NR_SAMPLES = 100;
 
-  @NonNull String appName;
-  @NonNull String appVersion;
-  @NonNull String appArguments;
+  String appName;
+  String appVersion;
+  String appArguments;
   int maxNrSamples;
-  @NonNull Path metadataPath;
-  @NonNull Path sqlWasmPath;
-  Path hpoPath;
-  Path referencePath;
-  Path genesPath;
-  Path decisionTreePath;
-  Path sampleTreePath;
-  Path templateConfigPath;
+  Path metadataPath;
+  Path sqlWasmPath;
+  @Nullable Path hpoPath;
+  @Nullable Path referencePath;
+  @Nullable Path genesPath;
+  @Nullable Path decisionTreePath;
+  @Nullable Path sampleTreePath;
+  @Nullable Path templateConfigPath;
 }

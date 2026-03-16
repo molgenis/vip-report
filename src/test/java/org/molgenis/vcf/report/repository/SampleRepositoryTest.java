@@ -89,6 +89,7 @@ class SampleRepositoryTest {
     when(person4.getSex()).thenReturn(Sex.FEMALE);
     when(person4.getAffectedStatus()).thenReturn(AffectedStatus.UNAFFECTED);
 
+    @SuppressWarnings("unchecked")
     Items<Sample> sampleItems = mock(Items.class);
     when(sampleItems.getItems()).thenReturn(List.of(sample1, sample2, dad1, mom1));
 

@@ -6,6 +6,7 @@ import static org.molgenis.vcf.report.utils.IntervalUtils.mergeIntervals;
 import htsjdk.variant.vcf.VCFIterator;
 import java.nio.file.Path;
 import java.util.*;
+import org.jspecify.annotations.Nullable;
 import org.molgenis.vcf.report.generator.SampleSettings;
 import org.springframework.stereotype.Component;
 
@@ -22,10 +23,16 @@ public class VariantIntervalCalculator {
   }
 
   public List<ContigInterval> calculate(
-      VCFIterator vcfIterator, Map<String, SampleSettings.CramPath> cramPaths, Path referencePath) {
+      VCFIterator vcfIterator,
+      Map<String, SampleSettings.CramPath> cramPaths,
+      @Nullable Path referencePath) {
     Map<String, List<ContigInterval>> cramIntervals;
     List<ContigInterval> intervals = new ArrayList<>();
     if (cramPaths != null && !cramPaths.isEmpty()) {
+      if (referencePath == null) {
+        throw new IllegalArgumentException();
+      }
+
       Map<String, List<ContigInterval>> vcfIntervals =
           vcfIntervalCalculator.calculate(vcfIterator.getHeader(), vcfIterator, FLANKING, null);
       cramIntervals = cramIntervalCalculator.calculate(cramPaths, referencePath);

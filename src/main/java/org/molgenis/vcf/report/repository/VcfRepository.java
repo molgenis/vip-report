@@ -7,6 +7,7 @@ import htsjdk.variant.variantcontext.Allele;
 import htsjdk.variant.variantcontext.VariantContext;
 import java.sql.*;
 import java.util.*;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,12 +16,19 @@ public class VcfRepository {
   public static final String MISSING = ".";
 
   public int insertVariant(
-      Connection conn, VariantContext vc, Map<Object, Integer> contigIds, Integer format) {
+      Connection conn,
+      VariantContext vc,
+      Map<Object, Integer> contigIds,
+      @Nullable Integer format) {
     try (PreparedStatement insertVCF =
         conn.prepareStatement(
             "INSERT INTO \"vcf\" (\"chrom\", \"pos\", \"id\", \"ref\", \"alt\", \"qual\", \"filter\", \"format\") VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             Statement.RETURN_GENERATED_KEYS)) {
-      insertVCF.setInt(1, contigIds.get(vc.getContig()));
+      Integer contigId = contigIds.get(vc.getContig());
+      if (contigId == null) {
+        throw new NoSuchElementException(vc.getContig());
+      }
+      insertVCF.setInt(1, contigId);
       insertVCF.setInt(2, vc.getStart());
       insertVCF.setString(3, writeJsonListValue(vc.getID(), ";"));
       insertVCF.setString(4, vc.getReference().getDisplayString());

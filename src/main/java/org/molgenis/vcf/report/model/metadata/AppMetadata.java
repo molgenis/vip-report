@@ -1,7 +1,6 @@
 package org.molgenis.vcf.report.model.metadata;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.NonFinal;
 
@@ -10,14 +9,11 @@ import lombok.experimental.NonFinal;
 public class AppMetadata {
 
   @JsonProperty("name")
-  @NonNull
   String appName;
 
   @JsonProperty("version")
-  @NonNull
   String appVersion;
 
   @JsonProperty("args")
-  @NonNull
   String appArguments;
 }

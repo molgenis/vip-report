@@ -12,6 +12,7 @@ import htsjdk.variant.variantcontext.VariantContext;
 import java.sql.*;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.regex.Pattern;
 import org.molgenis.vcf.utils.metadata.UnknownFieldException;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadata;
@@ -43,12 +44,16 @@ public class NestedRepository {
           insertNestedStmt.setInt(1, variantId);
           int index = 0;
           for (String nestedField : nestedEntries) {
+            FieldMetadata parentMeta = fieldMetadatas.getInfo().get(fieldName);
+            if (parentMeta == null) {
+              throw new NoSuchElementException(fieldName);
+            }
             insertNestedValue(
                 index,
                 matchingNestedFields,
                 nestedField,
                 fieldName,
-                fieldMetadatas.getInfo().get(fieldName),
+                parentMeta,
                 insertNestedStmt,
                 categoryLookup,
                 hasDecisionTree);

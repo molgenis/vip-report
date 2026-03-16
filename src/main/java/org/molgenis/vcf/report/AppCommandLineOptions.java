@@ -268,8 +268,8 @@ class AppCommandLineOptions {
     }
 
     String cramString = commandLine.getOptionValue(OPT_CRAM);
-    for (String sampleCramString : cramString.split(",")) {
-      String[] tokens = sampleCramString.split("=");
+    for (String sampleCramString : cramString.split(",", -1)) {
+      String[] tokens = sampleCramString.split("=", -1);
       if (tokens.length != 2) {
         throw new InvalidSampleCramException(sampleCramString);
       }
@@ -312,7 +312,7 @@ class AppCommandLineOptions {
     }
     String phenotypesString = commandLine.getOptionValue(OPT_PHENOTYPES);
     if (phenotypesString.contains(SAMPLE_PHENOTYPE_SEPARATOR)) {
-      for (String samplePhenotypes : phenotypesString.split(",")) {
+      for (String samplePhenotypes : phenotypesString.split(",", -1)) {
         if (samplePhenotypes.contains("/")) {
           if (samplePhenotypes.split("/").length != 2) {
             throw new InvalidSamplePhenotypesException(samplePhenotypes);
@@ -322,7 +322,7 @@ class AppCommandLineOptions {
         }
       }
     } else {
-      String[] phenotypes = phenotypesString.split(PHENOTYPE_SEPARATOR);
+      String[] phenotypes = phenotypesString.split(PHENOTYPE_SEPARATOR, -1);
       for (String phenotype : phenotypes) {
         checkPhenotype(phenotype);
       }

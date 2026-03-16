@@ -1,7 +1,6 @@
 package org.molgenis.vcf.report.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.NonFinal;
 
@@ -9,5 +8,5 @@ import lombok.experimental.NonFinal;
 @Value
 @NonFinal
 public class Bytes {
-  @NonNull byte[] bytes;
+  byte[] bytes;
 }

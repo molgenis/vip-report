@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.nio.file.Path;
 import java.util.*;
+import org.jspecify.annotations.Nullable;
 import org.molgenis.vcf.report.model.Bytes;
 
 public class VariantFastaSlicer {
@@ -13,7 +14,8 @@ public class VariantFastaSlicer {
     this.fastaSlicer = requireNonNull(fastaSlicer);
   }
 
-  public Map<String, Bytes> generate(List<ContigInterval> contigIntervals, Path referencePath) {
+  public @Nullable Map<String, Bytes> generate(
+      List<ContigInterval> contigIntervals, @Nullable Path referencePath) {
     Map<String, Bytes> fastaGzMap;
     if (referencePath != null) {
       List<FastaSlice> fastaGzSlices;

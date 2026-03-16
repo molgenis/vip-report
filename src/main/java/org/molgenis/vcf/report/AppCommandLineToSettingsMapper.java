@@ -43,13 +43,8 @@ public class AppCommandLineToSettingsMapper {
     String templateValue = commandLine.getOptionValue(OPT_TEMPLATE);
     templatePath = Path.of(templateValue);
 
-    Path metadataPath;
-    if (commandLine.hasOption(OPT_METADATA)) {
-      String metadataPathValue = commandLine.getOptionValue(OPT_METADATA);
-      metadataPath = Path.of(metadataPathValue);
-    } else {
-      metadataPath = null;
-    }
+    String metadataPathValue = commandLine.getOptionValue(OPT_METADATA);
+    Path metadataPath = Path.of(metadataPathValue);
 
     Path outputPath;
     if (commandLine.hasOption(OPT_OUTPUT)) {
@@ -189,7 +184,7 @@ public class AppCommandLineToSettingsMapper {
 
   private Map<String, CramPath> toCramPaths(String cramPathValue) {
     Map<String, CramPath> cramPaths = new LinkedHashMap<>();
-    String[] tokens = cramPathValue.split(",");
+    String[] tokens = cramPathValue.split(",", -1);
     for (String token : tokens) {
       int idx = token.indexOf("=");
       String sampleId = token.substring(0, idx);

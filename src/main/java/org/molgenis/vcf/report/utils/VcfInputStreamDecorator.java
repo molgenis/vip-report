@@ -1,6 +1,7 @@
 package org.molgenis.vcf.report.utils;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
@@ -14,12 +15,15 @@ public class VcfInputStreamDecorator {
 
   public static InputStream preprocessVCF(File inputVCF) throws IOException {
     try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(byteArrayOutputStream));
+        BufferedWriter writer =
+            new BufferedWriter(
+                new OutputStreamWriter(byteArrayOutputStream, StandardCharsets.UTF_8));
         InputStream inputStream = new FileInputStream(inputVCF);
         BufferedReader reader =
             inputVCF.toPath().toString().endsWith(".vcf.gz")
-                ? new BufferedReader(new InputStreamReader(new GZIPInputStream(inputStream)))
-                : new BufferedReader(new InputStreamReader(inputStream)); ) {
+                ? new BufferedReader(
+                    new InputStreamReader(new GZIPInputStream(inputStream), StandardCharsets.UTF_8))
+                : new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
       String line;
       while ((line = reader.readLine()) != null) {
         line = processLine(line);

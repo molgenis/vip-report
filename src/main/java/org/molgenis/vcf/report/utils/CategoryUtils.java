@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.molgenis.vcf.report.repository.DatabaseException;
 import org.molgenis.vcf.report.repository.FieldValueKey;
 import org.molgenis.vcf.utils.metadata.FieldType;
@@ -39,7 +40,7 @@ public class CategoryUtils {
       FieldMetadata meta,
       Map<FieldValueKey, Integer> categoryLookup,
       String field,
-      Object val,
+      @Nullable Object val,
       PreparedStatement insertNestedStmt,
       int index)
       throws SQLException {
@@ -51,8 +52,8 @@ public class CategoryUtils {
       FieldMetadata meta,
       Map<FieldValueKey, Integer> categoryLookup,
       String field,
-      String parent,
-      Object val,
+      @Nullable String parent,
+      @Nullable Object val,
       PreparedStatement insertNestedStmt,
       int index)
       throws SQLException {
@@ -71,7 +72,7 @@ public class CategoryUtils {
       } else {
         List<Integer> categories = new ArrayList<>();
         String separator = meta.getSeparator() != null ? meta.getSeparator().toString() : ",";
-        for (String singleValue : stringValue.split(separator)) {
+        for (String singleValue : stringValue.split(separator, -1)) {
           categories.add(categoryLookup.get(new FieldValueKey(key, singleValue)));
         }
         stringValue = toJson(categories);
@@ -80,7 +81,7 @@ public class CategoryUtils {
     }
   }
 
-  public static String getKey(FieldType type, String field, String parent) {
+  public static String getKey(FieldType type, String field, @Nullable String parent) {
     String key;
     if (parent != null) {
       key = String.format("%s/%s/%s", type.name(), parent, field);

@@ -9,7 +9,6 @@ import static org.molgenis.vcf.report.AppCommandLineOptions.OPT_FORCE_LONG;
 import ch.qos.logback.classic.Level;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import lombok.NonNull;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -62,10 +61,10 @@ public class AppCommandLineRunner implements CommandLineRunner {
     for (String arg : args) {
       if (arg.equals('-' + OPT_DEBUG) || arg.equals('-' + OPT_DEBUG_LONG)) {
         Logger rootLogger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-        if (!(rootLogger instanceof ch.qos.logback.classic.Logger)) {
+        if (!(rootLogger instanceof ch.qos.logback.classic.Logger logger)) {
           throw new ClassCastException("Expected root logger to be a logback logger");
         }
-        ((ch.qos.logback.classic.Logger) rootLogger).setLevel(Level.DEBUG);
+        logger.setLevel(Level.DEBUG);
         break;
       }
     }
@@ -73,7 +72,7 @@ public class AppCommandLineRunner implements CommandLineRunner {
     try {
       Settings settings = createSettings(args);
 
-      @NonNull Path outputReportPath = settings.getOutputReportPath();
+      Path outputReportPath = settings.getOutputReportPath();
       if (settings.isOverwriteOutputReport()) {
         Files.deleteIfExists(outputReportPath);
       } else if (Files.exists(outputReportPath)) {
@@ -92,6 +91,7 @@ public class AppCommandLineRunner implements CommandLineRunner {
     }
   }
 
+  @SuppressWarnings("NullAway")
   private Settings createSettings(String... args) {
     CommandLine commandLine = null;
     try {

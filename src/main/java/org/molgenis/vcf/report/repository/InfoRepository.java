@@ -18,6 +18,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import org.molgenis.vcf.utils.metadata.FieldType;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadata;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadatas;
@@ -58,6 +59,9 @@ public class InfoRepository {
       throws SQLException {
     final String key = infoColumns.get(i);
     final FieldMetadata meta = fieldMetadatas.getInfo().get(key);
+    if (meta == null) {
+      throw new NoSuchElementException(key);
+    }
     Object value = vc.getAttribute(key, null);
 
     if (meta.getType() == FLAG) {

@@ -4,12 +4,13 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import lombok.Value;
+import org.jspecify.annotations.Nullable;
 
 @Value
 public class SampleSettings {
   List<String> probandNames;
-  List<Path> pedigreePaths;
-  String phenotypeString;
+  @Nullable List<Path> pedigreePaths;
+  @Nullable String phenotypeString;
   Map<String, CramPath> cramPaths;
 
   @Value

@@ -2,25 +2,24 @@ package org.molgenis.vcf.report.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Map;
-import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.NonFinal;
+import org.jspecify.annotations.Nullable;
 
 @Value
 @NonFinal
 public class Report {
 
   @JsonProperty("fastaGz")
-  Map<String, Bytes> fastaGz;
+  @Nullable Map<String, Bytes> fastaGz;
 
   @JsonProperty("genesGz")
-  Bytes genesGz;
+  @Nullable Bytes genesGz;
 
   @JsonProperty("cram")
   Map<String, Cram> cram;
 
   @JsonProperty("wasmBinary")
-  @NonNull
   Bytes wasmBinary;
 
   @Value
@@ -34,6 +33,5 @@ public class Report {
   }
 
   @JsonProperty("database")
-  @NonNull
   Bytes database;
 }

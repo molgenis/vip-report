@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Locale;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import org.molgenis.vcf.report.utils.BestCompressionGZIPOutputStream;
@@ -16,7 +17,7 @@ public class BinaryEncoder {
   public byte[] encode(Path path) {
     byte[] bytes;
 
-    if (path.toString().toLowerCase().endsWith(".gz")) {
+    if (path.toString().toLowerCase(Locale.ROOT).endsWith(".gz")) {
       bytes = decompress(path);
     } else {
       bytes = toBytes(path);

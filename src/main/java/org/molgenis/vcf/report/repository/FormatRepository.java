@@ -15,6 +15,8 @@ import htsjdk.variant.variantcontext.VariantContext;
 import java.sql.*;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import org.jspecify.annotations.Nullable;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadata;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadatas;
 import org.molgenis.vcf.utils.sample.model.Sample;
@@ -61,7 +63,11 @@ public class FormatRepository {
         insertFormat.setInt(2, sampleIndex);
         for (int i = 0; i < formatColumns.size(); i++) {
           if (formatColumns.get(i).equals(GT_TYPE)) {
-            insertFormat.setInt(i + 3, gtIds.get(genotype.getType()));
+            Integer gtId = gtIds.get(genotype.getType());
+            if (gtId == null) {
+              throw new NoSuchElementException(genotype.getType().toString());
+            }
+            insertFormat.setInt(i + 3, gtId);
           } else {
             insertFormatDataColumn(
                 vc,
@@ -95,6 +101,9 @@ public class FormatRepository {
 
     final String key = formatColumns.get(i);
     final FieldMetadata meta = fieldMetadatas.getFormat().get(key);
+    if (meta == null) {
+      throw new NoSuchElementException(key);
+    }
     Object value = genotype.hasAnyAttribute(key) ? genotype.getAnyAttribute(key) : null;
 
     if (meta.getType() == CATEGORICAL || (key.equals(VIPC_S) && hasSampleTree)) {
@@ -111,8 +120,12 @@ public class FormatRepository {
     }
   }
 
-  private static Object getFormatValue(
-      VariantContext vc, Genotype genotype, FieldMetadata meta, Object value, String key) {
+  private static @Nullable Object getFormatValue(
+      VariantContext vc,
+      Genotype genotype,
+      FieldMetadata meta,
+      @Nullable Object value,
+      String key) {
     if ((meta.getNumberType() != FIXED || meta.getNumberCount() != 1)
         && value != null
         && !(value instanceof Iterable<?>)) {
