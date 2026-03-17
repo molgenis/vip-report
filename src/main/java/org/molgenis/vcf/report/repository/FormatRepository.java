@@ -1,5 +1,6 @@
 package org.molgenis.vcf.report.repository;
 
+import static java.util.Objects.requireNonNull;
 import static org.molgenis.vcf.report.repository.SqlUtils.quote;
 import static org.molgenis.vcf.report.repository.SqlUtils.replaceMissingValueWithNull;
 import static org.molgenis.vcf.report.utils.CategoryUtils.addCategorical;
@@ -126,7 +127,7 @@ public class FormatRepository {
       FieldMetadata meta,
       @Nullable Object value,
       String key) {
-    if ((meta.getNumberType() != FIXED || meta.getNumberCount() != 1)
+    if ((meta.getNumberType() != FIXED || requireNonNull(meta.getNumberCount()) != 1)
         && value != null
         && !(value instanceof Iterable<?>)) {
       String separator = meta.getSeparator() != null ? meta.getSeparator().toString() : ",";

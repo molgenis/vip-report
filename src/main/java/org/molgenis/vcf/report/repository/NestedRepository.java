@@ -1,5 +1,6 @@
 package org.molgenis.vcf.report.repository;
 
+import static java.util.Objects.requireNonNull;
 import static org.molgenis.vcf.report.repository.DatabaseManager.VARIANT_ID;
 import static org.molgenis.vcf.report.repository.SqlUtils.quote;
 import static org.molgenis.vcf.report.utils.CategoryUtils.addCategorical;
@@ -88,7 +89,7 @@ public class NestedRepository {
       if (nestedField.equals(CSQ_INDEX)) {
         insertNestedStmt.setInt(stmtIdx, index);
       } else {
-        NestedFieldMetadata meta = parentMeta.getNestedFields().get(nestedField);
+        NestedFieldMetadata meta = requireNonNull(parentMeta.getNestedFields()).get(nestedField);
         if (meta == null) {
           throw new UnknownFieldException(nestedField);
         }
