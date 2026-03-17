@@ -1,28 +1,48 @@
+arch: amd64
 os: linux
-dist: jammy
-language: java
-jdk: openjdk25
+dist: noble
+language: minimal
 cache:
   directories:
     - "$HOME/.m2"
+    - "$HOME/jdk"
+    - "$HOME/mvn"
 branches:
   only:
     - main
-    - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+    - "/^v\\d+\\.\\d+(\\.\\d+)?(-\\S*)?$/"
 before_install:
-  - cp travis.settings.xml $HOME/.m2/settings.xml
-  - gem update --system # workaround for https://travis-ci.community/t/builds-suddenly-failing/14580/14
+  # install temurin 25
+  - |
+    if [ ! -f "$HOME/jdk/bin/java" ]; then
+      curl --fail --silent --show-error --location --output "$HOME/jdk.tar.gz" \
+        https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.2%2B10/OpenJDK25U-jdk_x64_linux_hotspot_25.0.2_10.tar.gz
+      echo "987387933b64b9833846dee373b640440d3e1fd48a04804ec01a6dbf718e8ab8  $HOME/jdk.tar.gz" | sha256sum --check          
+      tar --extract --gunzip --strip-components=1 --directory="$HOME/jdk" -f "$HOME/jdk.tar.gz"
+      rm "$HOME/jdk.tar.gz"
+    fi
+  # install maven 3.9.11
+  - |
+    if [ ! -f "$HOME/mvn/bin/mvn" ]; then
+      curl --fail --silent --show-error --location --output "$HOME/mvn.tar.gz" \
+        https://archive.apache.org/dist/maven/maven-3/3.9.11/binaries/apache-maven-3.9.11-bin.tar.gz
+      echo "4b7195b6a4f5c81af4c0212677a32ee8143643401bc6e1e8412e6b06ea82beac  $HOME/mvn.tar.gz" | sha256sum --check
+      tar --extract --gunzip --strip-components=1 --directory="$HOME/mvn" -f "$HOME/mvn.tar.gz"
+      rm "$HOME/mvn.tar.gz"
+    fi
+  # sync maven settings
+  - rsync --archive --checksum travis.settings.xml $HOME/.m2/settings.xml
 script:
-  - mvn clean install -Pcoverage
+  - mvn verify --batch-mode --no-transfer-progress --activate-profiles coverage -Djacoco.skip.report=true
 deploy:
-  provider: releases
-  token:
-    secure: VouOH/Zuet7PgO5upSDBINSKg4uFsEbpfA/RxMhhG57w45/5bEoXSaGmg09MSaR6EHsiQXGcClESlcDRGDEPKE+Wu9xI+queCNX6P/Ne9354Su8iHX0LF5AfIMQBdAWnfS7mjySzTcacGAX36T51+R/V89U7w8gHdJEXwVJeZJL046whTZHdMBxZ+wywFqa15lazBxVrNwnLYk04agdPW+lzN6PYpEA4AHWSx9riT13bdoJ+eM/+/FnJxpTEgR4XLoHHVVugJvybdzyyOBt1jAA7lKOtWemZL2DPxmeZZXjPm0Kmy6xK1ls8fLXvOavpJqTwTMpCB4e3UhoXLrRg0q5IfCT9dFvudQXR5gWq7ZRW584oLjF+MlUcFYQwkbyNzVJelH8V+msNDIZ89EVP64h1knjrtc8LQ3V6rVpqQ08nAXjQT6z/CrqwQiN4T0caUEFezwZ47JOrN2CGgiexCJI8z+lSXS3Zzvq4shOhZBLD+kC/B/OOREciuhzG9i1gDHovQNM5MrXLie50DXP98MKnKp9AV/0J9istoHXp36fRAyeqyPHgXb2Lq5C97mNWGOYTsSzijE/29Y9Fapz/Y0k2BFkkYQ3+FXsmverePBff8SEmb87XIDyPVM3tedzKpn4RO0Ay+T6Tr4OQF0CJ84quOFiqlu9AfOpW2kX48n0=
-  file: target/vcf-report.jar
-  prerelease: true
-  on:
-    tags: true
-  edge: true # opt in to dpl v2
+  - provider: releases
+    token:
+      secure: VouOH/Zuet7PgO5upSDBINSKg4uFsEbpfA/RxMhhG57w45/5bEoXSaGmg09MSaR6EHsiQXGcClESlcDRGDEPKE+Wu9xI+queCNX6P/Ne9354Su8iHX0LF5AfIMQBdAWnfS7mjySzTcacGAX36T51+R/V89U7w8gHdJEXwVJeZJL046whTZHdMBxZ+wywFqa15lazBxVrNwnLYk04agdPW+lzN6PYpEA4AHWSx9riT13bdoJ+eM/+/FnJxpTEgR4XLoHHVVugJvybdzyyOBt1jAA7lKOtWemZL2DPxmeZZXjPm0Kmy6xK1ls8fLXvOavpJqTwTMpCB4e3UhoXLrRg0q5IfCT9dFvudQXR5gWq7ZRW584oLjF+MlUcFYQwkbyNzVJelH8V+msNDIZ89EVP64h1knjrtc8LQ3V6rVpqQ08nAXjQT6z/CrqwQiN4T0caUEFezwZ47JOrN2CGgiexCJI8z+lSXS3Zzvq4shOhZBLD+kC/B/OOREciuhzG9i1gDHovQNM5MrXLie50DXP98MKnKp9AV/0J9istoHXp36fRAyeqyPHgXb2Lq5C97mNWGOYTsSzijE/29Y9Fapz/Y0k2BFkkYQ3+FXsmverePBff8SEmb87XIDyPVM3tedzKpn4RO0Ay+T6Tr4OQF0CJ84quOFiqlu9AfOpW2kX48n0=
+    file: target/vcf-report.jar
+    on:
+      tags: true
 env:
   global:
-    secure: ZodsIq8/BMfhTT0rB1lZkCpBxzPzqUnK3Czyq39jMhT8J6trDPjd7w6YNF2wDdbAmIugsnnrWOs5GtFgFqUNiRDIOQpzc5ncsu3lsGEG7NaqGPdY0kMlf+ihUKsESNglUXOR8BctOdUO7vC/p8VHw8o43n+VRZsfSvzDdHF57KE23NvfY+q/yt5vggYc8BiRJOU6BOOk3VpwI6D/hc1Qt5ZWOv+Y2K5MkH+boAdkmg5t3BdFwJOaG85MxqSlWkcY8irjtgx8oNYayV+cneXnaFUS4wtK/kMQ6ftDhmh5fAveJQdXcbbVVRFPUUYnrf0Grxt+74gXvFNw0BLnIcDjArChqhypyB1EPT4a1cpf9tQyhZ7ZNXwBfDaibSbMUY+ethDCpAdDUCQUHea96gdzbs2enhGQ3nXajgXacdKS+lpn1TJhNWr0gkHXb3PiAHF3EH3JwRuF6NwwEYvlRpZ2gdYUK8IFA59na/CZ21QzrHBuqk5v8PJaQRAdGZhUgXh1GOiPLT8vDhIKq6qUNGUPOmUyIzyKxLJfFdws+c4i1II7r5CqdjlshIcBOnENpZbyRlFZm0hfoJ3oieCSNpnvLmzEdzBrK9hlu1dkZIIX/pSKNFl+cBb4IJnQEpC/SiKmpwG5Z11hP+nHQm3s9NzD/zek3F8djKIkCe+u08D9EMU=
+    - JAVA_HOME=$HOME/jdk
+    - PATH=$HOME/jdk/bin:$HOME/mvn/bin:$PATH
+    - secure: ZodsIq8/BMfhTT0rB1lZkCpBxzPzqUnK3Czyq39jMhT8J6trDPjd7w6YNF2wDdbAmIugsnnrWOs5GtFgFqUNiRDIOQpzc5ncsu3lsGEG7NaqGPdY0kMlf+ihUKsESNglUXOR8BctOdUO7vC/p8VHw8o43n+VRZsfSvzDdHF57KE23NvfY+q/yt5vggYc8BiRJOU6BOOk3VpwI6D/hc1Qt5ZWOv+Y2K5MkH+boAdkmg5t3BdFwJOaG85MxqSlWkcY8irjtgx8oNYayV+cneXnaFUS4wtK/kMQ6ftDhmh5fAveJQdXcbbVVRFPUUYnrf0Grxt+74gXvFNw0BLnIcDjArChqhypyB1EPT4a1cpf9tQyhZ7ZNXwBfDaibSbMUY+ethDCpAdDUCQUHea96gdzbs2enhGQ3nXajgXacdKS+lpn1TJhNWr0gkHXb3PiAHF3EH3JwRuF6NwwEYvlRpZ2gdYUK8IFA59na/CZ21QzrHBuqk5v8PJaQRAdGZhUgXh1GOiPLT8vDhIKq6qUNGUPOmUyIzyKxLJfFdws+c4i1II7r5CqdjlshIcBOnENpZbyRlFZm0hfoJ3oieCSNpnvLmzEdzBrK9hlu1dkZIIX/pSKNFl+cBb4IJnQEpC/SiKmpwG5Z11hP+nHQm3s9NzD/zek3F8djKIkCe+u08D9EMU=

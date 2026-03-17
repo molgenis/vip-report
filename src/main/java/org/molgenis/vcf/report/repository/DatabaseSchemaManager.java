@@ -1,5 +1,6 @@
 package org.molgenis.vcf.report.repository;
 
+import static java.util.Objects.requireNonNull;
 import static org.molgenis.vcf.report.repository.FormatRepository.GT_TYPE;
 
 import htsjdk.variant.vcf.VCFHeader;
@@ -334,7 +335,8 @@ public class DatabaseSchemaManager {
     for (var entry : infoFields.entrySet()) {
       FieldMetadata meta = entry.getValue();
       if (meta.getNestedFields() == null || meta.getNestedFields().isEmpty()) {
-        if (meta.getNumberType() == ValueCount.Type.FIXED && meta.getNumberCount() == 1) {
+        if (meta.getNumberType() == ValueCount.Type.FIXED
+            && requireNonNull(meta.getNumberCount()) == 1) {
           columns.add(
               String.format(
                   SQL_COLUMN, entry.getKey(), toSqlType(meta.getType(), meta.getNumberCount())));
@@ -362,7 +364,8 @@ public class DatabaseSchemaManager {
     for (var entry : formatFields.entrySet()) {
       FieldMetadata meta = entry.getValue();
       if (meta.getNestedFields() == null || meta.getNestedFields().isEmpty()) {
-        if (meta.getNumberType() == ValueCount.Type.FIXED && meta.getNumberCount() == 1) {
+        if (meta.getNumberType() == ValueCount.Type.FIXED
+            && requireNonNull(meta.getNumberCount()) == 1) {
           columns.add(
               String.format(
                   SQL_COLUMN, entry.getKey(), toSqlType(meta.getType(), meta.getNumberCount())));
@@ -402,7 +405,7 @@ public class DatabaseSchemaManager {
       NestedFieldMetadata nestedField = nestedEntry.getValue();
       String columnName = nestedEntry.getKey();
       if (nestedField.getNumberType() == ValueCount.Type.FIXED
-          && nestedField.getNumberCount() == 1) {
+          && requireNonNull(nestedField.getNumberCount()) == 1) {
         nestedColumns.add(
             String.format(
                 SQL_COLUMN,

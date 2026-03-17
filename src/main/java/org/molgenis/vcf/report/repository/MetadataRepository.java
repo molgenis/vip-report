@@ -1,5 +1,6 @@
 package org.molgenis.vcf.report.repository;
 
+import static java.util.Objects.requireNonNull;
 import static org.molgenis.vcf.report.repository.SqlUtils.insertLookupValues;
 import static org.molgenis.vcf.report.utils.CategoryUtils.getKey;
 import static org.molgenis.vcf.report.utils.JsonUtils.collectNodes;
@@ -236,7 +237,8 @@ class MetadataRepository {
     }
 
     if (nestedFlag) {
-      for (Map.Entry<String, NestedFieldMetadata> nestedEntry : meta.getNestedFields().entrySet()) {
+      for (Map.Entry<String, NestedFieldMetadata> nestedEntry :
+          requireNonNull(meta.getNestedFields()).entrySet()) {
         addMetadata(
             conn,
             nestedEntry,

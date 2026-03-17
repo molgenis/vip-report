@@ -1,6 +1,7 @@
 package org.molgenis.vcf.report.repository;
 
 import static java.util.Collections.emptyMap;
+import static java.util.Objects.requireNonNull;
 import static org.molgenis.vcf.report.repository.FormatRepository.VIPC_S;
 import static org.molgenis.vcf.report.repository.SqlUtils.quote;
 import static org.molgenis.vcf.report.repository.SqlUtils.replaceMissingValueWithNull;
@@ -69,7 +70,8 @@ public class InfoRepository {
       insertInfo.setInt(i + 2, flagVal);
     } else if (meta.getType() == CATEGORICAL || (VIPC_S.equals(key) && hasSampleTree)) {
       addCategorical(INFO, meta, categoryLookup, key, value, insertInfo, i + 2);
-    } else if ((meta.getNumberType() != FIXED || meta.getNumberCount() != 1) && value != null) {
+    } else if ((meta.getNumberType() != FIXED || requireNonNull(meta.getNumberCount()) != 1)
+        && value != null) {
       String separator = (meta.getSeparator() != null) ? meta.getSeparator().toString() : ",";
       Object[] arr =
           (value instanceof ArrayList)
