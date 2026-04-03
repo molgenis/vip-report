@@ -153,7 +153,8 @@ public class ReportGenerator {
     }
 
     Bytes sqlWasm = new Bytes(Files.readAllBytes(reportGeneratorSettings.getSqlWasmPath()));
-    return new Report(fastaGzMap, genesGz, cramMap, sqlWasm, database);
+    String id = UUID.randomUUID().toString();
+    return new Report(id, fastaGzMap, genesGz, cramMap, sqlWasm, database);
   }
 
   @SuppressWarnings("MixedMutabilityReturnType")
