@@ -50,6 +50,7 @@ class ReportServiceTest {
 
     Report report =
         new Report(
+            "MockId",
             null,
             null,
             Map.of(),

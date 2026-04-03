@@ -10,6 +10,9 @@ import org.jspecify.annotations.Nullable;
 @NonFinal
 public class Report {
 
+  @JsonProperty("id")
+  String id;
+
   @JsonProperty("fastaGz")
   @Nullable Map<String, Bytes> fastaGz;
 
