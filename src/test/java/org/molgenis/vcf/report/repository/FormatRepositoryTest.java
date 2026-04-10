@@ -111,7 +111,7 @@ class FormatRepositoryTest {
     Connection conn = mock(Connection.class);
     PreparedStatement ps = mock(PreparedStatement.class);
     when(conn.prepareStatement(
-        "INSERT INTO \"format\" (\"_variantId\", \"_sampleIndex\", \"GT\", \"VIPC_S\") VALUES (?, ?, ?, ?)"))
+            "INSERT INTO \"format\" (\"_variantId\", \"_sampleIndex\", \"GT\", \"VIPC_S\") VALUES (?, ?, ?, ?)"))
         .thenReturn(ps);
     when(conn.createStatement()).thenReturn(ps);
     ResultSet rs = mock(ResultSet.class);
@@ -151,7 +151,10 @@ class FormatRepositoryTest {
 
     when(genotype1.getSampleName()).thenReturn("sampleA");
 
-    assertThrows(MissingDecisionTreeException.class, () -> formatRepository.insertFormatData(
-        conn, vc, formatColumns, 1, fieldMetadatas, samples, false, Map.of()));
+    assertThrows(
+        MissingDecisionTreeException.class,
+        () ->
+            formatRepository.insertFormatData(
+                conn, vc, formatColumns, 1, fieldMetadatas, samples, false, Map.of()));
   }
 }

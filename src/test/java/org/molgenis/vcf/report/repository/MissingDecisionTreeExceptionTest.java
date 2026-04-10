@@ -9,6 +9,6 @@ class MissingDecisionTreeExceptionTest {
   void getMessage() {
     assertEquals(
         "Field 'VIPC_TEST' is CATEGORICAL, but required parameter '--test_param' for this to work is missing.",
-        new MissingDecisionTreeException("VIPC_TEST","--test_param").getMessage());
+        new MissingDecisionTreeException("VIPC_TEST", "--test_param").getMessage());
   }
 }

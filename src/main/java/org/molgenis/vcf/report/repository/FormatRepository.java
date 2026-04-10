@@ -108,8 +108,8 @@ public class FormatRepository {
     Object value = genotype.hasAnyAttribute(key) ? genotype.getAnyAttribute(key) : null;
 
     if (meta.getType() == CATEGORICAL) {
-      if((key.equals(VIPC_S) && !hasSampleTree)){
-        throw new MissingDecisionTreeException("FORMAT/VIPC_S","--sample_tree");
+      if ((key.equals(VIPC_S) && !hasSampleTree)) {
+        throw new MissingDecisionTreeException("FORMAT/VIPC_S", "--sample_tree");
       }
       addCategorical(FORMAT, meta, categoryLookup, key, value, insertFormat, i + 3);
     } else {

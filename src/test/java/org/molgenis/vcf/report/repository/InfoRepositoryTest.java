@@ -118,9 +118,9 @@ class InfoRepositoryTest {
     when(vc.getAttribute(eq("INT_ARRAY"), isNull())).thenReturn("1,.,2");
     when(vc.getAttribute(eq("SIMPLE"), isNull())).thenReturn("B");
 
-
-    assertThrows(MissingDecisionTreeException.class, () ->
-        infoRepository.insertInfoData(conn, vc, infoColumns, fieldMetadatas, 1, false));
+    assertThrows(
+        MissingDecisionTreeException.class,
+        () -> infoRepository.insertInfoData(conn, vc, infoColumns, fieldMetadatas, 1, false));
   }
 
   @Test
