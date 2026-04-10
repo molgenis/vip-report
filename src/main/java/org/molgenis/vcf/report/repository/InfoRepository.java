@@ -68,7 +68,11 @@ public class InfoRepository {
     if (meta.getType() == FLAG) {
       int flagVal = (value == null) ? 0 : 1;
       insertInfo.setInt(i + 2, flagVal);
-    } else if (meta.getType() == CATEGORICAL || (VIPC_S.equals(key) && hasSampleTree)) {
+    } else if (meta.getType() == CATEGORICAL) {
+      //VIPC_S: the INFO field containing all the unique values from FORMAT/VIPC_S
+      if((key.equals(VIPC_S) && !hasSampleTree)){
+        throw new MissingDecisionTreeException("INFO/VIPC_S","--sample_tree");
+      }
       addCategorical(INFO, meta, categoryLookup, key, value, insertInfo, i + 2);
     } else if ((meta.getNumberType() != FIXED || requireNonNull(meta.getNumberCount()) != 1)
         && value != null) {

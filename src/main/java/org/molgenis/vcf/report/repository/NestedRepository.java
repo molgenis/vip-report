@@ -102,8 +102,10 @@ public class NestedRepository {
         if (val == null || val.isEmpty()) {
           insertNestedStmt.setString(stmtIdx, null);
         } else if (meta.getType() == CATEGORICAL
-            || nestedField.equals("HPO")
-            || (nestedField.equals("VIPC") && hasDecisionTree)) {
+            || nestedField.equals("HPO")) {
+          if((nestedField.equals("VIPC") && !hasDecisionTree)){
+            throw new MissingDecisionTreeException("INFO/CSQ/VIPC","--decision_tree");
+          }
           addCategorical(
               INFO, meta, categoryLookup, nestedField, parent, val, insertNestedStmt, stmtIdx);
         } else if (meta.getSeparator() != null) {

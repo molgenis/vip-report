@@ -1,5 +1,6 @@
 package org.molgenis.vcf.report.repository;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 import htsjdk.variant.variantcontext.VariantContext;
@@ -10,10 +11,13 @@ import java.sql.SQLException;
 import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadata;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadatas;
 import org.molgenis.vcf.utils.model.metadata.NestedFieldMetadata;
 
+@ExtendWith(MockitoExtension.class)
 class NestedRepositoryTest {
 
   private NestedRepository nestedRepository;
@@ -53,8 +57,6 @@ class NestedRepositoryTest {
     infoMap.put(fieldName, parentMeta);
     when(fieldMetadatas.getInfo()).thenReturn(infoMap);
 
-    when(parentMeta.getSeparator()).thenReturn('|');
-
     NestedFieldMetadata geneMeta = mock(NestedFieldMetadata.class);
     when(geneMeta.getIndex()).thenReturn(0);
     when(geneMeta.getType()).thenReturn(null);
@@ -79,5 +81,51 @@ class NestedRepositoryTest {
 
     verify(ps, times(2)).addBatch();
     verify(ps).executeBatch();
+  }
+
+  @Test
+  void testInsertNestedMissingTree() throws SQLException {
+    Connection conn = mock(Connection.class);
+    PreparedStatement ps = mock(PreparedStatement.class);
+    when(conn.prepareStatement(anyString())).thenReturn(ps);
+    when(conn.createStatement()).thenReturn(ps);
+    ResultSet rs = mock(ResultSet.class);
+    when(rs.getString("field"))
+        .thenReturn("INFO/CSQ/VIPC")
+        .thenReturn("INFO/CSQ/VIPC");
+    when(rs.getString("value")).thenReturn("LP").thenReturn("P");
+    when(rs.getInt("id")).thenReturn(1).thenReturn(2);
+    when(rs.next()).thenReturn(true).thenReturn(true).thenReturn(false);
+    when(ps.executeQuery("SELECT \"id\", \"field\", \"value\" FROM \"categories\"")).thenReturn(rs);
+
+    String fieldName = "CSQ";
+    List<String> matchingNestedFields = new ArrayList<>();
+    matchingNestedFields.addAll(List.of("Gene", "VIPC"));
+    VariantContext vc = mock(VariantContext.class);
+    when(vc.hasAttribute(fieldName)).thenReturn(true);
+    List<String> nestedEntries =
+        Arrays.asList("GENE1|LP", "GENE2|P");
+    when(vc.getAttributeAsStringList(eq(fieldName), anyString())).thenReturn(nestedEntries);
+
+    FieldMetadatas fieldMetadatas = mock(FieldMetadatas.class);
+    FieldMetadata parentMeta = mock(FieldMetadata.class);
+    Map<String, FieldMetadata> infoMap = new HashMap<>();
+    infoMap.put(fieldName, parentMeta);
+    when(fieldMetadatas.getInfo()).thenReturn(infoMap);
+
+    NestedFieldMetadata geneMeta = mock(NestedFieldMetadata.class);
+    when(geneMeta.getIndex()).thenReturn(0);
+    when(geneMeta.getType()).thenReturn(null);
+    NestedFieldMetadata vipcMeta = mock(NestedFieldMetadata.class);
+    when(vipcMeta.getIndex()).thenReturn(1);
+    when(vipcMeta.getType()).thenReturn(org.molgenis.vcf.utils.metadata.ValueType.CATEGORICAL);
+
+    Map<String, NestedFieldMetadata> nestedFieldsMap = new HashMap<>();
+    nestedFieldsMap.put("Gene", geneMeta);
+    nestedFieldsMap.put("VIPC", vipcMeta);
+    when(parentMeta.getNestedFields()).thenReturn(nestedFieldsMap);
+
+    assertThrows(MissingDecisionTreeException.class, () -> nestedRepository.insertNested(
+        conn, fieldName, vc, matchingNestedFields, fieldMetadatas, 1, false));
   }
 }
