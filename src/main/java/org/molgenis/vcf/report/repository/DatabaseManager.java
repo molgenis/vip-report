@@ -29,7 +29,9 @@ import org.molgenis.vcf.report.utils.Utf8LineReader;
 import org.molgenis.vcf.utils.metadata.FieldType;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadata;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadatas;
+import org.molgenis.vcf.utils.sample.model.OntologyClass;
 import org.molgenis.vcf.utils.sample.model.Phenopacket;
+import org.molgenis.vcf.utils.sample.model.PhenotypicFeature;
 import org.molgenis.vcf.utils.sample.model.Sample;
 import org.springframework.stereotype.Component;
 
@@ -149,7 +151,8 @@ public class DatabaseManager {
           vcfIterator,
           nestedFields,
           codec,
-          metadataKeys);
+          metadataKeys,
+          phenopackets);
       phenotypeRepo.insertPhenotypeData(getConnection(), phenopackets, samples.getItems());
       if (templateConfig != null) {
         configRepo.insertConfigData(getConnection(), templateConfig);
@@ -174,7 +177,8 @@ public class DatabaseManager {
       LineIteratorImpl vcfIterator,
       Map<String, List<String>> nestedFields,
       VCFCodec vcfCodec,
-      Map<FieldType, Map<String, Integer>> metadataKeys)
+      Map<FieldType, Map<String, Integer>> metadataKeys,
+      List<Phenopacket> phenopackets)
       throws DatabaseException {
     List<String> formatColumns = getDatabaseFormatColumns();
     List<String> infoColumns = getDatabaseInfoColumns();
@@ -225,7 +229,8 @@ public class DatabaseManager {
               entry.getValue(),
               fieldMetadatas,
               variantId,
-              decisionTreePath != null);
+              decisionTreePath != null,
+              getHpoTerms(phenopackets));
         }
         formatRepo.insertFormatData(
             getConnection(),
@@ -240,6 +245,18 @@ public class DatabaseManager {
             getConnection(), vc, infoColumns, fieldMetadatas, variantId, sampleTreePath != null);
       }
     }
+  }
+
+  private Set<String> getHpoTerms(List<Phenopacket> phenopackets) {
+    Set<String> hpoTerms = new HashSet<>();
+    for (Phenopacket phenopacket : phenopackets) {
+      hpoTerms.addAll(
+          phenopacket.getPhenotypicFeaturesList().stream()
+              .map(PhenotypicFeature::getOntologyClass)
+              .map(OntologyClass::getId)
+              .collect(Collectors.toSet()));
+    }
+    return hpoTerms;
   }
 
   private void insertFormatValue(int key, String value) {

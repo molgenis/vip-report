@@ -14,6 +14,7 @@ import java.sql.*;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.regex.Pattern;
 import org.molgenis.vcf.utils.metadata.UnknownFieldException;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadata;
@@ -32,7 +33,8 @@ public class NestedRepository {
       List<String> matchingNestedFields,
       FieldMetadatas fieldMetadatas,
       int variantId,
-      boolean hasDecisionTree) {
+      boolean hasDecisionTree,
+      Set<String> hpoTerms) {
     try {
       Map<FieldValueKey, Integer> categoryLookup = loadCategoriesMap(conn);
       if (fieldName.equals("CSQ")) {
@@ -57,7 +59,8 @@ public class NestedRepository {
                 parentMeta,
                 insertNestedStmt,
                 categoryLookup,
-                hasDecisionTree);
+                hasDecisionTree,
+                hpoTerms);
             index++;
           }
           insertNestedStmt.executeBatch();
@@ -76,7 +79,8 @@ public class NestedRepository {
       FieldMetadata parentMeta,
       PreparedStatement insertNestedStmt,
       Map<FieldValueKey, Integer> categoryLookup,
-      boolean hasDecisionTree)
+      boolean hasDecisionTree,
+      Set<String> hpoTerms)
       throws SQLException {
     String separator =
         (parentMeta.getNestedAttributes() != null)
@@ -101,9 +105,13 @@ public class NestedRepository {
 
         if (val == null || val.isEmpty()) {
           insertNestedStmt.setString(stmtIdx, null);
-        } else if (meta.getType() == CATEGORICAL
-            || nestedField.equals("HPO")
-            || (nestedField.equals("VIPC") && hasDecisionTree)) {
+        } else if (meta.getType() == CATEGORICAL) {
+          if ((nestedField.equals("VIPC") && !hasDecisionTree)) {
+            throw new MissingDecisionTreeException("INFO/CSQ/VIPC", "--decision_tree");
+          }
+          if ((nestedField.equals("HPO") && !hpoTerms.contains(val))) {
+            throw new InvalidHpoException(val, hpoTerms);
+          }
           addCategorical(
               INFO, meta, categoryLookup, nestedField, parent, val, insertNestedStmt, stmtIdx);
         } else if (meta.getSeparator() != null) {

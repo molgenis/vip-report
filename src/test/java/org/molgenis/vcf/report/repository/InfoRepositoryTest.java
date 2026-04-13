@@ -1,5 +1,6 @@
 package org.molgenis.vcf.report.repository;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 import static org.molgenis.vcf.utils.metadata.FieldType.INFO;
 
@@ -31,13 +32,13 @@ class InfoRepositoryTest {
     when(conn.prepareStatement(anyString())).thenReturn(ps);
     when(conn.createStatement()).thenReturn(ps);
     ResultSet rs = mock(ResultSet.class);
-    when(rs.getString("field")).thenReturn("INFO/CAT");
+    when(rs.getString("field")).thenReturn("INFO/VIPC_S");
     when(rs.getString("value")).thenReturn("A");
     when(rs.getInt("id")).thenReturn(1);
     when(rs.next()).thenReturn(true).thenReturn(false);
     when(ps.executeQuery("SELECT \"id\", \"field\", \"value\" FROM \"categories\"")).thenReturn(rs);
 
-    List<String> infoColumns = Arrays.asList("FLAG", "CAT", "INT_ARRAY", "SIMPLE");
+    List<String> infoColumns = Arrays.asList("FLAG", "VIPC_S", "INT_ARRAY", "SIMPLE");
     FieldMetadatas fieldMetadatas = mock(FieldMetadatas.class);
     Map<String, FieldMetadata> infoMetaMap = new HashMap<>();
     FieldMetadata flagMeta = mock(FieldMetadata.class);
@@ -53,7 +54,7 @@ class InfoRepositoryTest {
     when(arrMeta.getSeparator()).thenReturn(',');
 
     infoMetaMap.put("FLAG", flagMeta);
-    infoMetaMap.put("CAT", catMeta);
+    infoMetaMap.put("VIPC_S", catMeta);
     infoMetaMap.put("INT_ARRAY", arrMeta);
     infoMetaMap.put("SIMPLE", simpleMeta);
     when(fieldMetadatas.getInfo()).thenReturn(infoMetaMap);
@@ -61,7 +62,7 @@ class InfoRepositoryTest {
     VariantContext vc = mock(VariantContext.class);
     when(vc.getAttribute(eq("FLAG"), isNull())).thenReturn(null); // No value for FLAG field
     Object catVal = "A";
-    when(vc.getAttribute(eq("CAT"), isNull())).thenReturn(catVal);
+    when(vc.getAttribute(eq("VIPC_S"), isNull())).thenReturn(catVal);
     when(vc.getAttribute(eq("INT_ARRAY"), isNull())).thenReturn("1,.,2");
     when(vc.getAttribute(eq("SIMPLE"), isNull())).thenReturn("B");
 
@@ -74,6 +75,52 @@ class InfoRepositoryTest {
     verify(ps).setString(4, "[\"1\",null,\"2\"]");
     verify(ps).setString(5, "[\"B\"]");
     verify(ps).executeUpdate();
+  }
+
+  @Test
+  void testInsertInfoDataMissingTree() throws SQLException {
+    Connection conn = mock(Connection.class);
+    PreparedStatement ps = mock(PreparedStatement.class);
+    when(conn.prepareStatement(anyString())).thenReturn(ps);
+    when(conn.createStatement()).thenReturn(ps);
+    ResultSet rs = mock(ResultSet.class);
+    when(rs.getString("field")).thenReturn("INFO/VIPC_S");
+    when(rs.getString("value")).thenReturn("A");
+    when(rs.getInt("id")).thenReturn(1);
+    when(rs.next()).thenReturn(true).thenReturn(false);
+    when(ps.executeQuery("SELECT \"id\", \"field\", \"value\" FROM \"categories\"")).thenReturn(rs);
+
+    List<String> infoColumns = Arrays.asList("FLAG", "VIPC_S", "INT_ARRAY", "SIMPLE");
+    FieldMetadatas fieldMetadatas = mock(FieldMetadatas.class);
+    Map<String, FieldMetadata> infoMetaMap = new HashMap<>();
+    FieldMetadata flagMeta = mock(FieldMetadata.class);
+    FieldMetadata catMeta = mock(FieldMetadata.class);
+    FieldMetadata arrMeta = mock(FieldMetadata.class);
+    FieldMetadata simpleMeta = mock(FieldMetadata.class);
+
+    when(flagMeta.getType()).thenReturn(org.molgenis.vcf.utils.metadata.ValueType.FLAG);
+    when(catMeta.getType()).thenReturn(org.molgenis.vcf.utils.metadata.ValueType.CATEGORICAL);
+
+    when(arrMeta.getNumberType()).thenReturn(org.molgenis.vcf.utils.metadata.ValueCount.Type.FIXED);
+    when(arrMeta.getNumberCount()).thenReturn(2);
+    when(arrMeta.getSeparator()).thenReturn(',');
+
+    infoMetaMap.put("FLAG", flagMeta);
+    infoMetaMap.put("VIPC_S", catMeta);
+    infoMetaMap.put("INT_ARRAY", arrMeta);
+    infoMetaMap.put("SIMPLE", simpleMeta);
+    when(fieldMetadatas.getInfo()).thenReturn(infoMetaMap);
+
+    VariantContext vc = mock(VariantContext.class);
+    when(vc.getAttribute(eq("FLAG"), isNull())).thenReturn(null); // No value for FLAG field
+    Object catVal = "A";
+    when(vc.getAttribute(eq("VIPC_S"), isNull())).thenReturn(catVal);
+    when(vc.getAttribute(eq("INT_ARRAY"), isNull())).thenReturn("1,.,2");
+    when(vc.getAttribute(eq("SIMPLE"), isNull())).thenReturn("B");
+
+    assertThrows(
+        MissingDecisionTreeException.class,
+        () -> infoRepository.insertInfoData(conn, vc, infoColumns, fieldMetadatas, 1, false));
   }
 
   @Test
