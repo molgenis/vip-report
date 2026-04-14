@@ -11,6 +11,7 @@ import static org.molgenis.vcf.utils.metadata.ValueType.CATEGORICAL;
 
 import htsjdk.variant.variantcontext.VariantContext;
 import java.sql.*;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -109,8 +110,15 @@ public class NestedRepository {
           if ((nestedField.equals("VIPC") && !hasDecisionTree)) {
             throw new MissingDecisionTreeException("INFO/CSQ/VIPC", "--decision_tree");
           }
-          if ((nestedField.equals("HPO") && !hpoTerms.contains(val))) {
-            throw new InvalidHpoException(val, hpoTerms);
+          if (nestedField.equals("HPO")) {
+            Character hpoSeparator = meta.getSeparator();
+            if (hpoSeparator == null) {
+              throw new IllegalStateException(
+                  "HPO list field is missing required metadata field 'separator'.");
+            }
+            if (!hpoTerms.containsAll(Arrays.asList(val.split(hpoSeparator.toString())))) {
+              throw new InvalidHpoException(val, hpoTerms);
+            }
           }
           addCategorical(
               INFO, meta, categoryLookup, nestedField, parent, val, insertNestedStmt, stmtIdx);
