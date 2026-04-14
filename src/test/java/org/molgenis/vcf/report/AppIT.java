@@ -26,7 +26,7 @@ class AppIT {
     String treePath = ResourceUtils.getFile("classpath:tree.json").toString();
     String sampleTreePath = ResourceUtils.getFile("classpath:sample_tree.json").toString();
     String probands = "NA00001";
-    String phenotypes = "Jimmy/HP:123456,Unknown/test:Headache,Jane/OMIM:23456";
+    String phenotypes = "Jimmy/HP:123456;HP:123457,Unknown/test:Headache,Jane/OMIM:23456";
     String bamFile = ResourceUtils.getFile("classpath:example.cram").toString();
     String referenceFile = ResourceUtils.getFile("classpath:example.fna.gz").toString();
     String metadataFile = ResourceUtils.getFile("classpath:field_metadata.json").toString();
