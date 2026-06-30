@@ -188,7 +188,7 @@ class ReportGeneratorTest {
             any(), any(), any(), any(), any(), any(), any(), any(), any(), any()))
         .thenReturn(new Bytes(Files.readAllBytes(database)));
 
-    when(reportIdGenerator.generate()).thenReturn("mockValue");
+    when(reportIdGenerator.generate(inputVcfPath)).thenReturn("mockValue");
 
     Report report =
         new Report(

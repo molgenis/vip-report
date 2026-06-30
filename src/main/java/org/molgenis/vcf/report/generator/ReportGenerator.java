@@ -15,7 +15,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;
 import org.molgenis.vcf.report.fasta.ContigInterval;
 import org.molgenis.vcf.report.fasta.VariantFastaSlicer;
@@ -157,7 +156,8 @@ public class ReportGenerator {
     }
 
     Bytes sqlWasm = new Bytes(Files.readAllBytes(reportGeneratorSettings.getSqlWasmPath()));
-    return new Report(reportIdGenerator.generate(), fastaGzMap, genesGz, cramMap, sqlWasm, database);
+    return new Report(
+        reportIdGenerator.generate(vcfPath), fastaGzMap, genesGz, cramMap, sqlWasm, database);
   }
 
   @SuppressWarnings("MixedMutabilityReturnType")
