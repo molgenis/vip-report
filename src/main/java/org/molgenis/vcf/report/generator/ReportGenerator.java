@@ -52,6 +52,7 @@ public class ReportGenerator {
   private final VariantIntervalCalculator variantIntervalCalculator;
   private final DatabaseSchemaManager databaseSchemaManager;
   private final DatabaseManager databaseManager;
+  private final ReportIdGenerator reportIdGenerator;
 
   public ReportGenerator(
       HtsJdkToPersonsMapper htsJdkToPersonsMapper,
@@ -62,7 +63,8 @@ public class ReportGenerator {
       GenesFilterFactory genesFilterFactory,
       VariantIntervalCalculator variantIntervalCalculator,
       DatabaseSchemaManager databaseSchemaManager,
-      DatabaseManager databaseManager) {
+      DatabaseManager databaseManager,
+      ReportIdGenerator reportIdGenerator) {
     this.htsJdkToPersonsMapper = requireNonNull(htsJdkToPersonsMapper);
     this.phenopacketMapper = requireNonNull(phenopacketMapper);
     this.personListMerger = requireNonNull(personListMerger);
@@ -72,6 +74,7 @@ public class ReportGenerator {
     this.variantIntervalCalculator = requireNonNull(variantIntervalCalculator);
     this.databaseManager = requireNonNull(databaseManager);
     this.databaseSchemaManager = requireNonNull(databaseSchemaManager);
+    this.reportIdGenerator = requireNonNull(reportIdGenerator);
   }
 
   public Report generateReport(
@@ -153,7 +156,8 @@ public class ReportGenerator {
     }
 
     Bytes sqlWasm = new Bytes(Files.readAllBytes(reportGeneratorSettings.getSqlWasmPath()));
-    return new Report(fastaGzMap, genesGz, cramMap, sqlWasm, database);
+    return new Report(
+        reportIdGenerator.generate(vcfPath), fastaGzMap, genesGz, cramMap, sqlWasm, database);
   }
 
   @SuppressWarnings("MixedMutabilityReturnType")

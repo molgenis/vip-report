@@ -24,6 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.molgenis.vcf.report.fasta.*;
 import org.molgenis.vcf.report.generator.ReportGenerator;
 import org.molgenis.vcf.report.generator.ReportGeneratorSettings;
+import org.molgenis.vcf.report.generator.ReportIdGenerator;
 import org.molgenis.vcf.report.generator.SampleSettings;
 import org.molgenis.vcf.report.genes.GenesFilterFactory;
 import org.molgenis.vcf.report.model.Bytes;
@@ -53,6 +54,7 @@ class ReportGeneratorTest {
   @Mock private VariantIntervalCalculator variantIntervalCalculator;
   @Mock private DatabaseManager databaseManager;
   @Mock private DatabaseSchemaManager databaseSchemaManager;
+  @Mock private ReportIdGenerator reportIdGenerator;
   private ReportGenerator reportGenerator;
 
   @BeforeEach
@@ -67,7 +69,8 @@ class ReportGeneratorTest {
             genesFilterFactory,
             variantIntervalCalculator,
             databaseSchemaManager,
-            databaseManager);
+            databaseManager,
+            reportIdGenerator);
   }
 
   @Test
@@ -185,8 +188,11 @@ class ReportGeneratorTest {
             any(), any(), any(), any(), any(), any(), any(), any(), any(), any()))
         .thenReturn(new Bytes(Files.readAllBytes(database)));
 
+    when(reportIdGenerator.generate(inputVcfPath)).thenReturn("mockValue");
+
     Report report =
         new Report(
+            "mockValue",
             Map.of("1:2-3", new Bytes(new byte[] {0})),
             null,
             Map.of(),
