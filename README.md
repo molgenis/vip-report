@@ -1,6 +1,6 @@
 [![Build Status](https://app.travis-ci.com/molgenis/vip-report.svg?branch=main)](https://app.travis-ci.com/molgenis/vip-report)
 
-#  Variant Interpretation Pipeline - VCF Report Generator
+#  Variant Interpretation Pipeline - VCF Report Generator ....
 
 Command-line application to generate a report for any VCF (Variant Call Format) file based on a
 report template.
