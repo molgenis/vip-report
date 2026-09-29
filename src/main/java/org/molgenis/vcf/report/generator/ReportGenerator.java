@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static org.molgenis.vcf.report.utils.PathUtils.getDatabaseLocation;
 import static org.molgenis.vcf.utils.sample.mapper.PedToSamplesMapper.mapPedFileToPersons;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import htsjdk.variant.vcf.*;
 import java.io.BufferedReader;
@@ -196,7 +197,8 @@ public class ReportGenerator {
     Map<?, ?> jsonObject;
     if (jsonPath != null) {
       try {
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper =
+            new ObjectMapper().enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS);
         jsonObject = mapper.readValue(jsonPath.toFile(), Map.class);
       } catch (IOException e) {
         throw new UncheckedIOException(e);
