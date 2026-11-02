@@ -171,7 +171,7 @@ public class AppCommandLineToSettingsMapper {
 
   private Path getWasmPath() {
     Path sqlWasmPath;
-    try (InputStream is = getClass().getClassLoader().getResourceAsStream("sql-wasm-1.13.wasm")) {
+    try (InputStream is = getClass().getClassLoader().getResourceAsStream("sql-wasm-1.15.wasm")) {
       if (is == null) throw new FileNotFoundException("Wasm file not found");
 
       sqlWasmPath = Files.createTempFile("sql-wasm-", ".wasm");
